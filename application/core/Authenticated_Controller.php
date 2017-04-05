@@ -34,5 +34,7 @@ class Authenticated_Controller extends Base_Controller
 
         $this->form_validation->CI =& $this;
         $this->form_validation->set_error_delimiters('', '');
+		// BaoDG: set theme
+		Template::set_theme('meeting_bullet', 'default');
     }
 }
