@@ -2,32 +2,32 @@
 
 class User_model extends BF_Model
 {
-    protected $table_name	= 'users';
+	protected $table_name	= 'users';
 	protected $key			= 'user_id';
 	protected $date_format	= 'datetime';
 
-	protected $log_user 	= false;
+	protected $log_user	= false;
 	protected $set_created	= true;
 	protected $set_modified = false;
 	protected $soft_deletes	= true;
 
-	protected $created_field     = 'created_on';
-    protected $deleted_field     = 'deleted';
+	protected $created_field	 = 'created_on';
+	protected $deleted_field	 = 'deleted';
 
 	// Customize the operations of the model without recreating the insert,
-    // update, etc. methods by adding the method names to act as callbacks here.
-	protected $before_insert 	= array();
-	protected $after_insert 	= array();
-	protected $before_update 	= array();
-	protected $after_update 	= array();
-	protected $before_find 	    = array();
-	protected $after_find 		= array();
-	protected $before_delete 	= array();
-	protected $after_delete 	= array();
+	// update, etc. methods by adding the method names to act as callbacks here.
+	protected $before_insert	= array();
+	protected $after_insert	= array();
+	protected $before_update	= array();
+	protected $after_update	= array();
+	protected $before_find		= array();
+	protected $after_find		= array();
+	protected $before_delete	= array();
+	protected $after_delete	= array();
 
 	// For performance reasons, you may require your model to NOT return the id
 	// of the last inserted row as it is a bit of a slow method. This is
-    // primarily helpful when running big loops over data.
+	// primarily helpful when running big loops over data.
 	protected $return_insert_id = true;
 
 	// The default type for returned row data.
@@ -40,7 +40,7 @@ class User_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	protected $validation_rules 		= array(
+	protected $validation_rules		= array(
 		array(
 			'field' => 'email',
 			'label' => 'lang:members_field_email',
@@ -126,17 +126,22 @@ class User_model extends BF_Model
 			'label' => 'lang:members_field_skype',
 			'rules' => 'max_length[255]',
 		),
+		array(
+			'field' => 'google_id_token',
+			'label' => 'lang:members_field_skype',
+			'rules' => 'max_length[2048]',
+		)
 	);
 	protected $insert_validation_rules  = array();
-	protected $skip_validation 			= false;
+	protected $skip_validation			= true;
 
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+	/**
+	 * Constructor
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+	}
 }

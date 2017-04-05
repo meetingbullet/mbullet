@@ -48,7 +48,8 @@
 
 		<div class="control-group">
 			<div class="controls">
-				<input class="btn btn-large btn-primary" type="submit" name="log-me-in" id="submit" value="<?php e(lang('us_let_me_in')); ?>" tabindex="5" />
+				<input class="btn btn-primary" type="submit" name="log-me-in" id="submit" value="<?php e(lang('us_let_me_in')); ?>" tabindex="5" />
+				<?php echo $signin_button ?>
 			</div>
 		</div>
 	<?php echo form_close(); ?>

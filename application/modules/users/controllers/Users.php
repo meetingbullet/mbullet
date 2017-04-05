@@ -63,11 +63,16 @@ class Users extends Front_Controller
      */
     public function login()
     {
+		//if logged in via google
+		if (! empty($_GET['login_via_google'])) {
+			$this->login_via_google($_GET);
+		}
         // If the user is already logged in, go home.
         if ($this->auth->is_logged_in() !== false) {
             Template::redirect('/');
         }
-
+		//load google api config file
+		$this->config->load('google_api');
         // Try to login.
         if (isset($_POST['log-me-in'])
             && true === $this->auth->login(
@@ -103,10 +108,84 @@ class Users extends Front_Controller
             Template::redirect('/');
         }
 
-        // Prompt the user to login.
+		// Set up login using google account
+		Assets::add_css('font-awesome/css/font-awesome.min.css');
+		Assets::add_module_js('users', 'google_api.js');
+		// Assets::add_js($this->load->view('google_api_js.php', null, true), 'inline');
+		Assets::add_module_js('users', 'users.js');
+		Template::set('use_google_api', true);
+		Template::set('client_id', $this->config->item('client_id'));
+		Template::set('signin_button', "<div class=\"g-signin2\" data-onsuccess=\"onSignIn\"></div>");
+		// Prompt the user to login.
         Template::set('page_title', 'Login');
         Template::render('login');
     }
+
+	public function login_via_google($google_data = null)
+	{
+		if (! $google_data['gg_token']) {
+			echo json_encode([
+				'status' => 'fail',
+				'reason' => 1
+			]); exit;
+		}
+
+		$token = $google_data['gg_token'];
+		if (! empty($this->config->item('client_id'))) {
+			$this->config->load('google_api');
+		}
+		
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $this->config->item('tokeninfo_endpoint') . '?id_token=' . $token);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$result = curl_exec($ch);
+		curl_close($ch);
+		echo $result; exit;
+
+		$user = $this->user_model->find_by('email', $email);
+		if (! $user) {
+			$added = $this->user_model->insert([
+				'email' => $email,
+				'google_id_token' => $token
+			]);
+
+			if (! $add) {
+				echo json_encode([
+					'status' => 'fail',
+					'reason' => 3
+				]); exit;
+			}
+		} else {
+			$updated = $this->user_model->update($user->user_id, [
+				'google_id_token' => $token
+			]);
+
+			if (! $updated) {
+				echo json_encode([
+					'status' => 'fail',
+					'reason' => 4
+				]); exit;
+			}
+		}
+
+		if (! class_exists('Auth')) {
+			$this->load->library('users/Auth');
+		}
+
+		$logged = $this->auth->login($email, null, false, true, $token);
+		if (! $logged) {
+			echo json_encode([
+				'status' => 'fail',
+				'reason' => 5
+			]); exit;
+		}
+
+		echo json_encode([
+			'status' => 'success',
+			'redirect' => base_url(),
+			'logged' => $logged
+		]); exit;
+	}
 
     /**
      * Log out, destroy the session, and cleanup, then redirect to the home page.
@@ -252,8 +331,8 @@ class Users extends Front_Controller
             );
         }
 
-        // Generate password hint messages.
-        $this->user_model->password_hints();
+        // // Generate password hint messages.
+        // $this->user_model->password_hints();
 
         Template::set_view('users/register');
         Template::set('languages', unserialize($this->settings_lib->item('site.languages')));
@@ -551,7 +630,6 @@ class Users extends Front_Controller
             $usernameRequired = 'required|';
         }
 
-        $this->form_validation->set_rules('username', 'lang:bf_username', "{$usernameRequired}trim|max_length[30]|unique[users.username{$extraUniqueRule}]");
         $this->form_validation->set_rules('email', 'lang:bf_email', "required|trim|valid_email|max_length[254]|unique[users.email{$extraUniqueRule}]");
 
         // If a value has been entered for the password, pass_confirm is required.

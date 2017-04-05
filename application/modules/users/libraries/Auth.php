@@ -91,9 +91,14 @@ class Auth
 	 *
 	 * @return boolean True if the user has authenticated, else false.
 	 */
-	public function login($login, $password, $remember = false)
+	public function login($login, $password, $remember = false, $via_google = false, $google_token = null)
 	{
-		if (empty($login) || empty($password)) {
+		if ($via_google !== false && (empty($login) || empty($google_token))) {
+			Template::set_message(lang('us_fields_required'), 'error');
+			return false;
+		}
+
+		if ($via_google === false && (empty($login) || empty($password))) {
 			Template::set_message(lang('us_fields_required'), 'error');
 			return false;
 		}
@@ -142,37 +147,39 @@ class Auth
 			return false;
 		}
 
-		// Try password
-		if (! $this->check_password($password, $user->password_hash)) {
-			// Bad password
-			Template::set_message(lang('us_bad_email_pass'), 'error');
-			$this->increase_login_attempts($login, 'us_bad_email_pass');
+		if ($via_google === false) {
+			// Try password
+			if (! $this->check_password($password, $user->password_hash)) {
+				// Bad password
+				Template::set_message(lang('us_bad_email_pass'), 'error');
+				$this->increase_login_attempts($login, 'us_bad_email_pass');
 
-			return false;
-		}
-
-		// Check whether the user needs to reset their password.
-		if ($user->force_password_reset == 1) {
-			Template::set_message(lang('us_forced_password_reset_note'), 'warning');
-
-			// Generate a reset hash to pass the reset_password checks...
-			if (! function_exists('random_string')) {
-				$this->ci->load->helper('string');
+				return false;
 			}
-			$hash = sha1(random_string('alnum', 40) . $user->email);
 
-			// Save the hash to the db so it can be confirmed later.
-			$this->ci->user_model->update_where(
-				'user_id',
-				$user->user_id,
-				array('reset_hash' => $hash, 'reset_by' => strtotime("+24 hours"))
-			);
+			// Check whether the user needs to reset their password.
+			if ($user->force_password_reset == 1) {
+				Template::set_message(lang('us_forced_password_reset_note'), 'warning');
 
-			$this->ci->session->set_userdata('pass_check', $hash);
-			$this->ci->session->set_userdata('email', $user->email);
+				// Generate a reset hash to pass the reset_password checks...
+				if (! function_exists('random_string')) {
+					$this->ci->load->helper('string');
+				}
+				$hash = sha1(random_string('alnum', 40) . $user->email);
 
-			// Redirect the user to the reset password page.
-			Template::redirect('users/reset_password');
+				// Save the hash to the db so it can be confirmed later.
+				$this->ci->user_model->update_where(
+					'user_id',
+					$user->user_id,
+					array('reset_hash' => $hash, 'reset_by' => strtotime("+24 hours"))
+				);
+
+				$this->ci->session->set_userdata('pass_check', $hash);
+				$this->ci->session->set_userdata('email', $user->email);
+
+				// Redirect the user to the reset password page.
+				Template::redirect('users/reset_password');
+			}
 		}
 
 		$this->clear_login_attempts($login);
@@ -197,7 +204,8 @@ class Auth
 			$user->email,
 			$user->role_ids,
 			$remember,
-			''
+			'',
+			$google_token
 		);
 
 			// Save the login info
@@ -268,7 +276,7 @@ class Auth
 		}
 
 		// Ensure user_token is still equivalent to SHA1 of the user_id and password_hash.
-		if (sha1($this->ci->session->userdata('user_id') . $user->password_hash)
+		if (sha1($this->ci->session->userdata('user_id') . $user->password_hash . $user->google_id_token)
 			!== $this->ci->session->userdata('user_token')
 		) {
 			return false;
@@ -633,7 +641,7 @@ class Auth
 	 *
 	 * @return boolean True/false on success/failure.
 	 */
-	private function setupSession($userId, $hash, $email, $roleIds, $remember = false, $oldToken = null)
+	private function setupSession($userId, $hash, $email, $roleIds, $remember = false, $oldToken = null, $google_token = null)
 	{
 		$login = $email;
 
@@ -642,7 +650,7 @@ class Auth
 			array(
 				'user_id'	 => $userId,
 				'auth_custom' => $login,
-				'user_token'  => sha1($userId . $hash),
+				'user_token'  => sha1($userId . $hash . $google_token),
 				'identity'	=> $login,
 				'role_ids'	 => $roleIds,
 				'logged_in'   => true,
