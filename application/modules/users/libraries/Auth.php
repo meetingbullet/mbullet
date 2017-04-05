@@ -326,21 +326,29 @@ class Auth
 			$org_id = $user->org_id;
 		}
 
-		// If no role is provided, assume it's for the current logged in user.
+		$this->ci->db->select('count(*) as count')->from('user_to_organizations uto')
+					->join('role_to_permissions rtp', 'uto.role_id = rtp.role_id', 'inner')
+					->join('permissions p', 'p.permission_id = rtp.permission_id', 'inner');
+		// If no role is provided, assume it's for the current logged in user based on org_id.
 		if (empty($role_id)) {
 			$role_ids = $user->role_ids;
 			if (isset($role_ids[$org_id])) {
 				$role_id = $role_ids[$org_id];
+
+				$this->ci->db->where('uto.role_id', $role_id);
 			} else {
-				return false;
+				$user_id = $user->user_id;
+
+				$this->ci->db->where('uto.user_id', $user_id)
+							->where('uto.organization_id', $org_id);
 			}
+		} else {
+			$this->ci->db->where('uto.role_id', $role_id);
 		}
 
-		$isset_permissions = $this->ci->db->select('count(*) as count')
-									->from('user_to_organizations uto')
-									->join('role_to_permissions rtp', 'uto.role_id = rtp.role_id AND uto.role_id = "' . $role_id . '"', 'left')
-									->join('permissions p', 'p.permission_id = rtp.permission_id AND key = \'' . $permission . '\' AND status = \'active\'', 'left')
-									->get()->row()->count > 0 ? true : false;
+		$isset_permissions = $this->ci->db->where('p.key', $permission)
+										->where('p.status', 'active')
+										->get()->row()->count > 0 ? true : false;
 
 		// Does the user/role have the permission?
 		if ($isset_permissions) {
