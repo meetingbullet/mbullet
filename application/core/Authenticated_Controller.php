@@ -29,12 +29,11 @@ class Authenticated_Controller extends Base_Controller
         $this->autoload['libraries'][] = 'Template';
         $this->autoload['libraries'][] = 'Assets';
         $this->autoload['libraries'][] = 'form_validation';
+        $this->autoload['libraries'][] = 'front_contexts';
 
         parent::__construct();
 
         $this->form_validation->CI =& $this;
         $this->form_validation->set_error_delimiters('', '');
-		// BaoDG: set theme
-		Template::set_theme('meeting_bullet', 'default');
     }
 }
