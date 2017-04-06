@@ -28,7 +28,7 @@ $lang['us_account_deleted']			= 'Unfortunately your account has been deleted. It
 $lang['us_bad_email_pass']			= 'Incorrect email or password.';
 $lang['us_must_login']				= 'You must be logged in to view that page.';
 $lang['us_no_permission']			= 'You do not have permission to access that page.';
-$lang['us_fields_required']         = '%s and Password fields must be filled out.';
+$lang['us_fields_required']         = 'Email Address and Password fields must be filled out.';
 
 $lang['us_access_logs']				= 'Access Logs';
 $lang['us_logged_in_on']			= '<b>%s</b> logged in on %s';
@@ -98,6 +98,7 @@ $lang['us_remember_note']			= 'Remember me';
 $lang['us_sign_up']					= 'Create An Account';
 $lang['us_forgot_your_password']	= 'Forgot Your Password?';
 $lang['us_let_me_in']				= 'Sign In';
+$lang['us_create_profile'] = 'Create Profile';
 
 $lang['us_password_mins']			= 'Minimum 8 characters.';
 $lang['us_register']				= 'Register';
@@ -211,3 +212,16 @@ $lang['us_no_account']              = 'No account?';
 $lang['us_force_password_reset']    = 'Force password reset on next login';
 
 $lang['users_act_invalid_login_attempt'] = 'Invalid login attempt from IP %s for user %s, reason: %s';
+
+// Register form
+$lang['us_reg_email'] = 'Email Address';
+$lang['us_reg_firstname'] = 'First Name';
+$lang['us_reg_lastname'] = 'Last Name';
+$lang['us_reg_skype'] = 'Skype';
+$lang['us_reg_avatar'] = 'Profile Picture';
+$lang['us_reg_password'] = 'Password';
+$lang['us_reg_conf_password'] = 'Confirm Password';
+$lang['us_reg_avatar'] = 'Avatar';
+$lang['us_register_failed'] = 'Register failed, Please try again!';
+// form validation
+$lang['form_validation_unique_email_check'] = 'This email address has been used by other user.';
