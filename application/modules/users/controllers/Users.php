@@ -50,6 +50,12 @@ class Users extends Front_Controller
 			Assets::add_module_js('users', 'password_strength.js');
 			Assets::add_module_js('users', 'jquery.strength.js');
 		}
+		//load google api config file
+		$this->config->load('users/google_api');
+		// Set up login using google account
+		Assets::add_module_js('users', 'google_api.js');
+		Template::set('use_google_api', true);
+		Template::set('client_id', $this->config->item('client_id'));
 	}
 
 	// -------------------------------------------------------------------------
@@ -108,10 +114,8 @@ class Users extends Front_Controller
 
 		Assets::add_css('font-awesome/css/font-awesome.min.css');
 		Assets::add_module_js('users', 'users.js');
-		Template::set('signin_button', "<div class=\"g-signin2\" data-onsuccess=\"onSignIn\"></div>");
-		// Prompt the user to login.
 		Template::set('page_title', 'Login');
-		Template::render('login');
+		Template::render('blank');
 	}
 
 	/**
@@ -265,7 +269,7 @@ class Users extends Front_Controller
 				Template::redirect('/users/profile');
 			}
 
-			Template::set_message(lang('us_profile_updated_error'), 'error');
+			Template::set_message(lang('us_profile_updated_error'), 'danger');
 		}
 
 		// Get the current user information.
@@ -301,7 +305,7 @@ class Users extends Front_Controller
 	{
 		// Are users allowed to register?
 		if (! $this->settings_lib->item('auth.allow_register')) {
-			Template::set_message(lang('us_register_disabled'), 'error');
+			Template::set_message(lang('us_register_disabled'), 'danger');
 			Template::redirect('/');
 		}
 
@@ -320,7 +324,7 @@ class Users extends Front_Controller
 
 		Template::set('languages', unserialize($this->settings_lib->item('site.languages')));
 		Template::set('page_title', 'Register');
-		Template::render();
+		Template::render('blank');
 	}
 
 	public function unique_email_check($email) {
@@ -336,7 +340,7 @@ class Users extends Front_Controller
 	{
 		// Are users allowed to register?
 		if (! $this->settings_lib->item('auth.allow_register')) {
-			Template::set_message(lang('us_register_disabled'), 'error');
+			Template::set_message(lang('us_register_disabled'), 'danger');
 			Template::redirect('/');
 		}
 
@@ -365,22 +369,76 @@ class Users extends Front_Controller
 					
 					$added = $this->user_model->insert($data);
 					if (! $added) {
-						Template::set_message(lang('us_register_failed'), 'error');
+						Template::set_message(lang('us_register_failed'), 'danger');
 						@unlink($upload_config['upload_path'] . $data['avatar']);
 					}
 				} else {
-					Template::set_message($this->upload->display_errors(), 'error');
+					Template::set_message($this->upload->display_errors(), 'danger');
 				}
 			} else {
 				if (form_error('email') != '') {
-					Template::set_message(form_error('email'), 'error');
+					Template::set_message(form_error('email'), 'danger');
 					redirect(REGISTER_URL);
+					// Template::redirect('/users/create_profile?email=' . $this->input->post('email'));
 				}
 			}
 		}
 
-		Template::render();
+		Template::render('blank');
 	}
+	// public function register()
+	// {
+	// 	// Are users allowed to register?
+	// 	if (! $this->settings_lib->item('auth.allow_register')) {
+	// 		Template::set_message(lang('us_register_disabled'), 'danger');
+	// 		Template::redirect('/');
+	// 	}
+
+	// 	$register_url = $this->input->post('register_url') ?: REGISTER_URL;
+	// 	$login_url	= $this->input->post('login_url') ?: LOGIN_URL;
+
+	// 	$this->load->model('roles/role_model');
+	// 	$this->load->helper('date');
+
+	// 	$this->load->config('address');
+	// 	$this->load->helper('address');
+
+	// 	$this->load->config('user_meta');
+	// 	$meta_fields = config_item('user_meta_fields');
+	// 	Template::set('meta_fields', $meta_fields);
+
+	// 	if (isset($_POST['register'])) {
+	// 		if ($userId = $this->saveUser('insert', 0, $meta_fields)) {
+	// 			// User Activation
+	// 			$activation = $this->user_model->set_activation($userId);
+	// 			$message = $activation['message'];
+	// 			$error   = $activation['danger'];
+
+	// 			Template::set_message($message, $error ? 'danger' : 'success');
+
+	// 			log_activity($userId, lang('us_log_register'), 'users');
+	// 			Template::redirect($login_url);
+	// 		}
+
+	// 		Template::set_message(lang('us_registration_fail'), 'danger');
+	// 		// Don't redirect because validation errors will be lost.
+	// 	}
+
+	// 	if ($this->siteSettings['auth.password_show_labels'] == 1) {
+	// 		Assets::add_js(
+	// 			$this->load->view('users_js', array('settings' => $this->siteSettings), true),
+	// 			'inline'
+	// 		);
+	// 	}
+
+	// 	// // Generate password hint messages.
+	// 	// $this->user_model->password_hints();
+
+	// 	Template::set_view('users/register');
+	// 	Template::set('languages', unserialize($this->settings_lib->item('site.languages')));
+	// 	Template::set('page_title', 'Register');
+	// 	Template::render();
+	// }
 
 	// -------------------------------------------------------------------------
 	// Password Management
@@ -408,7 +466,7 @@ class Users extends Front_Controller
 				$user = $this->user_model->find_by('email', $this->input->post('email'));
 				if ($user === false) {
 					// No user found with the entered email address.
-					Template::set_message(lang('us_invalid_email'), 'error');
+					Template::set_message(lang('us_invalid_email'), 'danger');
 				} else {
 					// User exists, create a hash to confirm the reset request.
 					$this->load->helper('string');
@@ -439,7 +497,7 @@ class Users extends Front_Controller
 					if ($this->emailer->send($data)) {
 						Template::set_message(lang('us_reset_pass_message'), 'success');
 					} else {
-						Template::set_message(lang('us_reset_pass_error') . $this->emailer->error, 'error');
+						Template::set_message(lang('us_reset_pass_error') . $this->emailer->error, 'danger');
 					}
 				}
 			}
@@ -447,7 +505,7 @@ class Users extends Front_Controller
 
 		Template::set_view('users/forgot_password');
 		Template::set('page_title', 'Password Reset');
-		Template::render();
+		Template::render('blank');
 	}
 
 	/**
@@ -482,7 +540,7 @@ class Users extends Front_Controller
 
 		// If there is no code/email, then it's not a valid request.
 		if (empty($code) || empty($email)) {
-			Template::set_message(lang('us_reset_invalid_email'), 'error');
+			Template::set_message(lang('us_reset_invalid_email'), 'danger');
 			Template::redirect(LOGIN_URL);
 		}
 
@@ -508,7 +566,7 @@ class Users extends Front_Controller
 				}
 
 				if (! empty($this->user_model->error)) {
-					Template::set_message(sprintf(lang('us_reset_password_error'), $this->user_model->error), 'error');
+					Template::set_message(sprintf(lang('us_reset_password_error'), $this->user_model->error), 'danger');
 				}
 			}
 		}
@@ -525,7 +583,7 @@ class Users extends Front_Controller
 
 		// $user will be an Object if a single result was returned.
 		if (! is_object($user)) {
-			Template::set_message(lang('us_reset_invalid_email'), 'error');
+			Template::set_message(lang('us_reset_invalid_email'), 'danger');
 			Template::redirect(LOGIN_URL);
 		}
 
@@ -540,7 +598,7 @@ class Users extends Front_Controller
 		Template::set('user', $user);
 
 		Template::set_view('users/reset_password');
-		Template::render();
+		Template::render('blank');
 	}
 
 	//--------------------------------------------------------------------------
@@ -582,20 +640,17 @@ class Users extends Front_Controller
 					if ($this->emailer->send($data)) {
 						Template::set_message(lang('us_account_active'), 'success');
 					} else {
-						Template::set_message(lang('us_err_no_email'). $this->emailer->error, 'error');
+						Template::set_message(lang('us_err_no_email'). $this->emailer->error, 'danger');
 					}
 
 					Template::redirect('/');
 				}
 
 				if (! empty($this->user_model->error)) {
-					Template::set_message($this->user_model->error . '. ' . lang('us_err_activate_code'), 'error');
+					Template::set_message($this->user_model->error . '. ' . lang('us_err_activate_code'), 'danger');
 				}
 			}
 		}
-
-		Template::set_view('users/activate');
-		Template::set('page_title', 'Account Activation');
 		Template::render();
 	}
 
@@ -614,13 +669,13 @@ class Users extends Front_Controller
 				// Form validated. Does the user actually exist?
 				$user = $this->user_model->find_by('email', $_POST['email']);
 				if ($user === false) {
-					Template::set_message('Cannot find that email in our records.', 'error');
+					Template::set_message('Cannot find that email in our records.', 'danger');
 				} else {
 					$activation = $this->user_model->set_activation($user->id);
 					$message = $activation['message'];
-					$error = $activation['error'];
+					$error = $activation['danger'];
 
-					Template::set_message($message, $error ? 'error' : 'success');
+					Template::set_message($message, $error ? 'danger' : 'success');
 				}
 			}
 		}

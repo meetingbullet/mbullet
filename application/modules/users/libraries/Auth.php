@@ -94,12 +94,12 @@ class Auth
 	public function login($login, $password = null, $remember = false, $via_google = false, $google_token = null)
 	{
 		if ($via_google !== false && (empty($login) || empty($google_token))) {
-			Template::set_message(lang('us_fields_required'), 'error');
+			Template::set_message(lang('us_fields_required'), 'danger');
 			return false;
 		}
 
 		if ($via_google === false && (empty($login) || empty($password))) {
-			Template::set_message(lang('us_fields_required'), 'error');
+			Template::set_message(lang('us_fields_required'), 'danger');
 			return false;
 		}
 
@@ -126,15 +126,15 @@ class Auth
 			$google_token = $user->google_id_token;
 		}
 
-		// Check whether the email, or password doesn't exist.
+		// Check whether the username, email, or password doesn't exist.
 		if ($user == false) {
-			Template::set_message(lang('us_bad_email_pass'), 'error');
+			Template::set_message(lang('us_bad_email_pass'), 'danger');
 			return false;
 		}
 
 		// Check whether the account has been activated.
 		if ($user->active == 0) {
-			Template::set_message(lang('us_account_not_active'), 'error');
+			Template::set_message(lang('us_account_not_active'), 'danger');
 			return false;
 		}
 
@@ -146,7 +146,7 @@ class Auth
 					lang('us_account_deleted'),
 					html_escape($this->ci->settings_lib->item('site.system_email'))
 				),
-				'error'
+				'danger'
 			);
 			return false;
 		}
@@ -155,7 +155,7 @@ class Auth
 			// Try password
 			if (! $this->check_password($password, $user->password_hash)) {
 				// Bad password
-				Template::set_message(lang('us_bad_email_pass'), 'error');
+				Template::set_message(lang('us_bad_email_pass'), 'danger');
 				$this->increase_login_attempts($login, 'us_bad_email_pass');
 
 				return false;
@@ -410,7 +410,7 @@ class Auth
 	{
 		// If user isn't logged in, redirect to the login page.
 		if ($this->is_logged_in() === false) {
-			Template::set_message($this->ci->lang->line('us_must_login'), 'error');
+			Template::set_message($this->ci->lang->line('us_must_login'), 'danger');
 			Template::redirect(LOGIN_URL);
 		}
 

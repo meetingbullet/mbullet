@@ -90,7 +90,7 @@ $lang['us_edit_profile']			= 'Edit Profile';
 $lang['us_edit_note']				= 'Enter your details below and click Save.';
 
 $lang['us_reset_password']			= 'Reset Password';
-$lang['us_reset_note']				= 'Enter your email and we will send a temporary password to you.';
+$lang['us_reset_note']				= 'Enter your email and we will send a reset password link to you.';
 $lang['us_send_password']			= 'Send Password';
 
 $lang['us_login']					= 'Please sign in';
@@ -102,6 +102,7 @@ $lang['us_create_profile'] = 'Create Profile';
 
 $lang['us_password_mins']			= 'Minimum 8 characters.';
 $lang['us_register']				= 'Register';
+$lang['us_continue']				= 'Continue';
 $lang['us_already_registered']		= 'Already registered?';
 
 $lang['us_action_save']				= 'Save User';

@@ -33,12 +33,6 @@ class Front_Controller extends Base_Controller
         $this->set_current_user();
 
         Events::trigger('after_front_controller');
-		//load google api config file
-		$this->config->load('users/google_api');
-		// Set up login using google account
-		Assets::add_module_js('users', 'google_api.js');
-		Template::set('use_google_api', true);
-		Template::set('client_id', $this->config->item('client_id'));
     }//end __construct()
 
     //--------------------------------------------------------------------

@@ -189,7 +189,7 @@
                     <li><a href="#"><i class="icon-calendar-check"></i>Calendar</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a href="#"><i class="icon-lock"></i>Lock screen</a></li>
-                    <li><a href="#"><i class="icon-download-left"></i>Log out</a></li>
+                    <li><a href="<?php e(site_url() . 'logout')?>"><i class="icon-download-left"></i>Log out</a></li>
                     </ul>
                 </div>
                 </div>
@@ -376,5 +376,3 @@
                     </ul> <!-- end .AN-MAIN-NAV -->
                 </div> <!-- end .AN-SIDEBAR-NAV -->
             </div> <!-- end .AN-SIDEBAR-NAV -->
-
-            <div class="an-content-body">
