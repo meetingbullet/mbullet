@@ -216,13 +216,14 @@ $lang['users_act_invalid_login_attempt'] = 'Invalid login attempt from IP %s for
 
 // Register form
 $lang['us_reg_email'] = 'Email Address';
-$lang['us_reg_firstname'] = 'First Name';
-$lang['us_reg_lastname'] = 'Last Name';
+$lang['us_reg_first_name'] = 'First Name';
+$lang['us_reg_last_name'] = 'Last Name';
 $lang['us_reg_skype'] = 'Skype';
 $lang['us_reg_avatar'] = 'Profile Picture';
 $lang['us_reg_password'] = 'Password';
 $lang['us_reg_conf_password'] = 'Confirm Password';
 $lang['us_reg_avatar'] = 'Avatar';
 $lang['us_register_failed'] = 'Register failed, Please try again!';
+$lang['us_register_success'] = 'Register successfully, Please check your email and input the verify code.';
 // form validation
 $lang['form_validation_unique_email_check'] = 'This email address has been used by other user.';

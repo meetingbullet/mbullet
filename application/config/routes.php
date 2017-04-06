@@ -67,6 +67,7 @@ Route::any('reset_password/(:any)/(:any)', 'users/reset_password/$1/$2');
 // Activation
 Route::any('activate', 'users/activate');
 Route::any('activate/(:any)', 'users/activate/$1');
+Route::any('activate/(:any)/(:any)', 'users/activate/$1/$2');
 Route::any('resend_activation', 'users/resend_activation');
 
 // Contexts

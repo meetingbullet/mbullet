@@ -326,16 +326,12 @@ class Users extends Front_Controller
 		Template::set('page_title', 'Register');
 		Template::render('blank');
 	}
-
-	public function unique_email_check($email) {
-		dump($email);die;
-		if ($this->db->select('count(*) as count')->where('email', $email)->get('users')->row()->count > 0) {
-			return false;
-		}
-
-		return true;
-	}
-
+	/**
+	 * Display the create profile form for the user and manage the registration process.
+	 *
+	 *
+	 * @return void
+	 */
 	public function create_profile()
 	{
 		// Are users allowed to register?
@@ -358,19 +354,35 @@ class Users extends Front_Controller
 			if ($this->form_validation->run() !== false) {
 				if ($this->upload->do_upload('avatar')) {
 					$avatar = $this->upload->data();
-					$data = [
-						'avatar' => $avatar['file_name'],
-						'first_name' => $this->input->post('first_name'),
-						'last_name' => $this->input->post('last_name'),
-						'email' => $this->input->post('email'),
-						'skype' => $this->input->post('skype'),
-						'password' => $this->input->post('password'),
-					];
-					
-					$added = $this->user_model->insert($data);
-					if (! $added) {
+
+					$password = $this->auth->hash_password($this->input->post('password'));
+					if (empty($password) || empty($password['hash'])) {
 						Template::set_message(lang('us_register_failed'), 'danger');
 						@unlink($upload_config['upload_path'] . $data['avatar']);
+					} else {
+						$data = [
+							'avatar' => $avatar['file_name'],
+							'first_name' => $this->input->post('first_name'),
+							'last_name' => $this->input->post('last_name'),
+							'email' => $this->input->post('email'),
+							'skype' => $this->input->post('skype'),
+							'password_hash' => $password['hash'],
+						];
+
+						$added = $this->user_model->insert($data);
+						if (! $added) {
+							Template::set_message(lang('us_register_failed'), 'danger');
+							@unlink($upload_config['upload_path'] . $data['avatar']);
+						} else {
+							$user_id = $added;
+							$activation = $this->user_model->set_activation($user_id);
+
+							$message = $activation['message'];
+							$error = $activation['error'];
+
+							Template::set_message($message, $error === true ? 'danger' : 'success');
+							log_activity($user_id, lang('us_log_register'), 'users');
+						}
 					}
 				} else {
 					Template::set_message($this->upload->display_errors(), 'danger');
@@ -384,7 +396,7 @@ class Users extends Front_Controller
 			}
 		}
 
-		Template::render('blank');
+		Template::render();
 	}
 	// public function register()
 	// {
@@ -615,41 +627,49 @@ class Users extends Front_Controller
 	 *
 	 * @return void
 	 */
-	public function activate($user_id = null)
+	public function activate($user_id = null, $code = null)
 	{
-		if (isset($_POST['activate'])) {
-			$this->form_validation->set_rules('code', 'Verification Code', 'required|trim');
-			if ($this->form_validation->run()) {
-				$code = $this->input->post('code');
-				$activated = $this->user_model->activate($user_id, $code);
-				if ($activated) {
-					$user_id = $activated;
+		$activated = $this->user_model->activate($user_id, $code);
+		if (! $activated) {
+			Template::set_message($this->user_model->error . '. ' . lang('us_err_activate_code'), 'danger');
 
-					// Now send the email.
-					$this->load->library('emailer/emailer');
-					$email_message_data = array(
-						'title' => $this->settings_lib->item('site.title'),
-						'link'  => site_url(LOGIN_URL),
-					);
-					$data = array(
-						'to'	  => $this->user_model->find($user_id)->email,
-						'subject' => lang('us_account_active'),
-						'message' => $this->load->view('_emails/activated', $email_message_data, true),
-					);
+			if (isset($_POST['activate'])) {
+				$this->form_validation->set_rules('code', 'Verification Code', 'required|trim');
+				if ($this->form_validation->run()) {
+					$code = $this->input->post('code');
+					$activated = $this->user_model->activate($user_id, $code);
+					if ($activated) {
+						$user_id = $activated;
 
-					if ($this->emailer->send($data)) {
-						Template::set_message(lang('us_account_active'), 'success');
+						// Now send the email.
+						$this->load->library('emailer/emailer');
+						$email_message_data = array(
+							'title' => $this->settings_lib->item('site.title'),
+							'link'  => site_url(LOGIN_URL),
+						);
+						$data = array(
+							'to'	  => $this->user_model->find($user_id)->email,
+							'subject' => lang('us_account_active'),
+							'message' => $this->load->view('_emails/activated', $email_message_data, true),
+						);
+
+						if ($this->emailer->send($data)) {
+							Template::set_message(lang('us_account_active'), 'success');
+						} else {
+							Template::set_message(lang('us_err_no_email'). $this->emailer->error, 'danger');
+						}
+
+						// Template::redirect('/');
 					} else {
-						Template::set_message(lang('us_err_no_email'). $this->emailer->error, 'danger');
+						if (! empty($this->user_model->error)) {
+							Template::set_message($this->user_model->error . '. ' . lang('us_err_activate_code'), 'danger');
+						}
 					}
-
-					Template::redirect('/');
-				}
-
-				if (! empty($this->user_model->error)) {
-					Template::set_message($this->user_model->error . '. ' . lang('us_err_activate_code'), 'danger');
 				}
 			}
+		} else {
+			Template::set_message(lang('us_account_active'), 'success');
+			// Template::redirect('/');
 		}
 		Template::render();
 	}

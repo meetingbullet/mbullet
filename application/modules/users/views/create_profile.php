@@ -23,13 +23,13 @@
                     </div>
 					<div class="control-group">
                         <div class="controls">
-							<label><?php echo lang('us_reg_firstname') ?></label>
+							<label><?php echo lang('us_reg_first_name') ?></label>
                             <input type="text" name="first_name" value="<?php echo set_value('first_name', isset($_POST['first_name']) ? $_POST['first_name'] : '') ?>"/>
                         </div>
                     </div>
 					<div class="control-group">
                         <div class="controls">
-							<label><?php echo lang('us_reg_lastname') ?></label>
+							<label><?php echo lang('us_reg_last_name') ?></label>
                             <input type="text" name="last_name" value="<?php echo set_value('last_name', isset($_POST['last_name']) ? $_POST['last_name'] : '') ?>"/>
                         </div>
                     </div>
