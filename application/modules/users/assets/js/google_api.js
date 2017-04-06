@@ -12,7 +12,7 @@ function onSignIn(googleUser) {
 	var id_token = googleUser.getAuthResponse().id_token;
 	var email = profile.getEmail();
 	// console.log("ID Token: " + id_token);
-	
+
 	$.get(
 		location.href,
 		{
@@ -20,10 +20,9 @@ function onSignIn(googleUser) {
 			'gg_token': id_token
 		}
 	).done(function(data) {
-		// data = JSON.parse(data);
-		// if (data.status == 'success') {
-		// 	location.href = data.redirect;
-		// }
-		console.log(data);
-	})
+		data = JSON.parse(data);
+		if (data.status == 'success') {
+			location.href = data.redirect;
+		}
+	});
 };

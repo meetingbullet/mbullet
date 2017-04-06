@@ -121,7 +121,7 @@ class Users extends Front_Controller
         Template::render('login');
     }
 
-	public function login_via_google($google_data = null)
+	private function login_via_google($google_data = null)
 	{
 		if (! $google_data['gg_token']) {
 			echo json_encode([
@@ -131,16 +131,25 @@ class Users extends Front_Controller
 		}
 
 		$token = $google_data['gg_token'];
-		if (! empty($this->config->item('client_id'))) {
+		if (empty($this->config->item('tokeninfo_endpoint'))) {
 			$this->config->load('google_api');
 		}
-		
+
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $this->config->item('tokeninfo_endpoint') . '?id_token=' . $token);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		$result = curl_exec($ch);
 		curl_close($ch);
-		echo $result; exit;
+
+		$result = json_decode($result);
+		if (isset($result->error_description)) {
+			echo json_encode([
+				'status' => 'fail',
+				'reason' => 2
+			]); exit;
+		}
+
+		$email = $result->email;
 
 		$user = $this->user_model->find_by('email', $email);
 		if (! $user) {
@@ -182,8 +191,7 @@ class Users extends Front_Controller
 
 		echo json_encode([
 			'status' => 'success',
-			'redirect' => base_url(),
-			'logged' => $logged
+			'redirect' => base_url()
 		]); exit;
 	}
 
