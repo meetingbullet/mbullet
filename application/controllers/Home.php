@@ -27,7 +27,7 @@
  * @link       http://guides.cibonfire.com/helpers/file_helpers.html
  *
  */
-class Home extends MX_Controller
+class Home extends Authenticated_Controller
 {
 	public function __construct()
 	{
