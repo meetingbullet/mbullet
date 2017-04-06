@@ -91,7 +91,7 @@ class Auth
 	 *
 	 * @return boolean True if the user has authenticated, else false.
 	 */
-	public function login($login, $password, $remember = false, $via_google = false, $google_token = null)
+	public function login($login, $password = null, $remember = false, $via_google = false, $google_token = null)
 	{
 		if ($via_google !== false && (empty($login) || empty($google_token))) {
 			Template::set_message(lang('us_fields_required'), 'error');
@@ -114,13 +114,18 @@ class Auth
 			'active',
 			'skype',
 			'password_hash',
-			'force_password_reset'
+			'force_password_reset',
+			'google_id_token'
 		);
 
 		$user = $this->ci->user_model->select($selects)->find_by(
 				'email',
 				$login
 			);
+
+		if (empty($google_token)) {
+			$google_token = $user->google_id_token;
+		}
 
 		// Check whether the username, email, or password doesn't exist.
 		if ($user == false) {
@@ -365,6 +370,26 @@ class Auth
 
 		return false;
 	}
+
+	/**
+     * Check whether a permission is in the system.
+     *
+     * @param string $permission The case-insensitive name of the permission to check.
+     *
+     * @return boolean True if the permission was found, else false.
+     */
+    public function permission_exists($permission)
+    {
+        // Move permission to lowercase for easier checking.
+        $permission = strtolower($permission);
+
+		$permission_exist = $this->db->count('count(*) as count')
+									->where('key', $permission)
+									->get('permissions')
+									->row()->count > 0 ? true : false;
+		
+		return $permission_exists;
+    }
 
 	/**
 	 * Check whether a user is logged in (and, optionally of the correct role) and,
@@ -695,7 +720,7 @@ class Auth
 
 		// Grab the current user info for the session.
 		$this->ci->load->model('users/user_model');
-		$user = $this->ci->user_model->select(array('user_id', 'username', 'email', 'password_hash'))
+		$user = $this->ci->user_model->select(array('user_id', 'username', 'email', 'password_hash', 'google_id_token'))
 									 ->find($cookie->userId);
 
 		// If no user was found, the session can't be created properly.
@@ -722,7 +747,8 @@ class Auth
 			$user->email,
 			$user->role_ids,
 			true,
-			$cookie->token
+			$cookie->token,
+			$user->google_id_token
 		);
 	}
 
@@ -908,4 +934,37 @@ class Auth
 		$this->allowRemember = (bool) $this->ci->settings_lib->item('auth.allow_remember');
 		return $this->allowRemember;
 	}
+}
+
+//------------------------------------------------------------------------------
+// Helper Functions
+//------------------------------------------------------------------------------
+
+if (! function_exists('has_permission')) {
+    /**
+     * A convenient shorthand for checking user permissions.
+     *
+     * @param string  $permission The permission to check for, ie 'Site.Signin.Allow'.
+     *
+     * @return boolean True if the user has the permission or $override is true
+     * and the permission wasn't found in the system, else false.
+     */
+    function has_permission($permission, $role_id = null, $org_id = null)
+    {
+        return get_instance()->auth->has_permission($permission, $role_id, $org_id);
+    }
+}
+
+if (! function_exists('permission_exists')) {
+    /**
+     * Check to see whether a permission is in the system.
+     *
+     * @param string $permission Case-insensitive permission to check.
+     *
+     * @return boolean True if the permission exists, else false.
+     */
+    function permission_exists($permission)
+    {
+        return get_instance()->auth->permission_exists($permission);
+    }
 }
