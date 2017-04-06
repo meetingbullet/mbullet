@@ -322,25 +322,25 @@
 
                     <li class="an-nav-item">
                         <a class=" js-show-child-nav" href="#">
-                        <i class="icon-book"></i>
-                        <span class="nav-title">App page
-                            <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-                        </span>
+							<i class="icon-book"></i>
+							<span class="nav-title">App page
+								<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
+							</span>
                         </a>
                         <ul class="an-child-nav js-open-nav">
-                        <li><a href="page-chats.html">Chat Layout</a></li>
-                        <li><a href="page-profile.html">Profile Page</a></li>
-                        <li><a href="page-profile-setting.html">Profile Setting</a></li>
-                        <li><a href="page-login.html">Login Form</a></li>
-                        <li><a href="page-signup.html">Register Form</a></li>
-                        <li><a href="page-contact-us.html">Contact Us</a></li>
-                        <li><a href="page-about-us.html">About Us</a></li>
-                        <li><a href="page-pricing.html">Pricing Table</a></li>
-                        <li><a href="page-portfolio.html">Portfolio</a></li>
-                        <li><a href="page-blog.html">Blog List</a></li>
-                        <li><a href="page-blog-post.html">Blog Post </a></li>
-                        <li><a href="page-construction.html">Comming soon</a></li>
-                        <li><a href="page-404.html">404 Page</a></li>
+							<li><a href="page-chats.html">Chat Layout</a></li>
+							<li><a href="page-profile.html">Profile Page</a></li>
+							<li><a href="page-profile-setting.html">Profile Setting</a></li>
+							<li><a href="page-login.html">Login Form</a></li>
+							<li><a href="page-signup.html">Register Form</a></li>
+							<li><a href="page-contact-us.html">Contact Us</a></li>
+							<li><a href="page-about-us.html">About Us</a></li>
+							<li><a href="page-pricing.html">Pricing Table</a></li>
+							<li><a href="page-portfolio.html">Portfolio</a></li>
+							<li><a href="page-blog.html">Blog List</a></li>
+							<li><a href="page-blog-post.html">Blog Post </a></li>
+							<li><a href="page-construction.html">Comming soon</a></li>
+							<li><a href="page-404.html">404 Page</a></li>
                         </ul>
                     </li>
 
@@ -374,7 +374,9 @@
                         </ul>
                     </li>
                     </ul> <!-- end .AN-MAIN-NAV -->
+					<?php echo Contexts::render_menu('both', 'normal'); ?>
                 </div> <!-- end .AN-SIDEBAR-NAV -->
             </div> <!-- end .AN-SIDEBAR-NAV -->
 
             <div class="an-content-body">
+

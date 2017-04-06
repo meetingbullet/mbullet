@@ -13,27 +13,30 @@
  */
 class Authenticated_Controller extends Base_Controller
 {
+	protected $require_authentication = true;
 
-    protected $require_authentication = true;
+	//--------------------------------------------------------------------------
 
-    //--------------------------------------------------------------------------
+	/**
+	 * Class constructor setup login restriction and load various libraries
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		$this->autoload['helpers'][]   = 'form';
+		$this->autoload['libraries'][] = 'Template';
+		$this->autoload['libraries'][] = 'Assets';
+		$this->autoload['libraries'][] = 'form_validation';
+		$this->autoload['libraries'][] = 'contexts';
+		$this->autoload['libraries'][] = 'users/auth';
 
-    /**
-     * Class constructor setup login restriction and load various libraries
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->autoload['helpers'][]   = 'form';
-        $this->autoload['libraries'][] = 'Template';
-        $this->autoload['libraries'][] = 'Assets';
-        $this->autoload['libraries'][] = 'form_validation';
-        $this->autoload['libraries'][] = 'contexts';
+		parent::__construct();
 
-        parent::__construct();
+		$this->form_validation->CI =& $this;
+		$this->form_validation->set_error_delimiters('', '');
 
-        $this->form_validation->CI =& $this;
-        $this->form_validation->set_error_delimiters('', '');
-    }
+		// Basic setup
+		Template::set_theme('user', 'junk');
+	}
 }

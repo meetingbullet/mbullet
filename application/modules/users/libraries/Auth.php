@@ -300,7 +300,15 @@ class Auth
 			}
 		}
 
-		$user->org_id = $this->ci->session->userdata('org_id') ? $this->ci->session->userdata('org_id') : 0;
+		$user->current_organization_id = null;
+		if (isset($_SESSION['organization_url'])) {
+			$org = $this->ci->db->select('organization_id')
+								->where('url', $_SESSION['organization_url'])
+								->get('organizations')->row();
+			if (isset($org)) {
+				$user->current_organization_id = $org->organization_id;
+			}
+		}
 
 		$this->user = $user;
 		$this->user->user_id = (int) $this->user->user_id;
@@ -322,38 +330,38 @@ class Auth
 	 * @return boolean True if the user/role has permission or the permission was
 	 * not found in the database and $override is true, else false.
 	 */
-	public function has_permission($permission, $role_id = null, $org_id = null)
+	public function has_permission($permission, $role_id = null, $organization_id = null)
 	{
 		// Move permission to lowercase for easier checking.
 		$permission = strtolower($permission);
 
-		if (empty($role_id) || empty($org_id)) {
+		if (empty($role_id) || empty($organization_id)) {
 			$user = $this->user();
 			if (!$user) {
 				return false;
 			}
 		}
 
-		// if empty $org_id, get organization id by user session
-		if (empty($org_id)) {
-			$org_id = $user->org_id;
+		// if empty $organization_id, get organization id by user session
+		if (empty($organization_id)) {
+			$organization_id = $user->current_organization_id;
 		}
 
 		$this->ci->db->select('count(*) as count')->from('user_to_organizations uto')
 					->join('role_to_permissions rtp', 'uto.role_id = rtp.role_id', 'inner')
 					->join('permissions p', 'p.permission_id = rtp.permission_id', 'inner');
-		// If no role is provided, assume it's for the current logged in user based on org_id.
+		// If no role is provided, assume it's for the current logged in user based on organization_id.
 		if (empty($role_id)) {
 			$role_ids = $user->role_ids;
-			if (isset($role_ids[$org_id])) {
-				$role_id = $role_ids[$org_id];
+			if (isset($role_ids[$organization_id])) {
+				$role_id = $role_ids[$organization_id];
 
 				$this->ci->db->where('uto.role_id', $role_id);
 			} else {
 				$user_id = $user->user_id;
 
 				$this->ci->db->where('uto.user_id', $user_id)
-							->where('uto.organization_id', $org_id);
+							->where('uto.organization_id', $organization_id);
 			}
 		} else {
 			$this->ci->db->where('uto.role_id', $role_id);
@@ -383,12 +391,12 @@ class Auth
         // Move permission to lowercase for easier checking.
         $permission = strtolower($permission);
 
-		$permission_exist = $this->db->count('count(*) as count')
+		$permission_exist = $this->ci->db->select('count(*) as count')
 									->where('key', $permission)
 									->get('permissions')
 									->row()->count > 0 ? true : false;
 		
-		return $permission_exists;
+		return $permission_exist;
     }
 
 	/**
@@ -949,9 +957,9 @@ if (! function_exists('has_permission')) {
      * @return boolean True if the user has the permission or $override is true
      * and the permission wasn't found in the system, else false.
      */
-    function has_permission($permission, $role_id = null, $org_id = null)
+    function has_permission($permission, $role_id = null, $organization_id = null)
     {
-        return get_instance()->auth->has_permission($permission, $role_id, $org_id);
+        return get_instance()->auth->has_permission($permission, $role_id, $organization_id);
     }
 }
 

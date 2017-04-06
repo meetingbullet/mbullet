@@ -49,9 +49,8 @@ $config['site.backup_folder']	= 'archives/';
 // The name of the context displayed in the UI is determined by language strings
 // as defined in application_lang.php. The string must follow the format:
 //      context_content_name
-// The icon displayed is chosen automatically from the file:
-//      theme/images/context_context_name.png
-$config['contexts'] = array('content','reports','settings','developer');
+$config['contexts'] = array('dashboard','projects','reports','team');
+$config['context_icons'] = array('chart-stock','grid','chart','group');
 
 //------------------------------------------------------------------------------
 // ACTIVITIES

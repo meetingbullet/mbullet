@@ -1,26 +1,13 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
-/**
- * Bonfire
- *
- * An open source project to allow developers to jumpstart their development of
- * CodeIgniter applications
- *
- * @package   Bonfire
- * @author    Bonfire Dev Team
- * @copyright Copyright (c) 2011 - 2015, Bonfire Dev Team
- * @license   http://opensource.org/licenses/MIT The MIT License
- * @link      http://cibonfire.com
- * @since     Version 1.0
- */
 
 /**
  * Contexts Library
  *
  * Provides helper methods for displaying Context Navigation.
  *
- * @package Bonfire\Core\Modules\UI\Libraries\Contexts
- * @author  Bonfire Dev Team
- * @link    http://cibonfire.com/docs/developer/contexts
+ * @package Core
+ * @author  DatLS
+ * @copyright Copyright (c) 2017, SGS Engineering Team
  */
 class Contexts
 {
@@ -32,24 +19,25 @@ class Contexts
     protected static $templateMenu        = "<li><a {extra}href='{url}' title='{title}'>{display}</a>\n</li>\n";
     protected static $templateSubMenu     = "<li class='{submenu_class}'><a href='{url}'>{display}</a><ul class='{child_class}'>{view}</ul></li>\n";
 
-    protected static $templateContextEnd             = "<span class='caret'></span>";
-    protected static $templateContextImage           = "<img src='{image}' alt='{title}' />";
+	protected static $templateContextContent         = "{icon}<span class='nav-title''>{title}\n{caret}</span>";
+	protected static $templateContextIcon            = "<i class='icon-{icon}'></i>";
     protected static $templateContextText            = "{title}";
-    protected static $templateContextMenuAnchorClass = 'dropdown-toggle';
+    protected static $templateContextCaret           = '<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>';
+    protected static $templateContextMenuAnchorClass = '';
     protected static $templateContextMenuExtra       = " data-toggle='dropdown' data-id='{dataId}_menu'";
     protected static $templateContextNavMobileClass  = 'mobile_nav';
 
     /** @var string The class name to attach to the outer ul tag. */
-    protected static $outer_class = 'nav';
+    protected static $outer_class = 'an-main-nav';
 
     /** @var string The class to attach to li tags with children. */
-    protected static $parent_class = 'dropdown';
+    protected static $parent_class = 'an-nav-item';
 
     /** @var string The class to apply to li tags within ul tags inside. */
     protected static $submenu_class = 'dropdown-submenu';
 
     /** @var string The class to apply to ul tags within li tags. */
-    protected static $child_class = 'dropdown-menu';
+    protected static $child_class = 'an-child-nav js-open-nav';
 
     /** @var string The id to apply to the outer ul tag. */
     protected static $outer_id = null;
@@ -70,7 +58,7 @@ class Contexts
     protected static $menu = array();
 
     /** @var string[] Contexts which are required. */
-    protected static $requiredContexts = array('settings', 'developer');
+    protected static $requiredContexts = []; //array('settings', 'developer');
 
     /** @var string Admin area to link to or other context. */
     protected static $site_area;
@@ -214,15 +202,14 @@ class Contexts
         }
 
         $template = '';
+		self::$templateContextContent = str_replace('{title}', self::$templateContextText, self::$templateContextContent);
         if ($mode == 'text') {
-            $template = self::$templateContextText;
-        } else {
-            $template = self::$templateContextImage;
-            if ($mode == 'both') {
-                $template .= self::$templateContextText;
-            }
+            $template = str_replace('{icon}', '', self::$templateContextContent);
+        } elseif ($mode == 'both') {
+			$template = str_replace('{icon}', self::$templateContextIcon, self::$templateContextContent);
         }
-        $template .= self::$templateContextEnd;
+
+		// self::$templateContextContent = str_replace('{caret}', self::$templateContextCaret, self::$templateContextText);
 
         // Build out the navigation.
         $menu = '';
@@ -236,10 +223,10 @@ class Contexts
                 // The text/image displayed in the top-level context menu.
                 $title    = self::$ci->lang->line("bf_context_{$context}");
                 $navTitle = str_replace(
-                    array('{title}', '{image}'),
+                    array('{title}', '{icon}'),
                     array(
                         $title,
-                        $mode == 'text' ? '' : Template::theme_url("images/context_{$context}.png"),
+                        $mode == 'text' ? '' : $context,
                     ),
                     $template
                 );

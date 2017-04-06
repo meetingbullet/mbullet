@@ -57,6 +57,9 @@ class Home extends Authenticated_Controller
 		$this->load->library('users/auth');
 		$this->set_current_user();
 
+		dump($this->auth->user());
+		dump($_SESSION);
+
 		Template::render();
 	}//end index()
 
