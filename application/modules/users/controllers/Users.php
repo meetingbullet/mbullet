@@ -380,7 +380,7 @@ class Users extends Front_Controller
 							$message = $activation['message'];
 							$error = $activation['error'];
 
-							Template::set_message($message, $error ? 'danger' : 'success');
+							Template::set_message($message, $error === true ? 'danger' : 'success');
 							log_activity($user_id, lang('us_log_register'), 'users');
 						}
 					}
@@ -396,7 +396,7 @@ class Users extends Front_Controller
 			}
 		}
 
-		Template::render('blank');
+		Template::render();
 	}
 	// public function register()
 	// {
