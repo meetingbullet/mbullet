@@ -129,7 +129,7 @@ $config['template.use_mobile_themes'] = false;
 //------------------------------------------------------------------------------
 // This is the folder name that contains the default theme to use when
 // 'template.use_mobile_themes' is set to true.
-$config['template.default_theme']	= 'user/';
+$config['template.default_theme']	= 'default/';
 
 //------------------------------------------------------------------------------
 // ADMIN THEME
