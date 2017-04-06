@@ -16,8 +16,11 @@ Assets::add_js($inline, 'inline');
         echo isset($page_title) ? "{$page_title} : " : '';
         e(class_exists('Settings_lib') ? settings_item('site.title') : 'Bonfire');
     ?></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="<?php e(isset($meta_description) ? $meta_description : ''); ?>">
+    <?php if (! empty($use_google_api)) : ?>
+    <meta name="google-signin-client_id" content="<?php echo $client_id ?>">
+    <?php endif ?>
     <meta name="author" content="<?php e(isset($meta_author) ? $meta_author : ''); ?>">
 	<?php if (! empty($use_google_api)) : ?>
 		<meta name="google-signin-client_id" content="<?php echo $client_id ?>">
@@ -28,5 +31,24 @@ Assets::add_js($inline, 'inline');
     ?>
     <?php echo Assets::css(); ?>
     <link rel="shortcut icon" href="<?php echo base_url(); ?>favicon.ico">
+
+    <!-- Theme CSS -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+    <link href="<?php echo Template::theme_url("css/animate.min.css"); ?>" rel="stylesheet">
+    <link href="<?php echo Template::theme_url("css/vendor-styles.css"); ?>" rel="stylesheet">
+    <link href="<?php echo Template::theme_url("css/styles.css"); ?>" rel="stylesheet" >
+    <link href="<?php echo Template::theme_url("screen.css"); ?>" rel="stylesheet" >
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
+
 <body>
+    <div class="main-wrapper">
+        <div class="an-loader-container" style="display: none;">
+            <img src="<?php echo Template::theme_url("images/loader.png"); ?>" alt="">
+        </div>

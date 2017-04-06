@@ -35,5 +35,6 @@ class Authenticated_Controller extends Base_Controller
 
         $this->form_validation->CI =& $this;
         $this->form_validation->set_error_delimiters('', '');
+        Template::set_theme('user');
     }
 }
