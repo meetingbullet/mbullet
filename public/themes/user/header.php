@@ -31,6 +31,7 @@ Assets::add_js($inline, 'inline');
     <link href="<?php echo Template::theme_url("css/animate.min.css"); ?>" rel="stylesheet">
     <link href="<?php echo Template::theme_url("css/vendor-styles.css"); ?>" rel="stylesheet">
     <link href="<?php echo Template::theme_url("css/styles.css"); ?>" rel="stylesheet" >
+    <link href="<?php echo Template::theme_url("screen.css"); ?>" rel="stylesheet" >
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

@@ -1,8 +1,8 @@
         <header class="an-header wow fadeInDown" style="visibility: visible; animation-name: fadeInDown;">
             <div class="an-topbar-left-part">
             <h3 class="an-logo-heading">
-                <a class="an-logo-link" href="index-2.html">MEETING BULLET
-                <span>DESCRIPTION GOES HERE</span>
+                <a class="an-logo-link" href="#"><?php echo $this->settings_lib->item('site.title'); ?>
+                <span><?php echo $this->settings_lib->item('site.description'); ?></span>
                 </a>
             </h3>
             <button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">

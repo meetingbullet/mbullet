@@ -191,6 +191,7 @@ class Contexts
         // should be in place. However, it's still a good idea to make sure an array
         // of contexts was provided.
         $contexts = self::getContexts();
+        
         if (empty($contexts) || ! is_array($contexts)) {
             die(self::$ci->lang->line('bf_no_contexts'));
         }
