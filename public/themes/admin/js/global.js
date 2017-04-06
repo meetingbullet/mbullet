@@ -1,15 +1,15 @@
 /* Nofication Close Buttons */
-$('.notification a.close').click(function(e){
-	e.preventDefault();
+$('.notification a.close').click(function(e) {
+    e.preventDefault();
 
-	$(this).parent('.notification').fadeOut();
+    $(this).parent('.notification').fadeOut();
 });
 
 /*
 	Check All Feature
 */
-$(".check-all").click(function(){
-	$("table input[type=checkbox]").attr('checked', $(this).is(':checked'));
+$(".check-all").click(function() {
+    $("table input[type=checkbox]").attr('checked', $(this).is(':checked'));
 });
 
 /*

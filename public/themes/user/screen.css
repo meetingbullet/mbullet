@@ -1,0 +1,6 @@
+@media (max-width: 767px) {
+    body {
+        padding-right: 0;
+        padding-left: 0;
+    }
+}

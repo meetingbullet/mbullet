@@ -29,6 +29,7 @@ class Authenticated_Controller extends Base_Controller
         $this->autoload['libraries'][] = 'Template';
         $this->autoload['libraries'][] = 'Assets';
         $this->autoload['libraries'][] = 'form_validation';
+        $this->autoload['libraries'][] = 'contexts';
 
         parent::__construct();
 
