@@ -14,15 +14,32 @@ function onSignIn(googleUser) {
 	// console.log("ID Token: " + id_token);
 
 	$.get(
-		location.href,
-		{
+		location.href, {
 			'login_via_google': true,
 			'gg_token': id_token
 		}
-	).done(function(data) {
+	).done(function (data) {
 		data = JSON.parse(data);
 		if (data.status == 'success') {
 			location.href = data.redirect;
 		}
 	});
+};
+
+function signOut(redirect) {
+	gapi.load('auth2', function () {
+		gapi.auth2.init().then(function () {
+			var auth2 = gapi.auth2.getAuthInstance();
+			if (auth2.isSignedIn.get() == true) {
+				auth2.disconnect().then(function () {
+					console.log('User signed out.');
+					location.href = redirect;
+				});
+			} else {
+				location.href = redirect;
+			}
+		});
+	});
+
+
 };

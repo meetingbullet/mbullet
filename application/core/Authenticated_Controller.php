@@ -34,7 +34,11 @@ class Authenticated_Controller extends Base_Controller
 
         $this->form_validation->CI =& $this;
         $this->form_validation->set_error_delimiters('', '');
-		// BaoDG: set theme
-		Template::set_theme('meeting_bullet', 'default');
+		//load google api config file
+		$this->config->load('users/google_api');
+		// Set up login using google account
+		Assets::add_module_js('users', 'google_api.js');
+		Template::set('use_google_api', true);
+		Template::set('client_id', $this->config->item('client_id'));
     }
 }

@@ -43,6 +43,13 @@ class Home extends MX_Controller
         // we're not extending from a Bonfire controller
         // and it's not done for us.
         $this->requested_page = isset($_SESSION['requested_page']) ? $_SESSION['requested_page'] : null;
+
+		//load google api config file
+		$this->config->load('users/google_api');
+		// Set up login using google account
+		Assets::add_module_js('users', 'google_api.js');
+		Template::set('use_google_api', true);
+		Template::set('client_id', $this->config->item('client_id'));
 	}
 
 	//--------------------------------------------------------------------
@@ -56,7 +63,6 @@ class Home extends MX_Controller
 	{
 		$this->load->library('users/auth');
 		$this->set_current_user();
-
 		Template::render();
 	}//end index()
 

@@ -20,29 +20,16 @@ $fieldData = array(
         <?php echo validation_errors(); ?>
     </div>
     <?php endif; ?>
-    <div class="alert alert-info fade in">
-        <h4 class="alert-heading"><?php echo lang('bf_required_note'); ?></h4>
-        <?php
-        if (isset($password_hints)) {
-            echo $password_hints;
-        }
-        ?>
-    </div>
     <div class="row-fluid">
         <div class="span12">
             <?php echo form_open(site_url(REGISTER_URL), array('class' => "form-horizontal", 'autocomplete' => 'off')); ?>
                 <fieldset>
-                    <?php Template::block('user_fields', 'user_fields', $fieldData); ?>
-                </fieldset>
-                <fieldset>
-                    <?php
-                    // Allow modules to render custom fields. No payload is passed
-                    // since the user has not been created, yet.
-                    Events::trigger('render_user_form');
-                    ?>
-                    <!-- Start of User Meta -->
-                    <?php $this->load->view('users/user_meta', array('frontend_only' => true)); ?>
-                    <!-- End of User Meta -->
+                    <div class="control-group">
+                        <div class="controls">
+							<label><?php echo lang('us_reg_email') ?></label>
+                            <input type="text" name="email" value="<?php set_value('email') ?>" />
+                        </div>
+                    </div>
                 </fieldset>
                 <fieldset>
                     <div class="control-group">
