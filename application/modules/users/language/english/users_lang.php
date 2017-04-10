@@ -227,3 +227,5 @@ $lang['us_register_failed'] = 'Register failed, Please try again!';
 $lang['us_register_success'] = 'Register successfully, Please check your email and input the verify code.';
 // form validation
 $lang['form_validation_unique_email_check'] = 'This email address has been used by other user.';
+// google sign in
+$lang['us_with_google'] = 'with Google';

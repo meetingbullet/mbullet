@@ -8,9 +8,6 @@
 
 	<div id="debug"><!-- Stores the Profiler Results --></div>
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-	<?php if (! empty($use_google_api)) : ?>
-		<script src="https://apis.google.com/js/platform.js" async defer></script>
-	<?php endif ?>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="<?php echo js_path(); ?>jquery-1.12.4.min.js"><\/script>');</script>
     <?php echo Assets::js(); ?>

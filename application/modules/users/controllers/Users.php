@@ -52,10 +52,6 @@ class Users extends Front_Controller
 		}
 		//load google api config file
 		$this->config->load('users/google_api');
-		// Set up login using google account
-		Assets::add_module_js('users', 'google_api.js');
-		Template::set('use_google_api', true);
-		Template::set('client_id', $this->config->item('client_id'));
 	}
 
 	// -------------------------------------------------------------------------
@@ -69,21 +65,84 @@ class Users extends Front_Controller
 	 */
 	public function login()
 	{
-		//if logged in via google
-		if (! empty($_GET['login_via_google'])) {
-			$this->login_via_google($_GET);
-		}
 		// If the user is already logged in, go home.
 		if ($this->auth->is_logged_in() !== false) {
 			Template::redirect('/');
 		}
+		// include google client api
+		require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
+		$client_id = $this->config->item('client_id');
+		$client_secret = $this->config->item('client_secret');
+		$redirect_uri = $this->config->item('redirect_uri');
+
+		$client = new Google_Client();
+		$client->setClientId($client_id);
+		$client->setClientSecret($client_secret);
+		$client->setRedirectUri($redirect_uri);
+		$client->addScope("email");
+		$client->addScope("profile");
+
+		Template::set('auth_url', $client->createAuthUrl());
+		// if logged in via google
+		$service = new Google_Service_Oauth2($client);
+
+		if (isset($_GET['error'])) {
+			Template::set_message(lang('us_failed_login_attempts'), 'danger');
+		}
+
+		if (isset($_GET['code'])) {
+			try {
+				$client->authenticate($_GET['code']);
+				$access_token = $client->getAccessToken();
+				$google_user = $service->userinfo->get();
+
+				$user = $this->user_model->find_by('email', $google_user->email);
+				if (! $user) {
+					$added = $this->user_model->insert([
+						'email' => $google_user->email,
+						'google_id_token' => $access_token['id_token'],
+						'first_name' => $google_user->given_name,
+						'last_name' => $google_user->family_name,
+						'avatar' => $google_user->picture,
+						'active' => 1
+					]);
+
+					if (! $added) {
+						throw new Exception(lang('us_failed_login_attempts'));
+					}
+				} else {
+					$updated = $this->user_model->update($user->user_id, [
+						'google_id_token' => $access_token['id_token'],
+						'first_name' => $google_user->given_name,
+						'last_name' => $google_user->family_name,
+						'avatar' => $google_user->picture,
+						'active' => 1
+					]);
+
+					if (! $updated) {
+						throw new Exception(lang('us_failed_login_attempts'));
+					}
+				}
+			} catch (Exception $e) {
+				$google_login_error = true;
+				Template::set_message($e->getMessage(), 'danger');
+			}
+		}
 		// Try to login.
-		if (isset($_POST['log-me-in'])
+		if ((isset($_POST['log-me-in'])
 			&& true === $this->auth->login(
 				$this->input->post('login'),
 				$this->input->post('password'),
 				$this->input->post('remember_me') == '1'
-			)
+			)) || (isset($_GET['code'])
+			&& !isset($google_login_error)
+			&& true === $this->auth->login(
+				$google_user->email,
+				null,
+				false,
+				true,
+				$access_token['id_token']
+			))
 		) {
 			log_activity(
 				$this->auth->user_id(),
@@ -91,17 +150,17 @@ class Users extends Front_Controller
 				'users'
 			);
 
-			// Now redirect. (If this ever changes to render something, note that
-			// auth->login() currently doesn't attempt to fix `$this->current_user`
-			// for the current page load).
+			// // Now redirect. (If this ever changes to render something, note that
+			// // auth->login() currently doesn't attempt to fix `$this->current_user`
+			// // for the current page load).
 
-			// If the site is configured to use role-based login destinations and
-			// the login destination has been set...
-			if ($this->settings_lib->item('auth.do_login_redirect')
-				&& ! empty($this->auth->login_destination)
-			) {
-				Template::redirect($this->auth->login_destination);
-			}
+			// // If the site is configured to use role-based login destinations and
+			// // the login destination has been set...
+			// if ($this->settings_lib->item('auth.do_login_redirect')
+			// 	&& ! empty($this->auth->login_destination)
+			// ) {
+			// 	Template::redirect($this->auth->login_destination);
+			// }
 
 			// If possible, send the user to the requested page.
 			if (! empty($this->requested_page)) {
