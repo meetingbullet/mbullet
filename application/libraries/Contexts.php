@@ -20,10 +20,11 @@ class Contexts
     protected static $templateSubMenu     = "<li class='{submenu_class}'><a href='{url}'>{display}</a><ul class='{child_class}'>{view}</ul></li>\n";
 
 	protected static $templateContextContent         = "{icon}<span class='nav-title''>{title}\n{caret}</span>";
-	protected static $templateContextIcon            = "<i class='icon-{icon}'></i>";
+	protected static $templateContextIcon            = "<i class='{icon}'></i>";
     protected static $templateContextText            = "{title}";
     protected static $templateContextCaret           = '<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>';
     protected static $templateContextMenuAnchorClass = '';
+    protected static $templateContextMenuOpenClass   = 'js-show-child-nav';
     protected static $templateContextMenuExtra       = " data-toggle='dropdown' data-id='{dataId}_menu'";
     protected static $templateContextNavMobileClass  = 'mobile_nav';
 
@@ -179,7 +180,10 @@ class Contexts
         // should be in place. However, it's still a good idea to make sure an array
         // of contexts was provided.
         $contexts = self::getContexts();
-        
+
+        // Context icon's index should be matched with context's
+        $context_icons = self::$ci->config->item('context_icons');
+
         if (empty($contexts) || ! is_array($contexts)) {
             die(self::$ci->lang->line('bf_no_contexts'));
         }
@@ -209,11 +213,11 @@ class Contexts
 			$template = str_replace('{icon}', self::$templateContextIcon, self::$templateContextContent);
         }
 
-		// self::$templateContextContent = str_replace('{caret}', self::$templateContextCaret, self::$templateContextText);
+		
 
         // Build out the navigation.
         $menu = '';
-        foreach ($contexts as $context) {
+        foreach ($contexts as $index => $context) {
             // Don't display an entry in the menu if the user doesn't have permission
             // to view it (unless the permission doesn't exist).
             $viewPermission = 'Site.' . ucfirst($context) . '.View';
@@ -226,23 +230,27 @@ class Contexts
                     array('{title}', '{icon}'),
                     array(
                         $title,
-                        $mode == 'text' ? '' : $context,
+                        $mode == 'text' ? '' : ( isset($context_icons[$index]) ? $context_icons[$index] : '')
                     ),
                     $template
                 );
 
+
                 // Build the menu for this context.
                 $menu .= str_replace(
-                    array('{parent_class}', '{url}', '{id}', '{current_class}', '{title}', '{extra}', '{text}', '{content}'),
+                    array('{parent_class}', '{url}', '{id}', '{current_class}', '{title}', '{extra}', '{text}', '{content}', '{caret}'),
                     array(
                         self::$parent_class . ' ' . check_class($context, true),
                         site_url(self::$site_area . "/{$context}"),
                         "tb_{$context}",
-                        $top_level_only ? '' : self::$templateContextMenuAnchorClass,
+                        $top_level_only ? '' : (self::has_context_nav($context) ? self::$templateContextMenuOpenClass : self::$templateContextMenuAnchorClass),
                         $title,
                         str_replace('{dataId}', $context, self::$templateContextMenuExtra),
                         $navTitle,
                         $top_level_only ? '' : self::context_nav($context),
+                        // We may need to change the ternary's false case to a rendered HTML of notification count
+                        self::has_context_nav($context) ? self::$templateContextCaret : '',
+                        // isset($context_icons[$index]) ? $context_icons[$index] : ''
                     ),
                     self::$templateContextMenu
                 );
@@ -362,6 +370,31 @@ class Contexts
         self::$actions = array();
 
         return $menu;
+    }
+
+    /**
+     * Check the context whether it has atleast 1 sub-menu to show the caret
+     *
+     * @param string  $context   The context of the nav to be checked.
+     *
+     * @return bool
+     */
+    public static function has_context_nav($context = null)
+    {
+        // Get a list of modules with a controller matching $context ('content',
+        // 'settings', 'reports', or 'developer').
+        foreach (Modules::list_modules() as $module) {
+            if (Modules::controller_exists($context, $module)) {
+
+                if (self::$ci->auth->has_permission('Bonfire.' . ucfirst($module) . '.View')
+                    || self::$ci->auth->has_permission(ucfirst($module) . '.' . ucfirst($context) . '.' . 'View')
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     //--------------------------------------------------------------------------

@@ -49,8 +49,8 @@ $config['site.backup_folder']	= 'archives/';
 // The name of the context displayed in the UI is determined by language strings
 // as defined in application_lang.php. The string must follow the format:
 //      context_content_name
-$config['contexts'] = array('dashboard','projects','reports','team');
-$config['context_icons'] = array('chart-stock','grid','chart','group');
+$config['contexts'] = array('dashboard', 'projects', 'reports', 'team');
+$config['context_icons'] = array('icon-chart-stock', 'icon-grid', 'icon-chart', 'ion-android-people');
 
 //------------------------------------------------------------------------------
 // ACTIVITIES
