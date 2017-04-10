@@ -33,8 +33,6 @@ class Front_Controller extends Base_Controller
         $this->set_current_user();
 
         Events::trigger('after_front_controller');
-		// BaoDG: set theme
-		Template::set_theme('meeting_bullet', 'default');
     }//end __construct()
 
     //--------------------------------------------------------------------

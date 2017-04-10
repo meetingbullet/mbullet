@@ -1,6 +1,6 @@
 <?php
 
-$errorClass   = empty($errorClass) ? ' error' : $errorClass;
+$errorClass   = empty($errorClass) ? ' danger' : $errorClass;
 $controlClass = empty($controlClass) ? 'span6' : $controlClass;
 $fieldData = array(
     'errorClass'   => $errorClass,

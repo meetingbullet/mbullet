@@ -41,95 +41,54 @@ class User_model extends BF_Model
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
 	protected $validation_rules		= array(
-		array(
-			'field' => 'email',
-			'label' => 'lang:members_field_email',
-			'rules' => 'max_length[254]',
+		'create_profile' => array (
+			array(
+				'field' => 'email',
+				'label' => 'lang:us_reg_email',
+				'rules' => 'trim|required|valid_email|max_length[255]|unique[users.email]',
+			),
+			// array(
+			// 	'field' => 'avatar',
+			// 	'label' => 'lang:us_reg_avatar',
+			// 	'rules' => 'trim|required|max_length[255]|',
+			// ),
+			array(
+				'field' => 'password',
+				'label' => 'lang:us_reg_password',
+				'rules' => 'trim|required|max_length[60]',
+			),
+			array(
+				'field' => 'conf_password',
+				'label' => 'lang:us_reg_conf_password',
+				'rules' => 'trim|required|max_length[60]|matches[password]',
+			),
+			array(
+				'field' => 'first_name',
+				'label' => 'lang:us_reg_first_name',
+				'rules' => 'trim|required|max_length[255]',
+			),
+			array(
+				'field' => 'last_name',
+				'label' => 'lang:us_reg_last_name',
+				'rules' => 'trim|required|max_length[255]',
+			),
+			array(
+				'field' => 'skype',
+				'label' => 'lang:us_reg_skype',
+				'rules' => 'trim|required|max_length[255]',
+			),
+			array(
+				'field' => 'google_id_token',
+				'label' => 'lang:us_reg_google_id_token',
+				'rules' => 'trim|max_length[2048]',
+			)
 		),
-		array(
-			'field' => 'username',
-			'label' => 'lang:members_field_username',
-			'rules' => 'trim|max_length[64]',
-		),
-		array(
-			'field' => 'password_hash',
-			'label' => 'lang:members_field_password_hash',
-			'rules' => 'max_length[60]',
-		),
-		array(
-			'field' => 'first_name',
-			'label' => 'lang:members_field_first_name',
-			'rules' => 'max_length[255]',
-		),
-		array(
-			'field' => 'last_name',
-			'label' => 'lang:members_field_last_name',
-			'rules' => 'max_length[255]',
-		),
-		array(
-			'field' => 'reset_hash',
-			'label' => 'lang:members_field_reset_hash',
-			'rules' => 'max_length[40]',
-		),
-		array(
-			'field' => 'last_login',
-			'label' => 'lang:members_field_last_login',
-			'rules' => '',
-		),
-		array(
-			'field' => 'last_ip',
-			'label' => 'lang:members_field_last_ip',
-			'rules' => 'max_length[45]',
-		),
-		array(
-			'field' => 'created_on',
-			'label' => 'lang:members_field_created_on',
-			'rules' => '',
-		),
-		array(
-			'field' => 'deleted',
-			'label' => 'lang:members_field_deleted',
-			'rules' => 'max_length[1]',
-		),
-		array(
-			'field' => 'reset_by',
-			'label' => 'lang:members_field_reset_by',
-			'rules' => 'max_length[10]',
-		),
-		array(
-			'field' => 'timezone',
-			'label' => 'lang:members_field_timezone',
-			'rules' => 'max_length[40]',
-		),
-		array(
-			'field' => 'language',
-			'label' => 'lang:members_field_language',
-			'rules' => 'max_length[20]',
-		),
-		array(
-			'field' => 'active',
-			'label' => 'lang:members_field_active',
-			'rules' => 'max_length[1]',
-		),
-		array(
-			'field' => 'activate_hash',
-			'label' => 'lang:members_field_activate_hash',
-			'rules' => 'max_length[40]',
-		),
-		array(
-			'field' => 'force_password_reset',
-			'label' => 'lang:members_field_force_password_reset',
-			'rules' => 'max_length[1]',
-		),
-		array(
-			'field' => 'skype',
-			'label' => 'lang:members_field_skype',
-			'rules' => 'max_length[255]',
-		),
-		array(
-			'field' => 'google_id_token',
-			'label' => 'lang:members_field_skype',
-			'rules' => 'max_length[2048]',
+		'register' => array(
+			array(
+				'field' => 'email',
+				'label' => 'lang:us_reg_email',
+				'rules' => 'trim|required|valid_email|max_length[255]|unique[users.email]',
+			)
 		)
 	);
 	protected $insert_validation_rules  = array();
@@ -144,4 +103,187 @@ class User_model extends BF_Model
 	{
 		parent::__construct();
 	}
+	//--------------------------------------------------------------------------
+    // !ACTIVATION
+    //--------------------------------------------------------------------------
+
+    /**
+     * Accepts an activation code and validates against a matching entry in the database.
+     *
+     * There are some instances where the activation hash should be removed but
+     * the user should be left inactive (e.g. Admin Activation), so $leave_inactive
+     * enables that use case.
+     *
+     * @param int    $user_id        The user to be activated (null will match any).
+     * @param string $code           The activation code to be verified.
+     * @param bool   $leave_inactive Flag whether to remove the activate hash value,
+     * but leave active = 0.
+     *
+     * @return int User Id on success, false on error.
+     */
+    public function activate($user_id, $code, $leave_inactive = false)
+    {
+        if ($user_id) {
+            $this->db->where('user_id', $user_id);
+        }
+
+        $query = $this->db->select('user_id')
+                          ->where('activate_hash', $code)
+                          ->get($this->table_name);
+
+        if ($query->num_rows() !== 1) {
+            $this->error = lang('us_err_no_matching_code');
+            return false;
+        }
+
+        // Now we can find the $user_id, even if it was passed as NULL
+        $result = $query->row();
+        $user_id = $result->user_id;
+
+        $active = $leave_inactive === false ? 1 : 0;
+        if ($this->update($user_id, array('activate_hash' => '', 'active' => $active))) {
+            return $user_id;
+        }
+
+        return false;
+    }
+
+    /**
+     * This function is triggered during account setup to ensure user is not active
+     * and, if not supressed, generate an activation hash code. This function can
+     * be used to deactivate accounts based on public view events.
+     *
+     * @param int    $user_id    The username or email to match to deactivate
+     * @param string $login_type Login Method
+     * @param bool   $make_hash  Create a hash
+     *
+     * @return mixed $activate_hash on success, false on error
+     */
+    public function deactivate($user_id, $make_hash = true)
+    {
+        // create a temp activation code.
+        $activate_hash = '';
+        if ($make_hash === true) {
+            $this->load->helper('string');
+            $activate_hash = sha1(random_string('alnum', 40) . time());
+        }
+
+        $this->db->update(
+            $this->table_name,
+            array('active' => 0, 'activate_hash' => $activate_hash),
+            array('user_id' => $user_id)
+        );
+
+        if ($this->db->affected_rows() != 1) {
+            return false;
+        }
+
+        return $make_hash ? $activate_hash : true;
+    }
+	/**
+     * Configure activation for the given user based on current user_activation_method.
+     *
+     * @param number $user_id User's ID.
+     *
+     * @return array A 'message' (string) and 'error' (boolean, true if an error
+     * occurred sending the activation email).
+     */
+    public function set_activation($user_id)
+    {
+        // User activation method
+        $activation_method = $this->settings_lib->item('auth.user_activation_method');
+
+        // Prepare user messaging vars
+        $emailMsgData   = array();
+        $emailView      = '';
+        $subject        = '';
+        $email_mess     = '';
+        $message        = lang('us_email_thank_you');
+        $type           = 'success';
+        $site_title     = $this->settings_lib->item('site.title');
+        $error          = false;
+        $ccAdmin      = false;
+
+        switch ($activation_method) {
+            case 0:
+                // No activation required.
+                // Activate the user and send confirmation email.
+                $subject = str_replace(
+                    '[SITE_TITLE]',
+                    $this->settings_lib->item('site.title'),
+                    lang('us_account_reg_complete')
+                );
+
+                $emailView  = '_emails/activated';
+                $message    .= lang('us_account_active_login');
+
+                $emailMsgData = array(
+                    'title' => $site_title,
+                    'link'  => site_url(),
+                );
+                break;
+            case 1:
+                // Email Activiation.
+                // Run the account deactivate to assure everything is set correctly.
+                $activation_code    = $this->deactivate($user_id);
+
+                // Create the link to activate membership
+                $activate_link = site_url("activate/{$user_id}/{$activation_code}");
+                $subject            =  lang('us_email_subj_activate');
+                $emailView          = '_emails/activate';
+                $message            .= lang('us_check_activate_email');
+
+                $emailMsgData = array(
+                    'title' => $site_title,
+                    'code'  => $activation_code,
+                    'link'  => $activate_link
+                );
+                break;
+            case 2:
+                // Admin Activation.
+                $ccAdmin   = true;
+                $subject    =  lang('us_email_subj_pending');
+                $emailView  = '_emails/pending';
+                $message    .= lang('us_admin_approval_pending');
+
+                $emailMsgData = array(
+                    'title' => $site_title,
+                );
+                break;
+        }
+
+        $email_mess = $this->load->view($emailView, $emailMsgData, true);
+
+        // Now send the email
+        $this->load->library('emailer/emailer');
+        $data = array(
+            'to'        => $this->find($user_id)->email,
+            'subject'   => $subject,
+            'message'   => $email_mess,
+        );
+
+        if ($this->emailer->send($data, true)) {
+            // If the message was sent successfully and the admin must be notified
+            // (Admin Activation is enabled), send another email to the system_email.
+            if ($ccAdmin) {
+                /**
+                 * @todo Add a setting to allow the user to change the email address
+                 * of the recipient of this message.
+                 *
+                 * @todo Add CC/BCC capabilities to emailer, so this doesn't require
+                 * sending a second email.
+                 */
+                $data['to'] = $this->settings_lib->item('system_email');
+                if (! empty($data['to'])) {
+                    $this->emailer->send($data, true);
+                }
+            }
+        } else {
+            // If the message was not sent successfully, set an error message.
+            $message    .= lang('us_err_no_email') . $this->emailer->error;
+            $error      = true;
+        }
+
+        return array('message' => $message, 'error' => $error);
+    }
 }
