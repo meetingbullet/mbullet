@@ -32,3 +32,12 @@ $hook['post_controller_constructor'][] = array(
     'filepath' => 'hooks',
     'params'   => ''
 );
+
+// Check current user's organization
+$hook['post_controller_constructor'][] = [
+    'class'    => 'Multi_orgs_hooks',
+    'function' => 'check_current_organization',
+    'filename' => 'Multi_orgs_hooks.php',
+    'filepath' => 'hooks',
+    'params'   => 2
+];

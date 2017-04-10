@@ -1,26 +1,13 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
-/**
- * Bonfire
- *
- * An open source project to allow developers to jumpstart their development of
- * CodeIgniter applications
- *
- * @package   Bonfire
- * @author    Bonfire Dev Team
- * @copyright Copyright (c) 2011 - 2015, Bonfire Dev Team
- * @license   http://opensource.org/licenses/MIT The MIT License
- * @link      http://cibonfire.com
- * @since     Version 1.0
- */
 
 /**
  * Contexts Library
  *
  * Provides helper methods for displaying Context Navigation.
  *
- * @package Bonfire\Core\Modules\UI\Libraries\Contexts
- * @author  Bonfire Dev Team
- * @link    http://cibonfire.com/docs/developer/contexts
+ * @package Core
+ * @author  DatLS
+ * @copyright Copyright (c) 2017, SGS Engineering Team
  */
 class Contexts
 {
@@ -32,24 +19,26 @@ class Contexts
     protected static $templateMenu        = "<li><a {extra}href='{url}' title='{title}'>{display}</a>\n</li>\n";
     protected static $templateSubMenu     = "<li class='{submenu_class}'><a href='{url}'>{display}</a><ul class='{child_class}'>{view}</ul></li>\n";
 
-    protected static $templateContextEnd             = "<span class='caret'></span>";
-    protected static $templateContextImage           = "<img src='{image}' alt='{title}' />";
+	protected static $templateContextContent         = "{icon}<span class='nav-title''>{title}\n{caret}</span>";
+	protected static $templateContextIcon            = "<i class='{icon}'></i>";
     protected static $templateContextText            = "{title}";
-    protected static $templateContextMenuAnchorClass = 'dropdown-toggle';
-    protected static $templateContextMenuExtra       = " data-toggle='dropdown' data-id='{dataId}_menu'";
+    protected static $templateContextCaret           = '<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>';
+    protected static $templateContextMenuAnchorClass = '';
+    protected static $templateContextMenuOpenClass   = 'js-show-child-nav';
+    protected static $templateContextMenuOpenExtra       = " data-toggle='dropdown' data-id='{dataId}_menu'";
     protected static $templateContextNavMobileClass  = 'mobile_nav';
 
     /** @var string The class name to attach to the outer ul tag. */
-    protected static $outer_class = 'nav';
+    protected static $outer_class = 'an-main-nav';
 
     /** @var string The class to attach to li tags with children. */
-    protected static $parent_class = 'dropdown';
+    protected static $parent_class = 'an-nav-item';
 
     /** @var string The class to apply to li tags within ul tags inside. */
     protected static $submenu_class = 'dropdown-submenu';
 
     /** @var string The class to apply to ul tags within li tags. */
-    protected static $child_class = 'dropdown-menu';
+    protected static $child_class = 'an-child-nav js-open-nav';
 
     /** @var string The id to apply to the outer ul tag. */
     protected static $outer_id = null;
@@ -70,7 +59,7 @@ class Contexts
     protected static $menu = array();
 
     /** @var string[] Contexts which are required. */
-    protected static $requiredContexts = array('settings', 'developer');
+    protected static $requiredContexts = []; //array('settings', 'developer');
 
     /** @var string Admin area to link to or other context. */
     protected static $site_area;
@@ -191,7 +180,10 @@ class Contexts
         // should be in place. However, it's still a good idea to make sure an array
         // of contexts was provided.
         $contexts = self::getContexts();
-        
+
+        // Context icon's index should be matched with context's
+        $context_icons = self::$ci->config->item('context_icons');
+
         if (empty($contexts) || ! is_array($contexts)) {
             die(self::$ci->lang->line('bf_no_contexts'));
         }
@@ -214,19 +206,18 @@ class Contexts
         }
 
         $template = '';
+		self::$templateContextContent = str_replace('{title}', self::$templateContextText, self::$templateContextContent);
         if ($mode == 'text') {
-            $template = self::$templateContextText;
-        } else {
-            $template = self::$templateContextImage;
-            if ($mode == 'both') {
-                $template .= self::$templateContextText;
-            }
+            $template = str_replace('{icon}', '', self::$templateContextContent);
+        } elseif ($mode == 'both') {
+			$template = str_replace('{icon}', self::$templateContextIcon, self::$templateContextContent);
         }
-        $template .= self::$templateContextEnd;
+
+		
 
         // Build out the navigation.
         $menu = '';
-        foreach ($contexts as $context) {
+        foreach ($contexts as $index => $context) {
             // Don't display an entry in the menu if the user doesn't have permission
             // to view it (unless the permission doesn't exist).
             $viewPermission = 'Site.' . ucfirst($context) . '.View';
@@ -236,26 +227,31 @@ class Contexts
                 // The text/image displayed in the top-level context menu.
                 $title    = self::$ci->lang->line("bf_context_{$context}");
                 $navTitle = str_replace(
-                    array('{title}', '{image}'),
+                    array('{title}', '{icon}'),
                     array(
                         $title,
-                        $mode == 'text' ? '' : Template::theme_url("images/context_{$context}.png"),
+                        $mode == 'text' ? '' : ( isset($context_icons[$index]) ? $context_icons[$index] : '')
                     ),
                     $template
                 );
 
+
                 // Build the menu for this context.
+                $has_context_nav = self::has_context_nav($context);
                 $menu .= str_replace(
-                    array('{parent_class}', '{url}', '{id}', '{current_class}', '{title}', '{extra}', '{text}', '{content}'),
+                    array('{parent_class}', '{url}', '{id}', '{current_class}', '{title}', '{extra}', '{text}', '{content}', '{caret}'),
                     array(
                         self::$parent_class . ' ' . check_class($context, true),
                         site_url(self::$site_area . "/{$context}"),
                         "tb_{$context}",
-                        $top_level_only ? '' : self::$templateContextMenuAnchorClass,
+                        $top_level_only ? '' : ($has_context_nav ? self::$templateContextMenuOpenClass : self::$templateContextMenuAnchorClass),
                         $title,
-                        str_replace('{dataId}', $context, self::$templateContextMenuExtra),
+                        $has_context_nav ? str_replace('{dataId}', $context, self::$templateContextMenuOpenExtra) : '',
                         $navTitle,
                         $top_level_only ? '' : self::context_nav($context),
+                        // We may need to change the ternary's false case to a rendered HTML of notification count
+                        $has_context_nav ? self::$templateContextCaret : '',
+                        // isset($context_icons[$index]) ? $context_icons[$index] : ''
                     ),
                     self::$templateContextMenu
                 );
@@ -375,6 +371,31 @@ class Contexts
         self::$actions = array();
 
         return $menu;
+    }
+
+    /**
+     * Check the context whether it has atleast 1 sub-menu to show the caret
+     *
+     * @param string  $context   The context of the nav to be checked.
+     *
+     * @return bool
+     */
+    public static function has_context_nav($context = null)
+    {
+        // Get a list of modules with a controller matching $context ('content',
+        // 'settings', 'reports', or 'developer').
+        foreach (Modules::list_modules() as $module) {
+            if (Modules::controller_exists($context, $module)) {
+
+                if (self::$ci->auth->has_permission('Bonfire.' . ucfirst($module) . '.View')
+                    || self::$ci->auth->has_permission(ucfirst($module) . '.' . ucfirst($context) . '.' . 'View')
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     //--------------------------------------------------------------------------

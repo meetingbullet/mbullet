@@ -210,169 +210,24 @@
                     </form>
                 </div> <!-- end .AN-SIDEBAR-SEARCH -->
 
-                <div class="an-sidebar-widgets">
+                <!--<div class="an-sidebar-widgets">
                     <div class="widget-signle">
-                    <h5 class="counter-result">789</h5>
-                    <p>Sales</p>
+                        <h5 class="counter-result">789</h5>
+                        <p>Sales</p>
                     </div>
                     <div class="widget-signle">
-                    <h5 class="counter-result">1,234</h5>
-                    <p>Order</p>
+                        <h5 class="counter-result">1,234</h5>
+                        <p>Order</p>
                     </div>
                     <div class="widget-signle">
-                    <h5 class="counter-result">$900</h5>
-                    <p>Send</p>
+                        <h5 class="counter-result">$900</h5>
+                        <p>Send</p>
                     </div>
-                </div> <!-- end .AN-SIDEBAR-WIDGETS -->
+                </div> end .AN-SIDEBAR-WIDGETS -->
 
                 <div class="an-sidebar-nav">
-                    <ul class="an-main-nav">
-                    <li class="an-nav-item current active">
-                        <a class=" js-show-child-nav" href="#">
-                        <i class="icon-chart-stock"></i>
-                        <span class="nav-title">Dashboard
-                            <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-                        </span>
-                        </a>
-
-                        <ul class="an-child-nav js-open-nav">
-                        <li><a href="index-2.html">Version 1</a></li>
-                        <li><a href="index_2.html">Version 2</a></li>
-                        <li><a href="index_3.html">Version 3</a></li>
-                        </ul>
-                    </li>
-                    <li class="an-nav-item">
-                        <a class=" js-show-child-nav" href="#">
-                        <i class="icon-squares"></i>
-                        <span class="nav-title">UI Layouts
-                            <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-                        </span>
-                        </a>
-                        <ul class="an-child-nav js-open-nav">
-                        <li><a href="ui-basics.html">Basic Ui</a></li>
-                        <li><a href="ui-buttons.html">Buttons</a></li>
-                        <li><a href="ui-tabs.html">Tabs</a></li>
-                        <li><a href="ui-accordions.html">Accordions</a></li>
-                        <li><a href="ui-portlets.html">Portlets</a></li>
-                        <li><a href="ui-sweetalerts.html">Sweet Alerts</a></li>
-                        <li><a href="ui-social-icons.html">Social Icons</a></li>
-                        <li><a href="ui-typography.html">Typography</a></li>
-                        <li><a href="ui-modals.html">Modals</a></li>
-                        <li><a href="ui-notifications.html">Notifications</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="an-nav-item">
-                        <a class=" js-show-child-nav" href="#">
-                        <i class="icon-grid"></i>
-                        <span class="nav-title">Components
-                            <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-                        </span>
-                        </a>
-                        <ul class="an-child-nav js-open-nav">
-                        <li><a href="component-select.html">Select Box</a></li>
-                        <li><a href="component-switch.html">LC Switch</a></li>
-                        <li><a href="component-bs-switch.html">Bootstrap switch</a></li>
-                        <li><a href="component-clipboard.html">Clipboard</a></li>
-                        <li><a href="component-datetime.html">Date Time Picker</a></li>
-                        <li><a href="component-range.html">Ion Range Slider</a></li>
-                        <li><a href="component-tags.html">Tags Input</a></li>
-                        </ul>
-                    </li>
-                    <li class="an-nav-item">
-                        <a class="" href="forms.html">
-                        <i class="icon-setting"></i>
-                        <span class="nav-title">Forms</span>
-                        </a>
-                    </li>
-
-                    <li class="an-nav-item">
-                        <a class=" js-show-child-nav" href="#">
-                        <i class="icon-board-list"></i>
-                        <span class="nav-title">Tables
-                            <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-                        </span>
-                        </a>
-                        <ul class="an-child-nav js-open-nav">
-                        <li><a href="tables-basic.html">Basic tables</a></li>
-                        <li><a href="tables-bootstrap.html">Bootstrap tables</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="an-nav-item">
-                        <a class="" href="charts.html">
-                        <i class="icon-chart"></i>
-                        <span class="nav-title">Charts</span>
-                        </a>
-                    </li>
-
-                    <li class="an-nav-item">
-                        <a class="" href="maps.html">
-                        <i class="icon-marker"></i>
-                        <span class="nav-title">Maps</span>
-                        </a>
-                    </li>
-
-                    <li class="an-nav-item">
-                        <a class="" href="inbox.html">
-                        <i class="icon-chat-o"></i>
-                        <span class="nav-title">Inbox <span class="an-arrow-nav count">3</span></span>
-                        </a>
-                    </li>
-
-                    <li class="an-nav-item">
-                        <a class=" js-show-child-nav" href="#">
-                        <i class="icon-book"></i>
-                        <span class="nav-title">App page
-                            <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-                        </span>
-                        </a>
-                        <ul class="an-child-nav js-open-nav">
-                        <li><a href="page-chats.html">Chat Layout</a></li>
-                        <li><a href="page-profile.html">Profile Page</a></li>
-                        <li><a href="page-profile-setting.html">Profile Setting</a></li>
-                        <li><a href="page-login.html">Login Form</a></li>
-                        <li><a href="page-signup.html">Register Form</a></li>
-                        <li><a href="page-contact-us.html">Contact Us</a></li>
-                        <li><a href="page-about-us.html">About Us</a></li>
-                        <li><a href="page-pricing.html">Pricing Table</a></li>
-                        <li><a href="page-portfolio.html">Portfolio</a></li>
-                        <li><a href="page-blog.html">Blog List</a></li>
-                        <li><a href="page-blog-post.html">Blog Post </a></li>
-                        <li><a href="page-construction.html">Comming soon</a></li>
-                        <li><a href="page-404.html">404 Page</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="an-nav-item">
-                        <a class=" js-show-child-nav" href="#">
-                        <i class="icon-dot-vertical"></i>
-                        <span class="nav-title">Starter page
-                            <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-                        </span>
-                        </a>
-                        <ul class="an-child-nav js-open-nav">
-                        <li><a href="layout-default.html">Layout Default</a></li>
-                        <li><a href="layout-boxed.html">Layout Boxed</a></li>
-                        <li><a href="layout-fixed-header.html">Layout Fixed Header</a></li>
-                        <li><a href="layout-minimal-header.html">Layout Minimal Header</a></li>
-                        <li><a href="layout-without-breadcrumb.html">Layout Without Breadcrumb</a></li>
-                        <li><a href="layout-white-bg.html">Layout White Bg</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="an-nav-item">
-                        <a class=" js-show-child-nav" href="#">
-                        <i class="icon-dot-horizontal"></i>
-                        <span class="nav-title">Sidebar layouts
-                            <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-                        </span>
-                        </a>
-                        <ul class="an-child-nav js-open-nav">
-                        <li><a href="layout-sidebar-default.html">Default Sidebar</a></li>
-                        <li><a href="layout-sidebar-hidden.html">Hidden Sidebar</a></li>
-                        </ul>
-                    </li>
-                    </ul> <!-- end .AN-MAIN-NAV -->
+					<?php echo Contexts::render_menu('both', 'normal'); ?>
                 </div> <!-- end .AN-SIDEBAR-NAV -->
             </div> <!-- end .AN-SIDEBAR-NAV -->
+
+            <div class="an-content-body">
