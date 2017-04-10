@@ -1,5 +1,4 @@
-                </div> <!-- end .AN-CONTENT-BODY -->
-            </div> <!-- end .AN-PAGE-CONTENT-BODY -->
+            </div> <!-- end .AN-PAGE-CONTENT -->
         </div> <!-- end .AN-PAGE-CONTENT -->
 
         <footer class="an-footer">

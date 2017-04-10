@@ -1,77 +1,86 @@
 <?php
 	$site_open = $this->settings_lib->item('auth.allow_register');
 ?>
-<p><br/><a href="<?php echo site_url(); ?>">&larr; <?php echo lang('us_back_to') . $this->settings_lib->item('site.title'); ?></a></p>
 
-<div id="login">
-	<h2><?php echo lang('us_login'); ?></h2>
-
-	<?php echo Template::message(); ?>
-
-	<?php
-		if (validation_errors()) :
-	?>
-	<div class="row-fluid">
-		<div class="span12">
-			<div class="alert alert-error fade in">
-			  <a data-dismiss="alert" class="close">&times;</a>
-				<?php echo validation_errors(); ?>
-			</div>
+	<?php if (validation_errors() || Template::message()) : ?>
+	<div class="an-notification-content top-full-width">
+		<?php if(validation_errors()): ?>
+		<div class="alert alert-danger  js-nofitication-body" role="alert" style="">
+			<button type="button" class="close"><span aria-hidden="true">×</span></button>
+			<?php echo validation_errors() ?>
 		</div>
+		<?php else: ?>
+			<?php echo iif(validation_errors(), validation_errors(), Template::message()); ?>
+		<?php endif; ?>
 	</div>
 	<?php endif; ?>
 
-	<?php echo form_open(LOGIN_URL, array('autocomplete' => 'off')); ?>
+	<div class="an-page-content">
+        <div class="an-flex-center-center">
+			<div class="container">
+				<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="an-login-container">
+					<div class="back-to-home">
+						<h3 class="an-logo-heading text-center wow fadeInDown">
+						<a class="an-logo-link" href="<?php e(base_url())?>"><?php e($this->settings_lib->item('site.title')) ?>
+							<span><?php e($this->settings_lib->item('site.description')) ?></span>
+						</a>
+						</h3>
+					</div>
+					<div class="an-single-component with-shadow">
+						<div class="an-component-header">
+						<h6><?php echo lang('us_login'); ?></h6>
+						<div class="component-header-right">
+							<?php if ( $site_open ) : ?>
+							<p class="sign-up-link">
+								<?php echo anchor(REGISTER_URL, lang('us_sign_up')); ?>
+							</p>
+							<?php endif; ?>
+						</div>
+						</div>
+						<div class="an-component-body">
+						<div class="an-social-login">
+							<div id="g-signin2" data-onsuccess="onSignIn"></div>
+							<!--<a class="an-social-icon facebook" href="#"><i class="ion-social-facebook"></i></a>
+							<a class="an-social-icon twitter" href="#"><i class="ion-social-twitter"></i></a>
+							<a class="an-social-icon google-plus" href="#"><i class="ion-social-googleplus"></i></a>
+							<a class="an-social-icon dribble" href="#"><i class="ion-social-dribbble"></i></a>
+							<a class="an-social-icon github" href="#"><i class="ion-social-github"></i></a>
+							<a class="an-social-icon instagram" href="#"><i class="ion-social-instagram"></i></a>
+							<a class="an-social-icon yahoo" href="#"><i class="ion-social-yahoo"></i></a>
+							<a class="an-social-icon linkedin" href="#"><i class="ion-social-linkedin"></i></a>-->
+						</div>
+						<?php echo form_open(LOGIN_URL, array('autocomplete' => 'off')); ?>
+							<label><?php echo $this->settings_lib->item('auth.login_type') == 'both' ? lang('bf_username') .'/'. lang('bf_email') : ucwords($this->settings_lib->item('auth.login_type')) ?></label>
+							<div class="an-input-group">
+								<div class="an-input-group-addon"><i class="ion-ios-email-outline"></i></div>
+								<input type="text" name="login" class="an-form-control <?php echo iif( form_error('login') , 'danger') ;?>" value="<?php echo set_value('login'); ?>" tabindex="1">
+							</div>
 
-		<div class="control-group <?php echo iif( form_error('login') , 'error') ;?>">
-			<div class="controls">
-				<input style="width: 95%" type="text" name="login" id="login_value" value="<?php echo set_value('login'); ?>" tabindex="1" placeholder="<?php echo $this->settings_lib->item('auth.login_type') == 'both' ? lang('bf_username') .'/'. lang('bf_email') : ucwords($this->settings_lib->item('auth.login_type')) ?>" />
-			</div>
-		</div>
+							<label><?php echo lang('bf_password'); ?></label>
+							<div class="an-input-group">
+								<div class="an-input-group-addon"><i class="ion-key"></i></div>
+								<input type="password" name="password" class="an-form-control <?php echo iif( form_error('password') , 'danger') ;?>" tabindex="2" >
+							</div>
 
-		<div class="control-group <?php echo iif( form_error('password') , 'error') ;?>">
-			<div class="controls">
-				<input style="width: 95%" type="password" name="password" id="password" value="" tabindex="2" placeholder="<?php echo lang('bf_password'); ?>" />
-			</div>
-		</div>
+							<div class="remembered-section">
+								<span class="an-custom-checkbox">
+									<input type="checkbox" name="remember_me" id="remember_me" value="1" tabindex="3" />
+									<label for="remember_me"><?php echo lang('us_remember_note'); ?></label>
+								</span>
+								<?php echo anchor('/forgot_password', lang('us_forgot_your_password')); ?>
+							</div>
 
-		<?php if ($this->settings_lib->item('auth.allow_remember')) : ?>
-			<div class="control-group">
-				<div class="controls">
-					<label class="checkbox" for="remember_me">
-						<input type="checkbox" name="remember_me" id="remember_me" value="1" tabindex="3" />
-						<span class="inline-help"><?php echo lang('us_remember_note'); ?></span>
-					</label>
+							<button name="log-me-in" class="an-btn an-btn-default fluid"><?php e(lang('us_let_me_in')); ?></button>
+						<?php echo form_close(); ?>
+
+						</div> <!-- end .AN-COMPONENT-BODY -->
+					</div> <!-- end .AN-SINGLE-COMPONENT -->
+					</div> <!-- end an-login-container -->
 				</div>
+				</div> <!-- end row -->
 			</div>
-		<?php endif; ?>
-
-		<div class="control-group">
-			<div class="controls">
-				<input class="btn btn-primary" type="submit" name="log-me-in" id="submit" value="<?php e(lang('us_let_me_in')); ?>" tabindex="5" />
-				<?php echo $signin_button ?>
-			</div>
-		</div>
-	<?php echo form_close(); ?>
-
-	<?php // show for Email Activation (1) only
-		if ($this->settings_lib->item('auth.user_activation_method') == 1) : ?>
-	<!-- Activation Block -->
-			<p style="text-align: left" class="well">
-				<?php echo lang('bf_login_activate_title'); ?><br />
-				<?php
-				$activate_str = str_replace('[ACCOUNT_ACTIVATE_URL]',anchor('/activate', lang('bf_activate')),lang('bf_login_activate_email'));
-				$activate_str = str_replace('[ACTIVATE_RESEND_URL]',anchor('/resend_activation', lang('bf_activate_resend')),$activate_str);
-				echo $activate_str; ?>
-			</p>
-	<?php endif; ?>
-
-	<p style="text-align: center">
-		<?php if ( $site_open ) : ?>
-			<?php echo anchor(REGISTER_URL, lang('us_sign_up')); ?>
-		<?php endif; ?>
-
-		<br/><?php echo anchor('/forgot_password', lang('us_forgot_your_password')); ?>
-	</p>
-
-</div>
+		</div> <!-- end an-flex-center-center -->
+	</div>
+	<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
