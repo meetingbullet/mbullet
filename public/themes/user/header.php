@@ -18,9 +18,6 @@ Assets::add_js($inline, 'inline');
     ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="<?php e(isset($meta_description) ? $meta_description : ''); ?>">
-    <?php if (! empty($use_google_api)) : ?>
-    <meta name="google-signin-client_id" content="<?php echo $client_id ?>">
-    <?php endif ?>
     <meta name="author" content="<?php e(isset($meta_author) ? $meta_author : ''); ?>">
     <?php
     /* Modernizr is loaded before CSS so CSS can utilize its features */
