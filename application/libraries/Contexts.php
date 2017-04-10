@@ -25,7 +25,7 @@ class Contexts
     protected static $templateContextCaret           = '<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>';
     protected static $templateContextMenuAnchorClass = '';
     protected static $templateContextMenuOpenClass   = 'js-show-child-nav';
-    protected static $templateContextMenuExtra       = " data-toggle='dropdown' data-id='{dataId}_menu'";
+    protected static $templateContextMenuOpenExtra       = " data-toggle='dropdown' data-id='{dataId}_menu'";
     protected static $templateContextNavMobileClass  = 'mobile_nav';
 
     /** @var string The class name to attach to the outer ul tag. */
@@ -237,19 +237,20 @@ class Contexts
 
 
                 // Build the menu for this context.
+                $has_context_nav = self::has_context_nav($context);
                 $menu .= str_replace(
                     array('{parent_class}', '{url}', '{id}', '{current_class}', '{title}', '{extra}', '{text}', '{content}', '{caret}'),
                     array(
                         self::$parent_class . ' ' . check_class($context, true),
                         site_url(self::$site_area . "/{$context}"),
                         "tb_{$context}",
-                        $top_level_only ? '' : (self::has_context_nav($context) ? self::$templateContextMenuOpenClass : self::$templateContextMenuAnchorClass),
+                        $top_level_only ? '' : ($has_context_nav ? self::$templateContextMenuOpenClass : self::$templateContextMenuAnchorClass),
                         $title,
-                        str_replace('{dataId}', $context, self::$templateContextMenuExtra),
+                        $has_context_nav ? str_replace('{dataId}', $context, self::$templateContextMenuOpenExtra) : '',
                         $navTitle,
                         $top_level_only ? '' : self::context_nav($context),
                         // We may need to change the ternary's false case to a rendered HTML of notification count
-                        self::has_context_nav($context) ? self::$templateContextCaret : '',
+                        $has_context_nav ? self::$templateContextCaret : '',
                         // isset($context_icons[$index]) ? $context_icons[$index] : ''
                     ),
                     self::$templateContextMenu
