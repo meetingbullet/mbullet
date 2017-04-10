@@ -40,17 +40,6 @@
 						</div>
 						</div>
 						<div class="an-component-body">
-						<div class="an-social-login">
-							<div id="g-signin2" data-onsuccess="onSignIn"></div>
-							<!--<a class="an-social-icon facebook" href="#"><i class="ion-social-facebook"></i></a>
-							<a class="an-social-icon twitter" href="#"><i class="ion-social-twitter"></i></a>
-							<a class="an-social-icon google-plus" href="#"><i class="ion-social-googleplus"></i></a>
-							<a class="an-social-icon dribble" href="#"><i class="ion-social-dribbble"></i></a>
-							<a class="an-social-icon github" href="#"><i class="ion-social-github"></i></a>
-							<a class="an-social-icon instagram" href="#"><i class="ion-social-instagram"></i></a>
-							<a class="an-social-icon yahoo" href="#"><i class="ion-social-yahoo"></i></a>
-							<a class="an-social-icon linkedin" href="#"><i class="ion-social-linkedin"></i></a>-->
-						</div>
 						<?php echo form_open(LOGIN_URL, array('autocomplete' => 'off')); ?>
 							<label><?php echo $this->settings_lib->item('auth.login_type') == 'both' ? lang('bf_username') .'/'. lang('bf_email') : ucwords($this->settings_lib->item('auth.login_type')) ?></label>
 							<div class="an-input-group">
@@ -73,6 +62,7 @@
 							</div>
 
 							<button name="log-me-in" class="an-btn an-btn-default fluid"><?php e(lang('us_let_me_in')); ?></button>
+							<a href="<?php echo $auth_url ?>" style="margin-top: 5px;" class="an-btn an-btn-default fluid"><i class="fa fa-google-plus" aria-hidden="true"></i><?php e(' ' . lang('us_let_me_in') . ' ' . lang('us_with_google')); ?></a>
 						<?php echo form_close(); ?>
 
 						</div> <!-- end .AN-COMPONENT-BODY -->
