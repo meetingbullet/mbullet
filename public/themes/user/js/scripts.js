@@ -611,3 +611,16 @@ if (clipboard) {
  * Initialize wow js for scrolling aniamtion
 */
 new WOW().init();
+
+/** baodg: relative long group **/
+$(document).ready(function() {
+	$('.an.input-group input.form-control').focus(function() {
+		var parent = $(this).parent();
+		parent.addClass('focused');
+	});
+	$('.an.input-group input.form-control').blur(function() {
+		var parent = $(this).parent();
+		parent.removeClass('focused');
+	});
+});
+/** baodg: end **/
