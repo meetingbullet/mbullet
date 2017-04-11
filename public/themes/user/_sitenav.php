@@ -177,19 +177,19 @@
             <div class="an-profile-settings">
                 <div class="btn-group an-notifications-dropown  profile">
                 <button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="an-profile-img" style="background-image: url('<?php echo Template::theme_url("images/users/user5.jpg"); ?>');"></span>
-                    <span class="an-user-name">John Smith</span>
+                    <span class="an-profile-img" style="background-image: url('<?php echo $current_user->avatar ? img_path() . 'users/' . $current_user->avatar : img_path() . 'default_avatar.png'; ?>');"></span>
+                    <span class="an-user-name"><?php echo $current_user->first_name . ' ' . $current_user->last_name ?></span>
                     <span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
                 </button>
                 <div class="dropdown-menu">
                     <p class="an-info-count">Profile Settings</p>
                     <ul class="an-profile-list">
-                    <li><a href="#"><i class="icon-user"></i>My profile</a></li>
-                    <li><a href="#"><i class="icon-envelop"></i>My inbox</a></li>
+                    <li><a href="<?php e(site_url() . 'users/profile')?>"><i class="icon-user"></i>My profile</a></li>
+                    <!--<li><a href="#"><i class="icon-envelop"></i>My inbox</a></li>
                     <li><a href="#"><i class="icon-calendar-check"></i>Calendar</a></li>
                     <li role="separator" class="divider"></li>
-                    <li><a href="#"><i class="icon-lock"></i>Lock screen</a></li>
-                    <li><a href="<?php e(site_url() . 'logout')?>"><i class="icon-download-left"></i>Log out</a></li>
+                    <li><a href="#"><i class="icon-lock"></i>Lock screen</a></li>-->
+                    <li><a href="<?php e(site_url() . 'logout')?>"><i class="icon-download-left"></i><?php e(lang('us_logout'))?></a></li>
                     </ul>
                 </div>
                 </div>

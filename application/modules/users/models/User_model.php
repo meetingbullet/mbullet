@@ -83,6 +83,38 @@ class User_model extends BF_Model
 				'rules' => 'trim|max_length[2048]',
 			)
 		),
+        'profile' => array (
+			array(
+				'field' => 'password',
+				'label' => 'lang:us_reg_password',
+				'rules' => 'trim|max_length[60]',
+			),
+			array(
+				'field' => 'conf_password',
+				'label' => 'lang:us_reg_conf_password',
+				'rules' => 'trim|max_length[60]|matches[password]',
+			),
+			array(
+				'field' => 'first_name',
+				'label' => 'lang:us_reg_first_name',
+				'rules' => 'trim|max_length[255]',
+			),
+			array(
+				'field' => 'last_name',
+				'label' => 'lang:us_reg_last_name',
+				'rules' => 'trim|max_length[255]',
+			),
+			array(
+				'field' => 'skype',
+				'label' => 'lang:us_reg_skype',
+				'rules' => 'trim|max_length[255]',
+			),
+			array(
+				'field' => 'google_id_token',
+				'label' => 'lang:us_reg_google_id_token',
+				'rules' => 'trim|max_length[2048]',
+			)
+		),
 		'register' => array(
 			array(
 				'field' => 'email',

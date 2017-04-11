@@ -52,6 +52,11 @@ class Users extends Front_Controller
 		}
 		//load google api config file
 		$this->config->load('users/google_api');
+		// Set up login using google account
+		Assets::add_module_js('users', 'google_api.js');
+		Assets::add_module_js('users', 'users.js');
+		Template::set('use_google_api', true);
+		Template::set('client_id', $this->config->item('client_id'));
 	}
 
 	// -------------------------------------------------------------------------
@@ -269,10 +274,10 @@ class Users extends Front_Controller
 	 */
 	public function logout()
 	{
-		if (isset($this->current_user->id)) {
+		if (isset($this->current_user->user_id)) {
 			// Login session is valid. Log the Activity.
 			log_activity(
-				$this->current_user->id,
+				$this->current_user->user_id,
 				lang('us_log_logged_out') . ': ' . $this->input->ip_address(),
 				'users'
 			);
@@ -303,52 +308,52 @@ class Users extends Front_Controller
 		$this->load->config('address');
 		$this->load->helper('address');
 
-		$this->load->config('user_meta');
-		$meta_fields = config_item('user_meta_fields');
-
-		Template::set('meta_fields', $meta_fields);
-
 		if (isset($_POST['save'])) {
-			$user_id = $this->current_user->id;
-			if ($this->saveUser('update', $user_id, $meta_fields)) {
-				$user = $this->user_model->find($user_id);
-				$log_name = empty($user->display_name) ?
-					($this->settings_lib->item('auth.use_usernames') ? $user->username : $user->email)
-					: $user->display_name;
+			$user_id = $this->current_user->user_id;
+			$user = $this->user_model->find($user_id);
+			$rules = $this->user_model->get_validation_rules();
+			$this->form_validation->set_rules($rules['profile']);
 
-				log_activity(
-					$this->current_user->id,
-					lang('us_log_edit_profile') . ": {$log_name}",
-					'users'
-				);
+			if ($this->form_validation->run() !== false) {
+				$data = $this->user_model->prep_data($this->input->post());
 
-				Template::set_message(lang('us_profile_updated_success'), 'success');
+				if ($data['avatar']['size'] > 0) {
+					if ($user->avatar) {
+						@unlink($upload_config['upload_path'] . $user->avatar);
+					}
 
-				// Redirect to make sure any language changes are picked up.
-				Template::redirect('/users/profile');
+					$upload_config = $this->config->load('upload');
+					$this->load->library('upload', $upload_config);
+					$this->upload->do_upload('avatar');
+					$data['avatar'] = $this->upload->data();
+				} else {
+					unset($data['avatar']);
+				}
+
+				// User cannot change his email
+				unset($data['email']);
+
+				if (isset($data['password'])) {
+					$data['password'] = $this->auth->hash_password($data['password']);
+				}
+
+				$updated = $this->user_model->update($user_id, $data);
+
+				if (! $updated) {
+					Template::set_message(lang('us_profile_updated_error'), 'danger');
+				} else {
+					Template::set_message(lang('us_profile_updated_success'), 'success');
+				}
 			}
-
-			Template::set_message(lang('us_profile_updated_error'), 'danger');
 		}
 
 		// Get the current user information.
-		$user = $this->user_model->find_user_and_meta($this->current_user->id);
-
-		if ($this->siteSettings['auth.password_show_labels'] == 1) {
-			Assets::add_js(
-				$this->load->view('users_js', array('settings' => $this->siteSettings), true),
-				'inline'
-			);
-		}
-
-		// Generate password hint messages.
-		$this->user_model->password_hints();
+		$user = $this->user_model->find($this->current_user->user_id);
 
 		Template::set('user', $user);
 		Template::set('languages', unserialize($this->settings_lib->item('site.languages')));
-
 		Template::set_view('profile');
-		Template::render();
+		Template::render('blank');
 	}
 
 	/**
@@ -411,40 +416,43 @@ class Users extends Front_Controller
 			$this->form_validation->set_rules($rules['create_profile']);
 
 			if ($this->form_validation->run() !== false) {
-				if ($this->upload->do_upload('avatar')) {
-					$avatar = $this->upload->data();
+				$post_avatar = $this->input->post('avatar');
+				$avatar = NULL;
 
-					$password = $this->auth->hash_password($this->input->post('password'));
-					if (empty($password) || empty($password['hash'])) {
+				if ($post_avatar['size'] > 0) {
+					$this->upload->do_upload('avatar');
+					$avatar = $this->upload->data();
+				}
+
+				$password = $this->auth->hash_password($this->input->post('password'));
+				if (empty($password) || empty($password['hash'])) {
+					Template::set_message(lang('us_register_failed'), 'danger');
+					@unlink($upload_config['upload_path'] . $data['avatar']);
+				} else {
+					$data = [
+						'avatar' => $avatar['file_name'],
+						'first_name' => $this->input->post('first_name'),
+						'last_name' => $this->input->post('last_name'),
+						'email' => $this->input->post('email'),
+						'skype' => $this->input->post('skype'),
+						'password_hash' => $password['hash'],
+					];
+
+					$added = $this->user_model->insert($data);
+					if (! $added) {
 						Template::set_message(lang('us_register_failed'), 'danger');
 						@unlink($upload_config['upload_path'] . $data['avatar']);
 					} else {
-						$data = [
-							'avatar' => $avatar['file_name'],
-							'first_name' => $this->input->post('first_name'),
-							'last_name' => $this->input->post('last_name'),
-							'email' => $this->input->post('email'),
-							'skype' => $this->input->post('skype'),
-							'password_hash' => $password['hash'],
-						];
+						$user_id = $added;
+						$activation = $this->user_model->set_activation($user_id);
 
-						$added = $this->user_model->insert($data);
-						if (! $added) {
-							Template::set_message(lang('us_register_failed'), 'danger');
-							@unlink($upload_config['upload_path'] . $data['avatar']);
-						} else {
-							$user_id = $added;
-							$activation = $this->user_model->set_activation($user_id);
+						$message = $activation['message'];
+						$error = $activation['error'];
 
-							$message = $activation['message'];
-							$error = $activation['error'];
-
-							Template::set_message($message, $error === true ? 'danger' : 'success');
-							log_activity($user_id, lang('us_log_register'), 'users');
-						}
+						log_activity($user_id, lang('us_log_register'), 'users');
+						Template::set_message($message, $error === true ? 'danger' : 'success');
+						Template::redirect(LOGIN_URL);
 					}
-				} else {
-					Template::set_message($this->upload->display_errors(), 'danger');
 				}
 			} else {
 				if (form_error('email') != '') {
@@ -455,7 +463,7 @@ class Users extends Front_Controller
 			}
 		}
 
-		Template::render();
+		Template::render('blank');
 	}
 	// public function register()
 	// {
@@ -730,7 +738,7 @@ class Users extends Front_Controller
 			Template::set_message(lang('us_account_active'), 'success');
 			// Template::redirect('/');
 		}
-		Template::render();
+		Template::render('blank');
 	}
 
 	/**
@@ -750,9 +758,9 @@ class Users extends Front_Controller
 				if ($user === false) {
 					Template::set_message('Cannot find that email in our records.', 'danger');
 				} else {
-					$activation = $this->user_model->set_activation($user->id);
+					$activation = $this->user_model->set_activation($user->user_id);
 					$message = $activation['message'];
-					$error = $activation['danger'];
+					$error = $activation['error'];
 
 					Template::set_message($message, $error ? 'danger' : 'success');
 				}
@@ -761,7 +769,7 @@ class Users extends Front_Controller
 
 		Template::set_view('users/resend_activation');
 		Template::set('page_title', 'Activate Account');
-		Template::render();
+		Template::render('blank');
 	}
 
 	// -------------------------------------------------------------------------
@@ -773,30 +781,25 @@ class Users extends Front_Controller
 	 *
 	 * @param  string  $type            The type of operation ('insert' or 'update').
 	 * @param  integer $id              The id of the user (ignored on insert).
-	 * @param  array   $metaFields      Array of meta fields for the user.
 	 *
 	 * @return boolean/integer The id of the inserted user or true on successful
 	 * update. False if the insert/update failed.
 	 */
-	private function saveUser($type = 'insert', $id = 0, $metaFields = array())
+	private function saveUser($type = 'insert', $id = 0)
 	{
-		$extraUniqueRule = '';
-
 		if ($type != 'insert') {
 			if ($id == 0) {
-				$id = $this->current_user->id;
+				$id = $this->current_user->user_id;
 			}
 			$_POST['id'] = $id;
 
 			// Security check to ensure the posted id is the current user's id.
-			if ($_POST['id'] != $this->current_user->id) {
+			if ($_POST['id'] != $this->current_user->user_id) {
 				$this->form_validation->set_message('email', 'lang:us_invalid_userid');
 				return false;
 			}
-
-			$extraUniqueRule = ',users.id';
 		}
-
+		dump($this->user_model->get_validation_rules($type));
 		$this->form_validation->set_rules($this->user_model->get_validation_rules($type));
 
 		$usernameRequired = '';
@@ -806,26 +809,11 @@ class Users extends Front_Controller
 			$usernameRequired = 'required|';
 		}
 
-		$this->form_validation->set_rules('email', 'lang:bf_email', "required|trim|valid_email|max_length[254]|unique[users.email{$extraUniqueRule}]");
-
 		// If a value has been entered for the password, pass_confirm is required.
 		// Otherwise, the pass_confirm field could be left blank and the form validation
 		// would still pass.
 		if ($type != 'insert' && $this->input->post('password')) {
 			$this->form_validation->set_rules('pass_confirm', 'lang:bf_password_confirm', "required|matches[password]");
-		}
-
-		$userIsAdmin = isset($this->current_user) && $this->current_user->role_id == 1;
-		$metaData = array();
-		foreach ($metaFields as $field) {
-			$adminOnlyField = isset($field['admin_only']) && $field['admin_only'] === true;
-			$frontEndField = ! isset($field['frontend']) || $field['frontend'];
-			if ($frontEndField
-				&& ($userIsAdmin || ! $adminOnlyField)
-			) {
-				$this->form_validation->set_rules($field['name'], $field['label'], $field['rules']);
-				$metaData[$field['name']] = $this->input->post($field['name']);
-			}
 		}
 
 		// Setting the payload for Events system.
@@ -840,6 +828,7 @@ class Users extends Front_Controller
 
 		// Compile our core user elements to save.
 		$data = $this->user_model->prep_data($this->input->post());
+		dump($data);
 		$result = false;
 
 		if ($type == 'insert') {
@@ -855,10 +844,6 @@ class Users extends Front_Controller
 			}
 		} else {
 			$result = $this->user_model->update($id, $data);
-		}
-
-		if (is_numeric($id) && ! empty($metaData)) {
-			$this->user_model->save_meta_for($id, $metaData);
 		}
 
 		// Add result to payload.
