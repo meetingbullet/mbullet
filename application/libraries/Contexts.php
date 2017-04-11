@@ -241,7 +241,7 @@ class Contexts
                 $menu .= str_replace(
                     array('{parent_class}', '{url}', '{id}', '{current_class}', '{title}', '{extra}', '{text}', '{content}', '{caret}'),
                     array(
-                        self::$parent_class . ' ' . check_class($context, true),
+                        self::$parent_class . ' ' . self::check_active($context, true),
                         site_url(self::$site_area . "/{$context}"),
                         "tb_{$context}",
                         $top_level_only ? '' : ($has_context_nav ? self::$templateContextMenuOpenClass : self::$templateContextMenuAnchorClass),
@@ -298,6 +298,22 @@ class Contexts
         }
 
         return $out;
+    }
+    /**
+     * Coppied from Template::self::check_active
+     *
+     * Default self::check_active function by Bonfire set class to 'active'.
+     * Our theme need 'current active'
+     *
+     * @return string The navigation lists.
+     */
+    public static function check_active($item = '', $class_only = false)
+    {
+        if (strtolower(get_instance()->router->class) == strtolower($item)) {
+            return $class_only ? 'current active' : 'class="current active"';
+        }
+
+        return '';
     }
 
     /**

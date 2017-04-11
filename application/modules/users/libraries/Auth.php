@@ -122,10 +122,6 @@ class Auth
 				$login
 			);
 
-		if (empty($google_token)) {
-			$google_token = $user->google_id_token;
-		}
-
 		// Check whether the username, email, or password doesn't exist.
 		if ($user == false) {
 			Template::set_message(lang('us_bad_email_pass'), 'danger');
@@ -201,6 +197,10 @@ class Auth
 			}
 		}
 
+		if (empty($google_token)) {
+			$google_token = $user->google_id_token;
+		}
+		
 		// The login was successfully validated, so setup the session
 		$this->setupSession(
 			$user->user_id,

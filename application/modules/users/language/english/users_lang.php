@@ -94,11 +94,13 @@ $lang['us_reset_note']				= 'Enter your email and we will send a reset password 
 $lang['us_send_password']			= 'Send Password';
 
 $lang['us_login']					= 'Please sign in';
+$lang['us_logout']					= 'Logout';
 $lang['us_remember_note']			= 'Remember me';
 $lang['us_sign_up']					= 'Create An Account';
 $lang['us_forgot_your_password']	= 'Forgot Your Password?';
 $lang['us_let_me_in']				= 'Sign In';
-$lang['us_create_profile'] = 'Create Profile';
+$lang['us_create_profile'] 			= 'Create Profile';
+$lang['us_update_profile'] 			= 'Update Profile';
 
 $lang['us_password_mins']			= 'Minimum 8 characters.';
 $lang['us_register']				= 'Register';
@@ -218,6 +220,8 @@ $lang['users_act_invalid_login_attempt'] = 'Invalid login attempt from IP %s for
 $lang['us_reg_email'] = 'Email Address';
 $lang['us_reg_first_name'] = 'First Name';
 $lang['us_reg_last_name'] = 'Last Name';
+$lang['us_reg_name'] = 'Your Name';
+$lang['us_reg_upload'] = 'Upload';
 $lang['us_reg_skype'] = 'Skype';
 $lang['us_reg_avatar'] = 'Profile Picture';
 $lang['us_reg_password'] = 'Password';

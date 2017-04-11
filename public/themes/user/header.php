@@ -23,8 +23,6 @@ Assets::add_js($inline, 'inline');
     /* Modernizr is loaded before CSS so CSS can utilize its features */
     echo Assets::js('modernizr-2.5.3.js');
     ?>
-    <?php echo Assets::css(); ?>
-    <link rel="shortcut icon" href="<?php echo base_url(); ?>favicon.ico">
 
     <!-- Theme CSS -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
@@ -32,6 +30,10 @@ Assets::add_js($inline, 'inline');
     <link href="<?php echo Template::theme_url("css/vendor-styles.css"); ?>" rel="stylesheet">
     <link href="<?php echo Template::theme_url("css/styles.css"); ?>" rel="stylesheet" >
     <link href="<?php echo Template::theme_url("screen.css"); ?>" rel="stylesheet" >
+
+    <?php echo Assets::css(); ?>
+    <link rel="shortcut icon" href="<?php echo base_url(); ?>favicon.ico">
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

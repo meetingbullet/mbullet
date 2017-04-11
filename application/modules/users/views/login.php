@@ -1,8 +1,9 @@
 <?php
 	$site_open = $this->settings_lib->item('auth.allow_register');
+	$message = Template::message();
 ?>
 
-	<?php if (validation_errors() || Template::message()) : ?>
+	<?php if (validation_errors() || $message) : ?>
 	<div class="an-notification-content top-full-width">
 		<?php if(validation_errors()): ?>
 		<div class="alert alert-danger  js-nofitication-body" role="alert" style="">
@@ -10,7 +11,7 @@
 			<?php echo validation_errors() ?>
 		</div>
 		<?php else: ?>
-			<?php echo iif(validation_errors(), validation_errors(), Template::message()); ?>
+			<?php echo $message; ?>
 		<?php endif; ?>
 	</div>
 	<?php endif; ?>

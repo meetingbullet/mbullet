@@ -1,76 +1,102 @@
-<?php
-
-$errorClass   = empty($errorClass) ? ' danger' : $errorClass;
-$controlClass = empty($controlClass) ? 'span6' : $controlClass;
-$fieldData = array(
-    'errorClass'   => $errorClass,
-    'controlClass' => $controlClass,
-);
-
-if (isset($password_hints)) {
-    $fieldData['password_hints'] = $password_hints;
-}
-
-// In order for $renderPayload to be set properly, the order of the isset() checks
-// for $current_user, $user, and $this->auth should be maintained. An if/elseif
-// structure could be used for $renderPayload, but the separate if statements would
-// still be needed to set $fieldData properly.
-$renderPayload = null;
-if (isset($current_user)) {
-    $fieldData['current_user'] = $current_user;
-    $renderPayload = $current_user;
-}
-if (isset($user)) {
-    $fieldData['user'] = $user;
-    $renderPayload = $user;
-}
-if (empty($renderPayload) && isset($this->auth)) {
-    $renderPayload = $this->auth->user();
-}
-
+<?php 
+$defaultTimezone = isset($user->timezone) ? $user->timezone : strtoupper(settings_item('site.default_user_timezone'));
+$message = Template::message();
 ?>
-<section id="profile">
-    <h1 class="page-header"><?php echo lang('us_edit_profile'); ?></h1>
-    <?php if (validation_errors()) : ?>
-    <div class="alert alert-error">
-        <?php echo validation_errors(); ?>
-    </div>
-    <?php
-    endif;
-    if (isset($user) && $user->role_name == 'Banned') :
-    ?>
-    <div data-dismiss="alert" class="alert alert-error">
-        <?php echo lang('us_banned_admin_note'); ?>
-    </div>
-    <?php endif; ?>
-    <div class="alert alert-info">
-        <h4 class="alert-heading"><?php echo lang('bf_required_note'); ?></h4>
-        <?php
-        if (isset($password_hints)) {
-            echo $password_hints;
-        }
-        ?>
-    </div>
-    <div class="row-fluid">
-        <div class="span12">
-            <?php echo form_open($this->uri->uri_string(), array('class' => 'form-horizontal', 'autocomplete' => 'off')); ?>
-                <fieldset>
-                    <?php Template::block('user_fields', 'user_fields', $fieldData); ?>
-                </fieldset>
-                <fieldset>
-                    <?php
-                    // Allow modules to render custom fields
-                    Events::trigger('render_user_form', $renderPayload);
-                    ?>
-                    <!-- Start User Meta -->
-                    <?php $this->load->view('users/user_meta', array('frontend_only' => true)); ?>
-                    <!-- End of User Meta -->
-                </fieldset>
-                <fieldset class="form-actions">
-                    <input type="submit" name="save" class="btn btn-primary" value="<?php echo lang('bf_action_save') . ' ' . lang('bf_user'); ?>" />
-                    <?php echo lang('bf_or') . ' ' . anchor('/', lang('bf_action_cancel')); ?>
-                </fieldset>
-            <?php echo form_close(); ?>
-        </div>
-    </div>
-</section>
+
+	<?php if (validation_errors() || $message) : ?>
+	<div class="an-notification-content top-full-width">
+		<?php if(validation_errors()): ?>
+		<div class="alert alert-danger  js-nofitication-body" role="alert" style="">
+			<button type="button" class="close"><span aria-hidden="true">×</span></button>
+			<?php echo validation_errors() ?>
+		</div>
+		<?php else: ?>
+			<?php echo $message; ?>
+		<?php endif; ?>
+	</div>
+	<?php endif; ?>
+
+	<div class="an-page-content">
+        <div class="an-flex-center-center">
+			<div class="container">
+				<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="an-login-container">
+					<div class="back-to-home">
+						<h3 class="an-logo-heading text-center wow fadeInDown">
+						<a class="an-logo-link" href="<?php e(base_url())?>"><?php e($this->settings_lib->item('site.title')) ?>
+							<span><?php e($this->settings_lib->item('site.description')) ?></span>
+						</a>
+						</h3>
+					</div>
+					<div class="an-single-component with-shadow">
+						<div class="an-component-header">
+                            <h6><?php echo lang('us_edit_profile'); ?></h6>
+
+                            <div class="component-header-right">
+                            </div>
+						</div>
+						<div class="an-component-body">
+							<?php echo form_open_multipart($this->uri->uri_string(), array('class' => "form-horizontal", 'autocomplete' => 'off')); ?>
+								<div class="an-input-group">
+                                    <label class='an-form-avatar-label'><?php echo lang('us_reg_avatar') ?></label>
+                                    <div class="an-avatar">
+                                        <img class='an-form-avatar-preview' id="user-avatar-preview" src="<?php echo $user->avatar ? img_path() . '/users/' . $user->avatar : img_path() . 'default_avatar.png' ?>"/>
+                                        <div class='an-form-avatar-dim'><span><i class='ion-ios-upload-outline'></i></span></div>
+                                        <input type="file" id="user-avatar" name="avatar" class="an-form-avatar"/>
+                                    </div>
+								</div>
+
+								<label><?php echo lang('us_reg_email') ?></label>
+								<div class="an-input-group">
+									<div class="an-input-group-addon"><i class="ion-ios-email-outline"></i></div>
+									<input type="text" name="email" class="an-form-control <?php echo iif( form_error('email') , 'danger') ;?>" value="<?php echo $user->email ?>" readOnly/>
+								</div>
+
+								<label><?php echo lang('us_reg_name') ?></label>
+								<div class="an-input-group">
+									<div class="an-input-group-addon"><i class="ion-ios-person"></i></div>
+									<input type="text" name="first_name" class="an-form-firstname an-form-control <?php echo iif( form_error('first_name') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_first_name') ?>" value="<?php echo set_value('first_name', $user->first_name) ?>"/>
+									<input type="text" name="last_name" class="an-form-lastname an-form-control <?php echo iif( form_error('last_name') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_last_name') ?>" value="<?php echo set_value('last_name', $user->last_name) ?>"/>
+								</div>
+
+								<label><?php echo lang('us_reg_password') ?></label>
+								<div class="an-input-group">
+									<div class="an-input-group-addon"><i class="ion-key"></i></div>
+									<input type="password" name="password" class="an-form-control <?php echo iif( form_error('password') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_password') ?>"/>
+								</div>
+								<div class="an-input-group">
+									<div class="an-input-group-addon"><i class="ion-key"></i></div>
+									<input type="password" name="conf_password" class="an-form-control <?php echo iif( form_error('password') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_conf_password') ?>"/>
+								</div>
+
+								<label><?php echo lang('us_reg_skype') ?></label>
+								<div class="an-input-group">
+									<div class="an-input-group-addon"><i class="ion-social-skype"></i></div>
+									<input type="text" name="skype" class="an-form-control <?php echo iif( form_error('skype') , 'danger') ;?>" value="<?php echo set_value('skype', $user->skype) ?>"/>
+								</div>
+
+								<label><?php echo lang('bf_timezone'); ?></label>
+								<div class="an-input-group">
+									<div class="an-input-group-addon"><i class="ion-social-skype"></i></div>
+									<?php
+                                    echo timezone_menu(
+                                        set_value('timezone', isset($user) ? $user->timezone : $defaultTimezone),
+                                        'an-form-control',
+                                        'timezone',
+                                        array('id' => 'timezone')
+                                    );
+                                    ?>
+								</div>
+
+								<button type="submit" name="save" class="an-btn an-btn-default fluid"><?php e(lang('us_update_profile')); ?></button>
+							<?php echo form_close(); ?>
+
+						</div> <!-- end .AN-COMPONENT-BODY -->
+					</div> <!-- end .AN-SINGLE-COMPONENT -->
+					</div> <!-- end an-login-container -->
+				</div>
+				</div> <!-- end row -->
+			</div>
+		</div> <!-- end an-flex-center-center -->
+	</div>
