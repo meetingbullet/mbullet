@@ -6462,3 +6462,38 @@ input[type="button"].btn-block {
         transform: rotate(360deg);
     }
 }
+
+/** baodg: relative long group **/
+.an.input-group {
+	outline: 0;
+    background-color: transparent;
+    border: 1px solid #999;
+    transition: all, 0.3s, ease;
+    border-radius: 2px;
+    margin-bottom: 20px;
+}
+
+.an.input-group>.input-group-addon {
+	background: rgba(249, 249, 249, 0.3);
+	border-left: 1px solid #ededed;
+	border-right: 1px solid #ededed;
+	padding-top: 0;
+	padding-bottom: 0;
+	font-size: 18px;
+}
+
+.an.input-group>* {
+	border-radius: 0px;
+	border: none;
+	color: #333333;
+}
+
+.an.input-group>*:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+.an.input-group.focused {
+	border-color: #333333;
+}
+/** baodg: end **/
