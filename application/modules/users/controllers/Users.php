@@ -162,13 +162,15 @@ class Users extends Front_Controller
 			// 	Template::redirect($this->auth->login_destination);
 			// }
 
-			// If possible, send the user to the requested page.
-			if (! empty($this->requested_page)) {
-				Template::redirect($this->requested_page);
-			}
+			// // If possible, send the user to the requested page.
+			// if (! empty($this->requested_page)) {
+			// 	Template::redirect($this->requested_page);
+			// }
 
-			// If there is nowhere else to go, go home.
-			Template::redirect('/');
+			// // If there is nowhere else to go, go home.
+			// Template::redirect('/');
+			$this->check_current_email();
+			redirect('/');
 		}
 
 		Assets::add_css('font-awesome/css/font-awesome.min.css');
@@ -728,7 +730,7 @@ class Users extends Front_Controller
 			}
 		} else {
 			Template::set_message(lang('us_account_active'), 'success');
-			// Template::redirect('/');
+			redirect('/login');
 		}
 		Template::render();
 	}
@@ -867,5 +869,72 @@ class Users extends Front_Controller
 		Events::trigger('save_user', $payload);
 
 		return $result;
+	}
+
+	private function check_current_email()
+	{
+		if (! isset($this->current_user)) {
+			if (! class_exists('Auth')) {
+				$this->load->library('users/Auth');
+			}
+			$current_user = $this->auth->user();
+		} else {
+			$current_user = $this->current_user;
+		}
+		$data = [
+			'public_domain' => false,
+			'domain_name' => ''
+		];
+
+		$current_email = $current_user->email;
+		$domain_name = substr(strrchr($current_email, "@"), 1);
+		// get email domain name
+		$data['domain_name'] = $domain_name;
+		// detect if it is a public domain name
+		$is_public_domain_name = $this->db->select('count(*) as count')
+										->where('domain', $domain_name)
+										->get('public_email_domains')->row()->count > 0 ? true : false;
+		if ($is_public_domain_name) {
+			// if it is a public domain name, check if it is in existed organization
+			$data['public_domain'] = true;
+			$user_organization = $this->db->select('o.url')
+											->from('organizations o')
+											->join('user_to_organizations uto', 'o.organization_id = uto.organization_id', 'left')
+											->where('uto.user_id', $current_user->user_id)
+											->get()->row();
+			// if it is in existed organization, not allow to create a new organization
+			if (! empty($user_organization)) {
+				Template::redirect('/'); // organization url
+			} else {
+				Template::redirect('/organization/create');
+			}
+		} else {
+			// if it is not a public domain name, check if it is in existed organization
+			$existed_domain_name = $this->db->select('od.*, o.url, r.role_id')
+											->from('organization_domains od')
+											->join('organizations o', 'o.organization_id = od.organization_id', 'left')
+											->join('roles r', 'r.organization_id = o.organization_id AND join_default = \'1\'', 'left')
+											->where('od.domain', $domain_name)
+											->get()->row();
+			// if it is in existed organization, not allow to create a new organization
+			if ($existed_domain_name) {
+				$in_organization = $this->db->select('count(*) as count')
+											->from('user_to_organizations')
+											->where('user_id', $current_user->user_id)
+											->get()->row()->count > 0 ? true : false;
+				if (! $in_organization) {
+					$this->db->insert('user_to_organizations', [
+						'user_id' => $current_user->user_id,
+						'organization_id' => $existed_domain_name->organization_id,
+						'role_id' => $existed_domain_name->role_id
+					]);
+				}
+
+				$organization_url = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $existed_domain_name->url . '.' . $_SERVER['SERVER_NAME'];
+				Template::redirect($organization_url);
+			} else {
+				Template::redirect('/organization/create');
+			}
+		}
 	}
 }
