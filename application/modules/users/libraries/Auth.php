@@ -749,7 +749,7 @@ class Auth
 		}
 
 		$this->setupSession(
-			$user->id,
+			$user->user_id,
 			$user->password_hash,
 			$user->email,
 			$user->role_ids,
