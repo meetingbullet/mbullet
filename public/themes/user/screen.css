@@ -2,6 +2,10 @@ body {
     background-color: #f9f9f9;
 }
 
+.an-sidebar-search .an-form-control {
+    background: transparent;
+}
+
 .an-form-control {
     background: #FFF;
 }
