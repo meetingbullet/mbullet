@@ -52,11 +52,6 @@ class Projects extends Authenticated_Controller
 		));
 
 		if ($this->form_validation->run() === false) {
-			dump(array_merge(
-			$this->project_model->project_validation_rules,
-			$constraint_rules,
-			$expectation_rules
-		));
 			return false;
 		}
 

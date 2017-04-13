@@ -52,12 +52,12 @@ class Project_expectation_model extends BF_Model
         ),
         array(
             'field' => 'no_meeting',
-            'label' => 'lang:pj_no_meetings',
+            'label' => 'lang:pj_no_of_meetings',
             'rules' => 'numeric|required|max_length[11]',
         ),
         array(
             'field' => 'no_attendee',
-            'label' => 'lang:pj_no_atendees',
+            'label' => 'lang:pj_no_of_attendees',
             'rules' => 'numeric|required|max_length[11]',
         ),
         array(
