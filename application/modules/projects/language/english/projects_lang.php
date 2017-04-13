@@ -5,6 +5,10 @@ $lang['pj_create_project']			= 'Create Project';
 $lang['pj_constraints']				= 'Constraints';
 $lang['pj_expectations']			= 'Expectations';
 
+// Messages
+$lang['pj_project_successfully_created'] = 'Project successfully created';
+$lang['pj_there_was_a_problem_while_creating_project'] = 'There was a problem while creating project';
+
 // Fields
 $lang['pj_project_name'] 			= 'Project name';
 $lang['pj_investment_hours'] 		= 'Investment (hours)';
@@ -16,7 +20,7 @@ $lang['pj_no_of_meetings'] 			= '# of meetings';
 $lang['pj_no_of_attendees'] 			= '# of attendees';
 $lang['pj_return_on_invested_hours'] 			= 'Return on invested hours';
 $lang['pj_time_cost_to_milestone'] 			= 'Time/Cost to milestone';
-$lang['pj_outcomes_per_period'] 			= 'Outcomes per peroid';
+$lang['pj_outcomes_per_period'] 			= 'Outcomes per period';
 $lang['pj_hours'] 			= 'hours';
 $lang['pj_days'] 			= 'days';
 $lang['pj_weeks'] 			= 'weeks';

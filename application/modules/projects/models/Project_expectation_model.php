@@ -39,54 +39,44 @@ class Project_expectation_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	protected $validation_rules		= array();
-	protected $insert_validation_rules  = array(
-        array(
-            'field' => 'name',
-            'label' => 'lang:pj_project_name',
-            'rules' => 'trim|required|max_length[255]',
-        ),
-        array(
-            'field' => 'cost_code',
-            'label' => 'lang:pj_cost_code',
-            'rules' => 'trim|required|max_length[64]',
-        ),
+	public $project_validation_rules		= array(
         array(
             'field' => 'min_hour',
             'label' => 'lang:pj_min_investment_hour',
-            'rules' => 'numberic|required|max_length[11]',
+            'rules' => 'numeric|required|max_length[11]',
         ),
         array(
             'field' => 'max_hour',
             'label' => 'lang:pj_min_investment_hour',
-            'rules' => 'numberic|required|max_length[11]',
+            'rules' => 'numeric|required|max_length[11]',
         ),
         array(
             'field' => 'no_meeting',
             'label' => 'lang:pj_no_meetings',
-            'rules' => 'numberic|required|max_length[11]',
+            'rules' => 'numeric|required|max_length[11]',
         ),
         array(
-            'field' => 'no_atendee',
+            'field' => 'no_attendee',
             'label' => 'lang:pj_no_atendees',
-            'rules' => 'numberic|required|max_length[11]',
+            'rules' => 'numeric|required|max_length[11]',
         ),
         array(
             'field' => 'time_cost_to_milestone',
             'label' => 'lang:pj_time_cost_to_milestone',
-            'rules' => 'numberic|required|max_length[11]',
+            'rules' => 'numeric|required|max_length[11]',
         ),
         array(
             'field' => 'outcomes_per_period',
             'label' => 'lang:pj_outcomes_per_period',
-            'rules' => 'numberic|required|max_length[11]',
+            'rules' => 'numeric|required|max_length[11]',
         ),
         array(
-            'field' => 'peroid_type',
+            'field' => 'period_type',
             'label' => 'lang:pj_period',
             'rules' => 'required',
         )
     );
+	protected $insert_validation_rules  = array();
 	protected $skip_validation	= false;
 
 	/**
