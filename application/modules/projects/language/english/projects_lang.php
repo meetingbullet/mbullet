@@ -33,3 +33,22 @@ $lang['pj_min_investment_hour'] = 'Min investment hour';
 $lang['pj_max_investment_hour'] = 'Max investment hour';
 $lang['pj_min_return_on_invested_hour'] = 'Min return on invested hour';
 $lang['pj_max_return_on_invested_hour'] = 'Max return on invested hour';
+
+// Project detail
+$lang['pj_not_found'] = 'Project not found.';
+$lang['pj_more_btn_open_pj'] = 'Open this project';
+$lang['pj_more_btn_inactive_pj'] = 'Set this project Inactive';
+$lang['pj_more_btn_archive_pj'] = 'Archive this project';
+$lang['pj_more_btn_pj_setting'] = 'Project settings';
+$lang['pj_detail_tab_info'] = 'Info';
+$lang['pj_detail_tab_action'] = 'Action';
+$lang['pj_detail_tab_report'] = 'Report';
+$lang['pj_detail_tab_info_table_actions'] = 'My Actions';
+$lang['pj_detail_tab_info_table_steps'] = 'My Steps';
+$lang['pj_detail_tab_info_table_tasks'] = 'My Tasks';
+$lang['pj_detail_tab_info_table_label_key'] = 'Key';
+$lang['pj_detail_tab_info_table_label_name'] = 'Name';
+$lang['pj_detail_tab_info_table_label_status'] = 'Status';
+$lang['pj_info_pager_first'] = 'First';
+$lang['pj_info_pager_last'] = 'Last';
+
