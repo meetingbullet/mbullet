@@ -6,7 +6,7 @@
 		</div> <!-- end AN-BODY-TOPBAR -->
 		<div class='row'>
 			<div class="col-md-12">
-				<?php echo form_open() ?>
+				<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '']) ?>
 
 					<?php echo mb_form_input('text', 'name', lang('pj_project_name'), true) ?>
 
@@ -165,7 +165,7 @@
 						</div> <!-- end .AN-COMPONENT-BODY -->
 					</div>
 
-					<?php echo mb_form_input('text', 'cost_code', lang('pj_cost_code'), true, '', 'an-form-control', '', lang('pj_ex_pjn')) ?>
+					<?php echo mb_form_input('text', 'cost_code', lang('pj_cost_code'), true, '', 'an-form-control auto-cost-code', '', lang('pj_ex_pjn')) ?>
 					<?php echo mb_form_input('text', 'invite_team', lang('pj_invite_team'), false, '', 'an-tags-input js-input-tags', '', lang('pj_member_email')) ?>
 
 					<div class="row">

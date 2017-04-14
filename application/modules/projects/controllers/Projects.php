@@ -11,6 +11,8 @@ class Projects extends Authenticated_Controller
 		$this->load->model('project_model');
 		$this->load->model('project_constraint_model');
 		$this->load->model('project_expectation_model');
+
+		Assets::add_module_js('projects', 'projects.js');
 	}
 
 	public function index()
@@ -22,11 +24,30 @@ class Projects extends Authenticated_Controller
 	{
 		if (isset($_POST['save'])) {
 			if ($this->save_project()) {
-				Template::set_message(lang('pj_project_successfully_created'), 'success');
-				Template::redirect('projects');
+				Template::set('close_modal', 1);
+				Template::set('message_type', 'success');
+				Template::set('message', lang('pj_project_successfully_created'));
+
+				// Just to reduce AJAX request size
+				if ($this->input->is_ajax_request()) {
+					Template::set('content', '');
+				}
+				
+				Template::render();
+				return;
+			} else {
+				Template::set('close_modal', 0);
+				Template::set('message_type', 'danger');
+				Template::set('message', lang('pj_there_was_a_problem_while_creating_project'));
+				Template::render();
+				return;
 			}
 		}
-
+ 
+ 
+		Template::set('close_modal', 0);
+		Template::set('message_type', null);
+		Template::set('message', '');
 		Template::render();
 	}
 
@@ -57,7 +78,8 @@ class Projects extends Authenticated_Controller
 
 
 		if ($type == 'insert') {
-			$project_data['owner'] = $project_data['created_by'] = $this->current_user->user_id;
+			$project_data['organization_id'] = $this->current_user->current_organization_id;
+			$project_data['owner_id'] = $project_data['created_by'] = $this->current_user->user_id;
 
 			$project_id = $this->project_model->insert($project_data);
 
