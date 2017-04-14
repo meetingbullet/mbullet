@@ -271,6 +271,7 @@ class Projects extends Authenticated_Controller
 		Template::set('report_tab_data', []);
 
 		Assets::add_module_css('projects', 'projects.css');
+		Assets::add_module_js('projects', 'action_board.js');
 		Assets::add_module_js('projects', 'projects.js');
 		Template::set('project_name', 'Project test'/*$project->name*/);
 		Template::set('project_key', $project_key);
