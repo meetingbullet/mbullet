@@ -39,29 +39,7 @@ class Project_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	protected $validation_rules		= array(
-        // array(
-        //     'field' => 'email',
-        //     'label' => 'lang:us_reg_email',
-        //     'rules' => 'trim|required|valid_email|max_length[255]|unique[users.email]',
-        // ),
-        // array(
-        //     'field' => 'password',
-        //     'label' => 'lang:us_reg_password',
-        //     'rules' => 'trim|required|max_length[60]',
-        // ),
-        // array(
-        //     'field' => 'conf_password',
-        //     'label' => 'lang:us_reg_conf_password',
-        //     'rules' => 'trim|required|max_length[60]|matches[password]',
-        // ),
-        // array(
-        //     'field' => 'first_name',
-        //     'label' => 'lang:us_reg_first_name',
-        //     'rules' => 'trim|required|max_length[255]',
-        // ),
-	);
-	protected $insert_validation_rules  = array(
+	public $project_validation_rules		= array(
         array(
             'field' => 'name',
             'label' => 'lang:pj_project_name',
@@ -71,48 +49,9 @@ class Project_model extends BF_Model
             'field' => 'cost_code',
             'label' => 'lang:pj_cost_code',
             'rules' => 'trim|required|max_length[64]',
-        ),
-        array(
-            'field' => 'contraints[min_hour]',
-            'label' => 'lang:pj_min_investment_hour',
-            'rules' => 'numberic|required|max_length[11]',
-        ),
-        array(
-            'field' => 'contraints[max_hour]',
-            'label' => 'lang:pj_min_investment_hour',
-            'rules' => 'numberic|required|max_length[11]',
-        ),
-        array(
-            'field' => 'contraints[no_meeting]',
-            'label' => 'lang:pj_no_meetings',
-            'rules' => 'numberic|required|max_length[11]',
-        ),
-        array(
-            'field' => 'contraints[no_atendee]',
-            'label' => 'lang:pj_no_atendees',
-            'rules' => 'numberic|required|max_length[11]',
-        ),
-        array(
-            'field' => 'contraints[min_roi_rating]',
-            'label' => 'lang:pj_roi_rating',
-            'rules' => 'numberic|required|max_length[11]',
-        ),
-        array(
-            'field' => 'contraints[pj_roi_rating]',
-            'label' => 'lang:pj_min_investment_hour',
-            'rules' => 'numberic|required|max_length[11]',
-        ),
-        array(
-            'field' => 'contraints[min_period]',
-            'label' => 'lang:pj_period',
-            'rules' => 'numberic|required|max_length[11]',
-        ),
-        array(
-            'field' => 'contraints[max_period]',
-            'label' => 'lang:pj_period',
-            'rules' => 'numberic|required|max_length[11]',
         )
     );
+	protected $insert_validation_rules  = array();
 	protected $skip_validation	= false;
 
 	/**
