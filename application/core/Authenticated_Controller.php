@@ -82,9 +82,9 @@ class Authenticated_Controller extends Base_Controller
 					Template::redirect('/organization/create');
 				}
 			} else {
-				if ($this->router->fetch_module() != null && $this->router->fetch_class() != 'Home' && $this->router->fetch_method() !== 'index') {
-					Template::redirect('/');
-				}
+				// if ($this->router->fetch_module() != null && $this->router->fetch_class() != 'Home' && $this->router->fetch_method() !== 'index') {
+				// 	Template::redirect('/');
+				// }
 			}
 		} else {
 			// if it is not a public domain name, check if it is in existed organization
@@ -99,9 +99,9 @@ class Authenticated_Controller extends Base_Controller
 					Template::redirect('/organization/create');
 				}
 			} else {
-				if ($this->router->fetch_module() != null && $this->router->fetch_class() != 'Home' && $this->router->fetch_method() !== 'index') {
-					Template::redirect('/');
-				}
+				// if ($this->router->fetch_module() != null && $this->router->fetch_class() != 'Home' && $this->router->fetch_method() !== 'index') {
+				// 	Template::redirect('/');
+				// }
 			}
 		}
 
