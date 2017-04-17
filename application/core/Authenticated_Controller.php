@@ -34,6 +34,8 @@ class Authenticated_Controller extends Base_Controller
 		$this->autoload['libraries'][] = 'users/auth';
 
 		parent::__construct();
+		
+		$this->redirect_to_organization_url();
 
 		$this->form_validation->CI =& $this;
 		$this->form_validation->set_error_delimiters('', '');
@@ -75,36 +77,63 @@ class Authenticated_Controller extends Base_Controller
 											->from('organizations o')
 											->join('user_to_organizations uto', 'o.organization_id = uto.organization_id', 'left')
 											->where('uto.user_id', $current_user->user_id)
+											->where('uto.enabled', 1)
 											->get()->row();
 			// if it is in existed organization, not allow to create a new organization
 			if (! $user_organization) {
 				if ($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create') {
-					Template::redirect('/organization/create');
+					redirect('/organization/create');
 				}
-			} else {
-				// if ($this->router->fetch_module() != null && $this->router->fetch_class() != 'Home' && $this->router->fetch_method() !== 'index') {
-				// 	Template::redirect('/');
-				// }
 			}
 		} else {
 			// if it is not a public domain name, check if it is in existed organization
 			$existed_domain_name = $this->db->select('od.*, o.url')
 											->from('organization_domains od')
 											->join('organizations o', 'o.organization_id = od.organization_id', 'left')
+											->join('user_to_organizations uto', 'o.organization_id = uto.organization_id', 'left')
 											->where('od.domain', $domain_name)
+											->where('uto.enabled', 1)
 											->get()->row();
 			// if it is in existed organization, not allow to create a new organization
 			if (! $existed_domain_name) {
 				if ($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create') {
-					Template::redirect('/organization/create');
+					redirect('/organization/create');
 				}
-			} else {
-				// if ($this->router->fetch_module() != null && $this->router->fetch_class() != 'Home' && $this->router->fetch_method() !== 'index') {
-				// 	Template::redirect('/');
-				// }
 			}
 		}
 
 		return $data;
+	}
+
+	private function redirect_to_organization_url()
+	{
+		if (is_null($this->current_user->current_organization_id)) {
+			// get main domain
+			$current_domain = $_SERVER['SERVER_NAME'];
+			$parsed_url = explode('.', $current_domain);
+			$main_domain_parts = [];
+			for ($i = (count($parsed_url) - MAIN_DOMAIN_PARTS); $i < count($parsed_url); $i++) {
+				$main_domain_parts[] = $parsed_url[$i];
+			}
+			$main_domain = implode('.', $main_domain_parts);
+
+			// get sub domain
+			$orgs = $this->db->select('o.organization_id, o.url')
+							->from('organizations o')
+							->join('user_to_organizations uo', 'o.organization_id = uo.organization_id', 'left')
+							->where('uo.user_id', $this->current_user->user_id)
+							->where('uo.enabled', 1)
+							->get();
+			if ($orgs->num_rows() > 1) {
+				redirect('/organization/choose');
+			} elseif ($orgs->num_rows() == 1) {
+				$sub = $orgs->row()->url;
+				// redirect to organization domain if current domain is incorrect
+				if (isset($this->requested_page) && !empty($this->requested_page))
+					redirect((is_https() ? 'https://' : 'http://') . $sub . '.' . $main_domain . '/' . $this->uri->uri_string());
+				else
+					redirect((is_https() ? 'https://' : 'http://') . $sub . '.' . $main_domain . '/' . DEFAULT_LOGIN_LOCATION);
+			}
+		}
 	}
 }

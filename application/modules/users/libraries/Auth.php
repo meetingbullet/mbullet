@@ -304,9 +304,9 @@ class Auth
 		}
 
 		$user->current_organization_id = null;
-		if (isset($_SESSION['organization_url'])) {
+		if (isset($this->ci->current_organization_url) && ! is_null($this->ci->current_organization_url)) {
 			$org = $this->ci->db->select('organization_id')
-								->where('url', $_SESSION['organization_url'])
+								->where('url', $this->ci->current_organization_url)
 								->get('organizations')->row();
 			if (isset($org)) {
 				$user->current_organization_id = $org->organization_id;

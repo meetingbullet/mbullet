@@ -72,7 +72,7 @@ class Users extends Front_Controller
 	{
 		// If the user is already logged in, go home.
 		if ($this->auth->is_logged_in() !== false) {
-			Template::redirect('/');
+			redirect('/');
 		}
 		// include google client api
 		require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
@@ -174,8 +174,8 @@ class Users extends Front_Controller
 
 			// // If there is nowhere else to go, go home.
 			// Template::redirect('/');
-			$this->check_current_email();
-			redirect('/');
+			$this->join_into_organization();
+			// redirect('/');
 		}
 
 		Assets::add_css('font-awesome/css/font-awesome.min.css');
@@ -287,7 +287,7 @@ class Users extends Front_Controller
 
 		// Always clear browser data (don't silently ignore user requests).
 		$this->auth->logout();
-		Template::redirect('/');
+		redirect('/');
 	}
 
 	// -------------------------------------------------------------------------
@@ -407,11 +407,11 @@ class Users extends Front_Controller
 		// Are users allowed to register?
 		if (! $this->settings_lib->item('auth.allow_register')) {
 			Template::set_message(lang('us_register_disabled'), 'danger');
-			Template::redirect('/');
+			redirect('/');
 		}
 
 		if ($this->auth->is_logged_in() === true) {
-			Template::redirect('/');
+			redirect('/');
 		}
 
 		$upload_config = $this->config->load('upload');
@@ -541,7 +541,7 @@ class Users extends Front_Controller
 	{
 		// If the user is logged in, go home.
 		if ($this->auth->is_logged_in() !== false) {
-			Template::redirect('/');
+			redirect('/');
 		}
 
 		if (isset($_POST['send'])) {
@@ -614,7 +614,7 @@ class Users extends Front_Controller
 	{
 		// If the user is logged in, go home.
 		if ($this->auth->is_logged_in() !== false) {
-			Template::redirect('/');
+			redirect('/');
 		}
 
 		// Bonfire may have stored the email and code in the session.
@@ -629,7 +629,7 @@ class Users extends Front_Controller
 		// If there is no code/email, then it's not a valid request.
 		if (empty($code) || empty($email)) {
 			Template::set_message(lang('us_reset_invalid_email'), 'danger');
-			Template::redirect(LOGIN_URL);
+			redirect(LOGIN_URL);
 		}
 
 			// Handle the form
@@ -650,7 +650,7 @@ class Users extends Front_Controller
 					log_activity($this->input->post('user_id'), lang('us_log_reset'), 'users');
 
 					Template::set_message(lang('us_reset_password_success'), 'success');
-					Template::redirect(LOGIN_URL);
+					redirect(LOGIN_URL);
 				}
 
 				if (! empty($this->user_model->error)) {
@@ -674,7 +674,7 @@ class Users extends Front_Controller
 		// $user will be an Object if a single result was returned.
 		if (! is_object($user)) {
 			Template::set_message(lang('us_reset_invalid_email'), 'danger');
-			Template::redirect(LOGIN_URL);
+			redirect(LOGIN_URL);
 		}
 
 		if ($this->siteSettings['auth.password_show_labels'] == 1) {
@@ -869,7 +869,7 @@ class Users extends Front_Controller
 		return $result;
 	}
 
-	private function check_current_email()
+	private function join_into_organization()
 	{
 		if (! isset($this->current_user)) {
 			if (! class_exists('Auth')) {
@@ -902,9 +902,9 @@ class Users extends Front_Controller
 											->get()->row();
 			// if it is in existed organization, not allow to create a new organization
 			if (! empty($user_organization)) {
-				Template::redirect('/'); // organization url
+				redirect(DEFAULT_LOGIN_LOCATION); // organization url
 			} else {
-				Template::redirect('/organization/create');
+				redirect('/organization/create');
 			}
 		} else {
 			// if it is not a public domain name, check if it is in existed organization
@@ -928,10 +928,9 @@ class Users extends Front_Controller
 					]);
 				}
 
-				$organization_url = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $existed_domain_name->url . '.' . $_SERVER['SERVER_NAME'];
-				Template::redirect($organization_url);
+				redirect(DEFAULT_LOGIN_LOCATION);
 			} else {
-				Template::redirect('/organization/create');
+				redirect('/organization/create');
 			}
 		}
 	}

@@ -25,23 +25,20 @@ class Multi_orgs_hooks
 	}
 
 	/**
-	 * Check and set current organization_id to session
+	 * Check and set current organization_id to $this->ci variable
 	 *
 	 * @param int $main_domain_parts - example meetingbullet.com has 2 parts, meetingbullet.com.vn has 3 parts
 	 * @return void
 	 */
 	public function check_current_organization($main_domain_parts = 2)
 	{
-		if (! class_exists('CI_Session', false)) {
-			$this->ci->load->library('session');
-		}
-
 		$current_domain = $_SERVER['SERVER_NAME'];
 		$parsed_url = explode('.', $current_domain);
-		if (count($parsed_url) - $main_domain_parts - 1 > 0) {
+		if (count($parsed_url) - $main_domain_parts - 1 >= 0) {
 			$subdomain = $parsed_url[count($parsed_url) - $main_domain_parts - 1];
-			$_SESSION['organization_url'] = $subdomain;
+			$this->ci->current_organization_url = $subdomain;
+		} else {
+			$this->ci->current_organization_url = null;
 		}
-		$_SESSION['organization_url'] = 'sixthgearstudios'; //test
 	}
 }

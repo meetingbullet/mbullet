@@ -117,3 +117,13 @@ if (! defined('IS_AJAX')) {
     define('IS_AJAX', $ajax_request);
     unset($ajax_request);
 }
+
+// -----------------------------------------------------------------------------
+// Number of parts in main domain, example: sgs.com has 2 parts, sgs.com.vn has 3 parts
+// -----------------------------------------------------------------------------
+define('MAIN_DOMAIN_PARTS', 2);
+
+// -----------------------------------------------------------------------------
+// Location location for authenticate user after login
+// -----------------------------------------------------------------------------
+define('DEFAULT_LOGIN_LOCATION' , '/dashboard');

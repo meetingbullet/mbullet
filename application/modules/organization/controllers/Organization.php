@@ -14,6 +14,15 @@ class Organization extends Authenticated_Controller
 
 	public function create()
 	{
+		// If user still access to an organization, can not create new anymore
+		$orgs = $this->db->select('count(*) AS total')
+							->from('organizations o')
+							->join('user_to_organizations uo', 'o.organization_id = uo.organization_id', 'left')
+							->where('uo.user_id', $this->current_user->user_id)
+							->where('uo.enabled', 1)
+							->get()->row();
+		if ($orgs->total > 0) redirect($this->previous_page);
+		
 		// if has submited data
 		if (isset($_POST['create'])) {
 			//get validation rules
