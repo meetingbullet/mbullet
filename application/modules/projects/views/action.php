@@ -1,4 +1,5 @@
-<div id="board">
+<div id="board" data-url="<?php echo base_url('/projects/get_action_board_data/' . $project_key) ?>">
+	<div id="loading"></div>
 	<div class="col-md-3 status" id="status_open">
 		<label>Open</label>
 		<div class="actions">

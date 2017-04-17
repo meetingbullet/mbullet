@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
-
+// before each method need to verify user
 class Projects extends Authenticated_Controller
 {
 	public function __construct()
@@ -101,34 +101,8 @@ class Projects extends Authenticated_Controller
 
 	public function detail($project_key = null)
 	{
-		if (! class_exists('Project_model')) {
-			$this->load->model('Project_model');
-		}
-
-		if (! class_exists('Role_model')) {
-			$this->load->model('roles/Role_model');
-		}
-
 		/***************** PROJECT AND USER CHECK *****************/
-		// // check user is organization owner or not
-		// $is_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
-		// 							->count_by('is_public', 1) == 1 ? true : false;
-		// // get project id
-		// if ($is_owner) {
-		// 	$project = $this->project_model->select('pm.project_id, projects.name')
-		// 								->where('projects.organization_id', $this->current_user->current_organization_id)
-		// 								->find_by('projects.project_key', $project_key);
-		// } else {
-		// 	$project = $this->project_model->select('pm.project_id, projects.name')
-		// 								->join('project_members pm', 'pm.project_id = projects.projet_id', 'inners')
-		// 								->where('projects.organization_id', $this->current_user->current_organization_id)
-		// 								->where('pm.user_id', $this->current_user->user_id)
-		// 								->find_by('projects.project_key', $project_key);
-		// }
-
-		// if (! empty($project)) {
-		// 	$project_id = $project->project_id;
-		// }
+		// $project_id = $this->get_project_id($project_key);
 
 		$project_id = 1; // test
 		/*---------------------------------- INFO TAB ----------------------------------*/
@@ -255,11 +229,60 @@ class Projects extends Authenticated_Controller
 		]);
 
 		/*---------------------------------- Action TAB ----------------------------------*/
+		Template::set('action_tab_data', [
+			'actions' => $this->get_actions($project_id)
+		]);
+
+		/*---------------------------------- Report TAB ----------------------------------*/
+		Template::set('report_tab_data', []);
+
+		Assets::add_module_css('projects', 'projects.css');
+		Assets::add_module_js('projects', 'action_board.js');
+		Assets::add_module_js('projects', 'projects.js');
+		Template::set('project_name', 'Project test'/*$project->name*/);
+		Template::set('project_key', $project_key);
+		Template::render();
+	}
+
+	public function sort_action($project_key = null)
+	{
+		// $project_id = $this->get_project_id($project_key);
+		$project_id = 1; // test
+		$moved_id = $this->input->get('moved_id');
+		$old_status = $this->input->get('old_status');
+		$old_status_above_id = $this->input->get('old_status_below_id');
+		$new_status = $this->input->get('new_status');
+		$new_status_above_id = $this->input->get('new_status_below_id');
+	}
+
+	public function get_action_board_data($project_key = null)
+	{
+		// $project_id = $this->get_project_id($project_key);
+		$project_id = 1; //test
+		if ($project_id !== false) {
+			$actions = $this->get_actions($project_id);
+		} else {
+			$actions = [
+				'open' => [],
+				'inprogress' => [],
+				'ready' => [],
+				'resolved' => []
+			];
+		}
+
+		echo json_encode($actions);
+		exit;
+	}
+
+	private function get_actions($project_id)
+	{
+		// get all project actions, sort by sort order
 		$all_actions = $this->db->select('a.action_key, a.name, a.status')
 								->from('actions a')
 								->where('a.project_id', $project_id)
-								->order_by('a.created_on', 'desc')
+								->order_by('a.sort_order', 'desc')
 								->get()->result();
+		// filter actions by status
 		$open = [];
 		$inprogress = [];
 		$ready = [];
@@ -280,23 +303,44 @@ class Projects extends Authenticated_Controller
 			}
 		}
 
-		Template::set('action_tab_data', [
-			'actions' => [
-				'open' => $open,
-				'inprogress' => $inprogress,
-				'ready' => $ready,
-				'resolved' => $resolved
-			]
-		]);
+		$actions = [
+			'open' => $open,
+			'inprogress' => $inprogress,
+			'ready' => $ready,
+			'resolved' => $resolved
+		];
 
-		/*---------------------------------- Report TAB ----------------------------------*/
-		Template::set('report_tab_data', []);
+		return $actions;
+	}
 
-		Assets::add_module_css('projects', 'projects.css');
-		Assets::add_module_js('projects', 'action_board.js');
-		Assets::add_module_js('projects', 'projects.js');
-		Template::set('project_name', 'Project test'/*$project->name*/);
-		Template::set('project_key', $project_key);
-		Template::render();
+	private function get_project_id($project_key) {
+		if (! class_exists('Project_model')) {
+			$this->load->model('Project_model');
+		}
+
+		if (! class_exists('Role_model')) {
+			$this->load->model('roles/Role_model');
+		}
+		// check user is organization owner or not
+		$is_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
+									->count_by('is_public', 1) == 1 ? true : false;
+		// get project id
+		if ($is_owner) {
+			$project = $this->project_model->select('pm.project_id, projects.name')
+										->where('projects.organization_id', $this->current_user->current_organization_id)
+										->find_by('projects.project_key', $project_key);
+		} else {
+			$project = $this->project_model->select('pm.project_id, projects.name')
+										->join('project_members pm', 'pm.project_id = projects.projet_id', 'inners')
+										->where('projects.organization_id', $this->current_user->current_organization_id)
+										->where('pm.user_id', $this->current_user->user_id)
+										->find_by('projects.project_key', $project_key);
+		}
+
+		if (! empty($project)) {
+			return $project->project_id;
+		}
+
+		return false;
 	}
 }
