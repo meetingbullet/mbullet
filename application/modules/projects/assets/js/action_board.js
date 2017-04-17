@@ -24,6 +24,10 @@ $(document).ready(function() {
 	});
 
 	refresh_action_board_multiple();
+
+	$('#board .status .actions').on('click', '.add-action button', function() {
+		alert('aaaa');
+	})
 });
 
 function refresh_action_board_multiple() {
@@ -69,6 +73,6 @@ function refresh_action_board() {
 		var div = `<div class="add-action">
 					<button><i class="ion-ios-plus-outline"></i></button>
 				</div>`;
-		$('#board .status .actions').append();
+		$('#board .status .actions').append(div);
 	});
 }
