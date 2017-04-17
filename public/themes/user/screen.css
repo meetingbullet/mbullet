@@ -1,3 +1,43 @@
+body {
+    background-color: #f9f9f9;
+}
+
+label>.required {
+    color: red;
+}
+
+.an-sidebar-search .an-form-control {
+    background: transparent;
+}
+
+.an-form-control {
+    background: #FFF;
+}
+
+.an-input-group-addon {
+    z-index: 1;
+}
+
+.an-input-group-addon>span {
+    font-size: 14px;
+    z-index: 1;
+}
+
+.an-input-group-right input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}
+
+.an-input-group-right input+select {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.selectize-control.an-tags-input {
+    margin-bottom: 20px;
+}
+
 @media (max-width: 767px) {
     body {
         padding-right: 0;
