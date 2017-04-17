@@ -75,7 +75,7 @@ class User_model extends BF_Model
 			array(
 				'field' => 'skype',
 				'label' => 'lang:us_reg_skype',
-				'rules' => 'trim|required|max_length[255]',
+				'rules' => 'trim|max_length[255]',
 			),
 			array(
 				'field' => 'google_id_token',

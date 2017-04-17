@@ -1,14 +1,9 @@
-<?php
-	$site_open = $this->settings_lib->item('auth.allow_register');
-?>
-	<div class="an-page-content">
-        <div class="an-flex-center-center">
 			<div class="container">
 				<div class="row">
 				<div class="col-md-6 col-md-offset-3">
 					<div class="an-login-container">
 					<div class="back-to-home">
-						<h3 class="an-logo-heading text-center">
+						<h3 class="an-logo-heading text-center wow fadeInDown">
 						<a class="an-logo-link" href="<?php e(base_url())?>"><?php e($this->settings_lib->item('site.title')) ?>
 							<span><?php e($this->settings_lib->item('site.description')) ?></span>
 						</a>
@@ -18,7 +13,7 @@
 						<div class="an-component-header">
 						<h6><?php echo lang('us_login'); ?></h6>
 						<div class="component-header-right">
-							<?php if ( $site_open ) : ?>
+							<?php if ($this->settings_lib->item('auth.allow_register')) : ?>
 							<p class="sign-up-link">
 								<?php echo anchor(REGISTER_URL, lang('us_sign_up')); ?>
 							</p>
@@ -57,6 +52,4 @@
 				</div>
 				</div> <!-- end row -->
 			</div>
-		</div> <!-- end an-flex-center-center -->
-	</div>
-	<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>

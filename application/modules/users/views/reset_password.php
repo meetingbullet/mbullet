@@ -1,11 +1,9 @@
-	<div class="an-page-content">
-        <div class="an-flex-center-center">
 			<div class="container">
 				<div class="row">
 				<div class="col-md-6 col-md-offset-3">
 					<div class="an-login-container">
 					<div class="back-to-home">
-						<h3 class="an-logo-heading text-center">
+						<h3 class="an-logo-heading text-center wow fadeInDown">
 						<a class="an-logo-link" href="<?php e(base_url())?>"><?php e($this->settings_lib->item('site.title')) ?>
 							<span><?php e($this->settings_lib->item('site.description')) ?></span>
 						</a>
@@ -13,10 +11,10 @@
 					</div>
 					<div class="an-single-component with-shadow">
 						<div class="an-component-header">
-                            <h6><?php echo lang('us_reset_password'); ?></h6>
+							<h6><?php echo lang('us_reset_password'); ?></h6>
 
-                            <div class="component-header-right">
-                            </div>
+							<div class="component-header-right">
+							</div>
 						</div>
 						<div class="an-component-body">
 						<p class="an-small-doc-block"><?php echo lang('us_reset_password_note'); ?></p>
@@ -45,5 +43,3 @@
 				</div>
 				</div> <!-- end row -->
 			</div>
-		</div> <!-- end an-flex-center-center -->
-	</div>

@@ -1,10 +1,9 @@
-<?php 
+<?php
 echo theme_view('header');
-echo theme_view('header_bar');
 echo Template::message();
 ?>
 		<div class="an-page-content">
-			<div class="an-content-body">
+			<div class="an-flex-center-center">
 <?php
 echo isset($content) ? $content : Template::content();
 ?>

@@ -1,11 +1,9 @@
-	<div class="an-page-content">
-        <div class="an-flex-center-center">
 			<div class="container">
 				<div class="row">
 				<div class="col-md-6 col-md-offset-3">
 					<div class="an-login-container">
 					<div class="back-to-home">
-						<h3 class="an-logo-heading text-center">
+						<h3 class="an-logo-heading text-center wow fadeInDown">
 						<a class="an-logo-link" href="<?php e(base_url())?>"><?php e($this->settings_lib->item('site.title')) ?>
 							<span><?php e($this->settings_lib->item('site.description')) ?></span>
 						</a>
@@ -13,22 +11,22 @@
 					</div>
 					<div class="an-single-component with-shadow">
 						<div class="an-component-header">
-                            <h6><?php echo lang('us_create_profile'); ?></h6>
+							<h6><?php echo lang('us_create_profile'); ?></h6>
 
-                            <div class="component-header-right">
-                                <?php echo lang('us_already_registered'); ?>&nbsp
-                                <p class="sign-up-link"><?php echo anchor(LOGIN_URL, lang('bf_action_login')); ?></p>
-                            </div>
+							<div class="component-header-right">
+								<?php echo lang('us_already_registered'); ?>&nbsp
+								<p class="sign-up-link"><?php echo anchor(LOGIN_URL, lang('bf_action_login')); ?></p>
+							</div>
 						</div>
 						<div class="an-component-body">
 							<?php echo form_open_multipart($this->uri->uri_string(), array('class' => "form-horizontal", 'autocomplete' => 'off')); ?>
 								<div class="an-input-group">
-                                    <label class='an-form-avatar-label'><?php echo lang('us_reg_avatar') ?></label>
-                                    <div class="an-avatar">
-                                        <img class='an-form-avatar-preview' id="user-avatar-preview" src="<?php echo img_path() . 'default_avatar.png' ?>"/>
-                                        <div class='an-form-avatar-dim'><span><i class='ion-ios-upload-outline'></i></span></div>
-                                        <input type="file" id="user-avatar" name="avatar" class="an-form-avatar"/>
-                                    </div>
+									<label class='an-form-avatar-label'><?php echo lang('us_reg_avatar') ?></label>
+									<div class="an-avatar">
+										<img class='an-form-avatar-preview' id="user-avatar-preview" src="<?php echo img_path() . 'default_avatar.png' ?>"/>
+										<div class='an-form-avatar-dim'><span><i class='ion-ios-upload-outline'></i></span></div>
+										<input type="file" id="user-avatar" name="avatar" class="an-form-avatar"/>
+									</div>
 								</div>
 
 								<label><?php echo lang('us_reg_email') ?></label>
@@ -69,5 +67,3 @@
 				</div>
 				</div> <!-- end row -->
 			</div>
-		</div> <!-- end an-flex-center-center -->
-	</div>
