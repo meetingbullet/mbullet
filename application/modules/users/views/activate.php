@@ -1,22 +1,3 @@
-<?php
-	$message = Template::message();
-?>
-
-	<?php if (validation_errors() || $message) : ?>
-	<div class="an-notification-content top-full-width">
-		<?php if(validation_errors()): ?>
-		<div class="alert alert-danger  js-nofitication-body" role="alert" style="">
-			<button type="button" class="close"><span aria-hidden="true">×</span></button>
-			<?php echo validation_errors() ?>
-		</div>
-		<?php else: ?>
-			<?php echo $message; ?>
-		<?php endif; ?>
-	</div>
-	<?php endif; ?>
-
-	<div class="an-page-content">
-        <div class="an-flex-center-center">
 			<div class="container">
 				<div class="row">
 				<div class="col-md-6 col-md-offset-3">
@@ -53,5 +34,3 @@
 				</div>
 				</div> <!-- end row -->
 			</div>
-		</div> <!-- end an-flex-center-center -->
-	</div>

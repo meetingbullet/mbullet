@@ -155,7 +155,7 @@ AddDefaultCharset utf-8
   # If you installed Bonfire in a subfolder, you will need to
   # change the following line to match the subfolder you need.
   # http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
-  RewriteBase /meeting-bullet-server/public/
+  RewriteBase /
 
   # Removes access to the system folder by users.
   # Additionally this will allow you to create a System.php controller,

@@ -27,7 +27,7 @@
  * @link       http://guides.cibonfire.com/helpers/file_helpers.html
  *
  */
-class Home extends Authenticated_Controller
+class Home extends Front_Controller
 {
 	public function __construct()
 	{
@@ -56,6 +56,7 @@ class Home extends Authenticated_Controller
 	{
 		$this->load->library('users/auth');
 		$this->set_current_user();
+		if (isset($current_user->email)) redirect('dashboard');
 		Template::render();
 	}//end index()
 
