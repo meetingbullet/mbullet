@@ -247,18 +247,89 @@ class Projects extends Authenticated_Controller
 	public function sort_action($project_key = null)
 	{
 		// $project_id = $this->get_project_id($project_key);
+
 		$project_id = 1; // test
-		$moved_id = $this->input->get('moved_id');
-		$old_status = $this->input->get('old_status');
-		$old_status_above_id = $this->input->get('old_status_below_id');
-		$new_status = $this->input->get('new_status');
-		$new_status_above_id = $this->input->get('new_status_below_id');
+		$action_id = $this->input->get('action_id');
+		$status = $this->input->get('status');
+		$status_order = $this->input->get('status_order');
+
+		if (empty($project_id) || empty($action_id) || empty($status) || empty($status_order)) {
+			echo json_encode([
+				'status' => '0',
+				'message' => 'failed at position 1'
+			]);
+			exit;
+		}
+
+		$action = $this->db->select('status, sort_order')
+						->where('project_id', $project_id)
+						->where('action_id', $action_id)
+						->get('actions')->row();
+		if (! $action) {
+			echo json_encode([
+				'status' => '0',
+				'message' => 'failed at position 2'
+			]);
+			exit;
+		}
+
+		try {
+			$this->db->trans_begin();
+
+			$old_status_order_updated = $this->db->where('status', $action->status)
+												->where('sort_order >=', $action->sort_order)
+												->set('sort_order', '`sort_order`-1', false)
+												->set('modified_on', date('Y-m-d H:i:s'))
+												->update('actions');
+			if (! $old_status_order_updated) {
+				throw new Exception('failed at position 3');
+			}
+
+			$new_status_order_updated = $this->db->where('status', $status)
+												->where('sort_order >=', $status_order)
+												->set('sort_order', '`sort_order`+1', false)
+												->set('modified_on', date('Y-m-d H:i:s'))
+												->update('actions');
+			if (! $new_status_order_updated) {
+				throw new Exception('failed at position 4');
+			}
+
+			$action_updated = $this->db->where('action_id', $action_id)
+									->update('actions', [
+										'status' => $status,
+										'sort_order' => $status_order,
+										'modified_on' => date('Y-m-d H:i:s'),
+									]);
+			if (! $action_updated) {
+				throw new Exception('failed at position 5');
+			}
+
+			if ($this->db->trans_status() === FALSE) {
+				throw new Exception('failed at position 6');
+			} else {
+				$this->db->trans_commit();
+			}
+		} catch (Exception $e) {
+			$this->db->trans_rollback();
+
+			echo json_encode([
+				'status' => '0',
+				'message' => $e->getMessage()
+			]);
+			exit;
+		}
+
+		echo json_encode([
+			'status' => '1',
+			'message' => 'success'
+		]);
+		exit;
 	}
 
 	public function get_action_board_data($project_key = null)
 	{
 		// $project_id = $this->get_project_id($project_key);
-		$project_id = 1; //test
+		$project_id = 1; // test
 		if ($project_id !== false) {
 			$actions = $this->get_actions($project_id);
 		} else {
@@ -277,10 +348,11 @@ class Projects extends Authenticated_Controller
 	private function get_actions($project_id)
 	{
 		// get all project actions, sort by sort order
-		$all_actions = $this->db->select('a.action_key, a.name, a.status')
+		$all_actions = $this->db->select('a.action_id, a.action_key, a.name, a.status, IF (a.modified_on IS NULL, a.created_on, a.modified_on) AS sort_time')
 								->from('actions a')
 								->where('a.project_id', $project_id)
-								->order_by('a.sort_order', 'desc')
+								->order_by('a.sort_order', 'asc')
+								->order_by('sort_time', 'desc')
 								->get()->result();
 		// filter actions by status
 		$open = [];
