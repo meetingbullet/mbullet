@@ -1,17 +1,19 @@
-<?php 
+<?php
 echo theme_view('header');
+echo theme_view('header_bar');
+echo Template::message();
+?>
+		<div class="an-page-content">
+<?php
 echo theme_view('_sitenav');
+?>
 
-$message = Template::message();
-
-if ($message) : ?>
-	<div class="an-notification-content top-full-width">
-			<?php echo $message; ?>
-	</div>
-<?php 
-endif;
-
+			<div class="an-content-body">
+<?php
 echo isset($content) ? $content : Template::content();
-
+?>
+			</div> <!-- end .AN-PAGE-CONTENT -->
+		</div> <!-- end .AN-PAGE-CONTENT -->
+<?php
 echo theme_view('footer');
 ?>

@@ -181,7 +181,7 @@ class Users extends Front_Controller
 		Assets::add_css('font-awesome/css/font-awesome.min.css');
 		Assets::add_module_js('users', 'users.js');
 		Template::set('page_title', 'Login');
-		Template::render('blank');
+		Template::render('account');
 	}
 
 	/**
@@ -346,6 +346,8 @@ class Users extends Front_Controller
 				} else {
 					Template::set_message(lang('us_profile_updated_success'), 'success');
 				}
+			} else {
+				Template::set_message(validation_errors(), 'danger');
 			}
 		}
 
@@ -355,7 +357,7 @@ class Users extends Front_Controller
 		Template::set('user', $user);
 		Template::set('languages', unserialize($this->settings_lib->item('site.languages')));
 		Template::set_view('profile');
-		Template::render('blank');
+		Template::render('account');
 	}
 
 	/**
@@ -372,11 +374,11 @@ class Users extends Front_Controller
 		// Are users allowed to register?
 		if (! $this->settings_lib->item('auth.allow_register')) {
 			Template::set_message(lang('us_register_disabled'), 'danger');
-			Template::redirect('/');
+			redirect('/');
 		}
 
 		if ($this->auth->is_logged_in() === true) {
-			Template::redirect('/');
+			redirect('/');
 		}
 
 		if ($this->input->post()) {
@@ -384,13 +386,15 @@ class Users extends Front_Controller
 			$this->form_validation->set_rules($rules['register']);
 
 			if ($this->form_validation->run() !== false) {
-				Template::redirect('/users/create_profile?email=' . $this->input->post('email'));
+				redirect('/users/create_profile?email=' . $this->input->post('email'));
+			} else {
+				Template::set_message(validation_errors(), 'danger');
 			}
 		}
 
 		Template::set('languages', unserialize($this->settings_lib->item('site.languages')));
 		Template::set('page_title', 'Register');
-		Template::render('blank');
+		Template::render('account');
 	}
 	/**
 	 * Display the create profile form for the user and manage the registration process.
@@ -453,7 +457,7 @@ class Users extends Front_Controller
 
 						log_activity($user_id, lang('us_log_register'), 'users');
 						Template::set_message($message, $error === true ? 'danger' : 'success');
-						Template::redirect(LOGIN_URL);
+						redirect(LOGIN_URL);
 					}
 				}
 			} else {
@@ -462,10 +466,11 @@ class Users extends Front_Controller
 					redirect(REGISTER_URL);
 					// Template::redirect('/users/create_profile?email=' . $this->input->post('email'));
 				}
+				Template::set_message(validation_errors(), 'danger');
 			}
 		}
 
-		Template::render('blank');
+		Template::render('account');
 	}
 	// public function register()
 	// {
@@ -573,7 +578,7 @@ class Users extends Front_Controller
 							array('link' => $pass_link),
 							true
 						),
-					 );
+					);
 
 					if ($this->emailer->send($data)) {
 						Template::set_message(lang('us_reset_pass_message'), 'success');
@@ -581,12 +586,14 @@ class Users extends Front_Controller
 						Template::set_message(lang('us_reset_pass_error') . $this->emailer->error, 'danger');
 					}
 				}
+			} else {
+				Template::set_message(validation_errors(), 'danger');
 			}
 		}
 
 		Template::set_view('users/forgot_password');
 		Template::set('page_title', 'Password Reset');
-		Template::render('blank');
+		Template::render('account');
 	}
 
 	/**
@@ -633,9 +640,9 @@ class Users extends Front_Controller
 			if ($this->form_validation->run() !== false) {
 				// The user model will create the password hash.
 				$data = array(
-					'password'   => $this->input->post('password'),
-								  'reset_by'	=> 0,
-								  'reset_hash'  => '',
+					'password' => $this->input->post('password'),
+					'reset_by' => 0,
+					'reset_hash' => '',
 					'force_password_reset' => 0,
 				);
 
@@ -649,6 +656,8 @@ class Users extends Front_Controller
 				if (! empty($this->user_model->error)) {
 					Template::set_message(sprintf(lang('us_reset_password_error'), $this->user_model->error), 'danger');
 				}
+			} else {
+				Template::set_message(validation_errors(), 'danger');
 			}
 		}
 
@@ -679,7 +688,7 @@ class Users extends Front_Controller
 		Template::set('user', $user);
 
 		Template::set_view('users/reset_password');
-		Template::render('blank');
+		Template::render('account');
 	}
 
 	//--------------------------------------------------------------------------
@@ -734,13 +743,15 @@ class Users extends Front_Controller
 							Template::set_message($this->user_model->error . '. ' . lang('us_err_activate_code'), 'danger');
 						}
 					}
+				} else {
+					Template::set_message(validation_errors(), 'danger');
 				}
 			}
 		} else {
 			Template::set_message(lang('us_account_active'), 'success');
 			redirect('/login');
 		}
-		Template::render('blank');
+		Template::render('account');
 	}
 
 	/**
@@ -766,12 +777,14 @@ class Users extends Front_Controller
 
 					Template::set_message($message, $error ? 'danger' : 'success');
 				}
+			} else {
+				Template::set_message(validation_errors(), 'danger');
 			}
 		}
 
 		Template::set_view('users/resend_activation');
 		Template::set('page_title', 'Activate Account');
-		Template::render('blank');
+		Template::render('account');
 	}
 
 	// -------------------------------------------------------------------------

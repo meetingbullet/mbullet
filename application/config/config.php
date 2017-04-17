@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
  */
-$config['base_url']	= 'http://localhost/meeting-bullet-server/public';
+$config['base_url']	= '';
 
 /*
 |--------------------------------------------------------------------------
@@ -374,7 +374,7 @@ $config['encryption_key'] = "27300a4c0fced5f2022c07d87f3dc95d";
 |
 */
 $config['sess_driver'] = 'database';
-$config['sess_cookie_name']		= 'bf_session';
+$config['sess_cookie_name']		= 'mb_session';
 $config['sess_expiration']		= 7200;
 $config['sess_save_path'] = 'ci3_sessions';
 $config['sess_match_ip'] = false;
@@ -397,7 +397,7 @@ $config['sess_regenerate_destroy'] = false;
 |
 */
 $config['cookie_prefix']	= '';
-$config['cookie_domain']	= '';
+$config['cookie_domain']	= '.mb.local';
 $config['cookie_path']		= '/';
 $config['cookie_secure'] = false;
 $config['cookie_httponly'] = false;

@@ -1,22 +1,3 @@
-<?php 
-$message = Template::message();
-?>
-
-	<?php if (validation_errors() || $message) : ?>
-	<div class="an-notification-content top-full-width">
-		<?php if(validation_errors()): ?>
-		<div class="alert alert-danger  js-nofitication-body" role="alert" style="">
-			<button type="button" class="close"><span aria-hidden="true">×</span></button>
-			<?php echo validation_errors() ?>
-		</div>
-		<?php else: ?>
-			<?php echo $message; ?>
-		<?php endif; ?>
-	</div>
-	<?php endif; ?>
-
-	<div class="an-page-content">
-        <div class="an-flex-center-center">
 			<div class="container">
 				<div class="row">
 				<div class="col-md-6 col-md-offset-3">
@@ -30,11 +11,11 @@ $message = Template::message();
 					</div>
 					<div class="an-single-component with-shadow">
 						<div class="an-component-header">
-                            <h6><?php echo lang('us_sign_up'); ?></h6>
-                            <div class="component-header-right">
-                                <?php echo lang('us_already_registered'); ?>&nbsp
-                                <p class='sign-up-link'><?php echo anchor(LOGIN_URL, lang('bf_action_login')); ?></p>
-                            </div>
+							<h6><?php echo lang('us_sign_up'); ?></h6>
+							<div class="component-header-right">
+								<?php echo lang('us_already_registered'); ?>&nbsp
+								<p class='sign-up-link'><?php echo anchor(LOGIN_URL, lang('bf_action_login')); ?></p>
+							</div>
 						</div>
 						<div class="an-component-body">
 						<?php echo form_open(REGISTER_URL, array('class' => "form-horizontal", 'autocomplete' => 'off')); ?>
@@ -53,5 +34,3 @@ $message = Template::message();
 				</div>
 				</div> <!-- end row -->
 			</div>
-		</div> <!-- end an-flex-center-center -->
- 	</div>
