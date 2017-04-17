@@ -2,28 +2,28 @@ $(document).ready(function() {
 	$('#board .status .actions').sortable({
 		connectWith: '#board .status .actions',
 		items: '.item',
-		// update: function (e, ui) {
-		// 	if (this === ui.item.parent()[0]) {
-		// 		console.log(ui.item.index())
-		// 		var url = $('#board').data('drag-drop-url');
-		// 		$.get(url,{
-		// 			status_order: ui.item.index(),
-		// 			action_id: ui.item.data('action-id'),
-		// 			status: ui.item.parent().parent().attr('id')
-		// 		}).done(function(data) {
-		// 			data = JSON.parse(data);
-		// 			if (data.status == 0) {
-		// 				console.log('update failed');
-		// 				refresh_action_board();
-		// 			} else {
-		// 				console.log('update success');
-		// 			}
-		// 		});
-		// 	}
-		// }
+		update: function (e, ui) {
+			if (this === ui.item.parent()[0]) {
+				console.log(ui.item.index())
+				var url = $('#board').data('drag-drop-url');
+				$.get(url,{
+					status_order: ui.item.index(),
+					action_id: ui.item.data('action-id'),
+					status: ui.item.parent().parent().attr('id')
+				}).done(function(data) {
+					data = JSON.parse(data);
+					if (data.status == 0) {
+						console.log('update failed');
+						refresh_action_board();
+					} else {
+						console.log('update success');
+					}
+				});
+			}
+		}
 	});
 
-	// refresh_action_board_multiple();
+	refresh_action_board_multiple();
 });
 
 function refresh_action_board_multiple() {
@@ -65,5 +65,10 @@ function refresh_action_board() {
 						</div>`;
 			$('#board .status#resolved .actions').append(div);
 		});
+
+		var div = `<div class="add-action">
+					<button><i class="ion-ios-plus-outline"></i></button>
+				</div>`;
+		$('#board .status .actions').append();
 	});
 }
