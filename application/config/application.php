@@ -149,10 +149,9 @@ $config['template.admin_theme'] = 'admin';
 // placeholder will be replaced. The message will replace the {message}
 // placeholder.
 $config['template.message_template'] =<<<EOD
- <div class="alert alert-{type} alert-dismissable">
-		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-		<div>{message}</div>
-	</div>
+<div id="notify" data-notify-type="{type}">
+	{message}
+</div>
 EOD;
 
 //------------------------------------------------------------------------------

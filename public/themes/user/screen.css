@@ -38,6 +38,13 @@ label>.required {
     margin-bottom: 20px;
 }
 
+
+/* Notifications are shown by $.notify plugin */
+
+#notify {
+    display: none;
+}
+
 @media (max-width: 767px) {
     body {
         padding-right: 0;
