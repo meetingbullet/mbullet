@@ -60,6 +60,7 @@ class Auth
 		$this->ci->load->library('session');
 		$this->ci->load->library('settings/settings_lib');
 		$this->ci->load->library('Template');
+		$this->ci->load->library('form_validation');
 
 		if ($this->ci->config->item('auth.log_failed_login_activity') === null) {
 			$this->ci->config->load('application');
@@ -100,6 +101,9 @@ class Auth
 
 		if ($via_google === false && (empty($login) || empty($password))) {
 			Template::set_message(lang('us_fields_required'), 'danger');
+			$this->ci->form_validation->set_rules('login', '', 'required');
+    		$this->ci->form_validation->set_rules('password', '', 'required');
+			$this->ci->form_validation->run();
 			return false;
 		}
 
