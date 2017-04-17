@@ -1,4 +1,4 @@
-        <header class="an-header wow fadeInDown" style="visibility: visible; animation-name: fadeInDown;">
+        <header class="an-header" style="visibility: visible; animation-name: fadeInDown;">
             <div class="an-topbar-left-part">
             <h3 class="an-logo-heading">
                 <a class="an-logo-link" href="#"><?php echo $this->settings_lib->item('site.title'); ?>

@@ -1,16 +1,3 @@
-<?php if (validation_errors() || Template::message()) : ?>
-<div class="an-notification-content top-full-width">
-	<?php if(validation_errors()): ?>
-	<div class="alert alert-danger  js-nofitication-body" role="alert" style="">
-		<button type="button" class="close"><span aria-hidden="true">×</span></button>
-		<?php echo validation_errors() ?>
-	</div>
-	<?php else: ?>
-		<?php echo iif(validation_errors(), validation_errors(), Template::message()); ?>
-	<?php endif; ?>
-</div>
-<?php endif; ?>
-
 <div class="an-page-content">
 	<div class="an-flex-center-center">
 		<div class="container">
@@ -18,7 +5,7 @@
 			<div class="col-md-10 col-md-offset-1">
 				<div class="an-login-container">
 				<div class="back-to-home">
-					<h3 class="an-logo-heading text-center wow fadeInDown">
+					<h3 class="an-logo-heading text-center">
 					<a class="an-logo-link" href="<?php e(base_url())?>"><?php e($this->settings_lib->item('site.title')) ?>
 						<span><?php e($this->settings_lib->item('site.description')) ?></span>
 					</a>
@@ -35,13 +22,13 @@
 						<label><?php echo lang('org_name') ?></label>
 						<div class="an-input-group">
 							<div class="an-input-group-addon"><i class="ion-briefcase"></i></div>
-							<input type="text" name="name" id="input_trigger" class="an-form-control <?php echo iif( form_error('login') , 'danger') ;?>" value="<?php echo set_value('name'); ?>" tabindex="1">
+							<input type="text" name="name" id="input_trigger" class="an-form-control <?php echo iif( form_error('name') , 'danger') ;?>" value="<?php echo set_value('name'); ?>" tabindex="1">
 						</div>
 
 						<label><?php echo lang('org_url'); ?></label>
 						<div class="an input-group">
 							<div class="input-group-addon"><?php echo empty($_SERVER['HTTPS']) ? 'http://' : 'https://' ?></div>
-							<input type="text" name="url" id="input_triggered" class="form-control <?php echo iif( form_error('password') , 'danger') ;?>" tabindex="2" value="<?php echo set_value('url') ?>">
+							<input type="text" name="url" id="input_triggered" class="an-form-control form-control <?php echo iif( form_error('url') , 'danger') ;?>" tabindex="2" value="<?php echo set_value('url') ?>">
 							<div class="input-group-addon">.<?php echo $_SERVER['SERVER_NAME'] ?></div>
 						</div>
 

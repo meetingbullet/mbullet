@@ -92,7 +92,7 @@ class Authenticated_Controller extends Base_Controller
 											->from('organization_domains od')
 											->join('organizations o', 'o.organization_id = od.organization_id', 'left')
 											->where('od.domain', $domain_name)
-											->get()->row();
+											->get()->row();dump($existed_domain_name);
 			// if it is in existed organization, not allow to create a new organization
 			if (! $existed_domain_name) {
 				if ($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create') {

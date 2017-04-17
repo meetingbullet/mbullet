@@ -48,3 +48,15 @@ Assets::add_js($inline, 'inline');
         <div class="an-loader-container" style="display: none;">
             <img src="<?php echo Template::theme_url("images/loader.png"); ?>" alt="">
         </div>
+
+        <?php 
+        $message = Template::message();
+        if (validation_errors() || $message) : ?>
+            <?php if(validation_errors()): ?>
+            <div id="notify" data-notify-type="error">
+                <?php echo nl2br(validation_errors()) ?>
+            </div>
+            <?php else: ?>
+                <?php echo $message; ?>
+            <?php endif;
+        endif; ?>

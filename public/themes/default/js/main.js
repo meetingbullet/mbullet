@@ -4,7 +4,7 @@ $(document).ready(function() {
         $.notify({
             message: $('#notify').html()
         }, {
-            type: $('#notify').data('notify-type') ? ($('#notify').data('notify-type') == 'error' ? 'danger' : $('#notify').data('notify-type')) : 'info',
+            type: $('#notify').data('notify-type') ? $('#notify').data('notify-type') : 'info',
             z_index: 1051
         });
     }

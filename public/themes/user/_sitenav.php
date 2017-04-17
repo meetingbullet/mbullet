@@ -1,4 +1,4 @@
-        <header class="an-header wow fadeInDown" style="visibility: visible; animation-name: fadeInDown;">
+        <header class="an-header" style="visibility: visible; animation-name: fadeInDown;">
             <div class="an-topbar-left-part">
             <h3 class="an-logo-heading">
                 <a class="an-logo-link" href="#"><?php echo $this->settings_lib->item('site.title'); ?>
@@ -229,15 +229,5 @@
 					<?php echo Contexts::render_menu('both', 'normal'); ?>
                 </div> <!-- end .AN-SIDEBAR-NAV -->
             </div> <!-- end .AN-SIDEBAR-NAV -->
-
-            <?php if (validation_errors()) : ?>
-            <div class="an-notification-content top-full-width">
-                <div class="alert alert-danger  js-nofitication-body" role="alert" style="">
-                    <button type="button" class="close"><span aria-hidden="true">×</span></button>
-                    <?php echo nl2br(validation_errors()); ?>
-                </div>
-            </div>
-            <?php endif; ?>
-
 
             <div class="an-content-body">

@@ -1,21 +1,6 @@
 <?php
 	$site_open = $this->settings_lib->item('auth.allow_register');
-	$message = Template::message();
 ?>
-
-	<?php if (validation_errors() || $message) : ?>
-	<div class="an-notification-content top-full-width">
-		<?php if(validation_errors()): ?>
-		<div class="alert alert-danger  js-nofitication-body" role="alert" style="">
-			<button type="button" class="close"><span aria-hidden="true">×</span></button>
-			<?php echo validation_errors() ?>
-		</div>
-		<?php else: ?>
-			<?php echo $message; ?>
-		<?php endif; ?>
-	</div>
-	<?php endif; ?>
-
 	<div class="an-page-content">
         <div class="an-flex-center-center">
 			<div class="container">
@@ -23,7 +8,7 @@
 				<div class="col-md-6 col-md-offset-3">
 					<div class="an-login-container">
 					<div class="back-to-home">
-						<h3 class="an-logo-heading text-center wow fadeInDown">
+						<h3 class="an-logo-heading text-center">
 						<a class="an-logo-link" href="<?php e(base_url())?>"><?php e($this->settings_lib->item('site.title')) ?>
 							<span><?php e($this->settings_lib->item('site.description')) ?></span>
 						</a>
