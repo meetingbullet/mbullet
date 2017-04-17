@@ -3,41 +3,53 @@
 	<div class="col-md-3 status" id="open">
 		<label>Open</label>
 		<div class="actions">
-		<?php foreach ($actions['open'] as $item) : ?>
+			<?php foreach ($actions['open'] as $item) : ?>
 			<div class="item" data-action-id="<?php e($item->action_id) ?>">
 				<?php echo $item->action_key ?>
 			</div>
-		<?php endforeach ?>
+			<?php endforeach ?>
+			<div class="add-action">
+				<button><i class="ion-ios-plus-outline"></i></button>
+			</div>
 		</div>
 	</div>
 	<div class="col-md-3 status" id="inprogress">
 		<label>In-progress</label>
 		<div class="actions">
-		<?php foreach ($actions['inprogress'] as $item) : ?>
+			<?php foreach ($actions['inprogress'] as $item) : ?>
 			<div class="item" data-action-id="<?php e($item->action_id) ?>">
 				<?php echo $item->action_key ?>
 			</div>
-		<?php endforeach ?>
+			<?php endforeach ?>
+			<div class="add-action">
+				<button><i class="ion-ios-plus-outline"></i></button>
+			</div>
 		</div>
 	</div>
 	<div class="col-md-3 status" id="ready">
 		<label>Ready for review</label>
 		<div class="actions">
-		<?php foreach ($actions['ready'] as $item) : ?>
+			<?php foreach ($actions['ready'] as $item) : ?>
 			<div class="item" data-action-id="<?php e($item->action_id) ?>">
 				<?php echo $item->action_key ?>
 			</div>
-		<?php endforeach ?>
+			<?php endforeach ?>
+			<div class="add-action">
+				<button><i class="ion-ios-plus-outline"></i></button>
+			</div>
 		</div>
 	</div>
 	<div class="col-md-3 status" id="resolved">
 		<label>Resolved</label>
 		<div class="actions">
-		<?php foreach ($actions['resolved'] as $item) : ?>
+			<?php foreach ($actions['resolved'] as $item) : ?>
 			<div class="item" data-action-id="<?php e($item->action_id) ?>">
 				<?php echo $item->action_key ?>
 			</div>
-		<?php endforeach ?>
+			<?php endforeach ?>
+			<div class="add-action">
+				<button><i class="ion-ios-plus-outline"></i></button>
+			</div>
 		</div>
 	</div>
 </div>
