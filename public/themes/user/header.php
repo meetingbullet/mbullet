@@ -22,6 +22,7 @@ Assets::add_js($inline, 'inline');
 	<?php
 	/* Modernizr is loaded before CSS so CSS can utilize its features */
 	echo Assets::js('modernizr-2.5.3.js');
+	echo Assets::css();
 	?>
 
 	<!-- Theme CSS -->
@@ -31,7 +32,6 @@ Assets::add_js($inline, 'inline');
 	<link href="<?php echo Template::theme_url("css/styles.css"); ?>" rel="stylesheet" >
 	<link href="<?php echo Template::theme_url("screen.css"); ?>" rel="stylesheet" >
 
-	<?php echo Assets::css(); ?>
 	<link rel="shortcut icon" href="<?php echo base_url(); ?>favicon.ico">
 
 
