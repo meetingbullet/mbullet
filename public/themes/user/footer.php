@@ -10,6 +10,7 @@
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="<?php echo js_path(); ?>jquery-1.12.4.min.js"><\/script>');</script>
+	<script src="<?php echo js_path() . 'jquery-ui.min.js' ?>"></script>
     <?php echo Assets::js(); ?>
 
     <!-- Theme Script -->
@@ -21,8 +22,10 @@
     <script src="<?php echo Template::theme_url("js-plugins/owl.carousel.min.js"); ?>" type="text/javascript"></script>
     <script src="<?php echo Template::theme_url("js-plugins/Chart.min.js"); ?>" type="text/javascript"></script>
     <script src="<?php echo Template::theme_url("js-plugins/circle-progress.min.js"); ?>" type="text/javascript"></script>
+    <script src="<?php echo Template::theme_url("js-plugins/bootstrap-notify.js"); ?>" type="text/javascript"></script>
 
     <script src="<?php echo Template::theme_url("js/customize-chart.js"); ?>" type="text/javascript"></script>
     <script src="<?php echo Template::theme_url("js/scripts.js"); ?>" type="text/javascript"></script>
+    <script src="<?php echo Template::theme_url("js/main.js"); ?>" type="text/javascript"></script>
 </body>
 </html>

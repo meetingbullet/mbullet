@@ -24,5 +24,6 @@
 
     <script src="<?php echo Template::theme_url("js/customize-chart.js"); ?>" type="text/javascript"></script>
     <script src="<?php echo Template::theme_url("js/scripts.js"); ?>" type="text/javascript"></script>
+    <script src="<?php echo Template::theme_url("js/main.js"); ?>" type="text/javascript"></script>
 </body>
 </html>
