@@ -47,50 +47,16 @@ class Authenticated_Controller extends Base_Controller
 
 	private function goto_create_organization()
 	{
-		if (! isset($this->current_user)) {
-			if (! class_exists('Auth')) {
-				$this->load->library('users/Auth');
-			}
-			$current_user = $this->auth->user();
-		} else {
-			$current_user = $this->current_user;
-		}
-
-		$current_email = $current_user->email;
-		$domain_name = substr(strrchr($current_email, "@"), 1);
-
-		// detect if it is a public domain name
-		$is_public_domain_name = $this->db->select('count(*) as count')
-										->where('domain', $domain_name)
-										->get('public_email_domains')->row()->count > 0 ? true : false;
-		if ($is_public_domain_name) {
-			// if it is a public domain name, check if it is in existed organization
-			$user_organization = $this->db->select('o.url')
-											->from('organizations o')
-											->join('user_to_organizations uto', 'o.organization_id = uto.organization_id', 'left')
-											->where('uto.user_id', $current_user->user_id)
-											->where('uto.enabled', 1)
-											->get()->row();
-			// if it is in existed organization, not allow to create a new organization
-			if (! $user_organization) {
-				if ($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create') {
-					redirect('/organization/create');
-				}
-			}
-		} else {
-			// if it is not a public domain name, check if it is in existed organization
-			$existed_domain_name = $this->db->select('od.*, o.url')
-											->from('organization_domains od')
-											->join('organizations o', 'o.organization_id = od.organization_id', 'left')
-											->join('user_to_organizations uto', 'o.organization_id = uto.organization_id', 'left')
-											->where('od.domain', $domain_name)
-											->where('uto.enabled', 1)
-											->get()->row();
-			// if it is in existed organization, not allow to create a new organization
-			if (! $existed_domain_name) {
-				if ($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create') {
-					redirect('/organization/create');
-				}
+		// If user still access to an organization, can not create new anymore
+		$orgs = $this->db->select('count(*) AS total')
+							->from('organizations o')
+							->join('user_to_organizations uo', 'o.organization_id = uo.organization_id', 'left')
+							->where('uo.user_id', $this->current_user->user_id)
+							->where('uo.enabled', 1)
+							->get()->row();
+		if ($orgs->total == 0) {
+			if ($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create') {
+				redirect('/organization/create');
 			}
 		}
 	}

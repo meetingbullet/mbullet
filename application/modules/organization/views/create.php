@@ -19,6 +19,7 @@
 					</div>
 					<div class="an-component-body">
 					<?php echo form_open('', 'autocomplete="off"'); ?>
+						<p class="an-small-doc-block"><?php echo lang('org_create_notice') ?></p>
 						<label><?php echo lang('org_name') ?></label>
 						<div class="an-input-group">
 							<div class="an-input-group-addon"><i class="ion-briefcase"></i></div>
@@ -27,9 +28,9 @@
 
 						<label><?php echo lang('org_url'); ?></label>
 						<div class="an input-group">
-							<div class="input-group-addon"><?php echo empty($_SERVER['HTTPS']) ? 'http://' : 'https://' ?></div>
+							<div class="input-group-addon"><?php echo is_https() ? 'https://' : 'http://' ?></div>
 							<input type="text" name="url" id="input_triggered" class="an-form-control form-control <?php echo iif( form_error('url') , 'danger') ;?>" tabindex="2" value="<?php echo set_value('url') ?>">
-							<div class="input-group-addon">.<?php echo $_SERVER['SERVER_NAME'] ?></div>
+							<div class="input-group-addon">.<?php echo $this->domain->get_main_domain() ?></div>
 						</div>
 
 						<button name="create" class="an-btn an-btn-default fluid"><?php e(lang('org_create')); ?></button>
@@ -43,4 +44,3 @@
 		</div>
 	</div> <!-- end an-flex-center-center -->
 </div>
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>

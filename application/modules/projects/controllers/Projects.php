@@ -102,9 +102,16 @@ class Projects extends Authenticated_Controller
 	public function detail($project_key = null)
 	{
 		/***************** PROJECT AND USER CHECK *****************/
-		// $project_id = $this->get_project_id($project_key);
+		if ($project_key == null) {
+			redirect('/dashboard');
+		}
 
-		$project_id = 1; // test
+		$project_id = $this->get_project_id($project_key);
+		if ($project_id === false) {
+			redirect('/dashboard');
+		}
+
+		// $project_id = 1; // test
 		/*---------------------------------- INFO TAB ----------------------------------*/
 		/***************** PAGINATION *****************/
 		$this->load->library('pagination');
@@ -246,14 +253,18 @@ class Projects extends Authenticated_Controller
 
 	public function sort_action($project_key = null)
 	{
-		// $project_id = $this->get_project_id($project_key);
+		if (! $this->input->is_ajax_request()) {
+			redirect('/dashboard');
+		}
 
-		$project_id = 1; // test
-		$action_id = $this->input->get('action_id');
-		$status = $this->input->get('status');
-		$status_order = $this->input->get('status_order');
+		$project_id = $this->get_project_id($project_key);
 
-		if (empty($project_id) || empty($action_id) || empty($status) || empty($status_order)) {
+		// $project_id = 1; // test
+		$action_id = trim($this->input->get('action_id'));
+		$status = trim($this->input->get('status'));
+		$status_order = trim($this->input->get('status_order'));
+
+		if (empty($project_id) || $action_id == '' || $status == '' || $status_order == '') {
 			echo json_encode([
 				'status' => '0',
 				'message' => 'failed at position 1'
@@ -328,8 +339,12 @@ class Projects extends Authenticated_Controller
 
 	public function get_action_board_data($project_key = null)
 	{
-		// $project_id = $this->get_project_id($project_key);
-		$project_id = 1; // test
+		if (! $this->input->is_ajax_request()) {
+			redirect('/dashboard');
+		}
+
+		$project_id = $this->get_project_id($project_key);
+		// $project_id = 1; // test
 		if ($project_id !== false) {
 			$actions = $this->get_actions($project_id);
 		} else {
@@ -391,22 +406,22 @@ class Projects extends Authenticated_Controller
 		}
 
 		if (! class_exists('Role_model')) {
-			$this->load->model('roles/Role_model');
+			$this->load->model('roles/role_model');
 		}
 		// check user is organization owner or not
 		$is_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
 									->count_by('is_public', 1) == 1 ? true : false;
 		// get project id
 		if ($is_owner) {
-			$project = $this->project_model->select('pm.project_id, projects.name')
+			$project = $this->project_model->select('project_id, projects.name')
 										->where('projects.organization_id', $this->current_user->current_organization_id)
-										->find_by('projects.project_key', $project_key);
+										->find_by('projects.cost_code', $project_key);
 		} else {
 			$project = $this->project_model->select('pm.project_id, projects.name')
-										->join('project_members pm', 'pm.project_id = projects.projet_id', 'inners')
+										->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
 										->where('projects.organization_id', $this->current_user->current_organization_id)
 										->where('pm.user_id', $this->current_user->user_id)
-										->find_by('projects.project_key', $project_key);
+										->find_by('projects.cost_code', $project_key);
 		}
 
 		if (! empty($project)) {

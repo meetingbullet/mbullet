@@ -14,16 +14,10 @@ class Organization extends Authenticated_Controller
 
 	public function create()
 	{
+		$this->load->library('domain');
 		// check current email
 		$result = $this->check_current_email();
-		// If user still access to an organization, can not create new anymore
-		$orgs = $this->db->select('count(*) AS total')
-							->from('organizations o')
-							->join('user_to_organizations uo', 'o.organization_id = uo.organization_id', 'left')
-							->where('uo.user_id', $this->current_user->user_id)
-							->where('uo.enabled', 1)
-							->get()->row();
-		if ($orgs->total > 0) redirect($this->previous_page);
+		
 		
 		// if has submited data
 		if (isset($_POST['create'])) {
@@ -138,6 +132,8 @@ class Organization extends Authenticated_Controller
 				} else {
 					Template::set_message(lang('org_create_fail'), 'danger');
 				}
+			} else {
+				Template::set_message(validation_errors(), 'danger');
 			}
 		}
 

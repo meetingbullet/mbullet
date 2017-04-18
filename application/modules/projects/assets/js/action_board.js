@@ -1,6 +1,6 @@
 $(document).ready(function() {
-	$('#board .status .actions').sortable({
-		connectWith: '#board .status .actions',
+	$('#board .status .actions .items').sortable({
+		connectWith: '#board .status .actions .items',
 		items: '.item',
 		update: function (e, ui) {
 			if (this === ui.item.parent()[0]) {
@@ -9,11 +9,11 @@ $(document).ready(function() {
 				$.get(url,{
 					status_order: ui.item.index(),
 					action_id: ui.item.data('action-id'),
-					status: ui.item.parent().parent().attr('id')
+					status: ui.item.parent().parent().parent().attr('id')
 				}).done(function(data) {
 					data = JSON.parse(data);
 					if (data.status == 0) {
-						console.log('update failed');
+						console.log(data);
 						refresh_action_board();
 					} else {
 						console.log('update success');
@@ -26,7 +26,7 @@ $(document).ready(function() {
 	refresh_action_board_multiple();
 
 	$('#board .status .actions').on('click', '.add-action button', function() {
-		alert('aaaa');
+		
 	})
 });
 
@@ -42,37 +42,32 @@ function refresh_action_board() {
 	$('#board #loading').fadeIn();
 	$.get(url).done(function(data) {
 		$('#board #loading').fadeOut();
-		$('#board .status .actions').empty();
+		$('#board .status .actions .items').empty();
 
 		data = JSON.parse(data);
 		data.open.forEach(function(item, index) {
 			var div = `<div class="item" data-action-id="${item.action_id}">
 							${item.action_key}
 						</div>`;
-			$('#board .status#open .actions').append(div);
+			$('#board .status#open .actions .items').append(div);
 		});
 		data.inprogress.forEach(function(item, index) {
 			var div = `<div class="item" data-action-id="${item.action_id}">
 							${item.action_key}
 						</div>`;
-			$('#board .status#inprogress .actions').append(div);
+			$('#board .status#inprogress .actions .items').append(div);
 		});
 		data.ready.forEach(function(item, index) {
 			var div = `<div class="item" data-action-id="${item.action_id}">
 							${item.action_key}
 						</div>`;
-			$('#board .status#ready .actions').append(div);
+			$('#board .status#ready .actions .items').append(div);
 		});
 		data.resolved.forEach(function(item, index) {
 			var div = `<div class="item" data-action-id="${item.action_id}">
 							${item.action_key}
 						</div>`;
-			$('#board .status#resolved .actions').append(div);
+			$('#board .status#resolved .actions .items').append(div);
 		});
-
-		var div = `<div class="add-action">
-					<button><i class="ion-ios-plus-outline"></i></button>
-				</div>`;
-		$('#board .status .actions').append(div);
 	});
 }

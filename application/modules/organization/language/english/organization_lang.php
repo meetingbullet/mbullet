@@ -4,6 +4,7 @@ $lang['org_create'] = 'Create';
 $lang['org_organization'] = 'Organization';
 $lang['org_name'] = 'Organization name';
 $lang['org_url'] = 'Your access domain';
+$lang['org_create_notice'] = 'Your organization does not exist, you must create your organization to continue.';
 //form
 $lang['org_reg_name'] = 'Organization name';
 $lang['org_reg_url'] = 'Organization url';
