@@ -13,9 +13,9 @@
 		</div> <!-- end AN-BODY-TOPBAR -->
 		<?php endif; ?>
 
-		<div class='container-fluid<?php echo $this->input->is_ajax_request() ? ' modal-body' : ''?>'>
-			<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '']) ?>
+		<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '']) ?>
 
+		<div class='container-fluid<?php echo $this->input->is_ajax_request() ? ' modal-body' : ''?>'>
 				<?php echo mb_form_input('text', 'name', lang('pj_project_name'), true) ?>
 
 				<div class="an-single-component with-shadow">
@@ -30,7 +30,7 @@
 									<label for="no_meeting" class="pull-right"><?php e(lang('pj_investment_hours'))?><span class="required">*</span></label>
 								</div>
 								<div class="col-md-9 col-sm-12">
-									<div class="container-fluid row">
+									<div class="row">
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_min'))?></span></div>
@@ -55,7 +55,7 @@
 									<label for="no_meeting" class="pull-right"><?php e(lang('pj_roi_rating'))?><span class="required">*</span></label>
 								</div>
 								<div class="col-md-9 col-sm-12">
-									<div class="container-fluid row">
+									<div class="row">
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_min'))?></span></div>
@@ -77,7 +77,7 @@
 									<label for="no_meeting" class="pull-right"><?php e(lang('pj_period'))?><span class="required">*</span></label>
 								</div>
 								<div class="col-md-9 col-sm-12">
-									<div class="container-fluid row">
+									<div class="row">
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_min'))?></span></div>
@@ -116,7 +116,7 @@
 									<label for="no_meeting" class="pull-right"><?php e(lang('pj_return_on_invested_hours'))?><span class="required">*</span></label>
 								</div>
 								<div class="col-md-9 col-sm-12">
-									<div class="container-fluid row">
+									<div class="row">
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_min'))?></span></div>
@@ -141,7 +141,7 @@
 									<label for="expectations[outcomes_per_period]" class="pull-right"><?php e(lang('pj_time_cost_to_milestone'))?><span class="required">*</span></label>
 								</div>
 								<div class="col-md-9 col-sm-12">
-									<div class="container-fluid row">
+									<div class="row">
 										<div class="col-md-3">
 											<input type="number" name="expectations[time_cost_to_milestone]" class="an-form-control<?php e(iif( form_error('expectations[time_cost_to_milestone]') , ' danger')) ?>" value="<?php e(set_value('expectations[time_cost_to_milestone]')) ?>">
 										</div>
@@ -154,7 +154,7 @@
 									<label for="expectations[outcomes_per_period]" class="pull-right"><?php e(lang('pj_outcomes_per_period'))?><span class="required">*</span></label>
 								</div>
 								<div class="col-md-9 col-sm-12">
-									<div class="container-fluid row">
+									<div class="row">
 										<div class="col-md-3">
 											<input type="number" name="expectations[outcomes_per_period]" class="an-form-control<?php e(iif( form_error('expectations[outcomes_per_period]') , ' danger')) ?>" value="<?php e(set_value('expectations[outcomes_per_period]')) ?>">
 										</div>
@@ -186,11 +186,12 @@
 				</div>
 
 				
-			<?php echo form_close(); ?>
 		</div>
 
 		<div class="<?php echo $this->input->is_ajax_request() ? 'modal-footer' : 'container-fluid pull-right' ?>">
 			<button type="submit" name="save" class="an-btn an-btn-primary"><?php e(lang('pj_create'))?></button>
 			<a href="#" class="an-btn an-btn-primary-transparent" <?php echo $this->input->is_ajax_request() ? 'data-dismiss="modal"' : '' ?>><?php e(lang('pj_cancel'))?></a>
 		</div>
+
+		<?php echo form_close(); ?>
 	</div>
