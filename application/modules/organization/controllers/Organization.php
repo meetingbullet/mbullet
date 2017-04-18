@@ -14,6 +14,8 @@ class Organization extends Authenticated_Controller
 
 	public function create()
 	{
+		// check current email
+		$result = $this->check_current_email();
 		// If user still access to an organization, can not create new anymore
 		$orgs = $this->db->select('count(*) AS total')
 							->from('organizations o')
@@ -40,7 +42,7 @@ class Organization extends Authenticated_Controller
 					'url' => $url,
 				];
 				// decide signup mode base on type on domain name
-				if ($this->check_current_email_result['public_domain']) {
+				if ($result['public_domain']) {
 					$data['signup_mode'] = 'INVITE';
 				}
 
@@ -106,10 +108,10 @@ class Organization extends Authenticated_Controller
 							}
 						}
 						// if not public domain name email, insert organization domain name
-						if ($this->check_current_email_result['public_domain'] === false) {
+						if ($result['public_domain'] === false) {
 							$organization_domain_added = $this->db->insert('organization_domains', [
 								'organization_id' => $organization_id,
-								'domain' => $this->check_current_email_result['domain_name']
+								'domain' => $result['domain_name']
 							]);
 							if (! $organization_domain_added) {
 								throw new Exception('error position 7');
@@ -141,5 +143,27 @@ class Organization extends Authenticated_Controller
 
 		Assets::add_module_js('organization', 'organization.js');
 		Template::render('organization');
+	}
+
+	private function check_current_email()
+	{
+		$result = [
+			'public_domain' => false,
+			'domain_name' => ''
+		];
+
+		$user = $this->current_user;
+		// get domain name of current email
+		$domain_name = substr(strrchr($user->email, "@"), 1);
+		// detect if it is a public domain name
+		$is_public_domain_name = $this->db->select('count(*) as count')
+										->where('domain', $domain_name)
+										->get('public_email_domains')->row()->count > 0 ? true : false;
+		if ($is_public_domain_name) {
+			$result['public_domain'] = true;
+		}
+
+		$result['domain_name'] = $domain_name;
+		return $result;
 	}
 }

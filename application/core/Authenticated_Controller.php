@@ -36,17 +36,16 @@ class Authenticated_Controller extends Base_Controller
 		parent::__construct();
 		
 		$this->redirect_to_organization_url();
+		$this->goto_create_organization();
 
 		$this->form_validation->CI =& $this;
 		$this->form_validation->set_error_delimiters('', '');
 
-		// check current user email
-		$this->check_current_email_result = $this->check_current_email();
 		// Basic setup
 		Template::set_theme('user', 'junk');
 	}
 
-	private function check_current_email()
+	private function goto_create_organization()
 	{
 		if (! isset($this->current_user)) {
 			if (! class_exists('Auth')) {
@@ -57,22 +56,15 @@ class Authenticated_Controller extends Base_Controller
 			$current_user = $this->current_user;
 		}
 
-		$data = [
-			'public_domain' => false,
-			'domain_name' => ''
-		];
-
 		$current_email = $current_user->email;
 		$domain_name = substr(strrchr($current_email, "@"), 1);
-		// get email domain name
-		$data['domain_name'] = $domain_name;
+
 		// detect if it is a public domain name
 		$is_public_domain_name = $this->db->select('count(*) as count')
 										->where('domain', $domain_name)
 										->get('public_email_domains')->row()->count > 0 ? true : false;
 		if ($is_public_domain_name) {
 			// if it is a public domain name, check if it is in existed organization
-			$data['public_domain'] = true;
 			$user_organization = $this->db->select('o.url')
 											->from('organizations o')
 											->join('user_to_organizations uto', 'o.organization_id = uto.organization_id', 'left')
@@ -101,22 +93,15 @@ class Authenticated_Controller extends Base_Controller
 				}
 			}
 		}
-
-		return $data;
 	}
 
 	private function redirect_to_organization_url()
 	{
 		if (is_null($this->current_user->current_organization_id)) {
 			// get main domain
-			$current_domain = $_SERVER['SERVER_NAME'];
-			$parsed_url = explode('.', $current_domain);
-			$main_domain_parts = [];
-			for ($i = (count($parsed_url) - MAIN_DOMAIN_PARTS); $i < count($parsed_url); $i++) {
-				$main_domain_parts[] = $parsed_url[$i];
-			}
-			$main_domain = implode('.', $main_domain_parts);
-
+			$this->load->library('domain');
+			$main_domain = $this->domain->get_main_domain();
+			
 			// get sub domain
 			$orgs = $this->db->select('o.organization_id, o.url')
 							->from('organizations o')

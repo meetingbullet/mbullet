@@ -74,13 +74,16 @@ class Users extends Front_Controller
 		if ($this->auth->is_logged_in() !== false) {
 			redirect('/');
 		}
+
+		$this->load->library('domain');
 		// include google client api
 		require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
 		$client_id = $this->config->item('client_id');
 		$client_secret = $this->config->item('client_secret');
-		$redirect_uri = $this->config->item('redirect_uri');
+		$redirect_uri = (is_https() ? 'https://' : 'http://') . $this->domain->get_main_domain() . '/login';
 
 		$client = new Google_Client();
+		$client->setAccessType("offline");
 		$client->setClientId($client_id);
 		$client->setClientSecret($client_secret);
 		$client->setRedirectUri($redirect_uri);
@@ -98,14 +101,15 @@ class Users extends Front_Controller
 		if (isset($_GET['code'])) {
 			try {
 				$client->authenticate($_GET['code']);
-				$access_token = $client->getAccessToken();
+				$token = $client->getAccessToken();
 				$google_user = $service->userinfo->get();
 
 				$user = $this->user_model->find_by('email', $google_user->email);
 				if (! $user) {
 					$added = $this->user_model->insert([
 						'email' => $google_user->email,
-						'google_id_token' => $access_token['id_token'],
+						'google_refresh_token' => $token['refresh_token'],
+						'google_id_token' => $token['id_token'],
 						'first_name' => $google_user->given_name,
 						'last_name' => $google_user->family_name,
 						'avatar' => $google_user->picture,
@@ -116,13 +120,18 @@ class Users extends Front_Controller
 						throw new Exception(lang('us_failed_login_attempts'));
 					}
 				} else {
-					$updated = $this->user_model->update($user->user_id, [
-						'google_id_token' => $access_token['id_token'],
+					$update_data = [
+						'google_id_token' => $token['id_token'],
 						'first_name' => $google_user->given_name,
 						'last_name' => $google_user->family_name,
 						'avatar' => $google_user->picture,
 						'active' => 1
-					]);
+					];
+
+					if (! empty($token['refresh_token'])) {
+						$update_data['google_refresh_token'] = $token['refresh_token'];
+					}
+					$updated = $this->user_model->update($user->user_id, $update_data);
 
 					if (! $updated) {
 						throw new Exception(lang('us_failed_login_attempts'));
@@ -146,7 +155,7 @@ class Users extends Front_Controller
 				null,
 				false,
 				true,
-				$access_token['id_token']
+				$token['id_token']
 			))
 		) {
 			log_activity(
@@ -182,91 +191,6 @@ class Users extends Front_Controller
 		Assets::add_module_js('users', 'users.js');
 		Template::set('page_title', 'Login');
 		Template::render('account');
-	}
-
-	/**
-	 * Present the login via google account.
-	 *
-	 * @return void
-	 */
-	private function login_via_google($google_data = null)
-	{
-		if (! $google_data['gg_token']) {
-			echo json_encode([
-				'status' => 'fail',
-				'reason' => 1
-			]);
-			exit;
-		}
-
-		$token = $google_data['gg_token'];
-		if (empty($this->config->item('tokeninfo_endpoint'))) {
-			$this->config->load('google_api');
-		}
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $this->config->item('tokeninfo_endpoint') . '?id_token=' . $token);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$result = curl_exec($ch);
-		curl_close($ch);
-
-		$result = json_decode($result);
-		if (isset($result->error_description)) {
-			echo json_encode([
-				'status' => 'fail',
-				'reason' => 2
-			]);
-			exit;
-		}
-
-		$email = $result->email;
-
-		$user = $this->user_model->find_by('email', $email);
-		if (! $user) {
-			$added = $this->user_model->insert([
-				'email' => $email,
-				'google_id_token' => $token
-			]);
-
-			if (! $add) {
-				echo json_encode([
-					'status' => 'fail',
-					'reason' => 3
-				]);
-				exit;
-			}
-		} else {
-			$updated = $this->user_model->update($user->user_id, [
-				'google_id_token' => $token
-			]);
-
-			if (! $updated) {
-				echo json_encode([
-					'status' => 'fail',
-					'reason' => 4
-				]);
-				exit;
-			}
-		}
-
-		if (! class_exists('Auth')) {
-			$this->load->library('users/Auth');
-		}
-
-		$logged = $this->auth->login($email, null, false, true, $token);
-		if (! $logged) {
-			echo json_encode([
-				'status' => 'fail',
-				'reason' => 5
-			]);
-			exit;
-		}
-
-		echo json_encode([
-			'status' => 'success',
-			'redirect' => base_url()
-		]);
-		exit;
 	}
 
 	/**
@@ -814,7 +738,6 @@ class Users extends Front_Controller
 				return false;
 			}
 		}
-		dump($this->user_model->get_validation_rules($type));
 		$this->form_validation->set_rules($this->user_model->get_validation_rules($type));
 
 		$usernameRequired = '';
@@ -843,7 +766,6 @@ class Users extends Front_Controller
 
 		// Compile our core user elements to save.
 		$data = $this->user_model->prep_data($this->input->post());
-		dump($data);
 		$result = false;
 
 		if ($type == 'insert') {
