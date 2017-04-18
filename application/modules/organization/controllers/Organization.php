@@ -54,7 +54,8 @@ class Organization extends Authenticated_Controller
 						// add owner role for this user
 						$owner_role = $this->role_model->select('role_id')->find_by('is_public', 1);
 						if (! $owner_role) {
-							throw new Exception('error position 1');
+							logit('line 57: unable to get owner role.');
+							throw new Exception(lang('org_error_position_1'));
 						}
 
 						$user_role_added = $this->db->insert('user_to_organizations', [
@@ -63,12 +64,14 @@ class Organization extends Authenticated_Controller
 							'role_id' => $owner_role->role_id,
 						]);
 						if (! $user_role_added) {
-							throw new Exception('error position 2');
+							logit('line 67: unable to set this user to be organization owner.');
+							throw new Exception(lang('org_error_position_2'));
 						}
 						// get system default roles
 						$system_default_roles = $this->role_model->select('role_id, name, description, join_default')->where('system_default', 1)->find_all();
 						if (($system_default_roles === false) || (is_array($system_default_roles) && count($system_default_roles) == 0)) {
-							throw new Exception('error position 3');
+							logit('line 73: unable to get system default roles.');
+							throw new Exception(lang('org_error_position_3'));
 						}
 
 						foreach ($system_default_roles as $role) {
@@ -78,7 +81,8 @@ class Organization extends Authenticated_Controller
 							// clone system default role to new organization
 							$organization_role_added = $this->role_model->insert((array) $role);
 							if (! $organization_role_added) {
-								throw new Exception('error position 4');
+								logit('line 84: unable to add system default roles to this organization.');
+								throw new Exception(lang('org_error_position_4'));
 							}
 							$organization_role_id = $organization_role_added;
 							// get system default role permissions
@@ -87,7 +91,8 @@ class Organization extends Authenticated_Controller
 														->get('role_to_permissions')
 														->result();
 							if (($role_permissions === false) || (is_array($role_permissions) && count($role_permissions) == 0)) {
-								throw new Exception('error position 5');
+								logit('line 94: unable to get system default role permissions.');
+								throw new Exception(lang('org_error_position_5'));
 							}
 
 							$organization_role_permissions = [];
@@ -98,7 +103,8 @@ class Organization extends Authenticated_Controller
 							// clone system default role permission to new organization
 							$organization_role_permissions_added = $this->db->insert_batch('role_to_permissions', $organization_role_permissions);
 							if (! $organization_role_permissions_added) {
-								throw new Exception('error position 5');
+								logit('line 106: unable to set organization role permissions.');
+								throw new Exceptionlang(lang('org_error_position_6'));
 							}
 						}
 						// if not public domain name email, insert organization domain name
@@ -108,29 +114,31 @@ class Organization extends Authenticated_Controller
 								'domain' => $result['domain_name']
 							]);
 							if (! $organization_domain_added) {
-								throw new Exception('error position 7');
+								logit('line 117: unable to add organization domain name.');
+								throw new Exception(lang('org_error_position_7'));
 							}
 						}
 					}
 
 					if ($this->db->trans_status() === FALSE) {
-						throw new Exception('error position 8');
+						logit('line 106: transaction status return false.');
+						throw new Exception(lang('org_error_position_8'));
 					} else {
 						$this->db->trans_commit();
 					}
 				} catch (Exception $e) {
 					// if any errors occour, roll back the queries
-					$catched = true;
+					$error = $e->getMessage();
 					$this->db->trans_rollback();
 				}
 
-				if (! isset($catched)) {
+				if (! isset($error)) {
 					Template::set_message(lang('org_create_success'), 'success');
 
 					$organization_url = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $url . '.' . $_SERVER['SERVER_NAME'];
 					redirect($organization_url);
 				} else {
-					Template::set_message(lang('org_create_fail'), 'danger');
+					Template::set_message($error, 'danger');
 				}
 			} else {
 				Template::set_message(validation_errors(), 'danger');
