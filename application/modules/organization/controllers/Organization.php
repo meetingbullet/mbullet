@@ -17,8 +17,7 @@ class Organization extends Authenticated_Controller
 		$this->load->library('domain');
 		// check current email
 		$result = $this->check_current_email();
-		
-		
+
 		// if has submited data
 		if (isset($_POST['create'])) {
 			//get validation rules
