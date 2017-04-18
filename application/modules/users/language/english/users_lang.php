@@ -229,7 +229,10 @@ $lang['us_reg_conf_password'] = 'Confirm Password';
 $lang['us_reg_avatar'] = 'Avatar';
 $lang['us_register_failed'] = 'Register failed, Please try again!';
 $lang['us_register_success'] = 'Register successfully, Please check your email and input the verify code.';
+$lang['us_agree_terms'] = 'By checking this box, I agree with <a style="color: #337ab7;"href="%s" target="_blank">Term of Service</a>';
+$lang['us_reg_confirm_terms'] = 'Confirm terms';
 // form validation
 $lang['form_validation_unique_email_check'] = 'This email address has been used by other user.';
+$lang['form_validation_confirm_required'] = 'Please agree with our Terms of Service.';
 // google sign in
 $lang['us_with_google'] = 'with Google';

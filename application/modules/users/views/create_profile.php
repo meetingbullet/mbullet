@@ -58,6 +58,11 @@
 									<input type="text" name="skype" class="an-form-control <?php echo iif( form_error('skype') , 'danger') ;?>" value="<?php echo set_value('skype', isset($_POST['skype']) ? $_POST['skype'] : '') ?>"/>
 								</div>
 
+								<span class="an-custom-checkbox primary">
+									<input type="checkbox" id="check-2" name="confirm_terms" value="1" <?php echo set_checkbox('confirm_terms', 1, isset($_POST['confirm_terms']) ? $_POST['confirm_terms'] : '') ?>/>
+									<label for="check-2"><?php echo sprintf(lang('us_agree_terms'), '/users/terms') ?></label>
+								</span>
+
 								<button type="submit" name="send" class="an-btn an-btn-default fluid"><?php e(lang('us_register')); ?></button>
 							<?php echo form_close(); ?>
 

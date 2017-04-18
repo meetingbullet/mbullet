@@ -310,7 +310,7 @@ class Users extends Front_Controller
 			$this->form_validation->set_rules($rules['register']);
 
 			if ($this->form_validation->run() !== false) {
-				redirect('/users/create_profile?email=' . $this->input->post('email'));
+				redirect('/users/create_profile?email=' . urlencode($this->input->post('email')));
 			} else {
 				Template::set_message(validation_errors(), 'danger');
 			}
@@ -395,6 +395,23 @@ class Users extends Front_Controller
 		}
 
 		Template::render('account');
+	}
+	public function confirm_required($str)
+	{
+		if (empty($str)) {
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * Display the terms of service.
+	 *
+	 *
+	 * @return void
+	 */
+	public function terms()
+	{
+		Template::render('blank');
 	}
 	// public function register()
 	// {
