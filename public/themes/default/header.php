@@ -43,6 +43,6 @@ Assets::add_js($inline, 'inline');
 
 <body>
 	<div class="main-wrapper">
-		<div class="an-loader-container" style="display: none;">
+		<div class="an-loader-container">
 			<img src="<?php echo Template::theme_url("images/loader.png"); ?>" alt="">
 		</div>

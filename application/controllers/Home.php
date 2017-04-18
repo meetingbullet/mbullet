@@ -33,16 +33,19 @@ class Home extends Front_Controller
 	{
 		parent::__construct();
 
+		//temporary redirect to login page as require from Mathias :)
+		redirect(LOGIN_URL);
+
 		$this->load->helper('application');
 		$this->load->library('Template');
 		$this->load->library('Assets');
 		$this->lang->load('application');
 		$this->load->library('events');
 
-        // Make the requested page var available, since
-        // we're not extending from a Bonfire controller
-        // and it's not done for us.
-        $this->requested_page = isset($_SESSION['requested_page']) ? $_SESSION['requested_page'] : null;
+		// Make the requested page var available, since
+		// we're not extending from a Bonfire controller
+		// and it's not done for us.
+		$this->requested_page = isset($_SESSION['requested_page']) ? $_SESSION['requested_page'] : null;
 	}
 
 	//--------------------------------------------------------------------
@@ -73,23 +76,23 @@ class Home extends Front_Controller
 	 */
 	protected function set_current_user()
 	{
-        if (class_exists('Auth')) {
+		if (class_exists('Auth')) {
 			// Load our current logged in user for convenience
-            if ($this->auth->is_logged_in()) {
+			if ($this->auth->is_logged_in()) {
 				$this->current_user = clone $this->auth->user();
 
 				$this->current_user->user_img = gravatar_link($this->current_user->email, 22, $this->current_user->email, "{$this->current_user->email} Profile");
 
 				// if the user has a language setting then use it
-                if (isset($this->current_user->language)) {
+				if (isset($this->current_user->language)) {
 					$this->config->set_item('language', $this->current_user->language);
 				}
-            } else {
+			} else {
 				$this->current_user = null;
 			}
 
 			// Make the current user available in the views
-            if (! class_exists('Template')) {
+			if (! class_exists('Template')) {
 				$this->load->library('Template');
 			}
 			Template::set('current_user', $this->current_user);
