@@ -4,6 +4,11 @@
 $lang['pj_create_project']			= 'Create Project';
 $lang['pj_constraints']				= 'Constraints';
 $lang['pj_expectations']			= 'Expectations';
+$lang['pj_resolved_label'] = 'Resolved';
+$lang['pj_ready_label'] = 'Ready for review';
+$lang['pj_inprogress_label'] = 'In-progress';
+$lang['pj_open_label'] = 'Open';
+
 
 // Messages
 $lang['pj_project_successfully_created'] = 'Project successfully created';

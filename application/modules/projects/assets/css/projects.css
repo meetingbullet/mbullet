@@ -48,6 +48,10 @@
 	width: 100%;
 }
 
+#board .status .actions .items {
+	min-height: 15px;
+}
+
 #board .status .actions .item {
 	margin: 5px;
 	padding: 10px;

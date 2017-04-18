@@ -1,6 +1,14 @@
-<?php 
-echo theme_view('header'); 
+<?php
+echo theme_view('header');
+echo Template::message();
+?>
+		<div class="an-page-content">
+			<div class="an-flex-center-center">
+<?php
 echo isset($content) ? $content : Template::content();
-// echo Front_Contexts::render_menu('text', 'normal'); 
-echo theme_view('footer', array('show' => false));
+?>
+			</div> <!-- end .AN-PAGE-CONTENT -->
+		</div> <!-- end .AN-PAGE-CONTENT -->
+<?php
+echo theme_view('footer');
 ?>
