@@ -6479,6 +6479,9 @@ input[type="button"].btn-block {
 	border-right: 1px solid #ededed;
 	padding-top: 0;
 	padding-bottom: 0;
+}
+
+.an.input-group>.input-group-addon>i {
 	font-size: 18px;
 }
 

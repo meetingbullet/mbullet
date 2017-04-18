@@ -72,7 +72,7 @@ class Users extends Front_Controller
 	{
 		// If the user is already logged in, go home.
 		if ($this->auth->is_logged_in() !== false) {
-			redirect('/');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$this->load->library('domain');
@@ -302,7 +302,7 @@ class Users extends Front_Controller
 		}
 
 		if ($this->auth->is_logged_in() === true) {
-			redirect('/');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if ($this->input->post()) {
@@ -335,7 +335,7 @@ class Users extends Front_Controller
 		}
 
 		if ($this->auth->is_logged_in() === true) {
-			redirect('/');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$upload_config = $this->config->load('upload');
@@ -465,7 +465,7 @@ class Users extends Front_Controller
 	{
 		// If the user is logged in, go home.
 		if ($this->auth->is_logged_in() !== false) {
-			redirect('/');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if (isset($_POST['send'])) {
@@ -538,7 +538,7 @@ class Users extends Front_Controller
 	{
 		// If the user is logged in, go home.
 		if ($this->auth->is_logged_in() !== false) {
-			redirect('/');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		// Bonfire may have stored the email and code in the session.
