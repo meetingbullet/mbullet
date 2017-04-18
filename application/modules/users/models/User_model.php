@@ -47,11 +47,11 @@ class User_model extends BF_Model
 				'label' => 'lang:us_reg_email',
 				'rules' => 'trim|required|valid_email|max_length[255]|unique[users.email]',
 			),
-			// array(
-			// 	'field' => 'avatar',
-			// 	'label' => 'lang:us_reg_avatar',
-			// 	'rules' => 'trim|required|max_length[255]|',
-			// ),
+			array(
+				'field' => 'confirm_terms',
+				'label' => 'lang:us_reg_confirm_terms',
+				'rules' => 'trim|callback_confirm_required',
+			),
 			array(
 				'field' => 'password',
 				'label' => 'lang:us_reg_password',
