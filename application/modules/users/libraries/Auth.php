@@ -305,12 +305,12 @@ class Auth
 
 		$user->current_organization_id = null;
 		if (isset($this->ci->current_organization_url) && ! is_null($this->ci->current_organization_url)) {
-			$org = $this->ci->db->select('organization_id')
+			$org = $this->ci->db->select('o.organization_id')
 								->from('organizations o')
 								->join('user_to_organizations uo', 'o.organization_id = uo.organization_id', 'left')
-								->where('url', $this->ci->current_organization_url)
-								->where('uo.user_id', $this->user->user_id)
-								->get('organizations')->row();
+								->where('o.url', $this->ci->current_organization_url)
+								->where('uo.user_id', $user->user_id)
+								->get()->row();
 			if (isset($org)) {
 				$user->current_organization_id = $org->organization_id;
 			}
