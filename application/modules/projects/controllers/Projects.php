@@ -17,6 +17,16 @@ class Projects extends Authenticated_Controller
 		Assets::add_module_js('projects', 'projects.js');
 	}
 
+	public function _remap($method, $params = array())
+	{
+		if (method_exists($this, $method))
+		{
+			return call_user_func_array(array($this, $method), $params);
+		} else {
+			$this->detail($method);
+		}
+	}
+
 	public function index()
 	{
 		Template::render();
@@ -291,6 +301,7 @@ class Projects extends Authenticated_Controller
 		Assets::add_module_js('projects', 'projects.js');
 		Template::set('project_name', 'Project test'/*$project->name*/);
 		Template::set('project_key', $project_key);
+		Template::set_view('detail');
 		Template::render();
 	}
 
