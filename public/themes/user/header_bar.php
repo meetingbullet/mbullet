@@ -3,9 +3,9 @@
 			<h3 class="an-logo-heading">
 				<a class="an-logo-link" href="#"><img src="<?php echo base_url('assets/images/icon.svg'); ?>" alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="87" height="31"></a>
 			</h3>
-			<!--<button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">
+			<button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">
 				<i class="icon-list"></i>
-			</button>-->
+			</button>
 			<form class="an-form" action="#">
 				<div class="an-search-field topbar">
 				<input class="an-form-control" type="text" placeholder="Search...">
@@ -186,7 +186,7 @@
 				<div class="dropdown-menu">
 					<p class="an-info-count">Profile Settings</p>
 					<ul class="an-profile-list">
-					<li><a href="<?php e(site_url() . 'users/profile')?>"><i class="icon-user"></i>My profile</a></li>
+					<li><a href="#<?php //e(site_url() . 'users/profile')?>"><i class="icon-user"></i>My profile</a></li>
 					<!--<li><a href="#"><i class="icon-envelop"></i>My inbox</a></li>
 					<li><a href="#"><i class="icon-calendar-check"></i>Calendar</a></li>
 					<li role="separator" class="divider"></li>

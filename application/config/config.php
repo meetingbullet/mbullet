@@ -397,7 +397,7 @@ $config['sess_regenerate_destroy'] = false;
 |
 */
 $config['cookie_prefix']	= '';
-$config['cookie_domain']	= '.mb.vn';
+$config['cookie_domain']	= '.mb.local';
 $config['cookie_path']		= '/';
 $config['cookie_secure'] = false;
 $config['cookie_httponly'] = false;

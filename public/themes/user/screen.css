@@ -77,6 +77,6 @@ label>.required {
     color: #fff;
 }
 
-header.an-header i {
+header.an-header .an-notifications i, header.an-header .an-messages i , header.an-header .js-toggle-sidebar i {
 	color: white;
 }
