@@ -165,7 +165,6 @@ label .required {
 .mb-rainbow {
     width: 100%;
     height: 10px;
-    position: absolute;
     top: 0;
 }
 
@@ -204,6 +203,10 @@ label .required {
 
 .an-page-content {
     min-height: 94vh;
+}
+
+body {
+    background: url('./images/mb-bg.png');
 }
 
 
