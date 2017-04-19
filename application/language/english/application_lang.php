@@ -288,6 +288,7 @@ $lang['bf_menu_sysinfo']        = 'System Information';
 $lang['bf_menu_template']       = 'Template';
 $lang['bf_menu_translate']      = 'Translate';
 $lang['bf_menu_users']          = 'Users';
+$lang['bf_menu_action']         = 'Action';
 
 //------------------------------------------------------------------------------
 // Anything that doesn't follow the 'bf_*' convention:
