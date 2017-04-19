@@ -8,11 +8,23 @@ class Projects extends Authenticated_Controller
 		$this->lang->load('projects');
 		$this->load->library('form_validation');
 		$this->load->helper('mb_form_helper');
+		$this->load->model('users/user_model');
 		$this->load->model('project_model');
 		$this->load->model('project_constraint_model');
 		$this->load->model('project_expectation_model');
+		$this->load->model('project_member_model');
 
 		Assets::add_module_js('projects', 'projects.js');
+	}
+
+	public function _remap($method, $params = array())
+	{
+		if (method_exists($this, $method))
+		{
+			return call_user_func_array(array($this, $method), $params);
+		} else {
+			$this->detail($method);
+		}
 	}
 
 	public function index()
@@ -22,6 +34,12 @@ class Projects extends Authenticated_Controller
 
 	public function create()
 	{
+		// Get invite emails
+		$emails = $this->user_model->select('email, first_name, last_name, avatar')
+									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id, 'RIGHT')
+									->find_all();
+		Template::set('invite_emails', $emails);
+
 		if (isset($_POST['save'])) {
 			if ($this->save_project()) {
 				Template::set('close_modal', 1);
@@ -90,8 +108,43 @@ class Projects extends Authenticated_Controller
 			$data['constraints']['project_id'] = $project_id;
 			$data['expectations']['project_id'] = $project_id;
 
-			$test = $this->project_constraint_model->insert($data['constraints']);
+			$this->project_constraint_model->insert($data['constraints']);
 			$this->project_expectation_model->insert($data['expectations']);
+
+			/*
+				For now, we're going to add invited members immediately into project members
+				because all of their account is already created and is in inviter's organization
+
+				We need to point the unregistered emails to the "User invite" after functionality is finished.
+			*/
+
+			$project_members = [];
+			$project_members[$this->current_user->user_id] = [
+					'project_id' => $project_id,
+					'user_id' => $this->current_user->user_id
+			];
+
+			$invited_team = $this->input->post('invite_team');
+			$invited_team = explode(',', $invited_team);
+
+			$registered_users = $this->user_model->select('users.user_id, email')
+									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id, 'RIGHT')
+									->where_in('email', $invited_team)
+									->find_all();
+
+			foreach ($invited_team as $email) {
+				foreach ($registered_users as $user) {
+					if ($user->email == $email) {
+						$project_members[$user->user_id] = [
+							'project_id' => $project_id,
+							'user_id' => $user->user_id
+						];
+						break;
+					}
+				}
+			}
+
+			$this->project_member_model->insert_batch($project_members);
 		} else {
 
 		}
@@ -248,6 +301,7 @@ class Projects extends Authenticated_Controller
 		Assets::add_module_js('projects', 'projects.js');
 		Template::set('project_name', 'Project test'/*$project->name*/);
 		Template::set('project_key', $project_key);
+		Template::set_view('detail');
 		Template::render();
 	}
 
@@ -418,7 +472,7 @@ class Projects extends Authenticated_Controller
 										->find_by('projects.cost_code', $project_key);
 		} else {
 			$project = $this->project_model->select('pm.project_id, projects.name')
-										->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
+										->join('project_members pm', 'pm.project_id = projects.project_id', 'inner')
 										->where('projects.organization_id', $this->current_user->current_organization_id)
 										->where('pm.user_id', $this->current_user->user_id)
 										->find_by('projects.cost_code', $project_key);

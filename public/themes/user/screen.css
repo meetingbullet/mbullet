@@ -38,6 +38,21 @@ label>.required {
     margin-bottom: 20px;
 }
 
+.an-tags-input .name {
+    margin-right: 5px;
+}
+
+.selectize-control.an-tags-input {
+    height: initial;
+}
+
+.an-tags-input .avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
 
 /* Notifications are shown by $.notify plugin */
 
