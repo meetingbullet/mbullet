@@ -63,4 +63,32 @@ class Project_model extends BF_Model
 	{
 		parent::__construct();
 	}
+
+	public function get_project_id($project_key, $current_user)
+	{
+		if (! class_exists('Role_model')) {
+			$this->load->model('roles/role_model');
+		}
+		// check user is organization owner or not
+		$is_owner = $this->role_model->where('role_id', $current_user->role_ids[$current_user->current_organization_id])
+									->count_by('is_public', 1) == 1 ? true : false;
+		// get project id
+		if ($is_owner) {
+			$project = $this->select('project_id, projects.name')
+							->where('projects.organization_id', $current_user->current_organization_id)
+							->find_by('projects.cost_code', $project_key);
+		} else {
+			$project = $this->select('pm.project_id, projects.name')
+							->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
+							->where('projects.organization_id', $current_user->current_organization_id)
+							->where('pm.user_id', $current_user->user_id)
+							->find_by('projects.cost_code', $project_key);
+		}
+
+		if (! empty($project)) {
+			return $project->project_id;
+		}
+
+		return false;
+	}
 }

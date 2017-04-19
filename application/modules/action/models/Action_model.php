@@ -44,13 +44,53 @@ class Action_model extends BF_Model
 		'create_action' => array(
 			array(
 				'field' => 'name',
-				'label' => 'lang:pj_project_name',
+				'label' => 'lang:ac_action_name',
 				'rules' => 'trim|required|max_length[255]',
 			),
 			array(
-				'field' => 'cost_code',
-				'label' => 'lang:pj_cost_code',
-				'rules' => 'trim|required|max_length[64]',
+				'field' => 'project_id',
+				'label' => 'lang:ac_project_id',
+				'rules' => 'trim|required|numeric',
+			),
+			array(
+				'field' => 'action_key',
+				'label' => 'lang:ac_action_key',
+				'rules' => 'trim|required',
+			),
+			array(
+				'field' => 'owner_id',
+				'label' => 'lang:ac_owner_id',
+				'rules' => 'trim|required|numeric',
+			),
+			array(
+				'field' => 'status',
+				'label' => 'lang:ac_action_status',
+				'rules' => 'trim',
+			),
+			array(
+				'field' => 'action_type',
+				'label' => 'lang:ac_action_type',
+				'rules' => 'trim|required',
+			),
+			array(
+				'field' => 'success_condition',
+				'label' => 'lang:ac_success_condition',
+				'rules' => 'trim|required',
+			),
+			array(
+				'field' => 'point_value_defined',
+				'label' => 'lang:ac_point_value_defined',
+				'rules' => 'trim|required',
+			),
+			array(
+				'field' => 'point_used',
+				'label' => 'lang:ac_point_used',
+				'rules' => 'trim|required',
+			),
+			array(
+				'field' => 'avarage_stars',
+				'label' => 'lang:ac_avarage_stars',
+				'rules' => 'trim|required',
 			)
 		)
     );
@@ -65,5 +105,9 @@ class Action_model extends BF_Model
 	public function __construct()
 	{
 		parent::__construct();
+	}
+
+	public function test() {
+		return $this->current_user;
 	}
 }

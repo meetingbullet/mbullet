@@ -106,7 +106,7 @@ class Projects extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$project_id = $this->get_project_id($project_key);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		if ($project_id === false) {
 			redirect('/dashboard');
 		}
@@ -257,7 +257,7 @@ class Projects extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$project_id = $this->get_project_id($project_key);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 
 		// $project_id = 1; // test
 		$action_id = trim($this->input->get('action_id'));
@@ -343,7 +343,7 @@ class Projects extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$project_id = $this->get_project_id($project_key);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		// $project_id = 1; // test
 		if ($project_id !== false) {
 			$actions = $this->get_actions($project_id);
@@ -400,34 +400,35 @@ class Projects extends Authenticated_Controller
 		return $actions;
 	}
 
-	private function get_project_id($project_key) {
-		if (! class_exists('Project_model')) {
-			$this->load->model('Project_model');
-		}
+	// private function get_project_id($project_key)
+	// {
+	// 	if (! class_exists('Project_model')) {
+	// 		$this->load->model('Project_model');
+	// 	}
 
-		if (! class_exists('Role_model')) {
-			$this->load->model('roles/role_model');
-		}
-		// check user is organization owner or not
-		$is_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
-									->count_by('is_public', 1) == 1 ? true : false;
-		// get project id
-		if ($is_owner) {
-			$project = $this->project_model->select('project_id, projects.name')
-										->where('projects.organization_id', $this->current_user->current_organization_id)
-										->find_by('projects.cost_code', $project_key);
-		} else {
-			$project = $this->project_model->select('pm.project_id, projects.name')
-										->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
-										->where('projects.organization_id', $this->current_user->current_organization_id)
-										->where('pm.user_id', $this->current_user->user_id)
-										->find_by('projects.cost_code', $project_key);
-		}
+	// 	if (! class_exists('Role_model')) {
+	// 		$this->load->model('roles/role_model');
+	// 	}
+	// 	// check user is organization owner or not
+	// 	$is_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
+	// 								->count_by('is_public', 1) == 1 ? true : false;
+	// 	// get project id
+	// 	if ($is_owner) {
+	// 		$project = $this->project_model->select('project_id, projects.name')
+	// 									->where('projects.organization_id', $this->current_user->current_organization_id)
+	// 									->find_by('projects.cost_code', $project_key);
+	// 	} else {
+	// 		$project = $this->project_model->select('pm.project_id, projects.name')
+	// 									->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
+	// 									->where('projects.organization_id', $this->current_user->current_organization_id)
+	// 									->where('pm.user_id', $this->current_user->user_id)
+	// 									->find_by('projects.cost_code', $project_key);
+	// 	}
 
-		if (! empty($project)) {
-			return $project->project_id;
-		}
+	// 	if (! empty($project)) {
+	// 		return $project->project_id;
+	// 	}
 
-		return false;
-	}
+	// 	return false;
+	// }
 }
