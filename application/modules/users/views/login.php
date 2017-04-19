@@ -23,7 +23,7 @@
 								</div>
 								<?php echo form_open(LOGIN_URL, array('autocomplete' => 'off', 'class' => 'mb-form')); ?>
 									<div class="an-component-body addon">
-										<a href="<?php echo $auth_url ?>" class="an-btn an-btn-google block-icon fluid">
+										<a href="<?php echo $auth_url ?>" class="an-btn an-btn-google block-icon fluid mb-uppercase">
 											<i class="fa fa-google-plus" aria-hidden="true"></i>
 											<?php e(' ' . lang('us_let_me_in') . ' ' . lang('us_with_google')); ?>
 										</a>
@@ -38,7 +38,7 @@
 											</div>
 											<input type="password" name="password" class="an-form-control <?php echo iif( form_error('password') , ' danger') ;?>" tabindex="2" placeholder="*******">
 
-											<button name="log-me-in" class="an-btn an-btn-default fluid"><?php e(lang('us_let_me_in')); ?></button>
+											<button name="log-me-in" class="an-btn an-btn-default fluid mb-uppercase"><?php e(lang('us_let_me_in')); ?></button>
 
 											<div class="remembered-section">
 												<span class="an-custom-checkbox">
