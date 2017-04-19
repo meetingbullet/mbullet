@@ -1,5 +1,5 @@
 		<footer class="an-footer">
-			<p>COPYRIGHT 2017 © SIXTH GEAR STUDIOS. ALL RIGHTS RESERVED</p>
+			<p>© 2017 Copyright by <?php echo anchor(site_url(), 'Meeting Bullet', ['class' => 'mb-link']) ?></p>
 		</footer> <!-- end an-footer -->
 	</div> <!-- end .MAIN-WRAPPER -->
 
