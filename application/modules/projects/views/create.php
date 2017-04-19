@@ -195,3 +195,75 @@
 
 		<?php echo form_close(); ?>
 	</div>
+
+	<?php if ($this->input->is_ajax_request()): ?>
+		<script>
+			var REGEX_EMAIL = '([a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@' +
+							'(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)';
+
+			$('.js-input-tags').selectize({
+				persist: false,
+				maxItems: null,
+				valueField: 'email',
+				labelField: 'name',
+				searchField: ['name', 'email'],
+				options: [
+					<?php foreach($invite_emails as $user): 
+						if (strstr($user->avatar, 'http') === false) {
+							$user->avatar = img_path() . 'users/' . $user->avatar;
+						}
+					?>
+					{email: '<?php e($user->email)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php e($user->avatar)?>'},
+					<?php endforeach; ?>
+				],
+				render: {
+					item: function(item, escape) {
+						return '<div>' +
+							(item.avatar ? '<img src="' + item.avatar + '" class="avatar" />' : '') +
+							(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
+							(item.email ? '<span class="email">(' + escape(item.email) + ')</span>' : '') +
+						'</div>';
+					},
+					option: function(item, escape) {
+						var label = item.name || item.email;
+						var caption = item.name ? item.email : null;
+						return '<div>' +
+							(item.avatar ? '<img src="' + item.avatar + '" class="avatar" />' : '') +
+							'<span class="name">' + escape(label) + '</span>' +
+							(caption ? '<span class="caption">(' + escape(caption) + ')</span>' : '') +
+						'</div>';
+					}
+				},
+				createFilter: function(input) {
+					var match, regex;
+
+					// email@address.com
+					regex = new RegExp('^' + REGEX_EMAIL + '$', 'i');
+					match = input.match(regex);
+					if (match) return !this.options.hasOwnProperty(match[0]);
+
+					// name <email@address.com>
+					regex = new RegExp('^([^<]*)\<' + REGEX_EMAIL + '\>$', 'i');
+					match = input.match(regex);
+					if (match) return !this.options.hasOwnProperty(match[2]);
+
+					return false;
+				},
+				create: function(input) {
+					if ((new RegExp('^' + REGEX_EMAIL + '$', 'i')).test(input)) {
+						return {email: input};
+					}
+					var match = input.match(new RegExp('^([^<]*)\<' + REGEX_EMAIL + '\>$', 'i'));
+					console.log(match);
+					if (match) {
+						return {
+							email : match[2],
+							name  : $.trim(match[1])
+						};
+					}
+					alert('Invalid email address.');
+					return false;
+				}
+			});
+		</script>
+	<?php endif; ?>
