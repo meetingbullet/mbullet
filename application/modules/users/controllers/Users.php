@@ -576,10 +576,12 @@ class Users extends Front_Controller
 
 			if ($this->form_validation->run() !== false) {
 				// The user model will create the password hash.
+
+				$hash_password = $this->auth->hash_password($this->input->post('password'));
 				$data = array(
-					'password' => $this->input->post('password'),
+					'password_hash' => $hash_password['hash'],
 					'reset_by' => 0,
-					'reset_hash' => '',
+					'reset_hash' => null,
 					'force_password_reset' => 0,
 				);
 
