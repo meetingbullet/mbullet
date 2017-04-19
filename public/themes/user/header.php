@@ -1,6 +1,6 @@
 <?php
 
-Assets::add_css(array('bootstrap.min.css', 'bootstrap-responsive.min.css'));
+//Assets::add_css(array('bootstrap.min.css', 'bootstrap-responsive.min.css'));
 
 Assets::add_js('bootstrap.min.js');
 

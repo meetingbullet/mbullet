@@ -61,3 +61,7 @@ label>.required {
 .an-profile-settings .an-btn-icon:active {
     color: #fff;
 }
+
+header.an-header i {
+	color: white;
+}
