@@ -95,10 +95,13 @@ $lang['us_send_password']			= 'Send Password';
 
 $lang['us_login']					= 'Please sign in';
 $lang['us_logout']					= 'Logout';
-$lang['us_remember_note']			= 'Remember me';
-$lang['us_sign_up']					= 'Create An Account';
+$lang['us_remember_note']			= 'Remember Me';
+$lang['us_dont_have_account']		= 'Don\'t have account? ';
+$lang['us_your_password']			= 'Your password';
+$lang['us_email_example']			= 'username@gmail.com';
+$lang['us_sign_up']					= 'Sign up';
 $lang['us_forgot_your_password']	= 'Forgot Your Password?';
-$lang['us_let_me_in']				= 'Sign In';
+$lang['us_let_me_in']				= 'Sign in';
 $lang['us_create_profile'] 			= 'Create Profile';
 $lang['us_update_profile'] 			= 'Update Profile';
 
@@ -235,4 +238,4 @@ $lang['us_reg_confirm_terms'] = 'Confirm terms';
 $lang['form_validation_unique_email_check'] = 'This email address has been used by other user.';
 $lang['form_validation_confirm_required'] = 'Please agree with our Terms of Service.';
 // google sign in
-$lang['us_with_google'] = 'with Google';
+$lang['us_with_google'] = 'using Google';

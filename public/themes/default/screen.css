@@ -70,6 +70,138 @@
     transform: translate(-50%, -50%);
 }
 
+.login-page {
+    background: -moz-linear-gradient(top, rgba(247, 253, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    background: -webkit-linear-gradient(top, rgba(247, 253, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to bottom, rgba(247, 253, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#f7fdff', endColorstr='#00ffffff', GradientType=0);
+}
+
+.login-page .an-component-header {
+    background: white;
+}
+
+.logo-login {
+    width: 120px;
+    margin: 15px 0;
+}
+
+.an-component-header {
+    align-items: flex-end;
+    padding: 0 15px;
+}
+
+.an-component-body.addon {
+    border-bottom: 1px solid #ededed;
+}
+
+.an-login-container .remembered-section {
+    margin-top: 20px;
+}
+
+label .required {
+    color: red;
+}
+
+.mb-form {
+    font-size: 12px;
+}
+
+.sign-up-link {
+    margin-bottom: 10px !important;
+    font-size: 12px;
+}
+
+.mb-form .an-form-control {
+    border-color: #EFEFEF;
+}
+
+.mb-form .an-form-control.danger {
+    border-color: #EFEFEF;
+    border: 1px solid rgba(235, 84, 124, 0.2)
+}
+
+.mb-form .an-form-control::placeholder {
+    color: #ABABAB;
+}
+
+.mb-form label {
+    font-weight: normal;
+    font-size: 12px;
+}
+
+.mb-link {
+    color: #38899E;
+}
+
+.mb-form .an-btn {
+    font-size: 13px;
+}
+
+.mb-uppercase {
+    text-transform: uppercase;
+}
+
+.an-btn-google {
+    position: relative;
+    background: #D74035;
+    border: 1px solid #D74035;
+    color: #ffffff;
+}
+
+.an-btn-google.block-icon i {
+    font-size: 14px;
+}
+
+.an-btn-google:hover {
+    background: #C74035;
+    color: #ffffff;
+}
+
+.mb-rainbow {
+    width: 100%;
+    height: 10px;
+    position: absolute;
+    top: 0;
+}
+
+.mb-rainbow>div {
+    float: left;
+    width: 20%;
+    height: 100%;
+}
+
+.mb-rainbow .dark-blue {
+    background: #257AA0;
+}
+
+.mb-rainbow .nearly-green {
+    background: #71BFB7;
+}
+
+.mb-rainbow .leaf-green {
+    background: #C2D8C9;
+}
+
+.mb-rainbow .almost-yellow {
+    background: #F4FFBB;
+}
+
+.mb-rainbow .mostly-pink {
+    background: #E9557F;
+}
+
+.an-footer {
+    background: transparent;
+}
+
+
+/* Leave 6vh for the footer */
+
+.an-page-content {
+    min-height: 94vh;
+}
+
 
 /* Notifications are shown by $.notify plugin */
 

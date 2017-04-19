@@ -3,18 +3,13 @@
 				<div class="col-md-6 col-md-offset-3">
 					<div class="an-login-container">
 					<div class="back-to-home">
-						<h3 class="an-logo-heading text-center wow fadeInDown">
-						<a class="an-logo-link" href="<?php e(base_url())?>"><?php e($this->settings_lib->item('site.title')) ?>
-							<span><?php e($this->settings_lib->item('site.description')) ?></span>
-						</a>
-						</h3>
+						<a class="an-logo-link" href="<?php e(base_url())?>"><img src="<?php echo img_path() . 'icon.svg' ?>" class='logo-login'/></a>
 					</div>
 					<div class="an-single-component with-shadow">
 						<div class="an-component-header">
 							<h6><?php echo lang('us_reset_password'); ?></h6>
 							<div class="component-header-right">
-								<?php echo lang('us_already_registered'); ?>&nbsp
-								<p class="sign-up-link"><?php echo anchor(LOGIN_URL, lang('bf_action_login')); ?></p>
+								<p class="sign-up-link"><?php echo lang('us_already_registered'); ?>&nbsp<?php echo anchor(LOGIN_URL, lang('bf_action_login')); ?></p>
 							</div>
 						</div>
 						<div class="an-component-body">

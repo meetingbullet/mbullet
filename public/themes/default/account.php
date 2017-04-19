@@ -2,7 +2,7 @@
 echo theme_view('header');
 echo Template::message();
 ?>
-		<div class="an-page-content">
+		<div class="an-page-content login-page">
 			<div class="an-flex-center-center">
 <?php
 echo isset($content) ? $content : Template::content();
