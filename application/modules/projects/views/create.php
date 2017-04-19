@@ -90,7 +90,7 @@
 												<input type="number" name="constraints[max_period]" class="an-form-control<?php e(iif( form_error('constraints[max_period]') , ' danger')) ?>" value="<?php e(set_value('constraints[max_period]')) ?>"/>
 											</div>
 										</div>
-										<div class="col-md-2">
+										<div class="col-md-3">
 											<select name="constraints[period_type]" class="an-form-control">
 												<option value='hours' <?php echo set_select('constraints[period_type]', 'hours') ?>><?php e(lang('pj_hours'))?></option>
 												<option value='days' <?php echo set_select('constraints[period_type]', 'days') ?>><?php e(lang('pj_days'))?></option>
@@ -159,7 +159,7 @@
 											<input type="number" name="expectations[outcomes_per_period]" class="an-form-control<?php e(iif( form_error('expectations[outcomes_per_period]') , ' danger')) ?>" value="<?php e(set_value('expectations[outcomes_per_period]')) ?>">
 										</div>
 
-										<div class="col-md-2">
+										<div class="col-md-3">
 											<select name="expectations[period_type]" class="an-form-control">
 												<option value='hours' <?php echo set_select('expectations[period_type]', 'hours') ?>><?php e(lang('pj_hours'))?></option>
 												<option value='days' <?php echo set_select('expectations[period_type]', 'days') ?>><?php e(lang('pj_days'))?></option>
