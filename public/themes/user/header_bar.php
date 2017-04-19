@@ -175,7 +175,11 @@
 			<div class="an-profile-settings">
 				<div class="btn-group an-notifications-dropown  profile">
 				<button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="an-profile-img" style="background-image: url('<?php echo $current_user->avatar ? img_path() . 'users/' . $current_user->avatar : img_path() . 'default_avatar.png'; ?>');"></span>
+					<span class="an-profile-img" style="background-image: url('<?php
+					if (empty($current_user->avatar)) echo gravatar_url($current_user->email, 40);
+					elseif (!filter_var($current_user->avatar, FILTER_VALIDATE_URL) === false)	echo $current_user->avatar;
+					else echo $current_user->avatar ? img_path() . 'users/' . $current_user->avatar : img_path() . 'default_avatar.png'; 
+					?>');"></span>
 					<span class="an-user-name"><?php echo $current_user->first_name . ' ' . $current_user->last_name ?></span>
 					<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
 				</button>

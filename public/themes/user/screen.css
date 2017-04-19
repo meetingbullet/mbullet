@@ -51,3 +51,13 @@ label>.required {
         padding-left: 0;
     }
 }
+
+.an-profile-settings {
+	color: white;
+}
+
+.an-profile-settings .an-btn-icon:hover,
+.an-profile-settings .an-btn-icon:focus,
+.an-profile-settings .an-btn-icon:active {
+    color: #fff;
+}
