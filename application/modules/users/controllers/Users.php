@@ -368,6 +368,7 @@ class Users extends Front_Controller
 						'email' => $this->input->post('email'),
 						'skype' => $this->input->post('skype'),
 						'password_hash' => $password['hash'],
+						'organization' => $this->input->post('org')
 					];
 
 					$added = $this->user_model->insert($data);

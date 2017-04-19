@@ -217,6 +217,7 @@ $lang['us_force_password_reset']    = 'Force password reset on next login';
 $lang['users_act_invalid_login_attempt'] = 'Invalid login attempt from IP %s for user %s, reason: %s';
 
 // Register form
+$lang['us_reg_org'] = 'Organization';
 $lang['us_reg_email'] = 'Email Address';
 $lang['us_reg_first_name'] = 'First Name';
 $lang['us_reg_last_name'] = 'Last Name';

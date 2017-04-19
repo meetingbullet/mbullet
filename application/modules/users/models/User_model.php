@@ -78,6 +78,11 @@ class User_model extends BF_Model
 				'rules' => 'trim|max_length[255]',
 			),
 			array(
+				'field' => 'org',
+				'label' => 'lang:us_reg_org',
+				'rules' => 'trim',
+			),
+			array(
 				'field' => 'google_id_token',
 				'label' => 'lang:us_reg_google_id_token',
 				'rules' => 'trim|max_length[2048]',
