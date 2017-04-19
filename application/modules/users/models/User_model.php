@@ -50,7 +50,7 @@ class User_model extends BF_Model
 			array(
 				'field' => 'confirm_terms',
 				'label' => 'lang:us_reg_confirm_terms',
-				'rules' => 'trim|callback_confirm_required',
+				'rules' => 'trim|required',
 			),
 			array(
 				'field' => 'password',
