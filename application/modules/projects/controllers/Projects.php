@@ -472,7 +472,7 @@ class Projects extends Authenticated_Controller
 										->find_by('projects.cost_code', $project_key);
 		} else {
 			$project = $this->project_model->select('pm.project_id, projects.name')
-										->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
+										->join('project_members pm', 'pm.project_id = projects.project_id', 'inner')
 										->where('projects.organization_id', $this->current_user->current_organization_id)
 										->where('pm.user_id', $this->current_user->user_id)
 										->find_by('projects.cost_code', $project_key);
