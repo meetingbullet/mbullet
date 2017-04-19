@@ -343,6 +343,8 @@ class Users extends Front_Controller
 
 		if ($this->input->post()) {
 			$rules = $this->user_model->get_validation_rules();
+			// custom error message for confirm terms
+			$rules['create_profile'][1]['errors']['required'] = lang('form_validation_confirm_required');
 			$this->form_validation->set_rules($rules['create_profile']);
 
 			if ($this->form_validation->run() !== false) {
@@ -366,6 +368,7 @@ class Users extends Front_Controller
 						'email' => $this->input->post('email'),
 						'skype' => $this->input->post('skype'),
 						'password_hash' => $password['hash'],
+						'organization' => $this->input->post('org')
 					];
 
 					$added = $this->user_model->insert($data);
@@ -395,13 +398,6 @@ class Users extends Front_Controller
 		}
 
 		Template::render('account');
-	}
-	public function confirm_required($str)
-	{
-		if (empty($str)) {
-			return false;
-		}
-		return true;
 	}
 	/**
 	 * Display the terms of service.

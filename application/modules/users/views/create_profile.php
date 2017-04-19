@@ -53,6 +53,12 @@
 									<input type="text" name="skype" class="an-form-control <?php echo iif( form_error('skype') , 'danger') ;?>" value="<?php echo set_value('skype', isset($_POST['skype']) ? $_POST['skype'] : '') ?>"/>
 								</div>
 
+								<label><?php echo lang('us_reg_org') ?></label>
+								<div class="an-input-group">
+									<div class="an-input-group-addon"><i class="ion-briefcase"></i></div>
+									<input type="text" name="org" class="an-form-control <?php echo iif( form_error('org') , 'danger') ;?>" value="<?php echo set_value('org', isset($_POST['org']) ? $_POST['org'] : '') ?>"/>
+								</div>
+
 								<span class="an-custom-checkbox primary">
 									<input type="checkbox" id="check-2" name="confirm_terms" value="1" <?php echo set_checkbox('confirm_terms', 1, isset($_POST['confirm_terms']) ? $_POST['confirm_terms'] : '') ?>/>
 									<label for="check-2"><?php echo sprintf(lang('us_agree_terms'), '/users/terms') ?></label>

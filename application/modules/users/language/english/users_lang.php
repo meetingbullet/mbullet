@@ -220,6 +220,7 @@ $lang['us_force_password_reset']    = 'Force password reset on next login';
 $lang['users_act_invalid_login_attempt'] = 'Invalid login attempt from IP %s for user %s, reason: %s';
 
 // Register form
+$lang['us_reg_org'] = 'Organization';
 $lang['us_reg_email'] = 'Email Address';
 $lang['us_reg_first_name'] = 'First Name';
 $lang['us_reg_last_name'] = 'Last Name';
@@ -232,7 +233,7 @@ $lang['us_reg_conf_password'] = 'Confirm Password';
 $lang['us_reg_avatar'] = 'Avatar';
 $lang['us_register_failed'] = 'Register failed, Please try again!';
 $lang['us_register_success'] = 'Register successfully, Please check your email and input the verify code.';
-$lang['us_agree_terms'] = 'By checking this box, I agree with <a style="color: #337ab7;"href="%s" target="_blank">Term of Service</a>';
+$lang['us_agree_terms'] = 'By checking this box, I agree with <a style="color: #337ab7;"href="%s" target="_blank">Terms of Service</a>';
 $lang['us_reg_confirm_terms'] = 'Confirm terms';
 // form validation
 $lang['form_validation_unique_email_check'] = 'This email address has been used by other user.';

@@ -50,7 +50,7 @@ class User_model extends BF_Model
 			array(
 				'field' => 'confirm_terms',
 				'label' => 'lang:us_reg_confirm_terms',
-				'rules' => 'trim|callback_confirm_required',
+				'rules' => 'trim|required',
 			),
 			array(
 				'field' => 'password',
@@ -76,6 +76,11 @@ class User_model extends BF_Model
 				'field' => 'skype',
 				'label' => 'lang:us_reg_skype',
 				'rules' => 'trim|max_length[255]',
+			),
+			array(
+				'field' => 'org',
+				'label' => 'lang:us_reg_org',
+				'rules' => 'trim',
 			),
 			array(
 				'field' => 'google_id_token',
