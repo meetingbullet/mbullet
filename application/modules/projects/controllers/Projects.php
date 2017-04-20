@@ -7,6 +7,7 @@ class Projects extends Authenticated_Controller
 		parent::__construct();
 		$this->lang->load('projects');
 		$this->load->library('form_validation');
+		$this->load->library('invite/invitation');
 		$this->load->helper('mb_form_helper');
 		$this->load->model('users/user_model');
 		$this->load->model('project_model');
@@ -134,12 +135,21 @@ class Projects extends Authenticated_Controller
 
 			foreach ($invited_team as $email) {
 				foreach ($registered_users as $user) {
+					$is_found = false;
+
 					if ($user->email == $email) {
 						$project_members[$user->user_id] = [
 							'project_id' => $project_id,
 							'user_id' => $user->user_id
 						];
+
+						$is_found = true;
 						break;
+					}
+
+					// Invite to the party
+					if ( ! $is_found) {
+						// $this->invitation->generate($email, $this->current_user);
 					}
 				}
 			}

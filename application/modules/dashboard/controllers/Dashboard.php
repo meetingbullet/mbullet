@@ -14,11 +14,10 @@ class Dashboard extends Authenticated_Controller
 	{
 		$projects = $this->project_model->select('projects.*, u.first_name, u.last_name')
 										->join('users u', 'u.user_id = projects.owner_id')
-										->where('owner_id', $this->current_user->user_id)
-										->or_where('created_by', $this->current_user->user_id)
+										->join('project_members pm', 'projects.project_id = pm.project_id AND pm.user_id = ' . $this->current_user->user_id)
 										->find_all();
 
-		Template::set('projects', $projects);
+		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
 		Template::render();
 	}
 }

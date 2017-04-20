@@ -13,7 +13,8 @@
  */
 class Authenticated_Controller extends Base_Controller
 {
-	protected $require_authentication = true;
+	// We will required authentication in the construct later for saving invitation code
+	protected $require_authentication = false;
 	// result return from function check_current_email()
 	protected $check_current_email_result;
 
@@ -35,8 +36,20 @@ class Authenticated_Controller extends Base_Controller
 
 		parent::__construct();
 		
+		// Save Inivite code into SESSION before login
+		$this->load->library('users/auth');
+		$this->set_current_user();
+		if ($this->current_user === NULL && strstr($this->uri->uri_string(), 'invite/confirm')) {
+			$this->session->set_userdata('invite_code', $this->uri->segment(3));
+		}
+
+		// Now It is safe to redirect to Login page
+		$this->auth->restrict();
+		$this->set_current_user();
+
 		$this->redirect_to_organization_url();
 		$this->goto_create_organization();
+
 
 		$this->form_validation->CI =& $this;
 		$this->form_validation->set_error_delimiters('', '');
@@ -47,6 +60,19 @@ class Authenticated_Controller extends Base_Controller
 
 	private function goto_create_organization()
 	{
+		// Invitation game
+		if ($invite_code = $this->session->userdata('invite_code')) {
+			$this->session->set_userdata('invite_code', NULL);
+			redirect('/invite/confirm/' . $invite_code);
+			return;
+		}
+
+		// Stay in the invite confirm page
+		if (strstr($this->uri->uri_string(), 'invite/confirm')) {
+			return;
+		}
+
+
 		// If user still access to an organization, can not create new anymore
 		$orgs = $this->db->select('count(*) AS total')
 							->from('organizations o')

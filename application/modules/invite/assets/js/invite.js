@@ -11,17 +11,6 @@ $(document).ready(function() {
 
     });
 
-    $('#invite').click((e) => {
-        e.preventDefault();
-
-        $.get(INVITE_USER_URL, (data) => {
-            data = JSON.parse(data);
-            $('#bigModal .modal-content').html(data.modal_content);
-            $('#bigModal').modal();
-        });
-
-    });
-
     // Set form-ajax to work inside a modal
     $(document).on("submit", '.form-ajax', (e) => {
         e.preventDefault();
@@ -42,9 +31,10 @@ $(document).ready(function() {
                 data = JSON.parse(data);
 
                 if (data.close_modal === 0) {
-                    $('.modal .modal-content').html(data.modal_content);
+                    $('#bigModal .modal-content').html(data.modal_content);
+                    $('#bigModal').modal('show');
                 } else {
-                    $('.modal').modal('hide');
+                    $('#bigModal').modal('hide');
                 }
 
                 if (data.message_type) {
