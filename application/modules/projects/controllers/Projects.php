@@ -43,8 +43,7 @@ class Projects extends Authenticated_Controller
 				return;
 			}
 		}
- 
- 
+
 		Template::set('close_modal', 0);
 		Template::set('message_type', null);
 		Template::set('message', '');
@@ -243,9 +242,10 @@ class Projects extends Authenticated_Controller
 		/*---------------------------------- Report TAB ----------------------------------*/
 		Template::set('report_tab_data', []);
 
+		Assets::add_module_css('action', 'action.css');
+		Assets::add_module_js('action', 'action.js');
 		Assets::add_module_css('projects', 'projects.css');
 		Assets::add_module_js('projects', 'action_board.js');
-		Assets::add_module_js('projects', 'projects.js');
 		Template::set('project_name', 'Project test'/*$project->name*/);
 		Template::set('project_key', $project_key);
 		Template::render();
@@ -287,7 +287,8 @@ class Projects extends Authenticated_Controller
 		try {
 			$this->db->trans_begin();
 
-			$old_status_order_updated = $this->db->where('status', $action->status)
+			$old_status_order_updated = $this->db->where('action_id !=', $action_id)
+												->where('status', $action->status)
 												->where('sort_order >=', $action->sort_order)
 												->set('sort_order', '`sort_order`-1', false)
 												->set('modified_on', date('Y-m-d H:i:s'))
@@ -296,7 +297,8 @@ class Projects extends Authenticated_Controller
 				throw new Exception('failed at position 3');
 			}
 
-			$new_status_order_updated = $this->db->where('status', $status)
+			$new_status_order_updated = $this->db->where('action_id !=', $action_id)
+												->where('status', $status)
 												->where('sort_order >=', $status_order)
 												->set('sort_order', '`sort_order`+1', false)
 												->set('modified_on', date('Y-m-d H:i:s'))
@@ -357,6 +359,29 @@ class Projects extends Authenticated_Controller
 		}
 
 		echo json_encode($actions);
+		exit;
+	}
+
+	public function get_members($project_key = null)
+	{
+		// if (! $this->input->is_ajax_request()) {
+		// 	redirect('/dashboard');
+		// }
+
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
+		if ($project_id !== false) {
+			$members = $this->db->select('u.user_id, CONCAT(u.first_name, u.last_name) as full_name')
+								->from('users u')
+								->join('project_members pm', 'u.user_id = pm.user_id', 'inner')
+								->like('CONCAT(u.first_name, u.last_name)', $this->input->get('member_name'))
+								->where('pm.project_id', $project_id)
+								->get()->result();
+			$result = $members;
+		} else {
+			$result = [];
+		}
+
+		echo json_encode($result);
 		exit;
 	}
 

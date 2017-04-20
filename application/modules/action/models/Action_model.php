@@ -40,7 +40,7 @@ class Action_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	public $project_validation_rules		= array(
+	public $validation_rules		= array(
 		'create_action' => array(
 			array(
 				'field' => 'name',
@@ -60,7 +60,7 @@ class Action_model extends BF_Model
 			array(
 				'field' => 'owner_id',
 				'label' => 'lang:ac_owner_id',
-				'rules' => 'trim|required|numeric',
+				'rules' => 'trim|numeric',
 			),
 			array(
 				'field' => 'status',
@@ -80,17 +80,17 @@ class Action_model extends BF_Model
 			array(
 				'field' => 'point_value_defined',
 				'label' => 'lang:ac_point_value_defined',
-				'rules' => 'trim|required',
+				'rules' => 'trim',
 			),
 			array(
 				'field' => 'point_used',
 				'label' => 'lang:ac_point_used',
-				'rules' => 'trim|required',
+				'rules' => 'trim',
 			),
 			array(
 				'field' => 'avarage_stars',
 				'label' => 'lang:ac_avarage_stars',
-				'rules' => 'trim|required',
+				'rules' => 'trim|numeric',
 			)
 		)
     );

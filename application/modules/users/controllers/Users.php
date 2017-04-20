@@ -40,9 +40,9 @@ class Users extends Front_Controller
 		$this->load->helper('form');
 		$this->load->library('form_validation');
 
-		$this->load->model('users/user_model');
+		$this->load->model('user_model');
 
-		$this->load->library('users/auth');
+		$this->load->library('auth');
 
 		$this->lang->load('users');
 		$this->siteSettings = $this->settings_lib->find_all();
@@ -51,7 +51,7 @@ class Users extends Front_Controller
 			Assets::add_module_js('users', 'jquery.strength.js');
 		}
 		//load google api config file
-		$this->config->load('users/google_api');
+		$this->config->load('google_api');
 		// Set up login using google account
 		Assets::add_module_js('users', 'google_api.js');
 		Assets::add_module_js('users', 'users.js');
