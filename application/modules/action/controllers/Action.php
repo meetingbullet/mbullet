@@ -112,16 +112,8 @@ class Action extends Authenticated_Controller
 							throw new Exception(lang('unable_add_action_members'));
 						}
 					}
-
-					if (! $this->input->is_ajax_request()) {
-						Template::set_message(lang('create_success'), 'success');
-					} else {
-						Template::set('message_type', 'success');
-						Template::set('message', lang('create_success'));
-						Template::set('content', '');
-					}
 				} catch (Exception $e) {
-					$form_error['other_error'] .= $e->getMessage;
+					$form_error['other_error'] = $e->getMessage;
 				}
 			} else {
 				$form_error = array_merge($form_error, $this->form_validation->error_array());
@@ -139,6 +131,14 @@ class Action extends Authenticated_Controller
 					Template::set('close_modal', 0);
 					Template::set('message_type', 'danger');
 					Template::set('message', $error_message);
+				}
+			} else {
+				if (! $this->input->is_ajax_request()) {
+						Template::set_message(lang('create_success'), 'success');
+				} else {
+					Template::set('message_type', 'success');
+					Template::set('message', lang('create_success'));
+					Template::set('content', '');
 				}
 			}
 		}
