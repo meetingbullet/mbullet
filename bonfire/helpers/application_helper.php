@@ -113,6 +113,68 @@ if (! function_exists('e')) {
     }
 }
 
+if (! function_exists('gravatar_url')) {
+    /**
+     * Create an image link based on Gravatar for the specified email address.
+     * Defaults to the site's generic image if none is found for the user.
+     *
+     * Note that if gravatar does not have an image that matches the criteria, it
+     * will default to gravatar's 'identicon' return a link to an image under
+     * *your_theme/images/user.png*.
+     * Also, by explicity omitting email you're denying http-req to gravatar.com.
+     *
+     * @param string $email The email address to check for. If null, the gravatar
+     * image defaults to 'identicon'.
+     * @param int    $size  The width (and height) of the resulting image to grab.
+     *
+     * @return string The resulting image url.
+     */
+    function gravatar_url($email = null, $size = 48)
+    {
+        // Make sure $size is an integer.
+        $size = empty($size) || is_object($size) || ! is_int($size) ? 48 : intval($size);
+
+        // If email is empty, don't send an HTTP request to gravatar.com.
+        if (empty($email)) {
+            $avatarURL = Template::theme_url('images/user.png');
+        } else {
+            // While it would be more efficient to place the values for $defaultImage,
+            // $rating, and $gravatarUrl (and $httpProtocol) directly into the call
+            // to sprintf(), it would be more difficult to document and change the
+            // values when necessary (as was the case when the format for the URL
+            // changed in the past).
+            //
+            // Similarly, the calls to the strtolower() and rawurlencode() functions
+            // to manipulate the $rating and $defaultImage values in the sprintf()
+            // call could be avoided/removed by making sure the values were correct
+            // beforehand, but the requirements would need to be documented for
+            // each value anyway...
+
+            // Set the default image.
+            $defaultImage = 'identicon';
+
+            // Set the minimum site rating to PG.
+            $rating = 'PG';
+
+            // Check whether HTTP or HTTPS Request should be used.
+            $httpProtocol = is_https() ? 'https://secure.' : 'http://www.';
+
+            // URL for Gravatar, with placeholders for sprintf().
+            $gravatarUrl = "{$httpProtocol}gravatar.com/avatar/%s?s=%s&amp;r=%s&amp;d=%s";
+
+            $avatarURL = sprintf(
+                $gravatarUrl,
+                md5(strtolower(trim($email))),
+                $size,
+                strtolower($rating),
+                rawurlencode($defaultImage)
+            );
+        }
+
+        return $avatarURL;
+    }
+}
+
 if (! function_exists('gravatar_link')) {
     /**
      * Create an image link based on Gravatar for the specified email address.

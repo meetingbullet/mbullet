@@ -17,7 +17,7 @@ class Dashboard extends Authenticated_Controller
 										->where('owner_id', $this->current_user->user_id)
 										->or_where('created_by', $this->current_user->user_id)
 										->find_all();
-
+		if (empty($projects)) $projects = [];
 		Template::set('projects', $projects);
 		Template::render();
 	}
