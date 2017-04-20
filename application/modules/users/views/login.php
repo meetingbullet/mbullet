@@ -1,11 +1,3 @@
-			<div class='mb-rainbow'>
-				<div class='dark-blue'></div>
-				<div class='nearly-green'></div>
-				<div class='leaf-green'></div>
-				<div class='almost-yellow'></div>
-				<div class='mostly-pink'></div>
-			</div>
-
 			<div class="container">
 				<div class="row">
 					<div class="col-md-6 col-md-offset-3">
