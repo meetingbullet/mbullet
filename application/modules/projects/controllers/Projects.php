@@ -299,7 +299,7 @@ class Projects extends Authenticated_Controller
 		Assets::add_module_js('action', 'action.js');
 		Assets::add_module_css('projects', 'projects.css');
 		Assets::add_module_js('projects', 'action_board.js');
-		Template::set('project_name', 'Project test'/*$project->name*/);
+		Template::set('project_name', $this->project_model->get_field($project_id, 'name'));
 		Template::set('project_key', $project_key);
 		Template::set_view('detail');
 		Template::render();
@@ -418,9 +418,9 @@ class Projects extends Authenticated_Controller
 
 	public function get_members($project_key = null)
 	{
-		// if (! $this->input->is_ajax_request()) {
-		// 	redirect('/dashboard');
-		// }
+		if (! $this->input->is_ajax_request()) {
+			redirect('/dashboard');
+		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		if ($project_id !== false) {
