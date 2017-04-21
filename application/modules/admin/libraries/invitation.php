@@ -42,7 +42,7 @@ class Invitation
 			$invite_code = $this->generateRandomString(64);
 		} while ($this->ci->user_invite_model->count_by('invite_code', $invite_code) > 0);
 
-		$pass_link = site_url("admin/team/invite/confirm/{$invite_code}");
+		$pass_link = site_url("users/invitation/{$invite_code}");
 
 		// Now send the email
 		$this->ci->load->library('emailer/emailer');
