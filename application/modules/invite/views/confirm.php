@@ -10,7 +10,7 @@
 					<div class='avatar' style='background-image:url("<?php echo link_avatar($invitation->inviter_avatar) ?>")'></div>
 					<i class='ion-ios-plus-empty big-plus'></i>
 					<div class='avatar' style='background-image:url("<?php echo link_avatar($invitation->my_avatar) ?>")'></div>
-					<h3><?php echo sprintf(lang('iv_inviting_introduction'), $invitation->inviter_name, $invitation->organization_name)?></h3>
+					<h4><?php echo sprintf(lang('iv_inviting_introduction'), $invitation->inviter_name, $invitation->organization_name)?></h4>
 					<button type="submit" name="accept" class="an-btn an-btn-success"><?php e(lang('iv_accept'))?></button>
 					<button type="submit" name="decline" class="an-btn an-btn-danger-transparent"><?php e(lang('iv_decline'))?></button>
 				</div> <!-- end .AN-HELPER-BLOCK -->
