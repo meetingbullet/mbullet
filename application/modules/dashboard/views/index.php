@@ -75,5 +75,5 @@
 
 <script>
 	var CREATE_PROJECT_URL = '<?php echo site_url('projects/create')?>';
-	var INVITE_USER_URL = '<?php echo site_url('invite')?>';
+	var INVITE_USER_URL = '<?php echo site_url('admin/team/invite')?>';
 </script>

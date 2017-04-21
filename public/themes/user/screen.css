@@ -53,6 +53,24 @@ label>.required {
     margin-right: 5px;
 }
 
+.avatar {
+    position: relative;
+    height: 50px;
+    width: 50px;
+    display: inline-block;
+    margin: 0 10px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.big-plus {
+    font-size: 30px;
+    vertical-align: middle;
+}
+
 
 /* Notifications are shown by $.notify plugin */
 

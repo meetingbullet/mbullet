@@ -9,9 +9,9 @@ class Invitation
 	public function __construct()
 	{
 		$this->ci =& get_instance();
-		$this->ci->load->model('admin/user_invite_model');
+		$this->ci->lang->load('invite/invite');
 		$this->ci->load->model('users/user_model');
-		$this->ci->lang->load('admin/invite');
+		$this->ci->load->model('invite/user_invite_model');
 	}
 
 	public function generate($email, $invite_role, $current_user)
@@ -42,7 +42,7 @@ class Invitation
 			$invite_code = $this->generateRandomString(64);
 		} while ($this->ci->user_invite_model->count_by('invite_code', $invite_code) > 0);
 
-		$pass_link = site_url("admin/team/invite/confirm/{$invite_code}");
+		$pass_link = site_url("users/invitation/{$invite_code}");
 
 		// Now send the email
 		$this->ci->load->library('emailer/emailer');
@@ -50,7 +50,7 @@ class Invitation
 			'to'	  => $email,
 			'subject' => lang('iv_meeting_bullet_invitation'),
 			'message' => $this->ci->load->view(
-				'team/invitation_template',
+				'invite/invitation_template',
 				array(
 					'link' => $pass_link,
 					'organization_name' => $invitation->organization_name,

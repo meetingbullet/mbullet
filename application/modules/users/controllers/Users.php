@@ -39,12 +39,11 @@ class Users extends Front_Controller
 
 		$this->load->helper('form');
 		$this->load->library('form_validation');
-
-		$this->load->model('users/user_model');
-
+		$this->load->library('domain');
 		$this->load->library('users/auth');
-
+		$this->load->model('users/user_model');
 		$this->lang->load('users');
+
 		$this->siteSettings = $this->settings_lib->find_all();
 		if ($this->siteSettings['auth.password_show_labels'] == 1) {
 			Assets::add_module_js('users', 'password_strength.js');
@@ -57,6 +56,21 @@ class Users extends Front_Controller
 		Assets::add_module_js('users', 'users.js');
 		Template::set('use_google_api', true);
 		Template::set('client_id', $this->config->item('client_id'));
+	}
+
+	/*
+		Invitation game
+		Save invite code and redirect to login page
+	*/
+	public function invitation($invite_code = '')
+	{
+		if (empty($invite_code)) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$this->session->set_userdata('invite_code', $this->uri->segment(3));
+		Template::set_message(lang('us_view_your_invitation'), 'info');
+		redirect(LOGIN_URL);
 	}
 
 	// -------------------------------------------------------------------------
@@ -75,7 +89,6 @@ class Users extends Front_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$this->load->library('domain');
 		// include google client api
 		require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
 		$client_id = $this->config->item('client_id');
@@ -211,7 +224,7 @@ class Users extends Front_Controller
 
 		// Always clear browser data (don't silently ignore user requests).
 		$this->auth->logout();
-		redirect('/');
+		redirect($this->domain->get_main_url());
 	}
 
 	// -------------------------------------------------------------------------
