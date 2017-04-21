@@ -50,12 +50,12 @@ class Authenticated_Controller extends Base_Controller
 		// Invitation game
 		if ($invite_code = $this->session->userdata('invite_code')) {
 			$this->session->set_userdata('invite_code', NULL);
-			redirect('/admin/team/confirm/' . $invite_code);
+			redirect('/invite/confirm/' . $invite_code);
 			return;
 		}
 
 		// Stay in the invite confirm page
-		if (strstr($this->uri->uri_string(), 'admin/team/confirm')) {
+		if (strstr($this->uri->uri_string(), 'invite/confirm')) {
 			return;
 		}
 
