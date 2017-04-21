@@ -2739,7 +2739,8 @@ input[type="button"].btn-block {
 
 .an-notifications,
 .an-messages,
-.an-profile-settings {
+.an-profile-settings,
+.an-settings {
     position: relative;
     margin-left: 30px;
 }

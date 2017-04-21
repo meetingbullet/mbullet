@@ -126,12 +126,8 @@ if (! function_exists('gravatar_url')) {
      * @param string $email The email address to check for. If null, the gravatar
      * image defaults to 'identicon'.
      * @param int    $size  The width (and height) of the resulting image to grab.
-     * @param string $alt   Alt text to be put in the link tag.
-     * @param string $title The title text to be put in the link tag.
-     * @param string $class Any class(es) that should be assigned to the link tag.
-     * @param string $id    The id (if any) that should put in the link tag.
      *
-     * @return string The resulting image tag.
+     * @return string The resulting image url.
      */
     function gravatar_url($email = null, $size = 48)
     {

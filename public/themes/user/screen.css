@@ -77,6 +77,40 @@ label>.required {
     color: #fff;
 }
 
-header.an-header .an-notifications i, header.an-header .an-messages i , header.an-header .js-toggle-sidebar i {
+header.an-header .an-notifications i, header.an-header .an-messages i, header.an-header .an-settings button i, header.an-header .js-toggle-sidebar i {
 	color: white;
+}
+
+.btn-group.an-notifications-dropown.profile .dropdown-menu .an-info-count {
+    padding: 13px;
+    background-color: #70c1b3;;
+}
+
+.btn-group.an-notifications-dropown.profile .dropdown-menu .an-info-count:before {
+    right: 18px;
+    border-bottom: 10px solid #70c1b3;;
+}
+
+.an-settings .an-settings-list {
+	position: relative;
+    margin: 0;
+    padding: 0;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    list-style: none;
+}
+
+.an-settings .an-settings-list li a {
+    display: block;
+    padding: 4px 15px;
+}
+
+.an-settings .an-settings-list a i {
+	position: relative;
+	top: 4px;
+	font-size: 25px;
+	display: inline-block;
+	width: 30px;
+	text-align: center;
+	margin-right: 10px;
 }
