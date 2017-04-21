@@ -9,9 +9,9 @@ class Invitation
 	public function __construct()
 	{
 		$this->ci =& get_instance();
-		$this->ci->lang->load('invite');
+		$this->ci->lang->load('invite/invite');
 		$this->ci->load->model('users/user_model');
-		$this->ci->load->model('user_invite_model');
+		$this->ci->load->model('invite/user_invite_model');
 	}
 
 	public function generate($email, $invite_role, $current_user)
@@ -50,7 +50,7 @@ class Invitation
 			'to'	  => $email,
 			'subject' => lang('iv_meeting_bullet_invitation'),
 			'message' => $this->ci->load->view(
-				'invitation_template',
+				'invite/invitation_template',
 				array(
 					'link' => $pass_link,
 					'organization_name' => $invitation->organization_name,
