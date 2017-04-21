@@ -1,16 +1,4 @@
 $(document).ready(function() {
-    // Create project function for testing, remove when finished
-    $('#create').click((e) => {
-        e.preventDefault();
-
-        $.get(CREATE_PROJECT_URL, (data) => {
-            data = JSON.parse(data);
-            $('#bigModal .modal-content').html(data.modal_content);
-            $('#bigModal').modal();
-        });
-
-    });
-
     $('#invite').click((e) => {
         e.preventDefault();
 

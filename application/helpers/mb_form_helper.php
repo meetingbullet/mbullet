@@ -23,26 +23,41 @@
  */
 
 if (! function_exists('mb_form_input')) {
-    /**
-     * Returns a properly templated text input field.
-     *
-     * @return string The formatted input element, label tag and wrapping divs.
-     */
-    function mb_form_input($type = 'text', $name, $label = '', $required = false, $value = '', $class = 'an-form-control', $addon = '', $placeholder = '', $tooltip = '')
-    {
-        return "
+	/**
+	 * Returns a properly templated text input field.
+	 *
+	 * @return string The formatted input element, label tag and wrapping divs.
+	 */
+	function mb_form_input($type = 'text', $name, $label = '', $required = false, $value = '', $class = 'an-form-control', $addon = '', $placeholder = '', $tooltip = '')
+	{
+		return "
 <div class=\"row\">
-    <div class=\"col-md-3 col-sm-12\">
-        ". iif($label, "<label for=\"$name\" class=\"pull-right\">$label". iif($required, '<span class="required">*</span>') ."</label>") ."
-    </div>
-    <div class=\"col-md-9 col-sm-12\">
-        ". iif($addon, "<div class=\"an-input-group\">
-            <div class=\"an-input-group-addon\">$addon</div>") ."
-            <input type=\"$type\" name=\"$name\" class=\"$class". iif( form_error($name) , ' danger') ."\" placeholder=\"$placeholder\" value=\"". ($value ? set_value($name, $value) : set_value($name)) ."\"/>
-        ". iif($addon, "</div>") ."
-        ". iif($tooltip, "<p class=\"an-small-doc-block\">$tooltip</p>") ."
-    </div>
+	<div class=\"col-md-3 col-sm-12\">
+		". iif($label, "<label for=\"$name\" class=\"pull-right\">$label". iif($required, '<span class="required">*</span>') ."</label>") ."
+	</div>
+	<div class=\"col-md-9 col-sm-12\">
+		". iif($addon, "<div class=\"an-input-group\">
+			<div class=\"an-input-group-addon\">$addon</div>") ."
+			<input type=\"$type\" name=\"$name\" class=\"$class". iif( form_error($name) , ' danger') ."\" placeholder=\"$placeholder\" value=\"". ($value ? set_value($name, $value) : set_value($name)) ."\"/>
+		". iif($addon, "</div>") ."
+		". iif($tooltip, "<p class=\"an-small-doc-block\">$tooltip</p>") ."
+	</div>
 </div>
 ";
-    }
+	}
+
+	/**
+	 * Returns a properly templated text input field.
+	 *
+	 * @return string The formatted input element, label tag and wrapping divs.
+	 */
+	function mb_form_input_placeholder($type = 'text', $name, $label = '', $required = false, $value = '', $class = 'an-form-control', $addon = '', $placeholder = '', $tooltip = '')
+	{
+		return iif($label, "<label for=\"$name\">$label". iif($required, '<span class="required">*</span>') ."</label>") ."
+		". iif($addon, "<div class=\"an-input-group\">
+			<div class=\"an-input-group-addon\">$addon</div>") ."
+			<input type=\"$type\" name=\"$name\" class=\"$class". iif( form_error($name) , ' danger') ."\" placeholder=\"$placeholder\" value=\"". ($value ? set_value($name, $value) : set_value($name)) ."\"/>
+		". iif($addon, "</div>") ."
+		". iif($tooltip, "<p class=\"an-small-doc-block\">$tooltip</p>");
+	}
 }
