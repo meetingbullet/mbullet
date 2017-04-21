@@ -72,7 +72,7 @@ class Invite extends Authenticated_Controller
 								->row();
 							
 		if (! $invitation) {
-			Template::set_message(lang('iv_invalid_invitation_code_or_already_used') . $this->db->last_query(), 'danger');
+			Template::set_message(lang('iv_invalid_invitation_code_or_already_used'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 			return;
 		}
@@ -86,7 +86,9 @@ class Invite extends Authenticated_Controller
 				'organization_id' => $invitation->organization_id,
 				'role_id' => $invitation->invite_role,
 			]);
-			redirect(DEFAULT_LOGIN_LOCATION);
+
+			$this->load->library('domain');
+			redirect($this->domain->get_main_url());
 		}
 		if (isset($_POST['decline'])) {
 			$this->user_invite_model->update_where('invite_code', $invite_code, ['status' => 'declined']);

@@ -94,7 +94,7 @@ defined('BONFIRE_VERSION') || define('BONFIRE_VERSION', 'v0.9.0-dev');
 // in the app. By default, this is set to '/admin', but this does not make sense
 // for all applications.
 // -----------------------------------------------------------------------------
-defined('SITE_AREA') || define('SITE_AREA', '');
+defined('SITE_AREA') || define('SITE_AREA', 'admin');
 
 // -----------------------------------------------------------------------------
 // The 'LOGIN_URL' and 'REGISTER_URL' constant allows changing of the url where

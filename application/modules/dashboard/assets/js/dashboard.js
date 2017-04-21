@@ -16,8 +16,8 @@ $(document).ready(function() {
 
         $.get(INVITE_USER_URL, (data) => {
             data = JSON.parse(data);
-            $('#bigModal .modal-content').html(data.modal_content);
-            $('#bigModal').modal();
+            $('#inviteModal .modal-content').html(data.modal_content);
+            $('#inviteModal').modal();
         });
 
     });

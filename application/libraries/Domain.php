@@ -21,4 +21,9 @@ class Domain
 
 		return $main_domain;
 	}
+
+	public function get_main_url()
+	{
+		return (is_https() ? 'https://' : 'http://') . $this->get_main_domain();
+	}
 }

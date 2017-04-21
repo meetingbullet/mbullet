@@ -36,7 +36,12 @@ class Invitation
 								->limit(1)
 								->find($current_user->user_id);
 
-		$invite_code = $this->generateRandomString(64);
+
+
+		do {
+			$invite_code = $this->generateRandomString(64);
+		} while ($this->ci->user_invite_model->count_by('invite_code', $invite_code) > 0);
+
 		$pass_link = site_url("invite/confirm/{$invite_code}");
 
 		// Now send the email

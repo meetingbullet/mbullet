@@ -13,4 +13,5 @@ $lang['iv_role']						= 'Role';
 $lang['iv_add']						= 'Add';
 $lang['iv_back']						= 'Back';
 $lang['iv_user_already_invited']						= 'User is already invited';
+$lang['iv_invalid_invitation_code_or_already_used']						= 'User is already invited or is used';
 $lang['iv_invitation_sent']						= 'Invitation sent';
