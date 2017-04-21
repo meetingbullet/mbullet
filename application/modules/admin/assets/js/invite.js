@@ -1,12 +1,11 @@
 $(document).ready(function() {
-    // Create project function for testing, remove when finished
-    $('#create').click((e) => {
+    $('#invite').click((e) => {
         e.preventDefault();
 
-        $.get(CREATE_PROJECT_URL, (data) => {
+        $.get(INVITE_USER_URL, (data) => {
             data = JSON.parse(data);
-            $('#bigModal .modal-content').html(data.modal_content);
-            $('#bigModal').modal();
+            $('#inviteModal .modal-content').html(data.modal_content);
+            $('#inviteModal').modal();
         });
 
     });
@@ -31,10 +30,9 @@ $(document).ready(function() {
                 data = JSON.parse(data);
 
                 if (data.close_modal === 0) {
-                    $('#bigModal .modal-content').html(data.modal_content);
-                    $('#bigModal').modal('show');
+                    $('.modal .modal-content').html(data.modal_content);
                 } else {
-                    $('#bigModal').modal('hide');
+                    $('.modal').modal('hide');
                 }
 
                 if (data.message_type) {

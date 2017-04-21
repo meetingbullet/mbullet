@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Invite extends Authenticated_Controller
+class Team extends Authenticated_Controller
 {
 	public function __construct()
 	{
@@ -12,10 +12,15 @@ class Invite extends Authenticated_Controller
 		$this->load->model('user_invite_model');
 		$this->load->model('role_model');
 		$this->load->model('user_to_organizations_model');
-		Assets::add_module_js('invite', 'invite.js');
+		Assets::add_module_js('admin', 'invite.js');
 	}
 
 	public function index()
+	{
+		Template::render();
+	}
+
+	public function invite()
 	{
 		Template::set('close_modal', 0);
 		Template::set('message_type', null);
