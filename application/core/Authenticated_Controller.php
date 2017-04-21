@@ -13,8 +13,7 @@
  */
 class Authenticated_Controller extends Base_Controller
 {
-	// We will required authentication in the construct later for saving invitation code
-	protected $require_authentication = false;
+	protected $require_authentication = true;
 	// result return from function check_current_email()
 	protected $check_current_email_result;
 
@@ -35,18 +34,6 @@ class Authenticated_Controller extends Base_Controller
 		$this->autoload['libraries'][] = 'users/auth';
 
 		parent::__construct();
-		
-		// Save Inivite code into SESSION before login
-		$this->load->library('users/auth');
-		$this->set_current_user();
-		if ($this->current_user === NULL && strstr($this->uri->uri_string(), 'invite/confirm')) {
-			$this->session->set_userdata('invite_code', $this->uri->segment(3));
-		}
-
-		// Now It is safe to redirect to Login page
-		$this->auth->restrict();
-		$this->set_current_user();
-
 		$this->redirect_to_organization_url();
 		$this->goto_create_organization();
 
