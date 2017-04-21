@@ -62,7 +62,7 @@ class Invitation
 			),
 		);
 
-		$this->ci->emailer->send($data);
+		$this->ci->emailer->send($data, TRUE);
 
 		// Save invitation
 		$query = $this->ci->user_invite_model->insert([
