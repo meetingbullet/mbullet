@@ -3,7 +3,7 @@
 // page title
 $lang['ac_create_action'] = 'Create Action';
 // form
-$lang['ac_action_name'] = 'Name';
+$lang['ac_name'] = 'Name';
 $lang['ac_project_id'] = 'Project';
 $lang['ac_action_key'] = 'Action key';
 $lang['ac_owner_id'] = 'Owner';
@@ -31,3 +31,25 @@ $lang['not_valid_members'] = 'One or more members in resource list is invalid.';
 $lang['create_success'] = 'Create action successfully.';
 $lang['unable_add_action_members'] = 'Unable to add action members.';
 $lang['unable_create_action'] = 'Unable to create action.';
+$lang['ac_invalid_action_key'] = 'Invalid action key';
+
+// Field
+$lang['ac_detail'] = 'Detail';
+$lang['ac_steps'] = 'Steps';
+$lang['ac_component_steps'] = 'Component / Steps';
+$lang['ac_type'] = 'Type';
+$lang['ac_action_key'] = 'ACT-%s';
+$lang['ac_project_key'] = 'Project %s';
+$lang['ac_step_key'] = 'STE-%s';
+$lang['ac_key'] = 'Key';
+$lang['ac_status'] = 'Status';
+$lang['ac_owner'] = 'Owner';
+$lang['ac_team_member'] = 'Team member';
+$lang['ac_date'] = 'Date';
+$lang['ac_created'] = 'Created';
+$lang['ac_updated'] = 'Updated';
+
+// Action
+$lang['ac_add_step'] = 'Add Step';
+$lang['ac_edit'] = 'Edit';
+$lang['ac_start_action'] = 'Start Action';

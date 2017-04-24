@@ -6,14 +6,54 @@ class Action extends Authenticated_Controller
 	{
 		parent::__construct();
 
-		$this->load->model('action_model');
 		$this->lang->load('action');
+		$this->load->helper('mb_form');
+		$this->load->model('action_model');
+		$this->load->model('projects/project_model');
+		$this->load->model('step/step_model');
+		Assets::add_module_css('action', 'action.css');
+	}
+
+	public function index()
+	{
+		Template::render();
+	}
+
+	public function detail($project_key, $action_key)
+	{
+		if (empty($project_key) || empty($action_key)) {
+			Template::set_message(lang('ac_invalid_action_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+									->join('projects p', 'p.project_id = actions.project_id')
+									->join('users u', 'u.user_id = actions.owner_id')
+									->where('p.cost_code', $project_key)
+									->limit(1)
+									->find_by('action_key', $action_key);
+
+		if (! $action) {
+			Template::set_message(lang('ac_invalid_action_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$steps = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+									->join('users u', 'u.user_id = steps.owner_id')
+									->where('action_id', $action->action_id)
+									->order_by('step_id')
+									->order_by('status')
+									->find_all();
+
+		Template::set('project_key', $project_key);
+		Template::set('action_key', $action_key);
+		Template::set('action', $action);
+		Template::set('steps', $steps);
+		Template::render();
 	}
 
 	public function create($project_key = null)
 	{
-		$this->load->model('projects/project_model');
-		$this->load->helper('mb_form');
 
 		if (empty($project_key)) {
 			redirect('/dashboard');

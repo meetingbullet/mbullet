@@ -1,85 +1,31 @@
-/****** Style Star Rating Widget *****/
-.rating {
-	border: none;
-	float: left;
+.breakcumb a {
+	color: #337ab7;
 }
 
-.rating > input {
-	display: none;
+.btn-block .an-btn {
+	margin-right: 10px;
 }
 
-.rating > label:before {
-	margin: 0; padding: 0;
-	margin: 5px;
-	font-size: 1.5em;
-	font-family: "Ionicons";
-	display: inline-block;
-	content: "\f4b3";
+.btn-block {
+	margin-bottom: 30px;
 }
 
-.rating > .half:before {
-	content: "\f4b1";
-	position: absolute;
+.action-detail {
+	line-height: 30px;
 }
 
-.rating > label {
-	color: #ddd;
-	float: right;
-	cursor: pointer;
+.user-single i {
+	margin-left: 15px;
 }
 
-.rating > label[for='star0'] {
-	opacity: 0;
-	transition: none;
+.user-single .name {
+	margin-left: 20px;
 }
 
-/***** CSS Magic to Highlight Stars on Hover *****/
-
-.rating > input:checked ~ label, /* show gold star when clicked */
-.rating:not(:checked) > label:hover, /* hover current star */
-.rating:not(:checked) > label:hover ~ label { color: #ffa500; } /* hover previous stars in list */
-
-.rating > input:checked + label:hover, /* hover current star when changing rating */
-.rating > input:checked ~ label:hover,
-.rating > label:hover ~ input:checked ~ label, /* lighten current selection */
-.rating > input:checked ~ label:hover ~ label { color: #ff8700; }
-
-/***** autocomplete *****/
-#action-members-warpper .ui-autocomplete,
-#owner-warpper .ui-autocomplete {
-	background: #fff;
-	border: 1px solid #999;
-	padding-left: 0;
+.user-single {
+	margin-bottom: 10px;
 }
 
-#action-members-warpper  .ui-autocomplete li,
-#owner-warpper .ui-autocomplete li {
-	list-style: none;
-	margin-left: none;
-	padding-left: 15px;
-}
-
-#action-members-warpper .ui-autocomplete li:hover,
-#action-members-warpper .ui-autocomplete li:checked,
-#owner-warpper .ui-autocomplete li:hover,
-#owner-warpper .ui-autocomplete li:checked {
-	background: #337ab7;
-	color: #fff;
-	transition: none;
-}
-
-#action-members-warpper .members span.label.label-success.label-bordered > i:hover {
-	cursor: pointer;
-}
-
-#action-members-warpper .members span.label.label-success.label-bordered:not(:first-child) {
-	margin-left: 10px;
-}
-
-#action-members-warpper .members span.label.label-success.label-bordered {
-	font-size: 18px;
-}
-
-.ui-helper-hidden-accessible {
-	display: none;
+.user-single:last-child {
+	margin-bottom: 0;
 }

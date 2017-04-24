@@ -106,8 +106,4 @@ class Action_model extends BF_Model
 	{
 		parent::__construct();
 	}
-
-	public function test() {
-		return $this->current_user;
-	}
 }
