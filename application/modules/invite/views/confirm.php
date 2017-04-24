@@ -7,9 +7,9 @@
 			</div>
 			<div class="an-component-body">
 				<div class="an-helper-block text-center">
-					<div class='avatar' style='background-image:url("<?php echo link_avatar($invitation->inviter_avatar) ?>")'></div>
+					<div class='avatar' style='background-image:url("<?php echo avatar_url($invitation->inviter_avatar) ?>")'></div>
 					<i class='ion-ios-plus-empty big-plus'></i>
-					<div class='avatar' style='background-image:url("<?php echo link_avatar($invitation->my_avatar) ?>")'></div>
+					<div class='avatar' style='background-image:url("<?php echo avatar_url($invitation->my_avatar) ?>")'></div>
 					<h4><?php echo sprintf(lang('iv_inviting_introduction'), $invitation->inviter_name, $invitation->organization_name)?></h4>
 					<button type="submit" name="accept" class="an-btn an-btn-success"><?php e(lang('iv_accept'))?></button>
 					<button type="submit" name="decline" class="an-btn an-btn-danger-transparent"><?php e(lang('iv_decline'))?></button>

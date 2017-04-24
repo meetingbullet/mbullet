@@ -1,3 +1,26 @@
+<?php 
+
+$action_button = [
+	'open' => [
+		'an-btn-primary',
+		'ac_start_action'
+	],
+	'inprogress' => [
+		'an-btn-success',
+		'ac_ready'
+	],
+	'ready' => [
+		'an-btn-danger-transparent',
+		'ac_resolve'
+	],
+	'resolved' => [
+		'an-btn-danger-transparent',
+		'ac_resolved'
+	]
+]
+
+?>
+
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
 		<h5 class='breakcumb'>
@@ -8,11 +31,14 @@
 
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
-
+<?php echo form_open() ?>
 <div class="btn-block">
 	<?php echo anchor('#', '<i class="ion-edit"></i> ' . lang('ac_edit'), ['class' => 'an-btn an-btn-primary']) ?>
-	<?php echo anchor('#', '<i class="ion-ios-play"></i> ' . lang('ac_start_action'), ['class' => 'an-btn an-btn-primary']) ?>
+	<button name='update' class='an-btn <?php echo $action_button[$action->status][0] ?>' <?php echo $action->status == 'resolved' ? ' disabled' : ''?>>
+		<i class="ion-ios-play"></i> <?php echo lang($action_button[$action->status][1])?>
+	</button>
 </div>
+<?php echo form_close() ?>
 
 <div class="row">
 		<div class="col-md-8">
@@ -98,22 +124,7 @@
 					<div class="an-helper-block">
 						<div class="an-input-group">
 							<div class="an-input-group-addon"><i class="ion-ios-search"></i></div>
-							<input type="text" class="an-form-control" placeholder="<?php e(lang('ac_team_member'))?>">
-						</div>
-
-						<div class="user-group">
-							<div class='user-single'>
-								<i class="ion-close-round remove"></i>
-								<span class='name'>User Demo</span>
-							</div>
-							<div class='user-single'>
-								<i class="ion-close-round remove"></i>
-								<span class='name'>User Demo</span>
-							</div>
-							<div class='user-single'>
-								<i class="ion-close-round remove"></i>
-								<span class='name'>User Demo</span>
-							</div>
+							<input type="text" id="team-member" class="select-member an-tags-input" placeholder="<?php e(lang('ac_add_team_member'))?>" value="<?php echo implode(',', $invited_members) ?> ">
 						</div>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->

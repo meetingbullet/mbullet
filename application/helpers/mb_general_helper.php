@@ -6,16 +6,28 @@
  * @author    Viet Hoang Duc
  */
 
-if (! function_exists('mb_form_input')) {
+if (! function_exists('avatar_url')) {
 	/**
 	 * Returns a properly linked avatar
 	 *
 	 * @return string The formatted input element, label tag and wrapping divs.
 	 */
-	function link_avatar($avatar)
+	function avatar_url($avatar, $email = NULL, $size = 24)
 	{
-		return strstr($avatar, 'http') !== false 
-					? $avatar 
-					: img_path() . 'users/' . $avatar;
+		if (! empty($avatar)) {
+			if (strstr($avatar, 'http') !== false) {
+				return $avatar;
+			} else {
+				if (file_exists('assets/images/users/' . $avatar)) {
+					return img_path() . 'users/' . $avatar;
+				}
+			}
+		}
+
+		if (! empty($email)) {
+			return gravatar_url($email, $size);
+		}
+
+		return $avatar;
 	}
 }
