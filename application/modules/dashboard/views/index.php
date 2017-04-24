@@ -1,4 +1,5 @@
 <button class="an-btn an-btn-primary" id="create" style="margin: 30px 0">Create Project</button>
+<button class="an-btn an-btn-success" id="invite" style="margin: 30px 0">Invite User</button>
 
 
 <div class="an-single-component with-shadow">
@@ -65,6 +66,14 @@
 	</div>
 </div>
 
+<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="bigModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
 <script>
 	var CREATE_PROJECT_URL = '<?php echo site_url('projects/create')?>';
+	var INVITE_USER_URL = '<?php echo site_url('admin/team/invite')?>';
 </script>

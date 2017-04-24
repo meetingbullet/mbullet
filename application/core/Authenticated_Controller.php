@@ -34,9 +34,9 @@ class Authenticated_Controller extends Base_Controller
 		$this->autoload['libraries'][] = 'users/auth';
 
 		parent::__construct();
-		
 		$this->redirect_to_organization_url();
 		$this->goto_create_organization();
+
 
 		$this->form_validation->CI =& $this;
 		$this->form_validation->set_error_delimiters('', '');
@@ -47,6 +47,19 @@ class Authenticated_Controller extends Base_Controller
 
 	private function goto_create_organization()
 	{
+		// Invitation game
+		if ($invite_code = $this->session->userdata('invite_code')) {
+			$this->session->set_userdata('invite_code', NULL);
+			redirect('/invite/confirm/' . $invite_code);
+			return;
+		}
+
+		// Stay in the invite confirm page
+		if (strstr($this->uri->uri_string(), 'invite/confirm')) {
+			return;
+		}
+
+
 		// If user still access to an organization, can not create new anymore
 		$orgs = $this->db->select('count(*) AS total')
 							->from('organizations o')
