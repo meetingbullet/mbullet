@@ -1,7 +1,7 @@
 		<header class="an-header wow fadeInDown" style="visibility: visible; animation-name: fadeInDown;">
 			<div class="an-topbar-left-part">
 			<h3 class="an-logo-heading">
-				<a class="an-logo-link" href="#"><img src="<?php echo base_url('assets/images/logo-white.svg'); ?>" alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="87" height="31"></a>
+				<a class="an-logo-link" href="<?php echo site_url(DEFAULT_LOGIN_LOCATION); ?>"><img src="<?php echo base_url('assets/images/logo-white.svg'); ?>" alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="87" height="31"></a>
 			</h3>
 			<!--<button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">
 				<i class="icon-list"></i>
