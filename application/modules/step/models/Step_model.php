@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Action_model extends BF_Model
+class Step_model extends BF_Model
 {
 	protected $table_name	= 'actions';
 	protected $key			= 'action_id';
