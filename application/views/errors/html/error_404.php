@@ -2,63 +2,55 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?><!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>404 Page Not Found</title>
-<style type="text/css">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title><?php echo $heading; ?></title>
 
-::selection { background-color: #E13300; color: white; }
-::-moz-selection { background-color: #E13300; color: white; }
+		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+		<link href="/themes/default/css/animate.min.css" rel="stylesheet">
+		<link href="/themes/default/css/vendor-styles.css" rel="stylesheet">
+		<link rel="stylesheet" href="/themes/default/css/styles.css">
 
-body {
-	background-color: #fff;
-	margin: 40px;
-	font: 13px/20px normal Helvetica, Arial, sans-serif;
-	color: #4F5155;
-}
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<div class="main-wrapper">
+			<div class="an-loader-container">
+				<img src="/themes/default/image/loader.png" alt="">
+			</div>
+			<div class="an-page-content">
+				<div class="an-flex-center-center">
+					<h3 class="an-logo-heading text-center wow fadeInDown">
+						<a class="an-logo-link" href="/"><img src="/assets/images/logo-black.svg" height="32"></a>
+					</h3>
+					<div class="an-4040-page">
+						<h1>404</h1>
+						<?php echo $message; ?>
+					</div>
+					<div class="back-to-home wow fadeInUp">
+						<a href="/" class="an-btn an-btn-default">Back to home</a>
+					</div>
 
-a {
-	color: #003399;
-	background-color: transparent;
-	font-weight: normal;
-}
+					<!-- end an-login-container -->
+					<!-- end row -->
 
-h1 {
-	color: #444;
-	background-color: transparent;
-	border-bottom: 1px solid #D0D0D0;
-	font-size: 19px;
-	font-weight: normal;
-	margin: 0 0 14px 0;
-	padding: 14px 15px 10px 15px;
-}
+				</div>
+			</div> <!-- end .AN-PAGE-CONTENT -->
 
-code {
-	font-family: Consolas, Monaco, Courier New, Courier, monospace;
-	font-size: 12px;
-	background-color: #f9f9f9;
-	border: 1px solid #D0D0D0;
-	color: #002166;
-	display: block;
-	margin: 14px 0 14px 0;
-	padding: 12px 10px 12px 10px;
-}
+		</div> <!-- end .MAIN-WRAPPER -->
+		<script src="/themes/default/js-plugins/jquery-3.1.1.min.js" type="text/javascript"></script>
+		<script src="/themes/default/js-plugins/bootstrap.min.js" type="text/javascript"></script>
+		<script src="/themes/default/js-plugins/perfect-scrollbar.jquery.min.js" type="text/javascript"></script>
+		<script src="/themes/default/js-plugins/wow.min.js" type="text/javascript"></script>
 
-#container {
-	margin: 10px;
-	border: 1px solid #D0D0D0;
-	box-shadow: 0 0 8px #D0D0D0;
-}
-
-p {
-	margin: 12px 15px 12px 15px;
-}
-</style>
-</head>
-<body>
-	<div id="container">
-		<h1><?php echo $heading; ?></h1>
-		<?php echo $message; ?>
-	</div>
-</body>
+		<!-- MAIN SCRIPTS START FROM HERE above scripts from plugin -->
+		<script src="/themes/default/js/scripts.js" type="text/javascript"></script>
+	</body>
 </html>
