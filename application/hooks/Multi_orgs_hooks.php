@@ -32,13 +32,15 @@ class Multi_orgs_hooks
 	 */
 	public function check_current_organization($main_domain_parts = 2)
 	{
-		$current_domain = $_SERVER['SERVER_NAME'];
-		$parsed_url = explode('.', $current_domain);
-		if (count($parsed_url) - $main_domain_parts - 1 >= 0) {
-			$subdomain = $parsed_url[count($parsed_url) - $main_domain_parts - 1];
-			$this->ci->current_organization_url = $subdomain;
-		} else {
-			$this->ci->current_organization_url = null;
+		$this->ci->current_organization_url = null;
+
+		if (isset($_SERVER['SERVER_NAME'])) {
+			$current_domain = $_SERVER['SERVER_NAME'];
+			$parsed_url = explode('.', $current_domain);
+			if (count($parsed_url) - $main_domain_parts - 1 >= 0) {
+				$subdomain = $parsed_url[count($parsed_url) - $main_domain_parts - 1];
+				$this->ci->current_organization_url = $subdomain;
+			}
 		}
 	}
 }

@@ -24,6 +24,7 @@
  */
 
 $lang['us_account_deleted']			= 'Unfortunately your account has been deleted. It has not yet been purged and <strong>may still</strong> be restored. Contact the administrator at %s.';
+$lang['us_view_your_invitation']	= 'Please login or register to view your invitation';
 
 $lang['us_bad_email_pass']			= 'Incorrect email or password.';
 $lang['us_must_login']				= 'You must be logged in to view that page.';

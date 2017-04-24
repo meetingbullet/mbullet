@@ -48,6 +48,11 @@ if (! function_exists('mb_form_input')) {
 }
 
 if (! function_exists('mb_form_dropdown')) {
+	/**
+	 * Returns a properly templated dropdown field.
+	 *
+	 * @return string The formatted input element, label tag and wrapping divs.
+	 */
     function mb_form_dropdown($data, $options = array(), $selected = array(), $label = '', $extra = '', $tooltip = '', $required = false)
     {
         if (! is_array($data)) {
@@ -108,4 +113,21 @@ if (! function_exists('mb_form_dropdown')) {
     </div>
 </div>";
     }
+}
+
+if (! function_exists('mb_form_input_placeholder')) {
+	/**
+	 * Returns a properly templated text input field.
+	 *
+	 * @return string The formatted input element, label tag and wrapping divs.
+	 */
+	function mb_form_input_placeholder($type = 'text', $name, $label = '', $required = false, $value = '', $class = 'an-form-control', $addon = '', $placeholder = '', $tooltip = '')
+	{
+		return iif($label, "<label for=\"$name\">$label". iif($required, '<span class="required">*</span>') ."</label>") ."
+		". iif($addon, "<div class=\"an-input-group\">
+			<div class=\"an-input-group-addon\">$addon</div>") ."
+			<input type=\"$type\" name=\"$name\" class=\"$class". iif( form_error($name) , ' danger') ."\" placeholder=\"$placeholder\" value=\"". ($value ? set_value($name, $value) : set_value($name)) ."\"/>
+		". iif($addon, "</div>") ."
+		". iif($tooltip, "<p class=\"an-small-doc-block\">$tooltip</p>");
+	}
 }
