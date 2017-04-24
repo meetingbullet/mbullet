@@ -29,9 +29,15 @@ class Step extends Authenticated_Controller
 								->join('users u', 'u.user_id = steps.owner_id', 'left')
 								->find_by('step_key', $step_key);
 
+		$this->load->model('task/task_model');
+		$tasks = $this->task_model->select('tasks.*, CONCAT(u.first_name, u.last_name) as owner_name')
+								->join('users u', 'u.user_id = tasks.owner_id', 'left')
+								->where('step_id', $step->step_id)->find_all();
+
 		Assets::add_module_css('step', 'step.css');
 		Assets::add_module_js('step', 'step.js');
 		Template::set('step', $step);
+		Template::set('tasks', $tasks);
 		Template::set('project_key', $project_key);
 		Template::set('action_key', $action_key);
 		Template::set('step_key', $step_key);

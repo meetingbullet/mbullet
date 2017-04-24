@@ -1,8 +1,8 @@
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
 		<h5 class='breadcrumb'>
-			<?php echo anchor(site_url('project/' . $project_key), sprintf(lang('st_project_key'), $project_key)) ?> /
-			<?php echo sprintf(lang('st_action_key'), $action_key) ?>
+			<?php echo anchor(site_url('project/' . $project_key), $project_key) ?> /
+			<?php e($step_key) ?>
 		</h5>
 		<h2><?php e($step->name)?></h2>
 
@@ -11,7 +11,7 @@
 
 <div class="btn-block">
 	<?php echo anchor('#', '<i class="ion-edit"></i> ' . lang('st_edit'), ['class' => 'an-btn an-btn-primary']) ?>
-	<?php echo anchor('#', '<i class="ion-ios-play"></i> ' . lang('st_start_action'), ['class' => 'an-btn an-btn-primary']) ?>
+	<?php echo anchor('#', '<i class="ion-ios-play"></i> ' . lang('st_start_step'), ['class' => 'an-btn an-btn-primary']) ?>
 </div>
 
 <div class="row">
@@ -51,19 +51,19 @@
 								</tr>
 							</thead>
 							<tbody>
-								<?php //foreach ($tasks as $task): ?>
+								<?php foreach ($tasks as $task) : ?>
 								<tr>
-									<td><?php //e(sprintf(lang('st_task_key'), $task->task_key))?></td>
-									<td><?php //e($task->name)?></td>
-									<td><?php //e($task->owner_name)?></td>
-									<td><?php //e($task->status)?></td>
+									<td><?php e($task->task_key)?></td>
+									<td><?php e($task->name)?></td>
+									<td><?php e($task->owner_name)?></td>
+									<td><?php e($task->status)?></td>
 								</tr>
-								<?php //endforeach; ?>
+								<?php endforeach ?>
 							</tbody>
 						</table>
 					</div>
 
-					<button class="an-btn an-btn-primary" id="add-step"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_step')?></button>
+					<button class="an-btn an-btn-primary" id="add-task"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div>
