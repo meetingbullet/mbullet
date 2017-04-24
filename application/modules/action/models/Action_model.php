@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Project_model extends BF_Model
+class Action_model extends BF_Model
 {
-	protected $table_name	= 'projects';
-	protected $key			= 'project_id';
+	protected $table_name	= 'actions';
+	protected $key			= 'action_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;
@@ -12,6 +12,7 @@ class Project_model extends BF_Model
 	protected $soft_deletes	= false;
 
 	protected $created_field	 = 'created_on';
+	protected $modified_field	 = 'modified_on';
 
 	// Customize the operations of the model without recreating the insert,
 	// update, etc. methods by adding the method names to act as callbacks here.
@@ -39,20 +40,62 @@ class Project_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	public $project_validation_rules		= array(
-        array(
-            'field' => 'name',
-            'label' => 'lang:pj_project_name',
-            'rules' => 'trim|required|max_length[255]',
-        ),
-        array(
-            'field' => 'cost_code',
-            'label' => 'lang:pj_cost_code',
-            'rules' => 'trim|required|max_length[64]',
-        )
+	public $validation_rules		= array(
+		'create_action' => array(
+			array(
+				'field' => 'name',
+				'label' => 'lang:ac_action_name',
+				'rules' => 'trim|required|max_length[255]',
+			),
+			array(
+				'field' => 'project_id',
+				'label' => 'lang:ac_project_id',
+				'rules' => 'trim|required|numeric',
+			),
+			array(
+				'field' => 'action_key',
+				'label' => 'lang:ac_action_key',
+				'rules' => 'trim|required',
+			),
+			array(
+				'field' => 'owner_id',
+				'label' => 'lang:ac_owner_id',
+				'rules' => 'trim|numeric',
+			),
+			array(
+				'field' => 'status',
+				'label' => 'lang:ac_action_status',
+				'rules' => 'trim',
+			),
+			array(
+				'field' => 'action_type',
+				'label' => 'lang:ac_action_type',
+				'rules' => 'trim|required',
+			),
+			array(
+				'field' => 'success_condition',
+				'label' => 'lang:ac_success_condition',
+				'rules' => 'trim|required',
+			),
+			array(
+				'field' => 'point_value_defined',
+				'label' => 'lang:ac_point_value_defined',
+				'rules' => 'trim',
+			),
+			array(
+				'field' => 'point_used',
+				'label' => 'lang:ac_point_used',
+				'rules' => 'trim',
+			),
+			array(
+				'field' => 'avarage_stars',
+				'label' => 'lang:ac_avarage_stars',
+				'rules' => 'trim|numeric',
+			)
+		)
     );
 	protected $insert_validation_rules  = array();
-	protected $skip_validation	= false;
+	protected $skip_validation	= true;
 
 	/**
 	 * Constructor
@@ -64,31 +107,7 @@ class Project_model extends BF_Model
 		parent::__construct();
 	}
 
-	public function get_project_id($project_key, $current_user)
-	{
-		if (! class_exists('Role_model')) {
-			$this->load->model('roles/role_model');
-		}
-		// check user is organization owner or not
-		$is_owner = $this->role_model->where('role_id', $current_user->role_ids[$current_user->current_organization_id])
-									->count_by('is_public', 1) == 1 ? true : false;
-		// get project id
-		if ($is_owner) {
-			$project = $this->select('project_id, projects.name')
-							->where('projects.organization_id', $current_user->current_organization_id)
-							->find_by('projects.cost_code', $project_key);
-		} else {
-			$project = $this->select('pm.project_id, projects.name')
-							->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
-							->where('projects.organization_id', $current_user->current_organization_id)
-							->where('pm.user_id', $current_user->user_id)
-							->find_by('projects.cost_code', $project_key);
-		}
-
-		if (! empty($project)) {
-			return $project->project_id;
-		}
-
-		return false;
+	public function test() {
+		return $this->current_user;
 	}
 }

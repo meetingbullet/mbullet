@@ -62,8 +62,7 @@ class Projects extends Authenticated_Controller
 				return;
 			}
 		}
- 
- 
+
 		Template::set('close_modal', 0);
 		Template::set('message_type', null);
 		Template::set('message', '');
@@ -169,7 +168,7 @@ class Projects extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$project_id = $this->get_project_id($project_key);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		if ($project_id === false) {
 			redirect('/dashboard');
 		}
@@ -306,10 +305,11 @@ class Projects extends Authenticated_Controller
 		/*---------------------------------- Report TAB ----------------------------------*/
 		Template::set('report_tab_data', []);
 
+		Assets::add_module_css('action', 'action.css');
+		Assets::add_module_js('action', 'action.js');
 		Assets::add_module_css('projects', 'projects.css');
 		Assets::add_module_js('projects', 'action_board.js');
-		Assets::add_module_js('projects', 'projects.js');
-		Template::set('project_name', 'Project test'/*$project->name*/);
+		Template::set('project_name', $this->project_model->get_field($project_id, 'name'));
 		Template::set('project_key', $project_key);
 		Template::set_view('detail');
 		Template::render();
@@ -321,7 +321,7 @@ class Projects extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$project_id = $this->get_project_id($project_key);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 
 		// $project_id = 1; // test
 		$action_id = trim($this->input->get('action_id'));
@@ -351,7 +351,8 @@ class Projects extends Authenticated_Controller
 		try {
 			$this->db->trans_begin();
 
-			$old_status_order_updated = $this->db->where('status', $action->status)
+			$old_status_order_updated = $this->db->where('action_id !=', $action_id)
+												->where('status', $action->status)
 												->where('sort_order >=', $action->sort_order)
 												->set('sort_order', '`sort_order`-1', false)
 												->set('modified_on', date('Y-m-d H:i:s'))
@@ -360,7 +361,8 @@ class Projects extends Authenticated_Controller
 				throw new Exception('failed at position 3');
 			}
 
-			$new_status_order_updated = $this->db->where('status', $status)
+			$new_status_order_updated = $this->db->where('action_id !=', $action_id)
+												->where('status', $status)
 												->where('sort_order >=', $status_order)
 												->set('sort_order', '`sort_order`+1', false)
 												->set('modified_on', date('Y-m-d H:i:s'))
@@ -407,7 +409,7 @@ class Projects extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$project_id = $this->get_project_id($project_key);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		// $project_id = 1; // test
 		if ($project_id !== false) {
 			$actions = $this->get_actions($project_id);
@@ -421,6 +423,29 @@ class Projects extends Authenticated_Controller
 		}
 
 		echo json_encode($actions);
+		exit;
+	}
+
+	public function get_members($project_key = null)
+	{
+		if (! $this->input->is_ajax_request()) {
+			redirect('/dashboard');
+		}
+
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
+		if ($project_id !== false) {
+			$members = $this->db->select('u.user_id, CONCAT(u.first_name, u.last_name) as full_name')
+								->from('users u')
+								->join('project_members pm', 'u.user_id = pm.user_id', 'inner')
+								->like('CONCAT(u.first_name, u.last_name)', $this->input->get('member_name'))
+								->where('pm.project_id', $project_id)
+								->get()->result();
+			$result = $members;
+		} else {
+			$result = [];
+		}
+
+		echo json_encode($result);
 		exit;
 	}
 
@@ -464,34 +489,35 @@ class Projects extends Authenticated_Controller
 		return $actions;
 	}
 
-	private function get_project_id($project_key) {
-		if (! class_exists('Project_model')) {
-			$this->load->model('Project_model');
-		}
+	// private function get_project_id($project_key)
+	// {
+	// 	if (! class_exists('Project_model')) {
+	// 		$this->load->model('Project_model');
+	// 	}
 
-		if (! class_exists('Role_model')) {
-			$this->load->model('roles/role_model');
-		}
-		// check user is organization owner or not
-		$is_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
-									->count_by('is_public', 1) == 1 ? true : false;
-		// get project id
-		if ($is_owner) {
-			$project = $this->project_model->select('project_id, projects.name')
-										->where('projects.organization_id', $this->current_user->current_organization_id)
-										->find_by('projects.cost_code', $project_key);
-		} else {
-			$project = $this->project_model->select('pm.project_id, projects.name')
-										->join('project_members pm', 'pm.project_id = projects.project_id', 'inner')
-										->where('projects.organization_id', $this->current_user->current_organization_id)
-										->where('pm.user_id', $this->current_user->user_id)
-										->find_by('projects.cost_code', $project_key);
-		}
+	// 	if (! class_exists('Role_model')) {
+	// 		$this->load->model('roles/role_model');
+	// 	}
+	// 	// check user is organization owner or not
+	// 	$is_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
+	// 								->count_by('is_public', 1) == 1 ? true : false;
+	// 	// get project id
+	// 	if ($is_owner) {
+	// 		$project = $this->project_model->select('project_id, projects.name')
+	// 									->where('projects.organization_id', $this->current_user->current_organization_id)
+	// 									->find_by('projects.cost_code', $project_key);
+	// 	} else {
+	// 		$project = $this->project_model->select('pm.project_id, projects.name')
+	// 									->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
+	// 									->where('projects.organization_id', $this->current_user->current_organization_id)
+	// 									->where('pm.user_id', $this->current_user->user_id)
+	// 									->find_by('projects.cost_code', $project_key);
+	// 	}
 
-		if (! empty($project)) {
-			return $project->project_id;
-		}
+	// 	if (! empty($project)) {
+	// 		return $project->project_id;
+	// 	}
 
-		return false;
-	}
+	// 	return false;
+	// }
 }

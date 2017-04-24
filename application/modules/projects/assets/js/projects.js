@@ -44,6 +44,10 @@ $(document).ready(function() {
                         type: data.message_type,
                         z_index: 1051
                     });
+
+					if ($('#board').length && data.message_type == 'success') {
+						refresh_action_board();
+					}
                 }
             }
         });
