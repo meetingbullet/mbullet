@@ -9,7 +9,7 @@ class Step extends Authenticated_Controller
 		$this->lang->load('step');
 	}
 
-	public function detail($step_key)
+	public function detail($step_key = null)
 	{
 		if (empty($step_key)) {
 			redirect('/dashboard');
@@ -35,8 +35,17 @@ class Step extends Authenticated_Controller
 								->join('users u', 'u.user_id = tasks.owner_id', 'left')
 								->where('step_id', $step->step_id)->find_all();
 
+		if (! class_exist('User_model')) {
+			$this->load->model('users', 'user_model');
+		}
+		$oragnization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+
 		Assets::add_module_css('step', 'step.css');
 		Assets::add_module_js('step', 'step.js');
+		Assets::add_js($this->load->view('detail_js', [
+			'oragnization_members' => $oragnization_members,
+			'step' => $step
+		], true), 'inline');
 		Template::set('step', $step);
 		Template::set('tasks', $tasks);
 		Template::set('project_key', $project_key);
@@ -45,7 +54,7 @@ class Step extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function update_status($step_key)
+	public function update_status($step_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
 			redirect('/dashboard');
