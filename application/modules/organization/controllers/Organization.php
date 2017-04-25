@@ -14,6 +14,18 @@ class Organization extends Authenticated_Controller
 
 	public function create()
 	{
+		// If user still access to an organization, can not create new anymore
+		$orgs = $this->db->select('count(*) AS total')
+							->from('organizations o')
+							->join('user_to_organizations uo', 'o.organization_id = uo.organization_id', 'left')
+							->where('uo.user_id', $this->current_user->user_id)
+							->where('uo.enabled', 1)
+							->get()->row();
+		if ($orgs->total > 0) {
+			if ($this->previous_page != current_url()) redirect($this->previous_page);
+			else redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
 		$this->load->library('domain');
 		// check current email
 		$result = $this->check_current_email();
@@ -145,6 +157,19 @@ class Organization extends Authenticated_Controller
 
 		Assets::add_module_js('organization', 'organization.js');
 		Template::render('organization');
+	}
+
+	public function choose($organization_id = null)
+	{
+		$this->load->library('domain');
+
+		if (! is_null($organization_id)) {
+			$org_url = $this->domain->get_organization_url($organization_id);
+			if (! is_null($org_url)) redirect($org_url . DEFAULT_LOGIN_LOCATION);
+			else redirect('organization/choose');
+		}
+
+		Template::render();
 	}
 
 	private function check_current_email()

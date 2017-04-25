@@ -26,4 +26,16 @@ class Domain
 	{
 		return (is_https() ? 'https://' : 'http://') . $this->get_main_domain();
 	}
+
+	public function get_organization_url($organization_id)
+	{
+		$query = $this->ci->db->select('url')->from('organizations')->where('organization_id', $organization_id)->get();
+
+		if ($query->num_rows() == 1) {
+			$sub = $query->row()->url;
+			return (is_https() ? 'https://' : 'http://') . strtolower($sub) . '.' . $this->get_main_domain();
+		} else {
+			return null;
+		}
+	}
 }
