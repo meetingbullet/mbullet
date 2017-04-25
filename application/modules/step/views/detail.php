@@ -1,3 +1,27 @@
+<?php
+$buttons = [
+	'open' => [
+		'icon' => 'ion-ios-play',
+		'label' => lang('st_start_step'),
+		'next_status' => 'in-progress',
+	],
+	'in-progress' => [
+		'icon' => 'ion-android-done',
+		'label' => lang('st_ready'),
+		'next_status' => 'ready-for-review',
+	],
+	'ready-for-review' => [
+		'icon' => 'ion-android-done-all',
+		'label' => lang('st_resolve'),
+		'next_status' => 'resolved',
+	],
+	'resolved' => [
+		'icon' => 'ion-ios-book',
+		'label' => lang('st_reopen'),
+		'next_status' => 'open',
+	]
+];
+?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
 		<h5 class='breadcrumb'>
@@ -11,7 +35,7 @@
 
 <div class="btn-block">
 	<?php echo anchor('#', '<i class="ion-edit"></i> ' . lang('st_edit'), ['class' => 'an-btn an-btn-primary']) ?>
-	<?php echo anchor('#', '<i class="ion-ios-play"></i> ' . lang('st_start_step'), ['class' => 'an-btn an-btn-primary']) ?>
+	<a class="an-btn an-btn-primary" id="change-step-status" data-next-status="<?php echo $buttons[$step->status]['next_status'] ?>" data-update-status-url="<?php echo base_url('/step/update_status/' . $step_key . '?status=' . urlencode($buttons[$step->status]['next_status'])) ?>"><i class="<?php echo $buttons[$step->status]['icon'] ?>"></i> <?php echo $buttons[$step->status]['label'] ?></a>
 </div>
 
 <div class="row">
@@ -21,7 +45,7 @@
 				<h6><?php e(lang('st_detail'))?> </h6>
 			</div>
 			<div class="an-component-body">
-				<div class="an-helper-block action-detail">
+				<div class="an-helper-block step-detail">
 					<div class="row">
 						<div class="col-md-4"><?php e(lang('st_owner'))?></div>
 						<div class="col-md-8"><?php e($step->owner_name)?></div>
@@ -29,6 +53,10 @@
 					<div class="row">
 						<div class="col-md-4"><?php e(lang('st_goal'))?></div>
 						<div class="col-md-8"><?php e($step->goal)?></div>
+					</div>
+					<div class="row">
+						<div class="col-md-4"><?php e(lang('st_status'))?></div>
+						<div class="col-md-8" id="status"><?php e(str_replace('-', ' ', $step->status))?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -104,7 +132,7 @@
 				<h6><?php e(lang('st_date'))?></h6>
 			</div>
 			<div class="an-component-body">
-				<div class="an-helper-block action-detail">
+				<div class="an-helper-block step-detail">
 					<div class="row">
 						<div class="col-md-4"><?php e(lang('st_created'))?></div>
 						<div class="col-md-8"><?php e($step->created_on)?></div>

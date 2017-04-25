@@ -1,0 +1,31 @@
+.breadcrumb a {
+	color: #337ab7;
+}
+
+.btn-block .an-btn {
+	margin-right: 10px;
+}
+
+.btn-block {
+	margin-bottom: 30px;
+}
+
+.step-detail {
+	line-height: 30px;
+}
+
+.user-single i {
+	margin-left: 15px;
+}
+
+.user-single .name {
+	margin-left: 20px;
+}
+
+.user-single {
+	margin-bottom: 10px;
+}
+
+.user-single:last-child {
+	margin-bottom: 0;
+}
