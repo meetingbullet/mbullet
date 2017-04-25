@@ -17,8 +17,7 @@ var REGEX_EMAIL = '([a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~
 
 var select_member = $('#team-member').selectize({
 	onItemAdd: function (item) {
-		$.post('<?php echo site_url('action/add_team_member') ?>', {
-			'action_id': <?php echo $step->step_id ?>,
+		$.post('<?php echo site_url('step/add_team_member/' . $step->step_key) ?>', {
 			'user_id': item
 		}, function (res) {
 			if (res == 0) {
@@ -27,8 +26,7 @@ var select_member = $('#team-member').selectize({
 		});
 	},
 	onItemRemove: function (item) {
-		$.post('<?php echo site_url('action/remove_team_member') ?>', {
-			'action_id': <?php echo $step->step_id ?>,
+		$.post('<?php echo site_url('step/remove_team_member/' . $step->step_key) ?>', {
 			'user_id': item
 		}, function (res) {
 			if (res == 0) {
@@ -43,7 +41,7 @@ var select_member = $('#team-member').selectize({
 	labelField: 'name',
 	searchField: ['name'],
 	options: [
-		<?php foreach($oragnization_members as $user) :
+		<?php foreach ($organization_members as $user) :
 			if (strstr($user->avatar, 'http') === false) {
 				$user->avatar = avatar_url($user->avatar, $user->email);
 			}

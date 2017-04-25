@@ -15,6 +15,7 @@ $lang['st_goal'] = 'Goal';
 $lang['st_tasks'] = 'Tasks';
 $lang['st_name'] = 'Name';
 $lang['st_resource'] = 'Resource';
+$lang['st_add_team_member'] = '+ Add team member';
 // Step
 $lang['st_add_task'] = 'Add Task';
 $lang['st_edit'] = 'Edit';

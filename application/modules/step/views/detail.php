@@ -106,22 +106,7 @@ $buttons = [
 				<div class="an-helper-block">
 					<div class="an-input-group">
 						<div class="an-input-group-addon"><i class="ion-ios-search"></i></div>
-						<input type="text" class="an-form-control" placeholder="<?php e(lang('st_team_member'))?>">
-					</div>
-
-					<div class="user-group">
-						<div class='user-single'>
-							<i class="ion-close-round remove"></i>
-							<span class='name'>User Demo</span>
-						</div>
-						<div class='user-single'>
-							<i class="ion-close-round remove"></i>
-							<span class='name'>User Demo</span>
-						</div>
-						<div class='user-single'>
-							<i class="ion-close-round remove"></i>
-							<span class='name'>User Demo</span>
-						</div>
+						<input type="text" id="team-member" class="select-member an-tags-input" placeholder="<?php e(lang('st_add_team_member'))?>" value="<?php echo implode(',', $invited_members) ?> ">
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
