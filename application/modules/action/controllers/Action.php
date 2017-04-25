@@ -6,14 +6,87 @@ class Action extends Authenticated_Controller
 	{
 		parent::__construct();
 
-		$this->load->model('action_model');
 		$this->lang->load('action');
+		$this->load->helper('mb_form');
+		$this->load->helper('mb_general');
+		$this->load->model('action_model');
+		$this->load->model('step/step_model');
+		$this->load->model('users/user_model');
+		$this->load->model('action_member_model');
+		$this->load->model('projects/project_model');
+
+		Assets::add_module_css('action', 'action.css');
+	}
+
+	public function _remap($method, $params = array())
+	{
+		if (method_exists($this, $method))
+		{
+			return call_user_func_array(array($this, $method), $params);
+		} else {
+			$this->detail($method);
+		}
+	}
+
+	public function index()
+	{
+		Template::render();
+	}
+
+	public function detail($action_key)
+	{
+		if (empty($action_key)) {
+			Template::set_message(lang('ac_invalid_action_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+									->join('users u', 'u.user_id = actions.owner_id')
+									->limit(1)
+									->find_by('action_key', $action_key);
+
+		if (! $action) {
+			Template::set_message(lang('ac_invalid_action_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (isset($_POST['update'])) {
+			$next_status = 'resolved';
+
+			if ($action->status == 'open') $next_status = 'inprogress';
+			if ($action->status == 'inprogress') $next_status = 'ready';
+
+			$this->action_model->update($action->action_id, ['status' => $next_status]);
+		}
+
+		$steps = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+									->join('users u', 'u.user_id = steps.owner_id')
+									->where('action_id', $action->action_id)
+									->order_by('step_id')
+									->order_by('status')
+									->find_all();
+
+		$invited_members =  $this->action_member_model->select('user_id')->where('action_id', $action->action_id)->find_all();
+		$invited_members = is_array($invited_members) ? array_column($invited_members, 'user_id') : [];
+
+		$oragnization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		Assets::add_js($this->load->view('detail_js', [
+			'oragnization_members' => $oragnization_members,
+			'invited_members' => $invited_members,
+			'action_key' => $action_key,
+			'action' => $action
+		], true), 'inline');
+
+		Template::set('invited_members', $invited_members);
+		Template::set('action_key', $action_key);
+		Template::set('action', $action);
+		Template::set('steps', $steps);
+		Template::set_view('detail');
+		Template::render();
 	}
 
 	public function create($project_key = null)
 	{
-		$this->load->model('projects/project_model');
-		$this->load->helper('mb_form');
 
 		if (empty($project_key)) {
 			redirect('/dashboard');
@@ -27,13 +100,9 @@ class Action extends Authenticated_Controller
 		$form_error = [];
 		$error_message = '';
 		if ($this->input->post()) {
-			// get last action id
-			$last_id = $this->db->select('MAX(action_id) as max_id')->get('actions')->row()->max_id;
-			if (empty($last_id)) {
-				$last_id = 0;
-			}
 			// generate action key
-			$_POST['action_key'] = $project_key . "-" . ($last_id + 1);
+			$this->load->library('project');
+			$_POST['action_key'] = $this->project->get_next_key($project_key);
 			$_POST['project_id'] = $project_id;
 			// validate owner_id and resource id
 			if (trim($this->input->post('owner_id')) != '') {
@@ -143,14 +212,79 @@ class Action extends Authenticated_Controller
 			}
 		}
 
-		Assets::add_module_js('action', 'action.js');
-		Assets::add_module_css('action', 'action.css');
+		Assets::add_module_js('action', 'create.js');
 		Template::set('project_key', $project_key);
 		Template::set('form_error', $form_error);
-		if (! $this->input->is_ajax_request()) {
-			Template::render();
-		} else {
-			Template::render('ajax');
+		Template::render();
+	}
+
+	public function add_team_member()
+	{
+		$user_id = $this->input->post('user_id');
+		$action_id = $this->input->post('action_id');
+
+		if ($user_id === NULL || $action_id === NULL) {
+			echo 0;
+			return;
 		}
+
+		// Does the current user has permission to add team member?
+		$check = $this->action_model->join('action_members am', 'actions.action_id = am.action_id', 'LEFT')
+										->join('projects p', 'p.project_id = actions.project_id')
+										->join('user_to_organizations uto', 'uto.user_id = am.user_id OR uto.user_id = ' . $this->current_user->user_id)
+										->where('am.action_id', $action_id)
+										->where('am.user_id', $this->current_user->user_id)
+										->or_where('actions.owner_id', $this->current_user->user_id)
+										->where('actions.action_id', $action_id)
+										->count_all();
+
+		if ($check === 0) {
+			echo -1;
+			return;
+		}
+
+		// Is the target user inside current user's organization?
+		$check = $this->user_model->join('user_to_organizations uto', 'uto.user_id = users.user_id')
+									->where('uto.organization_id', $this->current_user->current_organization_id)
+									->count_by('users.user_id', $user_id);
+
+		if ($check === 0) {
+			echo -2;
+			return;
+		}
+
+		// Prevent duplicate row by MySQL Insert Ignore
+		$query = $this->db->insert_string('action_members', ['user_id' => $user_id, 'action_id' => $action_id]);
+		$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+		echo (int) $this->db->query($query);
+	}
+
+	public function remove_team_member()
+	{
+		$user_id = $this->input->post('user_id');
+		$action_id = $this->input->post('action_id');
+
+		if ($user_id === NULL || $action_id === NULL) {
+			echo 0;
+			return;
+		}
+
+		// Does the current user has permission to add team member?
+		$check = $this->action_model->join('action_members am', 'actions.action_id = am.action_id', 'LEFT')
+										->join('projects p', 'p.project_id = actions.project_id')
+										->join('user_to_organizations uto', 'uto.user_id = am.user_id OR uto.user_id = ' . $this->current_user->user_id)
+										->where('am.action_id', $action_id)
+										->where('am.user_id', $this->current_user->user_id)
+										->or_where('actions.owner_id', $this->current_user->user_id)
+										->where('actions.action_id', $action_id)
+										->count_all();
+
+		if ($check === 0) {
+			echo -1;
+			return;
+		}
+
+		// Prevent duplicate row by MySQL Insert Ignore
+		echo (int) $this->action_member_model->delete_where(['user_id' => $user_id, 'action_id' => $action_id]);
 	}
 }

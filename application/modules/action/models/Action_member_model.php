@@ -1,20 +1,18 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Task_model extends BF_Model
+class Action_member_model extends BF_Model
 {
-	protected $table_name	= 'tasks';
-	protected $key			= 'task_id';
+	public $table_name	= 'action_members';
+	protected $key			= 'action_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;
-	protected $set_created	= true;
-	protected $set_modified = true;
+	protected $set_created	= false;
+	protected $set_modified = false;
 	protected $soft_deletes	= false;
 
 	protected $created_field	 = 'created_on';
 	protected $modified_field	 = 'modified_on';
-	protected $created_by_field	 = 'created_by';
-	protected $modified_by_field	 = 'modified_by';
 
 	// Customize the operations of the model without recreating the insert,
 	// update, etc. methods by adding the method names to act as callbacks here.
@@ -44,7 +42,7 @@ class Task_model extends BF_Model
 	// be updating a portion of the data.
 	public $validation_rules		= array();
 	protected $insert_validation_rules  = array();
-	protected $skip_validation	= true;
+	protected $skip_validation	= false;
 
 	/**
 	 * Constructor

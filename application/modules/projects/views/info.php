@@ -12,7 +12,7 @@
 			<tbody>
 			<?php foreach ($lists['actions'] as $item) : ?>
 				<tr>
-					<th scope="row"><a href="<?php e("/project/{$project_key}/action/{$item->action_key}") ?>"><?php e($item->action_key) ?></a></th>
+					<th scope="row"><a href="<?php e("/action/{$item->action_key}") ?>"><?php e($item->action_key) ?></a></th>
 					<td><?php e($item->name) ?></td>
 					<td><?php e($item->status) ?></td>
 				</tr>
@@ -41,7 +41,7 @@
 			<tbody>
 			<?php foreach ($lists['steps'] as $item) : ?>
 				<tr>
-					<th scope="row"><a href="<?php e("/project/{$project_key}/action/{$item->action_key}/step/{$item->step_key}") ?>"><?php e($item->step_key) ?></a></th>
+					<th scope="row"><a href="<?php e("/step/{$item->step_key}") ?>"><?php e($item->step_key) ?></a></th>
 					<td><?php e($item->name) ?></td>
 					<td><?php e($item->status) ?></td>
 				</tr>
@@ -70,7 +70,7 @@
 			<tbody>
 			<?php foreach ($lists['tasks'] as $item) : ?>
 				<tr>
-					<th scope="row"><a href="<?php e("/project/{$project_key}/action/{$item->action_key}/step/{$item->step_key}/task/{$item->task_key}") ?>"><?php e($item->task_key) ?></a></th>
+					<th scope="row"><a href="<?php e("/task/{$item->task_key}") ?>"><?php e($item->task_key) ?></a></th>
 					<td><?php e($item->name) ?></td>
 					<td><?php e($item->status) ?></td>
 				</tr>

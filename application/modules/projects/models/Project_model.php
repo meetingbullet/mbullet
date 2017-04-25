@@ -79,7 +79,7 @@ class Project_model extends BF_Model
 							->find_by('projects.cost_code', $project_key);
 		} else {
 			$project = $this->select('pm.project_id, projects.name')
-							->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
+							->join('project_members pm', 'pm.project_id = projects.project_id', 'inner')
 							->where('projects.organization_id', $current_user->current_organization_id)
 							->where('pm.user_id', $current_user->user_id)
 							->find_by('projects.cost_code', $project_key);
