@@ -51,25 +51,37 @@ function refresh_action_board() {
 		data = JSON.parse(data);
 		data.open.forEach(function(item, index) {
 			var div = `<div class="item" data-action-id="${item.action_id}">
-							${item.action_key}
+							<address>
+								<strong>${item.name}</strong><br/>
+								<a href="/action/detail/${item.action_key}"><img style="width: 24px; height: auto;" class="img-circle" src="${item.avatar_url}"/>&nbsp;${item.action_key}&nbsp;<i class="ion-edit"></a>
+							</address>
 						</div>`;
 			$('#board .status#open .actions .items').append(div);
 		});
 		data.inprogress.forEach(function(item, index) {
 			var div = `<div class="item" data-action-id="${item.action_id}">
-							${item.action_key}
+							<address>
+								<strong>${item.name}</strong><br/>
+								<a href="/action/detail/${item.action_key}"><img style="width: 24px; height: auto;" class="img-circle" src="${item.avatar_url}"/>&nbsp;${item.action_key}&nbsp;<i class="ion-edit"></a>
+							</address>
 						</div>`;
 			$('#board .status#inprogress .actions .items').append(div);
 		});
 		data.ready.forEach(function(item, index) {
 			var div = `<div class="item" data-action-id="${item.action_id}">
-							${item.action_key}
+							<address>
+								<strong>${item.name}</strong><br/>
+								<a href="/action/detail/${item.action_key}"><img style="width: 24px; height: auto;" class="img-circle" src="${item.avatar_url}"/>&nbsp;${item.action_key}&nbsp;<i class="ion-edit"></a>
+							</address>
 						</div>`;
 			$('#board .status#ready .actions .items').append(div);
 		});
 		data.resolved.forEach(function(item, index) {
 			var div = `<div class="item" data-action-id="${item.action_id}">
-							${item.action_key}
+							<address>
+								<strong>${item.name}</strong><br/>
+								<a href="/action/detail/${item.action_key}"><img style="width: 24px; height: auto;" class="img-circle" src="${item.avatar_url}"/>&nbsp;${item.action_key}&nbsp;<i class="ion-edit"></a>
+							</address>
 						</div>`;
 			$('#board .status#resolved .actions .items').append(div);
 		});

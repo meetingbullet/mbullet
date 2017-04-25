@@ -6,7 +6,10 @@
 			<div class="items">
 			<?php foreach ($actions['open'] as $item) : ?>
 				<div class="item" data-action-id="<?php e($item->action_id) ?>">
-					<?php echo $item->action_key ?>
+					<address>
+						<strong><?php e($item->name) ?></strong><br/>
+						<a href="<?php e('/action/' . $item->action_key) ?>"><img style="width: 24px; height: auto;" src="<?php echo $item->avatar_url ?>" class="img-circle"/> <?php echo $item->action_key ?> <i class="ion-edit"></i></a>
+					</address>
 				</div>
 			<?php endforeach ?>
 			</div>
@@ -21,7 +24,10 @@
 			<div class="items">
 			<?php foreach ($actions['inprogress'] as $item) : ?>
 				<div class="item" data-action-id="<?php e($item->action_id) ?>">
-					<?php echo $item->action_key ?>
+					<address>
+						<strong><?php e($item->name) ?></strong><br/>
+						<a href="<?php e('/action/' . $item->action_key) ?>"><img style="width: 24px; height: auto;" src="<?php echo $item->avatar_url ?>" class="img-circle"/> <?php echo $item->action_key ?> <i class="ion-edit"></i></a>
+					</address>
 				</div>
 			<?php endforeach ?>
 			</div>
@@ -36,7 +42,10 @@
 			<div class="items">
 			<?php foreach ($actions['ready'] as $item) : ?>
 				<div class="item" data-action-id="<?php e($item->action_id) ?>">
-					<?php echo $item->action_key ?>
+					<address>
+						<strong><?php e($item->name) ?></strong><br/>
+						<a href="<?php e('/action/' . $item->action_key) ?>"><img style="width: 24px; height: auto;" src="<?php echo $item->avatar_url ?>" class="img-circle"/> <?php echo $item->action_key ?> <i class="ion-edit"></i></a>
+					</address>
 				</div>
 			<?php endforeach ?>
 			</div>
@@ -51,7 +60,10 @@
 			<div class="items">
 			<?php foreach ($actions['resolved'] as $item) : ?>
 				<div class="item" data-action-id="<?php e($item->action_id) ?>">
-					<?php echo $item->action_key ?>
+					<address>
+						<strong><?php e($item->name) ?></strong><br/>
+						<a href="<?php e('/action/' . $item->action_key) ?>"><img style="width: 24px; height: auto;" src="<?php echo $item->avatar_url ?>" class="img-circle"/> <?php echo $item->action_key ?> <i class="ion-edit"></i></a>
+					</address>
 				</div>
 			<?php endforeach ?>
 			</div>
