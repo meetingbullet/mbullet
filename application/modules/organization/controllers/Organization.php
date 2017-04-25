@@ -169,6 +169,15 @@ class Organization extends Authenticated_Controller
 			else redirect('organization/choose');
 		}
 
+		$main_domain = $this->domain->get_main_domain();
+		$organizations = $this->organization_model->get_user_organizations($this->current_user->user_id);
+		//build organization url
+		foreach ($organizations as &$organization) {
+			$organization->url = (is_https() ? 'https://' : 'http://') . strtolower($organization->url) . '.' . $main_domain;
+		}
+
+		Assets::add_module_css('organization', 'choose.css');
+		Template::set('organizations', $organizations);
 		Template::render();
 	}
 

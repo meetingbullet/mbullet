@@ -68,4 +68,17 @@ class Organization_model extends BF_Model
 	{
 		parent::__construct();
 	}
+
+	public function get_user_organizations($user_id)
+	{
+		$query = $this->db->select('o.organization_id, o.name, o.url, o.icon, o.signup_mode')
+							->from('organizations o')
+							->join('user_to_organizations uo', 'o.organization_id = uo.organization_id')
+							->where('uo.user_id', $user_id)->get();
+		if ($query->num_rows() > 0) {
+			return $query->result();
+		} else {
+			return [];
+		}
+	}
 }
