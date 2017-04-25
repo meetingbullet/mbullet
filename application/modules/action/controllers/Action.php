@@ -18,22 +18,30 @@ class Action extends Authenticated_Controller
 		Assets::add_module_css('action', 'action.css');
 	}
 
+	public function _remap($method, $params = array())
+	{
+		if (method_exists($this, $method))
+		{
+			return call_user_func_array(array($this, $method), $params);
+		} else {
+			$this->detail($method);
+		}
+	}
+
 	public function index()
 	{
 		Template::render();
 	}
 
-	public function detail($project_key, $action_key)
+	public function detail($action_key)
 	{
-		if (empty($project_key) || empty($action_key)) {
+		if (empty($action_key)) {
 			Template::set_message(lang('ac_invalid_action_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
-									->join('projects p', 'p.project_id = actions.project_id')
 									->join('users u', 'u.user_id = actions.owner_id')
-									->where('p.cost_code', $project_key)
 									->limit(1)
 									->find_by('action_key', $action_key);
 
@@ -62,18 +70,18 @@ class Action extends Authenticated_Controller
 		$invited_members = is_array($invited_members) ? array_column($invited_members, 'user_id') : [];
 
 		$oragnization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
-
 		Assets::add_js($this->load->view('detail_js', [
 			'oragnization_members' => $oragnization_members,
 			'invited_members' => $invited_members,
+			'action_key' => $action_key,
 			'action' => $action
 		], true), 'inline');
 
 		Template::set('invited_members', $invited_members);
-		Template::set('project_key', $project_key);
 		Template::set('action_key', $action_key);
 		Template::set('action', $action);
 		Template::set('steps', $steps);
+		Template::set_view('detail');
 		Template::render();
 	}
 
@@ -92,13 +100,9 @@ class Action extends Authenticated_Controller
 		$form_error = [];
 		$error_message = '';
 		if ($this->input->post()) {
-			// get last action id
-			$last_id = $this->db->select('MAX(action_id) as max_id')->get('actions')->row()->max_id;
-			if (empty($last_id)) {
-				$last_id = 0;
-			}
 			// generate action key
-			$_POST['action_key'] = $project_key . "-" . ($last_id + 1);
+			$this->load->library('project');
+			$_POST['action_key'] = $this->project->get_next_key($project_key);
 			$_POST['project_id'] = $project_id;
 			// validate owner_id and resource id
 			if (trim($this->input->post('owner_id')) != '') {

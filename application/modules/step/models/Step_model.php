@@ -42,7 +42,18 @@ class Step_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	public $validation_rules		= array();
+	protected $validation_rules		= array(
+		array(
+			'field' => 'name',
+			'label' => 'lang:st_step_name',
+			'rules' => 'trim|required|max_length[255]',
+		),
+		array(
+			'field' => 'owner_id',
+			'label' => 'lang:st_project_id',
+			'rules' => 'trim|required|numeric',
+		)
+	);
 	protected $insert_validation_rules  = array();
 	protected $skip_validation	= true;
 
