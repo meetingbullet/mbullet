@@ -36,10 +36,7 @@ class Projects extends Authenticated_Controller
 	public function create()
 	{
 		// Get invite emails
-		$emails = $this->user_model->select('email, first_name, last_name, avatar')
-									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id, 'RIGHT')
-									->find_all();
-		Template::set('invite_emails', $emails);
+		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
 
 		if (isset($_POST['save'])) {
 			if ($this->save_project()) {
