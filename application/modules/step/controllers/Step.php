@@ -11,6 +11,10 @@ class Step extends Authenticated_Controller
 
 	public function detail($step_key)
 	{
+		if (empty($step_key)) {
+			redirect('/dashboard');
+		}
+
 		$keys = explode('-', $step_key);
 		if (empty($keys) || count($keys) < 3) {
 			redirect('/dashboard');
@@ -43,9 +47,21 @@ class Step extends Authenticated_Controller
 
 	public function update_status($step_key)
 	{
-		// if (! $this->input->is_ajax_request()) {
-		// 	redirect('/dashboard');
-		// }
+		if (! $this->input->is_ajax_request()) {
+			redirect('/dashboard');
+		}
+
+		if (empty($step_key)) {
+			if (! $this->input->is_ajax_request()) {
+				redirect('/dashboard');
+			} else {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_update_status_fail')
+				]);
+				exit;
+			}
+		}
 
 		$step_id = $this->step_model->get_step_id($step_key, $this->current_user);
 		if (! $step_id) {
