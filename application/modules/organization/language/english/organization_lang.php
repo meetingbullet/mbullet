@@ -20,3 +20,5 @@ $lang['org_error_position_7'] = 'Unable to add organization domain name.';
 $lang['org_error_position_8'] = 'Transaction status return false.';
 //info
 $lang['org_already_belong_to_other'] = 'You\'re already in an existed organization and unable to create a new one.';
+
+$lang['org_choose_organization'] = 'Choose Organization';
