@@ -134,8 +134,7 @@ class Organization extends Authenticated_Controller
 				if (! isset($error)) {
 					Template::set_message(lang('org_create_success'), 'success');
 
-					$organization_url = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $url . '.' . $_SERVER['SERVER_NAME'];
-					redirect($organization_url);
+					redirect(DEFAULT_LOGIN_URL);
 				} else {
 					Template::set_message($error, 'danger');
 				}

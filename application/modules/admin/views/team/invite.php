@@ -31,7 +31,7 @@
 		</div>
 
 		<div class="<?php echo $this->input->is_ajax_request() ? 'modal-footer' : 'container-fluid pull-right' ?>">
-			<button type="submit" name="add" class="an-btn an-btn-success"><?php e(lang('iv_add'))?></button>
+			<button type="submit" name="add" class="an-btn an-btn-success"><?php e(lang('iv_invite'))?></button>
 			<a href="#" class="an-btn an-btn-success-transparent" <?php echo $this->input->is_ajax_request() ? 'data-dismiss="modal"' : '' ?>><?php e(lang('iv_close'))?></a>
 		</div>
 

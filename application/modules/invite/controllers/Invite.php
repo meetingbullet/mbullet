@@ -26,10 +26,13 @@ class Invite extends Authenticated_Controller
 		$this->user_invite_model
 				->select('o.name AS organization_name, CONCAT(u.first_name, " ", u.last_name) AS inviter_name, 
 							u.avatar AS inviter_avatar, u1.avatar AS my_avatar, 
-							invite_role, o.organization_id, status', false)
+							invite_role, o.organization_id, status,
+							IF(uto.organization_id IS NULL, 0, 1) AS is_in_current_organization', false)
 				->join('organizations o', 'user_invite.organization_id = o.organization_id')
 				->join('users u', 'user_invite.invited_by = u.user_id')
 				->join('users u1', 'u1.user_id = ' . $this->current_user->user_id)
+				->join('user_to_organizations uto', 'user_invite.organization_id = uto.organization_id AND uto.user_id = ' . $this->current_user->user_id, 'LEFT')
+				->where('invited_by !=', $this->current_user->user_id)
 				->where('status', 'pending');
 		
 		// Invite code is CASE SeNsiTiVe
@@ -37,8 +40,8 @@ class Invite extends Authenticated_Controller
 								->limit(1)
 								->get('user_invite')
 								->row();
-							
-		if (! $invitation) {
+
+		if (! $invitation || $invitation->is_in_current_organization == TRUE) {
 			Template::set_message(lang('iv_invalid_invitation_code_or_already_used'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 			return;
