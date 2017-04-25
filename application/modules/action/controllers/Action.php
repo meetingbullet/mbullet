@@ -100,13 +100,9 @@ class Action extends Authenticated_Controller
 		$form_error = [];
 		$error_message = '';
 		if ($this->input->post()) {
-			// get last action id
-			$last_id = $this->db->select('MAX(action_id) as max_id')->get('actions')->row()->max_id;
-			if (empty($last_id)) {
-				$last_id = 0;
-			}
 			// generate action key
-			$_POST['action_key'] = $project_key . "-" . ($last_id + 1);
+			$this->load->library('project');
+			$_POST['action_key'] = $this->project->get_next_key($project_key);
 			$_POST['project_id'] = $project_id;
 			// validate owner_id and resource id
 			if (trim($this->input->post('owner_id')) != '') {

@@ -448,9 +448,13 @@ class Projects extends Authenticated_Controller
 
 	private function get_actions($project_id)
 	{
+		if (! function_exists('avatar_url')) {
+			$this->load->helper('mb_general');
+		}
 		// get all project actions, sort by sort order
-		$all_actions = $this->db->select('a.action_id, a.action_key, a.name, a.status, IF (a.modified_on IS NULL, a.created_on, a.modified_on) AS sort_time')
+		$all_actions = $this->db->select('a.action_id, a.action_key, a.name, a.status, IF (a.modified_on IS NULL, a.created_on, a.modified_on) AS sort_time, u.avatar, u.email')
 								->from('actions a')
+								->join('users u', 'u.user_id = a.owner_id', 'LEFT')
 								->where('a.project_id', $project_id)
 								->order_by('a.sort_order', 'asc')
 								->order_by('sort_time', 'desc')
@@ -461,6 +465,7 @@ class Projects extends Authenticated_Controller
 		$ready = [];
 		$resolved = [];
 		foreach ($all_actions as $action) {
+			$action->avatar_url = avatar_url($action->avatar, $action->email);
 			switch ($action->status) {
 				case 'inprogress':
 					$inprogress[] = $action;
