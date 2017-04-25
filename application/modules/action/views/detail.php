@@ -24,8 +24,7 @@ $action_button = [
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
 		<h5 class='breakcumb'>
-			<?php echo anchor(site_url('project/' . $project_key), sprintf(lang('ac_project_key'), $project_key)) ?> / 
-			<?php echo sprintf(lang('ac_action_key'), $action_key) ?>
+			<?php echo $action_key ?>
 		</h5>
 		<h2><?php e($action->name)?></h2>
 
@@ -87,7 +86,7 @@ $action_button = [
 				<div class="an-component-body">
 					<div class="an-helper-block">
 						<div class="an-scrollable-x">
-							<table class="table table-striped">
+							<table class="table table-striped table-step">
 								<thead>
 									<tr>
 										<th><?php e(lang('ac_key'))?></th>
@@ -123,8 +122,7 @@ $action_button = [
 				<div class="an-component-body">
 					<div class="an-helper-block">
 						<div class="an-input-group">
-							<div class="an-input-group-addon"><i class="ion-ios-search"></i></div>
-							<input type="text" id="team-member" class="select-member an-tags-input" placeholder="<?php e(lang('ac_add_team_member'))?>" value="<?php echo implode(',', $invited_members) ?> ">
+							<input type="text" id="team-member" class="select-member select-member-no-border an-tags-input" placeholder="<?php e(lang('ac_add_team_member'))?>" value="<?php echo implode(',', $invited_members) ?> ">
 						</div>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
@@ -148,4 +146,12 @@ $action_button = [
 				</div> <!-- end .AN-COMPONENT-BODY -->
 			</div> <!-- end .AN-SINGLE-COMPONENT  -->
 		</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
 </div>

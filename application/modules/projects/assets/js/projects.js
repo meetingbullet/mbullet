@@ -21,7 +21,6 @@ $(document).ready(function() {
         // Since serialize does not include form's action button, 
         // we need to add it on our own.
         data += '&' + $(e.target).find('[type="submit"]').attr('name') + '=';
-        console.log(data);
 
         $.ajax({
             type: "POST",

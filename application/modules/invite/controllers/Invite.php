@@ -26,6 +26,7 @@ class Invite extends Authenticated_Controller
 		$this->user_invite_model
 				->select('o.name AS organization_name, CONCAT(u.first_name, " ", u.last_name) AS inviter_name, 
 							u.avatar AS inviter_avatar, u1.avatar AS my_avatar, 
+							u.email AS inviter_email, u1.email AS my_email, 
 							invite_role, o.organization_id, status,
 							IF(uto.organization_id IS NULL, 0, 1) AS is_in_current_organization', false)
 				->join('organizations o', 'user_invite.organization_id = o.organization_id')

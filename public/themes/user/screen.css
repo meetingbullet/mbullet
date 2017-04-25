@@ -79,16 +79,6 @@ label>.required {
 }
 
 /* Selectize for picking members */
-.select-member {
-	border: none !important;
-	margin-bottom: 0 !important;
-}
-
-.select-member .selectize-input > * {
-	display: block !important;
-	margin-bottom: 10px !important; 
-}
-
 .select-member .selectize-input > input {
 	width: 100% !important;
 	border-bottom: 2px solid #f2f2f2 !important;
@@ -99,7 +89,9 @@ label>.required {
 }
 
 .select-member.multi .selectize-input > div {
+	display: block !important;
 	background: transparent !important;
+	margin-bottom: 10px !important; 
 }
 
 .select-member.plugin-remove_button [data-value] .remove {
@@ -115,6 +107,23 @@ label>.required {
 	background-color: #fffae9 !important;
 }
 
+.an-tags-input .selectize-input {
+	background: transparent !important;
+}
+
+.an-tags-input {
+	background: white;
+}
+
+.select-member-no-border {
+	border: none !important;
+	margin-bottom: 0 !important;
+}
+
+.an-tags-input.danger {
+	background-color: #FDEEF2;
+	border: 1px solid rgba(235, 84, 124, 0.2);
+}
 
 @media (max-width: 767px) {
 	body {
