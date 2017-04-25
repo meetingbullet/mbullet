@@ -1,20 +1,15 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Step_model extends BF_Model
+class Step_member_model extends BF_Model
 {
-	protected $table_name	= 'steps';
+	protected $table_name	= 'step_members';
 	protected $key			= 'step_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;
-	protected $set_created	= true;
-	protected $set_modified = true;
+	protected $set_created	= false;
+	protected $set_modified = false;
 	protected $soft_deletes	= false;
-
-	protected $created_field	 = 'created_on';
-	protected $modified_field	 = 'modified_on';
-	protected $created_by_field	 = 'created_by';
-	protected $modified_by_field	 = 'modified_by';
 
 	// Customize the operations of the model without recreating the insert,
 	// update, etc. methods by adding the method names to act as callbacks here.
@@ -54,38 +49,5 @@ class Step_model extends BF_Model
 	public function __construct()
 	{
 		parent::__construct();
-	}
-
-	public function get_step_id($step_key, $current_user)
-	{
-		if (! class_exists('Role_model')) {
-			$this->load->model('roles/role_model');
-		}
-
-		// check user is organization owner or not
-		$is_owner = $this->role_model->where('role_id', $current_user->role_ids[$current_user->current_organization_id])
-									->count_by('is_public', 1) == 1 ? true : false;
-		// get project id
-		if ($is_owner) {
-			$step = $this->select('steps.step_id')
-							->join('actions a', 'a.action_id = steps.action_id', 'inner')
-							->join('projects p', 'p.project_id = a.project_id', 'inner')
-							->where('p.organization_id', $current_user->current_organization_id)
-							->find_by('steps.step_key', $step_key);
-		} else {
-			$step = $this->select('steps.step_id')
-							->join('step_members sm', 'sm.step_id = steps.step_id', 'inner')
-							->join('actions a', 'a.action_id = steps.action_id', 'inner')
-							->join('projects p', 'p.project_id = a.project_id', 'inner')
-							->where('projects.organization_id', $current_user->current_organization_id)
-							->where('sm.user_id', $current_user->user_id)
-							->find_by('steps.step_key', $step_key);
-		}
-
-		if (! empty($step)) {
-			return $step->step_id;
-		}
-
-		return false;
 	}
 }
