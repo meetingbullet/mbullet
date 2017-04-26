@@ -703,7 +703,7 @@ class Users extends Front_Controller
 			}
 		} else {
 			Template::set_message(lang('us_account_active'), 'success');
-			redirect('/login');
+			redirect(LOGIN_URL);
 		}
 		Template::render('account');
 	}
