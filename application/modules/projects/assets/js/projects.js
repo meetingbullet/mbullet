@@ -44,8 +44,10 @@ $(document).ready(function() {
                         z_index: 1051
                     });
 
-					if ($('#board').length && data.message_type == 'success') {
-						refresh_action_board();
+					if (data.message_type == 'success') {
+                        setTimeout(function() {
+                            location.reload();
+                        }, 700);
 					}
                 }
             }

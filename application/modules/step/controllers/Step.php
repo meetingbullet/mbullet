@@ -139,11 +139,7 @@ class Step extends Authenticated_Controller
 		$project_key = explode('-', $step_key);
 		$project_key = $project_key[0];
 
-		$project_members = $this->project_member_model->select('u.user_id, email, first_name, last_name, avatar')
-													->join('users u', 'u.user_id = project_members.user_id')
-													->join('projects p', 'p.project_id = project_members.project_id')
-													->where('p.cost_code', $project_key)
-													->find_all();
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 
 		Template::set('project_members', $project_members);
 		Assets::add_js($this->load->view('create_js', [
