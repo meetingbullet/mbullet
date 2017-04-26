@@ -69,11 +69,6 @@ class Project_expectation_model extends BF_Model
             'field' => 'outcomes_per_period',
             'label' => 'lang:pj_outcomes_per_period',
             'rules' => 'numeric|required|max_length[11]',
-        ),
-        array(
-            'field' => 'period_type',
-            'label' => 'lang:pj_period',
-            'rules' => 'required',
         )
     );
 	protected $insert_validation_rules  = array();

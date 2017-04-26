@@ -6,7 +6,7 @@ $(document).ready(function() {
         $.get(CREATE_PROJECT_URL, (data) => {
             data = JSON.parse(data);
             $('#bigModal .modal-content').html(data.modal_content);
-            $('#bigModal').modal();
+            $('#bigModal').modal({backdrop: "static"});
         });
 
     });
@@ -17,7 +17,7 @@ $(document).ready(function() {
         $.get(INVITE_USER_URL, (data) => {
             data = JSON.parse(data);
             $('#inviteModal .modal-content').html(data.modal_content);
-            $('#inviteModal').modal();
+            $('#inviteModal').modal({backdrop: "static"});
         });
 
     });
