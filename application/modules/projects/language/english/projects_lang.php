@@ -21,6 +21,7 @@ $lang['pj_back'] = 'Back';
 // Messages
 $lang['pj_project_successfully_created'] = 'Project successfully created';
 $lang['pj_there_was_a_problem_while_creating_project'] = 'There was a problem while creating project';
+$lang['pj_duplicated_cost_code'] = 'Duplicated cost code';
 
 // Fields
 $lang['pj_project_name'] 			= 'Project name';
