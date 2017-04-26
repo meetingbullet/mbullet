@@ -33,7 +33,7 @@ if (! is_null($this->uri->segment(1))) {
 			break;
 		case 'step':
 			$action = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
-			$project = substr($project, 0, strrpos($project, '-'));
+			$project = substr($action, 0, strrpos($action, '-'));
 
 			$breadcrumb[] = [
 				'name' => $project,
