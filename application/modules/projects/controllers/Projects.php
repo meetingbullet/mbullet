@@ -88,6 +88,8 @@ class Projects extends Authenticated_Controller
 		));
 
 		if ($this->form_validation->run() === false) {
+			dump(validation_errors()); die;
+			logit('form_validation false');
 			return false;
 		}
 
@@ -99,6 +101,7 @@ class Projects extends Authenticated_Controller
 			$project_id = $this->project_model->insert($project_data);
 
 			if ($project_id === false) {
+				logit('project_id false');
 				return false;
 			}
 
