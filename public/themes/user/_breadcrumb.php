@@ -32,13 +32,14 @@ if (! is_null($this->uri->segment(1))) {
 			];
 			break;
 		case 'step':
-			$project = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
+			$action = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
+			$project = substr($action, 0, strrpos($action, '-'));
+
 			$breadcrumb[] = [
 				'name' => $project,
 				'path' => 'projects/' . $project
 			];
 
-			$action = substr($project, 0, strrpos($project, '-'));
 			$breadcrumb[] = [
 				'name' => $action,
 				'path' => 'action/' . $action
@@ -50,19 +51,20 @@ if (! is_null($this->uri->segment(1))) {
 			];
 			break;
 		case 'task':
-			$project = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
+			$step = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
+			$action = substr($step, 0, strrpos($step, '-'));
+			$project = substr($action, 0, strrpos($action, '-'));
+
 			$breadcrumb[] = [
 				'name' => $project,
 				'path' => 'projects/' . $project
 			];
 
-			$action = substr($project, 0, strrpos($project, '-'));
 			$breadcrumb[] = [
 				'name' => $action,
 				'path' => 'action/' . $action
 			];
 
-			$step = substr($action, 0, strrpos($action, '-'));
 			$breadcrumb[] = [
 				'name' => $step,
 				'path' => 'step/' . $step

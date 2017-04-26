@@ -37,7 +37,9 @@ $lang['not_valid_members'] = 'One or more members in resource list is invalid.';
 $lang['create_success'] = 'Create action successfully.';
 $lang['unable_add_action_members'] = 'Unable to add action members.';
 $lang['unable_create_action'] = 'Unable to create action.';
+$lang['unable_update_action'] = 'Unable to update action.';
 $lang['ac_invalid_action_key'] = 'Invalid action key';
+$lang['update_success'] = 'Update action successfully.';
 
 // Field
 $lang['ac_detail'] = 'Detail';
@@ -54,6 +56,9 @@ $lang['ac_add_team_member'] = '+ Add team member';
 $lang['ac_date'] = 'Date';
 $lang['ac_created'] = 'Created';
 $lang['ac_updated'] = 'Updated';
+$lang['ac_update'] = 'Update';
+$lang['ac_update'] = 'Update';
+$lang['ac_update_action'] = 'Update Action';
 
 // Action
 $lang['ac_add_step'] = 'Add Step';
