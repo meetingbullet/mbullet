@@ -44,7 +44,7 @@ $project_key = $project_key['0'];
 <?php echo form_open() ?>
 <div class="btn-block">
 	<?php echo anchor(site_url('projects/' . $project_key), '<i class="ion-android-arrow-back"></i> ' . lang('ac_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
-	<a href='#' class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('ac_edit')?></a>
+	<a data-toggle="modal" data-target="#bigModal" id="update-action" data-update-action-url="<?php echo site_url('action/create/' . $project_key . '/' . $action_key) ?>" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('ac_edit')?></a>
 
 	<button name='update' class='an-btn <?php echo $action_button[$action->status][0] ?>' <?php echo $action->status == 'resolved' ? ' disabled' : ''?>>
 		<i class="ion-ios-play"></i> <?php echo lang($action_button[$action->status][1])?>
@@ -167,7 +167,7 @@ $project_key = $project_key['0'];
 </div>
 
 <!-- Modal -->
-<div class="modal fade" tabindex="-1" role="dialog">
+<div class="modal fade" id="bigModal" tabindex="-1" role="dialog" aria-labelledby="bigModalLabel">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
