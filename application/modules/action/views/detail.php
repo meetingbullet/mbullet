@@ -78,7 +78,7 @@ $project_key = $project_key['0'];
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_point_used'))?></div>
-							<div class="col-xs-8"><?php e('0')?></div>
+							<div class="col-xs-8"><?php e($action->point_used)?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_avarage_stars'))?></div>

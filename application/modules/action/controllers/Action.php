@@ -47,7 +47,7 @@ class Action extends Authenticated_Controller
 									->join('project_members pm', 'pm.project_id = actions.project_id AND pm.user_id = ' . $this->current_user->user_id, 'LEFT')
 									->limit(1)
 									->find_by('action_key', $action_key);
-									
+
 		/*
 			Permission to access this page:
 			User must be in the project member or is project owner
@@ -56,6 +56,14 @@ class Action extends Authenticated_Controller
 			Template::set_message(lang('ac_invalid_action_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+
+		$point_used = $this->step_model->select('SUM(cost_of_time) AS point_used', false)
+													->join('step_members sm', 'steps.step_id = sm.step_id')
+													->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
+													->where('action_id', $action->action_id)
+													->find_all();
+
+		$action->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
 
 		if (isset($_POST['update'])) {
 			$next_status = 'resolved';
