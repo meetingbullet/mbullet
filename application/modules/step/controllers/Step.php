@@ -51,8 +51,8 @@ class Step extends Authenticated_Controller
 			$data['action_id'] = $action->action_id;
 			$data['created_by'] = $this->current_user->user_id;
 
-			$this->load->library('key');
-			$data['step_key'] = 'TEST_KEY';
+			$this->load->library('project');
+			$data['step_key'] = $this->project->get_next_key($action_key);
 
 			if ($id = $this->step_model->insert($data)) {
 				Template::set('close_modal', 1);

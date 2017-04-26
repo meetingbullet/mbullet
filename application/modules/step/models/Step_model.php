@@ -55,7 +55,7 @@ class Step_model extends BF_Model
 		)
 	);
 	protected $insert_validation_rules  = array();
-	protected $skip_validation	= true;
+	protected $skip_validation	= false;
 
 	/**
 	 * Constructor

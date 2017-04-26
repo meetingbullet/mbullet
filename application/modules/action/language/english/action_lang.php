@@ -10,7 +10,7 @@ $lang['ac_owner_id'] = 'Owner';
 $lang['ac_action_status'] = 'Status';
 $lang['ac_action_type'] = 'Type';
 $lang['ac_success_condition'] = 'Success condition';
-$lang['ac_point_value_defined'] = 'Point value defined';
+$lang['ac_point_value'] = 'Point value';
 $lang['ac_point_used'] = 'Point used';
 $lang['ac_avarage_stars'] = 'Avarage stars';
 $lang['ac_create'] = 'Create';
@@ -25,6 +25,8 @@ $lang['ac_prioritize'] = 'Prioritize';
 $lang['ac_assess'] = 'Assess';
 $lang['ac_review'] = 'Review';
 $lang['ac_resource'] = 'Resource';
+
+
 // error
 $lang['not_valid_owner'] = 'This owner does not exist.';
 $lang['not_valid_members'] = 'One or more members in resource list is invalid.';
