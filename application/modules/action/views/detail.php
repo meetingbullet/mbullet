@@ -105,14 +105,14 @@ $project_key = $project_key['0'];
 									</tr>
 								</thead>
 								<tbody>
-									<?php foreach ($steps as $step): ?>
+									<?php if ($steps): foreach ($steps as $step): ?>
 									<tr>
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->step_key)?></td>
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name)?></td>
 										<td><?php e($step->owner_name)?></td>
 										<td><?php e($step->status)?></td>
 									</tr>
-									<?php endforeach; ?>
+									<?php endforeach; endif;?>
 								</tbody>
 							</table>
 						</div>
@@ -131,7 +131,7 @@ $project_key = $project_key['0'];
 				<div class="an-component-body">
 					<div class="an-helper-block">
 						<ul class="list-unstyled list-member">
-							<?php foreach ($invited_members as $user): 
+							<?php if ($invited_members): foreach ($invited_members as $user): 
 								$user->avatar = avatar_url($user->avatar, $user->email);
 							?>
 							<li>
@@ -140,7 +140,7 @@ $project_key = $project_key['0'];
 
 								<span class="badge badge-<?php e($cost_of_time_to_badge[$user->cost_of_time])?> badge-bordered pull-right"><?php e($user->cost_of_time_name)?></span>
 							</li>
-							<?php endforeach; ?>
+							<?php endforeach; endif; ?>
 						</ul>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
