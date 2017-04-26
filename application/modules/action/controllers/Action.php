@@ -56,7 +56,13 @@ class Action extends Authenticated_Controller
 			if ($action->status == 'open') $next_status = 'inprogress';
 			if ($action->status == 'inprogress') $next_status = 'ready';
 
+
 			$this->action_model->update($action->action_id, ['status' => $next_status]);
+
+			$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+									->join('users u', 'u.user_id = actions.owner_id')
+									->limit(1)
+									->find_by('action_key', $action_key);
 		}
 
 		$steps = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
@@ -66,13 +72,33 @@ class Action extends Authenticated_Controller
 									->order_by('status')
 									->find_all();
 
-		$invited_members =  $this->action_member_model->select('user_id')->where('action_id', $action->action_id)->find_all();
-		$invited_members = is_array($invited_members) ? array_column($invited_members, 'user_id') : [];
+		$invited_members =  $this->user_model
+								->select('uto.user_id, email, CONCAT(first_name, " ", last_name) AS name,
+									avatar, cost_of_time, 
+									IF(
+										uto.cost_of_time = 1, 
+										p.cost_of_time_1,
+										IF(
+											uto.cost_of_time = 2, 
+											p.cost_of_time_2,
+											IF(
+												uto.cost_of_time = 3, 
+												p.cost_of_time_3,
+												IF(
+													uto.cost_of_time = 4, 
+													p.cost_of_time_4,
+													p.cost_of_time_5
+												)
+											)
+										)
+									) AS cost_of_time_name', false)
+									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id)
+									->join('projects p', 'p.project_id = ' . $action->project_id)
+									->order_by('name')
+									->order_by('uto.cost_of_time', 'DESC')
+									->find_all();
 
-		$oragnization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 		Assets::add_js($this->load->view('detail_js', [
-			'oragnization_members' => $oragnization_members,
-			'invited_members' => $invited_members,
 			'action_key' => $action_key,
 			'action' => $action
 		], true), 'inline');

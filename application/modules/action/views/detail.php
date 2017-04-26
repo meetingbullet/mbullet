@@ -1,5 +1,14 @@
 <?php 
 
+$cost_of_time_to_badge = [
+	'', // Skip cost_of_time_to_badge[0]
+	'default',	// XS
+	'primary',	// S
+	'success',		// M
+	'info',	// L
+	'warning',	// XL
+];
+
 $action_button = [
 	'open' => [
 		'an-btn-primary',
@@ -17,8 +26,7 @@ $action_button = [
 		'an-btn-danger-transparent',
 		'ac_resolved'
 	]
-]
-
+];
 ?>
 
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
@@ -53,27 +61,23 @@ $action_button = [
 						</div>
 						<div class="row">
 							<div class="col-md-4"><?php e(lang('ac_success_condition'))?></div>
-							<div class="col-md-8"><?php e($action->success_condition)?></div>
+							<div class="col-md-8"><?php e(lang('ac_' . $action->success_condition))?></div>
 						</div>
 						<div class="row">
 							<div class="col-md-4"><?php e(lang('ac_type'))?></div>
-							<div class="col-md-8"><?php e($action->action_type)?></div>
+							<div class="col-md-8"><?php e(lang('ac_' . $action->action_type))?></div>
 						</div>
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_component_steps'))?></div>
-							<div class="col-md-8"><?php e($action->success_condition)?></div>
-						</div>
-						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_point_value_defined'))?></div>
-							<div class="col-md-8"><?php e($action->point_value_defined)?></div>
+							<div class="col-md-4"><?php e(lang('ac_point_value'))?></div>
+							<div class="col-md-8"><?php e($action->point_value)?></div>
 						</div>
 						<div class="row">
 							<div class="col-md-4"><?php e(lang('ac_point_used'))?></div>
-							<div class="col-md-8"><?php e($action->point_used)?></div>
+							<div class="col-md-8"><?php e('[calc_from_step]')?></div>
 						</div>
 						<div class="row">
 							<div class="col-md-4"><?php e(lang('ac_avarage_stars'))?></div>
-							<div class="col-md-8"><?php e($action->avarage_stars)?></div>
+							<div class="col-md-8"><?php e('[calc_from_step]')?></div>
 						</div>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
@@ -121,9 +125,18 @@ $action_button = [
 				</div>
 				<div class="an-component-body">
 					<div class="an-helper-block">
-						<div class="an-input-group">
-							<input type="text" id="team-member" class="select-member select-member-no-border an-tags-input" placeholder="<?php e(lang('ac_add_team_member'))?>" value="<?php echo implode(',', $invited_members) ?> ">
-						</div>
+						<ul class="list-unstyled list-member">
+							<?php foreach ($invited_members as $user): 
+								$user->avatar = avatar_url($user->avatar, $user->email);
+							?>
+							<li>
+								<div class="avatar" style="background-image: url('<?php echo $user->avatar ?>')"></div>
+								<?php e($user->name)?>
+
+								<span class="badge badge-<?php e($cost_of_time_to_badge[$user->cost_of_time])?> badge-bordered pull-right"><?php e($user->cost_of_time_name)?></span>
+							</li>
+							<?php endforeach; ?>
+						</ul>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
 			</div> <!-- end .AN-SINGLE-COMPONENT  -->

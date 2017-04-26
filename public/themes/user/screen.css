@@ -125,6 +125,27 @@ label>.required {
 	border: 1px solid rgba(235, 84, 124, 0.2);
 }
 
+.list-member li {
+	margin-bottom: 10px;
+}
+
+.list-member li:last-child {
+	margin-bottom: 0;
+}
+
+.list-member .avatar {
+	width: 25px;
+	height: 25px;
+}
+
+.form-ajax {
+	line-height: 34px;
+}
+
+.form-ajax .an-form-control, .form-ajax .selectize-control{
+	line-height: 15px;
+}
+
 @media (max-width: 767px) {
     body {
         padding-right: 0;
