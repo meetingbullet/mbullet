@@ -87,3 +87,29 @@
 	box-shadow: none;
 	font-size: 25px;
 }
+
+.pj-detail {
+	overflow: hidden;
+	height: 100%;
+}
+
+.pj-detail-item {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.pj-detail-item:nth-child(2n + 1) {
+	clear: both;
+}
+
+.an-page-title {
+	width: 100%;
+}
+
+.an-page-title h2 {
+	display: table;
+}
+
+#back-btn {
+	float: right;
+}

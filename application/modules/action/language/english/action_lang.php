@@ -56,3 +56,4 @@ $lang['ac_start_action'] = 'Start Action';
 $lang['ac_ready'] = 'Ready to review';
 $lang['ac_resolve'] = 'Resolve';
 $lang['ac_resolved'] = 'Resolved';
+$lang['ac_action_name'] = 'Name';
