@@ -131,23 +131,30 @@ class Projects extends Authenticated_Controller
 									->where_in('email', $invited_team)
 									->find_all();
 
-			foreach ($invited_team as $email) {
-				foreach ($registered_users as $user) {
-					$is_found = false;
-
-					if ($user->email == $email) {
-						$project_members[$user->user_id] = [
-							'project_id' => $project_id,
-							'user_id' => $user->user_id
-						];
-
-						$is_found = true;
-						break;
+			if ($invited_team) {
+				foreach ($invited_team as $email) {
+					if (! $registered_users) {
+						// $this->invitation->generate($email, $this->current_user);
+						continue;
 					}
 
-					// Invite to the party
-					if ( ! $is_found) {
-						// $this->invitation->generate($email, $this->current_user);
+					foreach ($registered_users as $user) {
+						$is_found = false;
+
+						if ($user->email == $email) {
+							$project_members[$user->user_id] = [
+								'project_id' => $project_id,
+								'user_id' => $user->user_id
+							];
+
+							$is_found = true;
+							break;
+						}
+
+						// Invite to the party
+						if ( ! $is_found) {
+							// $this->invitation->generate($email, $this->current_user);
+						}
 					}
 				}
 			}
