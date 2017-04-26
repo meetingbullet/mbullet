@@ -56,7 +56,9 @@ $(document).ready(function() {
 
                     if (data.message_type == 'success') {
                         // @TODO Refresh Step list
-                        location.reload();
+                        setTimeout(function() {
+                            location.reload();
+                        }, 700);
                     }
                 }
             }
