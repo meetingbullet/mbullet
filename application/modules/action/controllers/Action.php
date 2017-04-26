@@ -111,6 +111,8 @@ class Action extends Authenticated_Controller
 			'action' => $action
 		], true), 'inline');
 
+		Assets::add_module_js('action', 'detail.js');
+		Assets::add_module_js('project', 'project.js');
 		Template::set('invited_members', $invited_members);
 		Template::set('action_key', $action_key);
 		Template::set('action', $action);
@@ -119,9 +121,8 @@ class Action extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function create($project_key = null)
+	public function create($project_key = null, $action_key = null)
 	{
-
 		if (empty($project_key)) {
 			redirect('/dashboard');
 		}
@@ -129,6 +130,23 @@ class Action extends Authenticated_Controller
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		if ($project_id === false) {
 			redirect('/dashboard');
+		}
+
+		if(! empty($action_key)) {
+			$action = $this->action_model->get_action_by_key($action_key, $this->current_user, 'actions.*');//dump($action);
+			if ($action !== false) {
+				$action->members = $this->action_member_model->select('user_id')->find_all_by('action_id', $action->action_id);
+				if (! empty($action->members)) {
+					$members = [];
+					foreach ($action->members as $member) {
+						$members[] = $member->user_id;
+					}
+					$action->members = implode(',', $members);
+				} else {
+					$action->members = '';
+				}
+				Template::set('action', $action);
+			}
 		}
 
 		$project_members = $this->project_member_model->select('u.user_id, email, first_name, last_name, avatar')
@@ -145,13 +163,17 @@ class Action extends Authenticated_Controller
 		if ($this->input->post()) {
 			// generate action key
 			$this->load->library('project');
-			$_POST['action_key'] = $this->project->get_next_key($project_key);
+			if(empty($action_key)) {
+				$_POST['action_key'] = $this->project->get_next_key($project_key);
+			} else {
+				$_POST['action_key'] = $action->action_key;
+			}
 			$_POST['project_id'] = $project_id;
 			// validate owner_id and resource id
 			if (trim($this->input->post('owner_id')) != '') {
 				$valid_owner_id = $this->db->select('COUNT(*) as count')
-										->from('project_members')
-										->where('project_id', $project_id)
+										->from('user_to_organizations')
+										->where('organization_id', $this->current_user->current_organization_id)
 										->where('user_id', $this->input->post('owner_id'))
 										->get()->row()->count > 0 ? true : false;
 				if (! $valid_owner_id) {
@@ -190,30 +212,61 @@ class Action extends Authenticated_Controller
 				}
 
 				try {
-					$action_id = $this->action_model->insert($data);
-					if (!$action_id) {
-						logit('line 99: unable to insert data to table mb_actions');
-						throw new Exception(lang('unable_create_action'));
-					}
+					if (empty($action_key)) {
+						$action_id = $this->action_model->insert($data);
+						if (!$action_id) {
+							logit('line 99: unable to insert data to table mb_actions');
+							throw new Exception(lang('unable_create_action'));
+						}
 
-					if ($team = $this->input->post('team')) {
-						if ($team = explode(',', $team)) {
-							$member_data = [];
-							foreach ($team as $member) {
-								$member_data[] = [
-									'action_id' => $action_id,
-									'user_id' => $member
-								];
+						if ($team = $this->input->post('team')) {
+							if ($team = explode(',', $team)) {
+								$member_data = [];
+								foreach ($team as $member) {
+									$member_data[] = [
+										'action_id' => $action_id,
+										'user_id' => $member
+									];
+								}
+
+								$inserted = $this->action_member_model->insert_batch($member_data);
+								if (! $inserted) {
+									logit('line 210: unable to add action members');
+									throw new Exception(lang('unable_add_action_members'));
+								}
 							}
+						}
+					} else {
+						$updated = $this->action_model->update($action->action_id, $data);
+						if (!$updated) {
+							logit('line 99: unable to update data to table mb_actions');
+							throw new Exception(lang('unable_update_action'));
+						}
 
-							$this->action_member_model->insert_batch($member_data);
+						if ($team = $this->input->post('team')) {
+							if ($team = explode(',', $team)) {
+								$member_data = [];
+								foreach ($team as $member) {
+									$member_data[] = [
+										'action_id' => $action->action_id,
+										'user_id' => $member
+									];
+								}
+
+								$this->action_member_model->delete_where(['action_id' => $action->action_id]);
+								$inserted = $this->action_member_model->insert_batch($member_data);
+								if (! $inserted) {
+									logit('line 210: unable to add action members');
+									throw new Exception(lang('unable_add_action_members'));
+								}
+							}
 						}
 					}
 				} catch (Exception $e) {
 					$form_error['other_error'] = $e->getMessage;
 				}
 			} else {
-				$form_error = array_merge($form_error, $this->form_validation->error_array());
+				$form_error = array_merge($form_error, $this->form_validation->error_array());dump($form_error);
 			}
 
 			if (count($form_error) > 0) {
@@ -231,10 +284,10 @@ class Action extends Authenticated_Controller
 				}
 			} else {
 				if (! $this->input->is_ajax_request()) {
-						Template::set_message(lang('create_success'), 'success');
+						Template::set_message(empty($action_key) ? lang('create_success') : lang('update_success'), 'success');
 				} else {
 					Template::set('message_type', 'success');
-					Template::set('message', lang('create_success'));
+					Template::set('message', empty($action_key) ? lang('create_success') : lang('update_success'));
 					Template::set('content', '');
 				}
 			}
