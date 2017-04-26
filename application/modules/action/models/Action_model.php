@@ -114,13 +114,10 @@ class Action_model extends BF_Model
 							->find_by('actions.action_key', $action_key);
 		} else {
 			$action = $this->select($select)
-							->join('action_members am', 'am.action_id = actions.action_id', 'inner')
+							->join('action_members am', 'am.action_id = actions.action_id', 'left')
 							->join('projects p', 'p.project_id = actions.project_id', 'inner')
 							->where('p.organization_id', $current_user->current_organization_id)
-							->group_start()
-								->where('am.user_id', $current_user->user_id)
-								->or_where('actions.owner_id', $current_user->user_id)
-							->group_end()
+							->where('(am.user_id = \'' . $current_user->user_id . '\' OR actions.owner_id = \'' . $current_user->user_id . '\')')
 							->find_by('actions.action_key', $action_key);
 		}
 

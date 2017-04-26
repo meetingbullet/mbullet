@@ -306,12 +306,12 @@ class Step extends Authenticated_Controller
 			'open' => [
 				'icon' => 'ion-ios-play',
 				'label' => lang('st_start_step'),
-				'next_status' => 'in-progress',
+				'next_status' => 'inprogress',
 			],
 			'in-progress' => [
 				'icon' => 'ion-android-done',
 				'label' => lang('st_ready'),
-				'next_status' => 'ready-for-review',
+				'next_status' => 'ready',
 			],
 			'ready-for-review' => [
 				'icon' => 'ion-android-done-all',
@@ -326,13 +326,13 @@ class Step extends Authenticated_Controller
 		];
 
 		$status = $this->input->get('status');
-		$updated = $this->step_model->update($step_id, [
+		$updated = $this->step_model->skip_validation(true)->update($step_id, [
 										'status' => $status
 									]);
 		if (! $updated) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_update_status_fail')
+				'message' => $status//lang('st_update_status_fail')
 			]);
 			exit;
 		}
