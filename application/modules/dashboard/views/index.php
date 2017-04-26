@@ -9,7 +9,7 @@
 		</div>
 	</div>
 	<div class="an-component-body">
-		<div class="an-user-lists messages">
+		<div class="an-user-lists">
 			<div class="list-title">
 				<h6 class="basis-10">
 					<span class="an-custom-checkbox">
@@ -25,7 +25,7 @@
 				<h6 class="basis-20">Created on</h6>
 			</div>
 
-			<div class="an-lists-body an-customScrollbar ps-container ps-theme-default ps-active-y">
+			<div class="an-lists-body">
 				<?php foreach($projects as $project): ?>
 				<div class="list-user-single">
 					<div class="list-name basis-10">

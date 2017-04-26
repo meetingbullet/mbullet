@@ -146,6 +146,10 @@ label>.required {
 	line-height: 15px;
 }
 
+.an-user-lists .an-lists-body {
+	max-height: none !important; 
+}
+
 @media (max-width: 767px) {
 	body {
 		padding-right: 0;

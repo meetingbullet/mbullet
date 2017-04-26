@@ -217,7 +217,7 @@
 				options: [
 					<?php foreach($invite_emails as $user): 
 						if (strstr($user->avatar, 'http') === false) {
-							$user->avatar = img_path() . 'users/' . $user->avatar;
+							$user->avatar = avatar_url($user->avatar, $user->email);
 						}
 					?>
 					{email: '<?php e($user->email)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
