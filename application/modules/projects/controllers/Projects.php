@@ -9,6 +9,7 @@ class Projects extends Authenticated_Controller
 		$this->load->library('form_validation');
 		$this->load->library('invite/invitation');
 		$this->load->helper('mb_form_helper');
+		$this->load->helper('mb_general');
 		$this->load->model('users/user_model');
 		$this->load->model('project_model');
 		$this->load->model('project_constraint_model');
