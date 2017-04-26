@@ -40,7 +40,8 @@ $action_button = [
 </div> <!-- end AN-BODY-TOPBAR -->
 <?php echo form_open() ?>
 <div class="btn-block">
-	<?php echo anchor('#', '<i class="ion-edit"></i> ' . lang('ac_edit'), ['class' => 'an-btn an-btn-primary']) ?>
+	<a href='#' class='an-btn an-btn-primary'><i class="ion-ios-play"></i> <?php echo lang('ac_edit')?></a>
+
 	<button name='update' class='an-btn <?php echo $action_button[$action->status][0] ?>' <?php echo $action->status == 'resolved' ? ' disabled' : ''?>>
 		<i class="ion-ios-play"></i> <?php echo lang($action_button[$action->status][1])?>
 	</button>
@@ -56,28 +57,28 @@ $action_button = [
 				<div class="an-component-body">
 					<div class="an-helper-block action-detail">
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_owner'))?></div>
-							<div class="col-md-8"><?php e($action->owner_name)?></div>
+							<div class="col-xs-4"><?php e(lang('ac_owner'))?></div>
+							<div class="col-xs-8"><?php e($action->owner_name)?></div>
 						</div>
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_success_condition'))?></div>
-							<div class="col-md-8"><?php e(lang('ac_' . $action->success_condition))?></div>
+							<div class="col-xs-4"><?php e(lang('ac_success_condition'))?></div>
+							<div class="col-xs-8"><?php e(lang('ac_' . $action->success_condition))?></div>
 						</div>
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_type'))?></div>
-							<div class="col-md-8"><?php e(lang('ac_' . $action->action_type))?></div>
+							<div class="col-xs-4"><?php e(lang('ac_type'))?></div>
+							<div class="col-xs-8"><?php e(lang('ac_' . $action->action_type))?></div>
 						</div>
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_point_value'))?></div>
-							<div class="col-md-8"><?php e($action->point_value)?></div>
+							<div class="col-xs-4"><?php e(lang('ac_point_value'))?></div>
+							<div class="col-xs-8"><?php e($action->point_value)?></div>
 						</div>
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_point_used'))?></div>
-							<div class="col-md-8"><?php e('[calc_from_step]')?></div>
+							<div class="col-xs-4"><?php e(lang('ac_point_used'))?></div>
+							<div class="col-xs-8"><?php e('')?></div>
 						</div>
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_avarage_stars'))?></div>
-							<div class="col-md-8"><?php e('[calc_from_step]')?></div>
+							<div class="col-xs-4"><?php e(lang('ac_avarage_stars'))?></div>
+							<div class="col-xs-8"><?php e('')?></div>
 						</div>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
@@ -102,8 +103,8 @@ $action_button = [
 								<tbody>
 									<?php foreach ($steps as $step): ?>
 									<tr>
-										<td><?php e(sprintf(lang('ac_step_key'), $step->step_key))?></td>
-										<td><?php e($step->name)?></td>
+										<td><?php echo anchor(site_url('step/' . $step->step_key), sprintf(lang('ac_step_key'), $step->step_key))?></td>
+										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name)?></td>
 										<td><?php e($step->owner_name)?></td>
 										<td><?php e($step->status)?></td>
 									</tr>
@@ -148,12 +149,12 @@ $action_button = [
 				<div class="an-component-body">
 					<div class="an-helper-block action-detail">
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_created'))?></div>
-							<div class="col-md-8"><?php e($action->created_on)?></div>
+							<div class="col-xs-4"><?php e(lang('ac_created'))?></div>
+							<div class="col-xs-8"><?php e($action->created_on)?></div>
 						</div>
 						<div class="row">
-							<div class="col-md-4"><?php e(lang('ac_updated'))?></div>
-							<div class="col-md-8"><?php e($action->modified_on)?></div>
+							<div class="col-xs-4"><?php e(lang('ac_updated'))?></div>
+							<div class="col-xs-8"><?php e($action->modified_on)?></div>
 						</div>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
