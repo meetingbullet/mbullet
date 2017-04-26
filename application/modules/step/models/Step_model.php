@@ -88,7 +88,7 @@ class Step_model extends BF_Model
 							->join('step_members sm', 'sm.step_id = steps.step_id', 'inner')
 							->join('actions a', 'a.action_id = steps.action_id', 'inner')
 							->join('projects p', 'p.project_id = a.project_id', 'inner')
-							->where('projects.organization_id', $current_user->current_organization_id)
+							->where('p.organization_id', $current_user->current_organization_id)
 							->where('sm.user_id', $current_user->user_id)
 							->find_by('steps.step_key', $step_key);
 		}
