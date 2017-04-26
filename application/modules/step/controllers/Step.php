@@ -19,6 +19,16 @@ class Step extends Authenticated_Controller
 		Assets::add_module_js('step', 'step.js');
 	}
 
+	public function _remap($method, $params = array())
+	{
+		if (method_exists($this, $method))
+		{
+			return call_user_func_array(array($this, $method), $params);
+		} else {
+			$this->detail($method);
+		}
+	}
+
 	public function index()
 	{
 		Template::render();
@@ -75,8 +85,6 @@ class Step extends Authenticated_Controller
 		}
 
 
-		
-
 		Template::set('oragnization_members', $oragnization_members);
 		Template::set('action_key', $action_key);
 		Template::render();
@@ -104,45 +112,54 @@ class Step extends Authenticated_Controller
 		$this->load->model('projects/project_model');
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 
-		$step = $this->step_model->select('steps.*, CONCAT(u.first_name, u.last_name) as owner_name')
+		$step = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
 								->join('users u', 'u.user_id = steps.owner_id', 'left')
 								->find_by('step_id', $step_id);
 
 		$this->load->model('task/task_model');
-		$tasks = $this->task_model->select('tasks.*, CONCAT(u.first_name, u.last_name) as owner_name')
+		$tasks = $this->task_model->select('tasks.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
 								->join('users u', 'u.user_id = tasks.owner_id', 'left')
 								->where('step_id', $step_id)->find_all();
 
 		if (! class_exists('User_model')) {
 			$this->load->model('users', 'user_model');
 		}
-		$organization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 
-		$step_members = $this->step_member_model->select('user_id')
-												->where('step_id', $step_id)
-												->find_all();
-		$temp = [];
-		foreach ($step_members as $member) {
-			$temp[] = $member->user_id;
-		}
-		$step_members = $temp;
+		$invited_members =  $this->user_model
+								->select('uto.user_id, email, CONCAT(first_name, " ", last_name) AS name,
+									avatar, cost_of_time, 
+									IF(
+										uto.cost_of_time = 1, 
+										p.cost_of_time_1,
+										IF(
+											uto.cost_of_time = 2, 
+											p.cost_of_time_2,
+											IF(
+												uto.cost_of_time = 3, 
+												p.cost_of_time_3,
+												IF(
+													uto.cost_of_time = 4, 
+													p.cost_of_time_4,
+													p.cost_of_time_5
+												)
+											)
+										)
+									) AS cost_of_time_name', false)
+									->join('step_members sm', 'sm.user_id = users.user_id AND sm.step_id = ' . $step_id)
+									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id)
+									->join('projects p', 'p.project_id = ' . $project_id)
+									->order_by('name')
+									->order_by('uto.cost_of_time', 'DESC')
+									->find_all();
 
-		if (! function_exists('avatar_url')) {
-			$this->load->helper('mb_general');
-		}
-
-		Assets::add_module_css('step', 'step.css');
-		Assets::add_module_js('step', 'step.js');
-		Assets::add_js($this->load->view('detail_js', [
-			'organization_members' => $organization_members,
-			'step' => $step
-		], true), 'inline');
-		Template::set('invited_members', $step_members);
+		Assets::add_js($this->load->view('detail_js', null, true), 'inline');
+		Template::set('invited_members', $invited_members);
 		Template::set('step', $step);
 		Template::set('tasks', $tasks);
 		Template::set('project_key', $project_key);
 		Template::set('action_key', $action_key);
 		Template::set('step_key', $step_key);
+		Template::set_view('detail');
 		Template::render();
 	}
 

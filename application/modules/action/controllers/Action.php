@@ -40,12 +40,18 @@ class Action extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+		$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name, pm.user_id AS member_id, p.owner_id AS project_owner_id')
 									->join('users u', 'u.user_id = actions.owner_id')
+									->join('projects p', 'p.project_id = actions.project_id')
+									->join('project_members pm', 'pm.project_id = actions.project_id AND pm.user_id = ' . $this->current_user->user_id, 'LEFT')
 									->limit(1)
 									->find_by('action_key', $action_key);
-
-		if (! $action) {
+									
+		/*
+			Permission to access this page:
+			User must be in the project member or is project owner
+		*/
+		if (! $action || $action->project_owner_id != $this->current_user->user_id && $action->member_id != $this->current_user->user_id) {
 			Template::set_message(lang('ac_invalid_action_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
@@ -92,6 +98,7 @@ class Action extends Authenticated_Controller
 											)
 										)
 									) AS cost_of_time_name', false)
+									->join('action_members am', 'am.user_id = users.user_id AND am.action_id = ' . $action->action_id)
 									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id)
 									->join('projects p', 'p.project_id = ' . $action->project_id)
 									->order_by('name')
