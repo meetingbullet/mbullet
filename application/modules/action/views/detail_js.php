@@ -20,7 +20,7 @@ $('#add-step').click((e) => {
 		data = JSON.parse(data);
 		console.log(data.modal_content);
 		$('.modal .modal-content').html(data.modal_content);
-		$('.modal').modal();
+		$('.modal').modal({backdrop: "static"});
 	});
 
 });
