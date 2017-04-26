@@ -2,6 +2,7 @@
 
 // Genaral
 $lang['st_create_step'] = 'Create Step';
+$lang['st_edit_step'] = 'Edit Step';
 
 // Field
 $lang['st_name'] = 'Name';
@@ -20,9 +21,11 @@ $lang['st_cancel'] = 'Cancel';
 $lang['st_select_team_member'] = 'Select Team Member';
 $lang['st_add_team_member'] = '+ Add Team Member';
 $lang['st_back'] = 'Back';
+$lang['st_update'] = 'Update';
 
 // Message
 $lang['st_step_successfully_created'] = 'Step successfully created';
+$lang['st_step_successfully_updated'] = 'Step successfully updated';
 $lang['st_there_was_a_problem_while_creating_step'] = 'There was a problem while creating step';
 
 // Field
@@ -45,7 +48,11 @@ $lang['st_add_team_member'] = '+ Add team member';
 $lang['st_add_task'] = 'Add Task';
 $lang['st_edit'] = 'Edit';
 $lang['st_start_step'] = 'Start Step';
-$lang['st_ready'] = 'Mark as \'Ready for Review\'';
+$lang['st_open'] = 'Open';
+$lang['st_inprogress'] = 'In progress';
+$lang['st_ready'] = 'Ready';
+$lang['st_resolved'] = 'Resolved';
+$lang['st_mask_as_ready'] = 'Mark as \'Ready for Review\'';
 $lang['st_resolve'] = 'Resolve Step';
 $lang['st_reopen'] = 'Re-open Step';
 $lang['st_update_status_fail'] = 'Unable to update step\'s status.';

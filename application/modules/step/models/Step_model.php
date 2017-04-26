@@ -51,7 +51,7 @@ class Step_model extends BF_Model
 		array(
 			'field' => 'owner_id',
 			'label' => 'lang:st_project_id',
-			'rules' => 'trim|required|numeric',
+			'rules' => 'trim|numeric',
 		)
 	);
 	protected $insert_validation_rules  = array();
@@ -65,38 +65,5 @@ class Step_model extends BF_Model
 	public function __construct()
 	{
 		parent::__construct();
-	}
-
-	public function get_step_id($step_key, $current_user)
-	{
-		if (! class_exists('Role_model')) {
-			$this->load->model('roles/role_model');
-		}
-
-		// check user is organization owner or not
-		$is_owner = $this->role_model->where('role_id', $current_user->role_ids[$current_user->current_organization_id])
-									->count_by('is_public', 1) == 1 ? true : false;
-		// get project id
-		if ($is_owner) {
-			$step = $this->select('steps.step_id')
-							->join('actions a', 'a.action_id = steps.action_id', 'inner')
-							->join('projects p', 'p.project_id = a.project_id', 'inner')
-							->where('p.organization_id', $current_user->current_organization_id)
-							->find_by('steps.step_key', $step_key);
-		} else {
-			$step = $this->select('steps.step_id')
-							->join('step_members sm', 'sm.step_id = steps.step_id', 'inner')
-							->join('actions a', 'a.action_id = steps.action_id', 'inner')
-							->join('projects p', 'p.project_id = a.project_id', 'inner')
-							->where('p.organization_id', $current_user->current_organization_id)
-							->where('sm.user_id', $current_user->user_id)
-							->find_by('steps.step_key', $step_key);
-		}
-
-		if (! empty($step)) {
-			return $step->step_id;
-		}
-
-		return false;
 	}
 }

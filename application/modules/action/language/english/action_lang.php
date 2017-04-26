@@ -26,6 +26,9 @@ $lang['ac_assess'] = 'Assess';
 $lang['ac_review'] = 'Review';
 $lang['ac_resource'] = 'Resource';
 $lang['ac_not_rated'] = 'Not rated';
+$lang['ac_action_name'] = 'Action name';
+$lang['ac_select_team_member'] = 'Select team member';
+$lang['ac_add_team_member'] = '+ Add team member';
 
 
 // error
