@@ -88,7 +88,6 @@ class Projects extends Authenticated_Controller
 		));
 
 		if ($this->form_validation->run() === false) {
-			dump(validation_errors()); die;
 			logit('form_validation false');
 			return false;
 		}
