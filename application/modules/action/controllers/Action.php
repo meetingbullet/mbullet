@@ -14,6 +14,7 @@ class Action extends Authenticated_Controller
 		$this->load->model('users/user_model');
 		$this->load->model('action_member_model');
 		$this->load->model('projects/project_model');
+		$this->load->model('projects/project_member_model');
 
 		Assets::add_module_css('action', 'action.css');
 	}
@@ -130,6 +131,15 @@ class Action extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
+		$project_members = $this->project_member_model->select('u.user_id, email, first_name, last_name, avatar')
+													->join('users u', 'u.user_id = project_members.user_id')
+													->where('project_id', $project_id)
+													->find_all();
+
+		Assets::add_js($this->load->view('create_js', [
+			'project_members' => $project_members
+		], true), 'inline');
+
 		$form_error = [];
 		$error_message = '';
 		if ($this->input->post()) {
@@ -151,19 +161,6 @@ class Action extends Authenticated_Controller
 				$form_error['owner_id'] = lang('not_valid_owner');
 			}
 
-			if (trim($this->input->post('action_members')) != '[]' || count(json_decode(trim($this->input->post('action_members')))) != 0) {
-				$action_member_ids = array_map(create_function('$o', 'return $o->value;'), json_decode(trim($this->input->post('action_members'))));
-
-				$valid_member_ids = $this->db->select('COUNT(*) as count')
-										->from('project_members')
-										->where('project_id', $project_id)
-										->where_in('user_id', $action_member_ids)
-										->get()->row()->count == count($action_member_ids) ? true : false;
-				if (! $valid_member_ids) {
-					$form_error['member_ids'] = lang('not_valid_members');
-				}
-			}
-
 			$rules = $this->action_model->get_validation_rules();
 			$this->form_validation->set_rules($rules['create_action']);
 			if ($this->form_validation->run() !== false) {
@@ -180,8 +177,8 @@ class Action extends Authenticated_Controller
 					$data['owner_id'] = $this->input->post('owner_id');
 				}
 
-				if ($this->input->post('point_value_defined') != '') {
-					$data['point_value_defined'] = $this->input->post('point_value_defined');
+				if ($this->input->post('point_value') != '') {
+					$data['point_value'] = $this->input->post('point_value');
 				}
 
 				if ($this->input->post('point_used') != '') {
@@ -199,19 +196,17 @@ class Action extends Authenticated_Controller
 						throw new Exception(lang('unable_create_action'));
 					}
 
-					if (! empty($action_member_ids)) {
-						$action_members = array_map(function($id) use ($action_id)
-						{
-							return [
-								'action_id' => $action_id,
-								'user_id' => $id
-							];
-						}, $action_member_ids);
+					if ($team = $this->input->post('team')) {
+						if ($team = explode(',', $team)) {
+							$member_data = [];
+							foreach ($team as $member) {
+								$member_data[] = [
+									'action_id' => $action_id,
+									'user_id' => $member
+								];
+							}
 
-						$added = $this->db->insert_batch('action_members', $action_members);
-						if (!$added) {
-							logit('line 112: unable to insert data to table mb_action_members');
-							throw new Exception(lang('unable_add_action_members'));
+							$this->action_member_model->insert_batch($member_data);
 						}
 					}
 				} catch (Exception $e) {
