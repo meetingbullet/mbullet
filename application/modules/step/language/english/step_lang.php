@@ -19,6 +19,7 @@ $lang['st_create'] = 'Create';
 $lang['st_cancel'] = 'Cancel';
 $lang['st_select_team_member'] = 'Select Team Member';
 $lang['st_add_team_member'] = '+ Add Team Member';
+$lang['st_back'] = 'Back';
 
 // Message
 $lang['st_step_successfully_created'] = 'Step successfully created';

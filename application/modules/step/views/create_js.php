@@ -25,7 +25,7 @@ $('.owner-id').selectize({
 				$user->avatar = avatar_url($user->avatar, $user->email);
 			}
 		?>
-		{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php e($user->avatar)?>'},
+		{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
 		<?php endforeach; ?>
 	],
 	render: {

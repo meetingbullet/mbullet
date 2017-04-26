@@ -44,7 +44,7 @@ $project_key = $project_key['0'];
 <?php echo form_open() ?>
 <div class="btn-block">
 	<?php echo anchor(site_url('projects/' . $project_key), '<i class="ion-android-arrow-back"></i> ' . lang('ac_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
-	<a href='#' class='an-btn an-btn-primary'><i class="ion-ios-play"></i> <?php echo lang('ac_edit')?></a>
+	<a href='#' class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('ac_edit')?></a>
 
 	<button name='update' class='an-btn <?php echo $action_button[$action->status][0] ?>' <?php echo $action->status == 'resolved' ? ' disabled' : ''?>>
 		<i class="ion-ios-play"></i> <?php echo lang($action_button[$action->status][1])?>
@@ -107,7 +107,7 @@ $project_key = $project_key['0'];
 								<tbody>
 									<?php foreach ($steps as $step): ?>
 									<tr>
-										<td><?php echo anchor(site_url('step/' . $step->step_key), sprintf(lang('ac_step_key'), $step->step_key))?></td>
+										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->step_key)?></td>
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name)?></td>
 										<td><?php e($step->owner_name)?></td>
 										<td><?php e($step->status)?></td>
