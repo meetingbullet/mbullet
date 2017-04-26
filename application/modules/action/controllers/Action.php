@@ -174,6 +174,16 @@ class Action extends Authenticated_Controller
 					$data['owner_id'] = $this->input->post('owner_id');
 				}
 
+				// Add to project members if not in
+				// Prevent duplicate row by MySQL Insert Ignore
+				$query = $this->db->insert_string('project_members', [
+					'project_id' => $data['project_id'],
+					'user_id' => $data['owner_id']
+				]);
+
+				$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+				$this->db->query($query);
+
 				if ($this->input->post('point_value') != '') {
 					$data['point_value'] = $this->input->post('point_value');
 				}
@@ -201,6 +211,16 @@ class Action extends Authenticated_Controller
 									'action_id' => $action_id,
 									'user_id' => $member
 								];
+
+								// Add to project members if not in
+								// Prevent duplicate row by MySQL Insert Ignore
+								$query = $this->db->insert_string('project_members', [
+									'project_id' => $data['project_id'],
+									'user_id' => $member
+								]);
+
+								$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+								$this->db->query($query);
 							}
 
 							$this->action_member_model->insert_batch($member_data);

@@ -120,7 +120,7 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step = $this->step_model->select('steps.*')
+		$step = $this->step_model->select('steps.*, p.project_id')
 								->join('actions a', 'a.action_id = steps.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
@@ -154,6 +154,16 @@ class Step extends Authenticated_Controller
 				$data['owner_id'] = $this->current_user->user_id;
 			}
 
+			// Add to project members if not in
+			// Prevent duplicate row by MySQL Insert Ignore
+			$query = $this->db->insert_string('project_members', [
+				'project_id' => $step->project_id,
+				'user_id' => $data['owner_id']
+			]);
+
+			$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+			$this->db->query($query);
+
 			if ($this->step_model->update($step->step_id, $data)) {
 				$this->step_member_model->delete_where(['step_id' => $step->step_id]);
 
@@ -165,6 +175,16 @@ class Step extends Authenticated_Controller
 								'step_id' => $step->step_id,
 								'user_id' => $member
 							];
+
+							// Add to project members if not in
+							// Prevent duplicate row by MySQL Insert Ignore
+							$query = $this->db->insert_string('project_members', [
+								'project_id' => $step->project_id,
+								'user_id' => $member
+							]);
+
+							$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+							$this->db->query($query);
 						}
 
 						$this->step_member_model->insert_batch($member_data);
