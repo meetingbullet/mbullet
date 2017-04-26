@@ -96,4 +96,49 @@ class Action_model extends BF_Model
 	{
 		parent::__construct();
 	}
+
+	public function get_action_by_key($action_key, $current_user, $select = '*')
+	{
+		if (! class_exists('Role_model')) {
+			$this->load->model('roles/role_model');
+		}
+
+		// check user is organization owner or not
+		$is_owner = $this->role_model->where('role_id', $current_user->role_ids[$current_user->current_organization_id])
+									->count_by('is_public', 1) == 1 ? true : false;
+		// get project id
+		if ($is_owner) {
+			$action = $this->select($select)
+							->join('projects p', 'p.project_id = actions.project_id', 'inner')
+							->where('p.organization_id', $current_user->current_organization_id)
+							->find_by('actions.action_key', $action_key);
+		} else {
+			$action = $this->select($select)
+							->join('action_members am', 'am.action_id = actions.action_id', 'inner')
+							->join('projects p', 'p.project_id = actions.project_id', 'inner')
+							->where('p.organization_id', $current_user->current_organization_id)
+							->group_start()
+								->where('am.user_id', $current_user->user_id)
+								->or_where('actions.owner_id', $current_user->user_id)
+							->group_end()
+							->find_by('actions.action_key', $action_key);
+		}
+
+		if (! empty($action)) {
+			return $action;
+		}
+
+		return false;
+	}
+
+	public function get_action_id($action_key, $current_user)
+	{
+		$action = $this->get_action_by_key($action_key, $current_user, 'actions.action_id');
+
+		if (! empty($action)) {
+			return $action->action_id;
+		}
+
+		return false;
+	}
 }
