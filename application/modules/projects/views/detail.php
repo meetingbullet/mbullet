@@ -14,8 +14,8 @@
 				</ul>
 			</div>
 		</h2>
-		<a id="back-btn" href="/dashboard" class="an-btn an-btn-primary-transparent"><?php echo lang('pj_back') ?></a>
 	</div>
+	<a id="back-btn" href="/dashboard" class="an-btn an-btn-primary-transparent"><?php echo lang('pj_back') ?></a>
 </div> <!-- end AN-BODY-TOPBAR -->
 <div class='row'>
 	<div class="col-md-3">
