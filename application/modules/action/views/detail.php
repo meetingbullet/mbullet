@@ -78,7 +78,7 @@ $project_key = $project_key['0'];
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_point_used'))?></div>
-							<div class="col-xs-8"><?php e('0')?></div>
+							<div class="col-xs-8"><?php e($action->point_used)?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_avarage_stars'))?></div>
@@ -105,7 +105,7 @@ $project_key = $project_key['0'];
 									</tr>
 								</thead>
 								<tbody>
-									<?php if ($steps): foreach ($steps as $step): ?>
+									<?php if (is_array($steps)) : foreach ($steps as $step): ?>
 									<tr>
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->step_key)?></td>
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name)?></td>
@@ -131,7 +131,7 @@ $project_key = $project_key['0'];
 				<div class="an-component-body">
 					<div class="an-helper-block">
 						<ul class="list-unstyled list-member">
-							<?php if ($invited_members): foreach ($invited_members as $user): 
+							<?php if (is_array($invited_members)) : foreach ($invited_members as $user): 
 								$user->avatar = avatar_url($user->avatar, $user->email);
 							?>
 							<li>
