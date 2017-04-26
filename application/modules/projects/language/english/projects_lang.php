@@ -8,7 +8,15 @@ $lang['pj_resolved_label'] = 'Resolved';
 $lang['pj_ready_label'] = 'Ready for review';
 $lang['pj_inprogress_label'] = 'In-progress';
 $lang['pj_open_label'] = 'Open';
-
+$lang['pj_detail'] = 'Project detail';
+$lang['pj_constraint'] = 'Project constraint';
+$lang['pj_expectation'] = 'Project expectation';
+$lang['pj_config'] = 'Project configuration';
+$lang['pj_owner'] = 'Owner';
+$lang['pj_created_on'] = 'Created on';
+$lang['pj_mofified_on'] = 'Modified on';
+$lang['pj_cost_unit_time'] = 'Cost/Unit of time';
+$lang['pj_back'] = 'Back';
 
 // Messages
 $lang['pj_project_successfully_created'] = 'Project successfully created';
@@ -60,4 +68,6 @@ $lang['pj_detail_tab_info_table_label_name'] = 'Name';
 $lang['pj_detail_tab_info_table_label_status'] = 'Status';
 $lang['pj_info_pager_first'] = 'First';
 $lang['pj_info_pager_last'] = 'Last';
-
+$lang['pj_no_action'] = 'There are no actions at the moment.';
+$lang['pj_no_step'] = 'There are no steps at the moment.';
+$lang['pj_no_task'] = 'There are no tasks at the moment.';
