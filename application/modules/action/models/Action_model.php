@@ -78,19 +78,9 @@ class Action_model extends BF_Model
 				'rules' => 'trim|required',
 			),
 			array(
-				'field' => 'point_value_defined',
-				'label' => 'lang:ac_point_value_defined',
-				'rules' => 'trim',
-			),
-			array(
-				'field' => 'point_used',
-				'label' => 'lang:ac_point_used',
-				'rules' => 'trim',
-			),
-			array(
-				'field' => 'avarage_stars',
-				'label' => 'lang:ac_avarage_stars',
-				'rules' => 'trim|numeric',
+				'field' => 'point_value',
+				'label' => 'lang:ac_point_value',
+				'rules' => 'trim|required|numeric',
 			)
 		)
     );

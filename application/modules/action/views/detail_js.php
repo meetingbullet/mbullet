@@ -60,6 +60,7 @@ $(document).on("submit", '.form-ajax', (e) => {
 
 				if (data.message_type == 'success') {
 					// @TODO Refresh Step list
+					location.reload();
 				}
 			}
 		}

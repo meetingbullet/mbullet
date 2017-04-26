@@ -51,7 +51,7 @@ class Step_model extends BF_Model
 		array(
 			'field' => 'owner_id',
 			'label' => 'lang:st_project_id',
-			'rules' => 'trim|required|numeric',
+			'rules' => 'trim|numeric',
 		)
 	);
 	protected $insert_validation_rules  = array();

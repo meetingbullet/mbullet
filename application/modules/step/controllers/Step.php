@@ -61,10 +61,28 @@ class Step extends Authenticated_Controller
 			$data['action_id'] = $action->action_id;
 			$data['created_by'] = $this->current_user->user_id;
 
+			if ($this->input->post('owner_id') == '') {
+				$data['owner_id'] = $this->current_user->user_id;
+			}
+
 			$this->load->library('project');
 			$data['step_key'] = $this->project->get_next_key($action_key);
 
 			if ($id = $this->step_model->insert($data)) {
+				if ($team = $this->input->post('team')) {
+					if ($team = explode(',', $team)) {
+						$member_data = [];
+						foreach ($team as $member) {
+							$member_data[] = [
+								'step_id' => $id,
+								'user_id' => $member
+							];
+						}
+
+						$this->step_member_model->insert_batch($member_data);
+					}
+				}
+
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
 				Template::set('message', lang('st_step_successfully_created'));

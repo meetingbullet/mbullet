@@ -30,56 +30,23 @@ $action_types = [
 <?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '']) ?>
 
 <div class='container-fluid<?php echo $this->input->is_ajax_request() ? ' modal-body' : ''?>'>
-	<?php echo mb_form_input('text', 'name', lang('ac_action_name'), true) ?>
+	<?php echo mb_form_input('text', 'name', lang('ac_name'), true) ?>
 	<?php echo mb_form_dropdown('success_condition', $success_conditions, set_value('success_condition'), lang('ac_success_condition'), 'class="an-form-control ' . iif( form_error('success_condition') , ' danger') .'"', '', true) ?>
 	<?php echo mb_form_dropdown('action_type', $action_types, set_value('action_type'), lang('ac_action_type'), 'class="an-form-control ' . iif( form_error('action_type') , ' danger') .'"', '', true) ?>
+	<?php echo mb_form_input('text', 'owner_id', lang('ac_owner'), true, '', 'owner-id an-tags-input', '', lang('ac_select_team_member')) ?>
 	<div class="row">
 		<div class="col-md-3 col-sm-12">
-			<label for="owner_name" class="pull-right"><?php e(lang('ac_owner_id')) ?></label>
-		</div>
-		<div class="col-md-9 col-sm-12" id="owner-warpper">
-			<div class="an-input-group">
-				<div class="an-input-group-addon"><i class="ion-android-search"></i></div>
-				<input type="text" class="an-form-control <?php echo (form_error('owner_id') || ! empty($form_error['owner_id'])) ? 'danger' : '' ?>" id="owner-name" name="owner_name" value="<?php echo set_value('owner_name') ?>" data-get-owner-url="<?php echo base_url() . 'projects/get_members/' . $project_key ?>"/>
-			</div>
-			<input type="hidden" class="an-form-control" id="owner-id" name="owner_id" value="<?php echo set_value('owner_id') ?>"/>
-		</div>
-	</div>
-	<?php echo mb_form_input('text', 'point_value_defined', lang('ac_point_value_defined')) ?>
-	<?php echo mb_form_input('text', 'point_used', lang('ac_point_used')) ?>
-	<div class="row">
-		<div class="col-md-3 col-sm-12">
-			<label for="avarage_stars" class="pull-right"><?php e(lang('ac_avarage_stars')) ?></label>
+			<label for="in" class="pull-right"><?php e(lang('ac_point_value')) ?></label>
 		</div>
 		<div class="col-md-9 col-sm-12">
-			<div class="rating">
-				<input type="radio" id="star5" name="avarage_stars" value="5" <?php echo set_radio('avarage_stars', 5) ?>/><label class="full" for="star5"></label>
-				<input type="radio" id="star4half" name="avarage_stars" value="4.5" <?php echo set_radio('avarage_stars', 4.5) ?>/><label class="half" for="star4half"></label>
-				<input type="radio" id="star4" name="avarage_stars" value="4" <?php echo set_radio('avarage_stars', 4) ?>/><label class="full" for="star4"></label>
-				<input type="radio" id="star3half" name="avarage_stars" value="3.5" <?php echo set_radio('avarage_stars', 3.5) ?>/><label class="half" for="star3half"></label>
-				<input type="radio" id="star3" name="avarage_stars" value="3" <?php echo set_radio('avarage_stars', 3) ?>/><label class="full" for="star3"></label>
-				<input type="radio" id="star2half" name="avarage_stars" value="2.5" <?php echo set_radio('avarage_stars', 2.5) ?>/><label class="half" for="star2half"></label>
-				<input type="radio" id="star2" name="avarage_stars" value="2" <?php echo set_radio('avarage_stars', 2) ?>/><label class="full" for="star2"></label>
-				<input type="radio" id="star1half" name="avarage_stars" value="1.5" <?php echo set_radio('avarage_stars', 1.5) ?>/><label class="half" for="star1half"></label>
-				<input type="radio" id="star1" name="avarage_stars" value="1" <?php echo set_radio('avarage_stars', 1) ?>/><label class="full" for="star1"></label>
-				<input type="radio" id="star0half" name="avarage_stars" value="0.5" <?php echo set_radio('avarage_stars', 0.5) ?>/><label class="half" for="star0half"></label>
-				<input type="radio" id="star0" name="avarage_stars" value="0" <?php echo set_radio('avarage_stars', 0) ?>/><label class="full" for="star0"></label>
+			<div class="row">
+				<div class="col-md-3">
+					<input type="number" name="point_value" id="point_value" class="an-form-control<?php e(iif( form_error('point_value') , ' danger')) ?>" value="<?php e(set_value('point_value', 0)) ?>" step="0.1">
+				</div>
 			</div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-md-3 col-sm-12">
-			<label for="action_members" class="pull-right"><?php e(lang('ac_resource')) ?></label>
-		</div>
-		<div class="col-md-9 col-sm-12" id="action-members-warpper">
-			<div class="an-input-group">
-				<div class="an-input-group-addon"><i class="ion-android-search"></i></div>
-				<input type="text" class="an-form-control" id="action-member-name" name="action_member_name" value="<?php echo set_value('action_member_name') ?>" data-get-resource-url="<?php echo base_url() . 'projects/get_members/' . $project_key ?>"/>
-			</div>
-			<input type="hidden" class="an-form-control" id="action-members" name="action_members" value="<?php echo set_value('action_members', '[]') ?>"/>
-			<div class="members"></div>
-		</div>
-	</div>
+	<?php echo mb_form_input('text', 'team', lang('ac_resource'), false, '', 'team select-member an-tags-input', '', lang('ac_add_team_member')) ?>
 </div>
 
 <div class="<?php echo $this->input->is_ajax_request() ? 'modal-footer' : 'container-fluid pull-right' ?>">
@@ -88,3 +55,87 @@ $action_types = [
 </div>
 
 <?php echo form_close(); ?>
+
+<?php if ($this->input->is_ajax_request()): ?>
+<script>
+	Selectize.define('select-member', function(options) {
+		var self = this;
+
+		// Override updatePlaceholder method to keep the placeholder
+		this.updatePlaceholder = (function() {
+			var original = self.updatePlaceholder;
+			return function() {
+				// do your logic
+				return false;
+				// return original.apply(this, arguments);
+			};
+		})();
+	});
+
+	$('.owner-id').selectize({
+		plugins: ['select-member'],
+		persist: false,
+		maxItems: 1,
+		valueField: 'id',
+		labelField: 'name',
+		searchField: ['name'],
+		options: [
+			<?php foreach($project_members as $user): 
+				if (strstr($user->avatar, 'http') === false) {
+					$user->avatar = avatar_url($user->avatar, $user->email);
+				}
+			?>
+			{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php e($user->avatar)?>'},
+			<?php endforeach; ?>
+		],
+		render: {
+			item: function(item, escape) {
+				return '<div>' +
+					'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
+					(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
+				'</div>';
+			},
+			option: function(item, escape) {
+				return '<div>' +
+					'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
+					(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
+				'</div>';
+			}
+		},
+		create: false
+	});
+
+	$('.team').selectize({
+		plugins: ['remove_button', 'select-member'],
+		persist: false,
+		maxItems: null,
+		valueField: 'id',
+		labelField: 'name',
+		searchField: ['name'],
+		options: [
+			<?php foreach($project_members as $user): 
+				if (strstr($user->avatar, 'http') === false) {
+					$user->avatar = avatar_url($user->avatar, $user->email);
+				}
+			?>
+			{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php e($user->avatar)?>'},
+			<?php endforeach; ?>
+		],
+		render: {
+			item: function(item, escape) {
+				return '<div>' +
+					'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
+					(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
+				'</div>';
+			},
+			option: function(item, escape) {
+				return '<div>' +
+					'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
+					(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
+				'</div>';
+			}
+		},
+		create: false
+	});
+</script>
+<?php endif; ?>
