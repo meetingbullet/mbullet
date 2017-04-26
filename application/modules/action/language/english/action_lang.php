@@ -25,6 +25,7 @@ $lang['ac_prioritize'] = 'Prioritize';
 $lang['ac_assess'] = 'Assess';
 $lang['ac_review'] = 'Review';
 $lang['ac_resource'] = 'Resource';
+$lang['ac_not_rated'] = 'Not rated';
 
 
 // error

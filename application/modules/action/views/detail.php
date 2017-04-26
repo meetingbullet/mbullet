@@ -78,11 +78,11 @@ $project_key = $project_key['0'];
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_point_used'))?></div>
-							<div class="col-xs-8"><?php e('')?></div>
+							<div class="col-xs-8"><?php e('0')?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_avarage_stars'))?></div>
-							<div class="col-xs-8"><?php e('')?></div>
+							<div class="col-xs-8"><?php e(lang('ac_not_rated'))?></div>
 						</div>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
