@@ -35,16 +35,10 @@
 					<div class="col-md-9 col-sm-12">
 						<div class="row">
 							<div class="col-md-3">
-								<input type="number" name="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in', 0)) ?>">
+								<input type="number" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in', 0)) ?>">
 							</div>
-
 							<div class="col-md-3">
-								<select name="in_type" class="an-form-control">
-									<option value='minutes' <?php echo set_select('in_type', 'minutes') ?>><?php e(lang('st_minutes'))?></option>
-									<option value='hours' <?php echo set_select('in_type', 'hours') ?>><?php e(lang('st_hours'))?></option>
-									<option value='days' <?php echo set_select('in_type', 'days') ?>><?php e(lang('st_days'))?></option>
-									<option value='weeks' <?php echo set_select('in_type', 'weeks') ?>><?php e(lang('st_weeks'))?></option>
-								</select>
+								<?php e(lang('st_hours'))?>
 							</div>
 						</div>
 					</div>

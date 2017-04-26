@@ -1,4 +1,14 @@
 <?php
+
+$cost_of_time_to_badge = [
+	'', // Skip cost_of_time_to_badge[0]
+	'default',	// XS
+	'info',	// S
+	'success',		// M
+	'primary',	// L
+	'warning',	// XL
+];
+
 $buttons = [
 	'open' => [
 		'icon' => 'ion-ios-play',
@@ -21,20 +31,22 @@ $buttons = [
 		'next_status' => 'open',
 	]
 ];
+
+$action_key = explode('-', $step_key);
+$action_key = $action_key['0'] . '-' . $action_key[1];
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<h5 class='breadcrumb'>
-			<?php echo anchor(site_url('project/' . $project_key), $project_key) ?> /
-			<?php e($step_key) ?>
-		</h5>
-		<h2><?php e($step->name)?></h2>
+		<?php echo anchor(site_url('project/' . $project_key), $project_key) ?> /
+		<?php e($step_key) ?>
 
+		<h2><?php e($step->name)?></h2>
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
 
 <div class="btn-block">
-	<?php echo anchor('#', '<i class="ion-edit"></i> ' . lang('st_edit'), ['class' => 'an-btn an-btn-primary']) ?>
+	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
+	<a href='#' class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
 	<a class="an-btn an-btn-primary" id="change-step-status" data-next-status="<?php echo $buttons[$step->status]['next_status'] ?>" data-update-status-url="<?php echo base_url('/step/update_status/' . $step_key . '?status=' . urlencode($buttons[$step->status]['next_status'])) ?>"><i class="<?php echo $buttons[$step->status]['icon'] ?>"></i> <?php echo $buttons[$step->status]['label'] ?></a>
 </div>
 
@@ -47,16 +59,16 @@ $buttons = [
 			<div class="an-component-body">
 				<div class="an-helper-block step-detail">
 					<div class="row">
-						<div class="col-md-4"><?php e(lang('st_owner'))?></div>
-						<div class="col-md-8"><?php e($step->owner_name)?></div>
+						<div class="col-xs-4"><?php e(lang('st_owner'))?></div>
+						<div class="col-xs-8"><?php e($step->owner_name)?></div>
 					</div>
 					<div class="row">
-						<div class="col-md-4"><?php e(lang('st_goal'))?></div>
-						<div class="col-md-8"><?php e($step->goal)?></div>
+						<div class="col-xs-4"><?php e(lang('st_goal'))?></div>
+						<div class="col-xs-8"><?php e($step->goal)?></div>
 					</div>
 					<div class="row">
-						<div class="col-md-4"><?php e(lang('st_status'))?></div>
-						<div class="col-md-8" id="status"><?php e(str_replace('-', ' ', $step->status))?></div>
+						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
+						<div class="col-xs-8" id="status"><?php e(str_replace('-', ' ', $step->status))?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -81,8 +93,8 @@ $buttons = [
 							<tbody>
 								<?php foreach ($tasks as $task) : ?>
 								<tr>
-									<td><?php e($task->task_key)?></td>
-									<td><?php e($task->name)?></td>
+									<td><?php echo anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
+									<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name)?></td>
 									<td><?php e($task->owner_name)?></td>
 									<td><?php e($task->status)?></td>
 								</tr>
@@ -105,8 +117,18 @@ $buttons = [
 			<div class="an-component-body">
 				<div class="an-helper-block">
 					<div class="an-input-group">
-						<div class="an-input-group-addon"><i class="ion-ios-search"></i></div>
-						<input type="text" id="team-member" class="select-member an-tags-input" placeholder="<?php e(lang('st_add_team_member'))?>" value="<?php echo implode(',', $invited_members) ?> ">
+						<ul class="list-unstyled list-member">
+							<?php foreach ($invited_members as $user): 
+								$user->avatar = avatar_url($user->avatar, $user->email);
+							?>
+							<li>
+								<div class="avatar" style="background-image: url('<?php echo $user->avatar ?>')"></div>
+								<?php e($user->name)?>
+
+								<span class="badge badge-<?php e($cost_of_time_to_badge[$user->cost_of_time])?> badge-bordered pull-right"><?php e($user->cost_of_time_name)?></span>
+							</li>
+							<?php endforeach; ?>
+						</ul>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -119,12 +141,12 @@ $buttons = [
 			<div class="an-component-body">
 				<div class="an-helper-block step-detail">
 					<div class="row">
-						<div class="col-md-4"><?php e(lang('st_created'))?></div>
-						<div class="col-md-8"><?php e($step->created_on)?></div>
+						<div class="col-xs-4"><?php e(lang('st_created'))?></div>
+						<div class="col-xs-8"><?php e($step->created_on)?></div>
 					</div>
 					<div class="row">
-						<div class="col-md-4"><?php e(lang('st_updated'))?></div>
-						<div class="col-md-8"><?php e($step->modified_on)?></div>
+						<div class="col-xs-4"><?php e(lang('st_updated'))?></div>
+						<div class="col-xs-8"><?php e($step->modified_on)?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
