@@ -3,9 +3,9 @@
 $cost_of_time_to_badge = [
 	'', // Skip cost_of_time_to_badge[0]
 	'default',	// XS
-	'primary',	// S
+	'info',	// S
 	'success',		// M
-	'info',	// L
+	'primary',	// L
 	'warning',	// XL
 ];
 
@@ -27,6 +27,9 @@ $action_button = [
 		'ac_resolved'
 	]
 ];
+
+$project_key = explode('-', $action_key);
+$project_key = $project_key['0'];
 ?>
 
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
@@ -40,6 +43,7 @@ $action_button = [
 </div> <!-- end AN-BODY-TOPBAR -->
 <?php echo form_open() ?>
 <div class="btn-block">
+	<?php echo anchor(site_url('projects/' . $project_key), '<i class="ion-android-arrow-back"></i> ' . lang('ac_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a href='#' class='an-btn an-btn-primary'><i class="ion-ios-play"></i> <?php echo lang('ac_edit')?></a>
 
 	<button name='update' class='an-btn <?php echo $action_button[$action->status][0] ?>' <?php echo $action->status == 'resolved' ? ' disabled' : ''?>>
