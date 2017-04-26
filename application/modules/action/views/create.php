@@ -46,7 +46,7 @@ $action_types = [
 			</div>
 		</div>
 	</div>
-	<?php echo mb_form_input('text', 'team', lang('ac_resource'), false, set_value('owner_id', ! empty($action->members) ? $action->members : null), 'team select-member an-tags-input', '', lang('ac_add_team_member')) ?>
+	<?php echo mb_form_input('text', 'team', lang('ac_resource'), false, set_value('owner_id', ! empty($action->members) ? $action->members : ''), 'team select-member an-tags-input', '', lang('ac_add_team_member')) ?>
 </div>
 
 <div class="<?php echo $this->input->is_ajax_request() ? 'modal-footer' : 'container-fluid pull-right' ?>">

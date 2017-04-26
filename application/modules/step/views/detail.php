@@ -13,12 +13,12 @@ $buttons = [
 	'open' => [
 		'icon' => 'ion-ios-play',
 		'label' => lang('st_start_step'),
-		'next_status' => 'in-progress',
+		'next_status' => 'inprogress',
 	],
 	'inprogress' => [
 		'icon' => 'ion-android-done',
 		'label' => lang('st_ready'),
-		'next_status' => 'ready-for-review',
+		'next_status' => 'ready',
 	],
 	'ready' => [
 		'icon' => 'ion-android-done-all',

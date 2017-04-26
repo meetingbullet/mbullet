@@ -140,9 +140,8 @@ class Action extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-
 		if(! empty($action_key)) {
-			$action = $this->action_model->get_action_by_key($action_key, $this->current_user, 'actions.*');//dump($action);
+			$action = $this->action_model->get_action_by_key($action_key, $this->current_user, 'actions.*');
 			if ($action !== false) {
 				$action->members = $this->action_member_model->select('user_id')->find_all_by('action_id', $action->action_id);
 				if (! empty($action->members)) {
