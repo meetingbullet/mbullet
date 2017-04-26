@@ -21,6 +21,7 @@ $lang['pj_back'] = 'Back';
 // Messages
 $lang['pj_project_successfully_created'] = 'Project successfully created';
 $lang['pj_there_was_a_problem_while_creating_project'] = 'There was a problem while creating project';
+$lang['pj_duplicated_cost_code'] = 'Duplicated cost code';
 
 // Fields
 $lang['pj_project_name'] 			= 'Project name';
@@ -44,6 +45,11 @@ $lang['pj_invite_team'] 			= 'Invite team';
 $lang['pj_member_email'] 			= 'Member email';
 $lang['pj_create'] 			= 'Create';
 $lang['pj_cancel'] 			= 'Cancel';
+$lang['pj_total_point_project'] = 'Total Points/Project';
+$lang['pj_total_point_action'] = 'Total Points/Action';
+$lang['pj_total_point_resource'] = 'Total Points/Resource';
+$lang['pj_min_value_cost_ratio_per_step'] = 'Min Value/Cost Ratio Per Step';
+$lang['pj_max_time_action'] = 'Max Time/Action';
 
 // Validation
 $lang['pj_min_investment_hour'] = 'Min investment hour';

@@ -13,6 +13,7 @@ class Step extends Authenticated_Controller
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
 		$this->load->model('projects/project_model');
+		$this->load->model('projects/project_member_model');
 		$this->load->model('users/user_model');
 
 		Assets::add_module_css('step', 'step.css');
@@ -51,9 +52,13 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$oragnization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		$project_key = explode('-', $action_key);
+		$project_key = $project_key[0];
+
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+
 		Assets::add_js($this->load->view('create_js', [
-			'oragnization_members' => $oragnization_members
+			'project_members' => $project_members
 		], true), 'inline');
 
 		if ($data = $this->input->post()) {
@@ -103,8 +108,89 @@ class Step extends Authenticated_Controller
 		}
 
 
-		Template::set('oragnization_members', $oragnization_members);
+		Template::set('project_members', $project_members);
 		Template::set('action_key', $action_key);
+		Template::render();
+	}
+
+	public function edit($step_key = null)
+	{
+
+		if (empty($step_key)) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step = $this->step_model->select('steps.*')
+								->join('actions a', 'a.action_id = steps.action_id')
+								->join('projects p', 'a.project_id = p.project_id')
+								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
+								->limit(1)
+								->find_by('step_key', $step_key);
+
+		if ($step === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step_members = $this->step_member_model->where('step_id', $step->step_id)->find_all();
+		$step_members = $step_members && count($step_members) > 0 ? array_column($step_members, 'user_id') : [];
+		Template::set('step_members', $step_members);
+		Template::set('step', $step);
+
+		$project_key = explode('-', $step_key);
+		$project_key = $project_key[0];
+
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+
+		Template::set('project_members', $project_members);
+		Assets::add_js($this->load->view('create_js', [
+			'project_members' => $project_members
+		], true), 'inline');
+
+		if ($data = $this->input->post()) {
+			$data = $this->step_model->prep_data($data);
+			$data['modified_by'] = $this->current_user->user_id;
+
+			if ($this->input->post('owner_id') == '') {
+				$data['owner_id'] = $this->current_user->user_id;
+			}
+
+			if ($this->step_model->update($step->step_id, $data)) {
+				$this->step_member_model->delete_where(['step_id' => $step->step_id]);
+
+				if ($team = $this->input->post('team')) {
+					if ($team = explode(',', $team)) {
+						$member_data = [];
+						foreach ($team as $member) {
+							$member_data[] = [
+								'step_id' => $step->step_id,
+								'user_id' => $member
+							];
+						}
+
+						$this->step_member_model->insert_batch($member_data);
+					}
+				}
+
+				Template::set('close_modal', 1);
+				Template::set('message_type', 'success');
+				Template::set('message', lang('st_step_successfully_updated'));
+
+				// Just to reduce AJAX request size
+				if ($this->input->is_ajax_request()) {
+					Template::set('content', '');
+				}
+				
+			} else {
+				Template::set('close_modal', 0);
+				Template::set('message_type', 'danger');
+				Template::set('message', lang('st_there_was_a_problem_while_creating_step'));
+			}
+
+			Template::render();
+			return;
+		}
+
+
 		Template::render();
 	}
 
@@ -119,10 +205,18 @@ class Step extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user);
-		if (! $step_id) {
+		$step = $this->step_model->select('steps.*')
+								->join('actions a', 'a.action_id = steps.action_id')
+								->join('projects p', 'a.project_id = p.project_id')
+								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
+								->limit(1)
+								->find_by('step_key', $step_key);
+
+		if (! $step) {
 			redirect('/dashboard');
 		}
+
+		$step_id = $step->step_id;
 
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
@@ -170,7 +264,7 @@ class Step extends Authenticated_Controller
 									->order_by('uto.cost_of_time', 'DESC')
 									->find_all();
 
-		Assets::add_js($this->load->view('detail_js', null, true), 'inline');
+		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key], true), 'inline');
 		Template::set('invited_members', $invited_members);
 		Template::set('step', $step);
 		Template::set('tasks', $tasks);

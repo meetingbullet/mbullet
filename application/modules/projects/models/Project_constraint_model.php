@@ -81,9 +81,29 @@ class Project_constraint_model extends BF_Model
             'rules' => 'numeric|required|max_length[11]',
         ),
         array(
-            'field' => 'period_type',
-            'label' => 'lang:pj_period',
-            'rules' => 'required',
+            'field' => 'total_point_project',
+            'label' => 'lang:pj_total_point_action',
+            'rules' => 'numeric|required|max_length[11]',
+        ),
+        array(
+            'field' => 'total_point_action',
+            'label' => 'lang:pj_total_point_action',
+            'rules' => 'numeric|required|max_length[11]',
+        ),
+        array(
+            'field' => 'total_point_resource',
+            'label' => 'lang:pj_total_point_resource',
+            'rules' => 'numeric|required|max_length[11]',
+        ),
+        array(
+            'field' => 'min_value_cost_ratio_per_step',
+            'label' => 'lang:pj_min_value_cost_ratio_per_step',
+            'rules' => 'numeric|required|max_length[11]',
+        ),
+        array(
+            'field' => 'max_time_action',
+            'label' => 'lang:pj_max_time_action',
+            'rules' => 'numeric|required|max_length[11]',
         )
     );
 	protected $insert_validation_rules  = array();

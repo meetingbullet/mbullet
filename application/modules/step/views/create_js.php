@@ -20,7 +20,7 @@ $('.owner-id').selectize({
 	labelField: 'name',
 	searchField: ['name'],
 	options: [
-		<?php foreach($oragnization_members as $user): 
+		<?php foreach($project_members as $user): 
 			if (strstr($user->avatar, 'http') === false) {
 				$user->avatar = avatar_url($user->avatar, $user->email);
 			}
@@ -53,12 +53,12 @@ $('.team').selectize({
 	labelField: 'name',
 	searchField: ['name'],
 	options: [
-		<?php foreach($oragnization_members as $user): 
+		<?php foreach($project_members as $user): 
 			if (strstr($user->avatar, 'http') === false) {
 				$user->avatar = avatar_url($user->avatar, $user->email);
 			}
 		?>
-		{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php e($user->avatar)?>'},
+		{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
 		<?php endforeach; ?>
 	],
 	render: {

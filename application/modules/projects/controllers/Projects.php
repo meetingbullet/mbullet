@@ -9,6 +9,7 @@ class Projects extends Authenticated_Controller
 		$this->load->library('form_validation');
 		$this->load->library('invite/invitation');
 		$this->load->helper('mb_form_helper');
+		$this->load->helper('mb_general');
 		$this->load->model('users/user_model');
 		$this->load->model('project_model');
 		$this->load->model('project_constraint_model');
@@ -54,7 +55,6 @@ class Projects extends Authenticated_Controller
 			} else {
 				Template::set('close_modal', 0);
 				Template::set('message_type', 'danger');
-				Template::set('message', lang('pj_there_was_a_problem_while_creating_project'));
 				Template::render();
 				return;
 			}
@@ -88,6 +88,15 @@ class Projects extends Authenticated_Controller
 		));
 
 		if ($this->form_validation->run() === false) {
+			logit('form_validation false');
+			Template::set('message', lang('pj_there_was_a_problem_while_creating_project'));
+			return false;
+		}
+
+		$check_cost_code = $this->project_model->where('organization_id', $this->current_user->current_organization_id)->find_by('cost_code', $project_data['cost_code']);
+
+		if ($check_cost_code !== false) {
+			Template::set('message', lang('pj_duplicated_cost_code'));
 			return false;
 		}
 
@@ -95,10 +104,12 @@ class Projects extends Authenticated_Controller
 		if ($type == 'insert') {
 			$project_data['organization_id'] = $this->current_user->current_organization_id;
 			$project_data['owner_id'] = $project_data['created_by'] = $this->current_user->user_id;
+			$project_data['cost_code'] = strtoupper($project_data['cost_code']);
 
 			$project_id = $this->project_model->insert($project_data);
 
 			if ($project_id === false) {
+				logit('project_id false');
 				return false;
 			}
 
@@ -129,23 +140,30 @@ class Projects extends Authenticated_Controller
 									->where_in('email', $invited_team)
 									->find_all();
 
-			foreach ($invited_team as $email) {
-				foreach ($registered_users as $user) {
-					$is_found = false;
-
-					if ($user->email == $email) {
-						$project_members[$user->user_id] = [
-							'project_id' => $project_id,
-							'user_id' => $user->user_id
-						];
-
-						$is_found = true;
-						break;
+			if ($invited_team) {
+				foreach ($invited_team as $email) {
+					if (! $registered_users) {
+						// $this->invitation->generate($email, $this->current_user);
+						continue;
 					}
 
-					// Invite to the party
-					if ( ! $is_found) {
-						// $this->invitation->generate($email, $this->current_user);
+					foreach ($registered_users as $user) {
+						$is_found = false;
+
+						if ($user->email == $email) {
+							$project_members[$user->user_id] = [
+								'project_id' => $project_id,
+								'user_id' => $user->user_id
+							];
+
+							$is_found = true;
+							break;
+						}
+
+						// Invite to the party
+						if ( ! $is_found) {
+							// $this->invitation->generate($email, $this->current_user);
+						}
 					}
 				}
 			}

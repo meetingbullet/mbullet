@@ -67,11 +67,12 @@ class Step_model extends BF_Model
 		parent::__construct();
 	}
 
-	public function get_step_id($step_key, $current_user)
-	{
-		if (! class_exists('Role_model')) {
-			$this->load->model('roles/role_model');
-		}
+	
+    public function get_step_id($step_key, $current_user)
+    {
+        if (! class_exists('Role_model')) {
+            $this->load->model('roles/role_model');
+        }
 
 		// check user is organization owner or not
 		$is_owner = $this->role_model->where('role_id', $current_user->role_ids[$current_user->current_organization_id])
@@ -96,10 +97,11 @@ class Step_model extends BF_Model
 							->find_by('steps.step_key', $step_key);
 		}
 
-		if (! empty($step)) {
-			return $step->step_id;
-		}
+        if (! empty($step)) {
+            return $step->step_id;
+        }
 
-		return false;
-	}
+        return false;
+    }
+
 }

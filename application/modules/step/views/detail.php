@@ -15,12 +15,12 @@ $buttons = [
 		'label' => lang('st_start_step'),
 		'next_status' => 'in-progress',
 	],
-	'in-progress' => [
+	'inprogress' => [
 		'icon' => 'ion-android-done',
 		'label' => lang('st_ready'),
 		'next_status' => 'ready-for-review',
 	],
-	'ready-for-review' => [
+	'ready' => [
 		'icon' => 'ion-android-done-all',
 		'label' => lang('st_resolve'),
 		'next_status' => 'resolved',
@@ -46,7 +46,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 
 <div class="btn-block">
 	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
-	<a href='#' class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
+	<a href='#' id="edit-step" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
 	<a class="an-btn an-btn-primary" id="change-step-status" data-next-status="<?php echo $buttons[$step->status]['next_status'] ?>" data-update-status-url="<?php echo base_url('/step/update_status/' . $step_key . '?status=' . urlencode($buttons[$step->status]['next_status'])) ?>"><i class="<?php echo $buttons[$step->status]['icon'] ?>"></i> <?php echo $buttons[$step->status]['label'] ?></a>
 </div>
 
@@ -91,14 +91,14 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 								</tr>
 							</thead>
 							<tbody>
-								<?php foreach ($tasks as $task) : ?>
+								<?php if($tasks): foreach ($tasks as $task) : ?>
 								<tr>
 									<td><?php echo anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
 									<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name)?></td>
 									<td><?php e($task->owner_name)?></td>
 									<td><?php e($task->status)?></td>
 								</tr>
-								<?php endforeach ?>
+								<?php endforeach; endif; ?>
 							</tbody>
 						</table>
 					</div>
@@ -118,7 +118,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 				<div class="an-helper-block">
 					<div class="an-input-group">
 						<ul class="list-unstyled list-member">
-							<?php foreach ($invited_members as $user): 
+							<?php if ($invited_members): foreach ($invited_members as $user): 
 								$user->avatar = avatar_url($user->avatar, $user->email);
 							?>
 							<li>
@@ -127,7 +127,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 
 								<span class="badge badge-<?php e($cost_of_time_to_badge[$user->cost_of_time])?> badge-bordered pull-right"><?php e($user->cost_of_time_name)?></span>
 							</li>
-							<?php endforeach; ?>
+							<?php endforeach; endif;?>
 						</ul>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
@@ -151,5 +151,13 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div> <!-- end .AN-SINGLE-COMPONENT  -->
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+		</div>
 	</div>
 </div>
