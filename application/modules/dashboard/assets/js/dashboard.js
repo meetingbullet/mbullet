@@ -53,6 +53,11 @@ $(document).ready(function() {
                         type: data.message_type,
                         z_index: 1051
                     });
+
+                    if (data.message_type == 'success') {
+                        // @TODO Refresh Step list
+                        location.reload();
+                    }
                 }
             }
         });
