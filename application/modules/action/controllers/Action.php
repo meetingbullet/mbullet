@@ -131,10 +131,7 @@ class Action extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$project_members = $this->project_member_model->select('u.user_id, email, first_name, last_name, avatar')
-													->join('users u', 'u.user_id = project_members.user_id')
-													->where('project_id', $project_id)
-													->find_all();
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 
 		Assets::add_js($this->load->view('create_js', [
 			'project_members' => $project_members
