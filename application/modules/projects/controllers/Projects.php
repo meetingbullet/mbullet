@@ -165,12 +165,21 @@ class Projects extends Authenticated_Controller
 			redirect('/dashboard');
 		}
 
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
-		if ($project_id === false) {
+		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, 'projects.*, u.email, u.avatar, CONCAT(u.first_name, u.last_name) as full_name');
+		if ($project === false) {
 			redirect('/dashboard');
 		}
 
-		// $project_id = 1; // test
+		$project_id = $project->project_id;
+		/***************** PROJECT DETAIL *****************/
+		$constraint = $this->project_constraint_model->find($project_id);
+		$expectation = $this->project_expectation_model->find($project_id);
+
+		Template::set('detail', [
+			'constraint' => $constraint,
+			'expectation' => $expectation,
+			'project' => $project
+		]);
 		/*---------------------------------- INFO TAB ----------------------------------*/
 		/***************** PAGINATION *****************/
 		$this->load->library('pagination');
@@ -205,10 +214,7 @@ class Projects extends Authenticated_Controller
 		// pagination for actions
 		$config_actions = $pagination_config;
 		$config_actions['query_string_segment'] = 'actions_page';
-		$config_actions['total_rows'] = $this->db->select('count(*) as count')
-												->from('actions a')
-												->where('a.project_id', $project_id)
-												->get()->row()->count;
+		$config_actions['total_rows'] = $this->project_model->count_actions($project_id);
 		$this->pagination->initialize($config_actions);
 		// generate links
 		$actions_links = $this->pagination->create_links();
@@ -216,11 +222,7 @@ class Projects extends Authenticated_Controller
 		// pagination for steps
 		$config_steps = $pagination_config;
 		$config_steps['query_string_segment'] = 'steps_page';
-		$config_steps['total_rows'] = $this->db->select('count(*) as count')
-											->from('actions a')
-											->join('steps s', 'a.action_id = s.action_id', 'left')
-											->where('a.project_id', $project_id)
-											->get()->row()->count;
+		$config_steps['total_rows'] = $this->project_model->count_steps($project_id);
 		$this->pagination->initialize($config_steps);
 		// generate links
 		$steps_links = $this->pagination->create_links();
@@ -228,12 +230,7 @@ class Projects extends Authenticated_Controller
 		// pagination for tasks
 		$config_tasks = $pagination_config;
 		$config_tasks['query_string_segment'] = 'tasks_page';
-		$config_tasks['total_rows'] = $this->db->select('count(*) as count')
-											->from('actions a')
-											->join('steps s', 'a.action_id = s.action_id', 'left')
-											->join('tasks t', 's.step_id = t.step_id', 'left')
-											->where('a.project_id', $project_id)
-											->get()->row()->count;
+		$config_tasks['total_rows'] = $this->project_model->count_tasks($project_id);
 		$this->pagination->initialize($config_tasks);
 		// generate links
 		$tasks_links = $this->pagination->create_links();
@@ -245,12 +242,7 @@ class Projects extends Authenticated_Controller
 			$actions_current_page = $this->input->get('actions_page');
 		}
 		// get actions list
-		$actions = $this->db->select('a.action_key, a.name, a.status')
-							->from('actions a')
-							->where('a.project_id', $project_id)
-							->order_by('a.created_on', 'desc')
-							->limit($pagination_config['per_page'], ($actions_current_page - 1) * $pagination_config['per_page'])
-							->get()->result();
+		$actions = $this->project_model->get_actions($project_id, $pagination_config['per_page'], ($actions_current_page - 1) * $pagination_config['per_page']);
 
 		// get steps current page
 		$steps_current_page = 1;
@@ -258,13 +250,7 @@ class Projects extends Authenticated_Controller
 			$steps_current_page = $this->input->get('steps_page');
 		}
 		// get steps list
-		$steps = $this->db->select('a.action_key, s.step_key, s.name, s.status')
-							->from('actions a')
-							->join('steps s', 'a.action_id = s.action_id', 'left')
-							->where('a.project_id', $project_id)
-							->order_by('s.created_on', 'desc')
-							->limit($pagination_config['per_page'], ($steps_current_page - 1) * $pagination_config['per_page'])
-							->get()->result();
+		$steps = $this->project_model->get_steps($project_id, $pagination_config['per_page'], ($steps_current_page - 1) * $pagination_config['per_page']);
 
 		// get tasks current page
 		$tasks_current_page = 1;
@@ -272,14 +258,7 @@ class Projects extends Authenticated_Controller
 			$tasks_current_page = $this->input->get('tasks_page');
 		}
 		// get tasks list
-		$tasks = $this->db->select('a.action_key, s.step_key, t.task_key, t.name, t.status')
-							->from('actions a')
-							->join('steps s', 'a.action_id = s.action_id', 'left')
-							->join('tasks t', 's.step_id = t.step_id', 'left')
-							->where('a.project_id', $project_id)
-							->order_by('t.created_on', 'desc')
-							->limit($pagination_config['per_page'], ($tasks_current_page - 1) * $pagination_config['per_page'])
-							->get()->result();
+		$tasks = $this->project_model->get_tasks($project_id, $pagination_config['per_page'], ($tasks_current_page - 1) * $pagination_config['per_page']);
 
 		Template::set('info_tab_data', [
 			'paginations' => [
@@ -302,11 +281,15 @@ class Projects extends Authenticated_Controller
 		/*---------------------------------- Report TAB ----------------------------------*/
 		Template::set('report_tab_data', []);
 
+		if (! function_exists('avatar_url')) {
+			$this->load->helper('mb_general');
+		}
+
 		Assets::add_module_css('action', 'action.css');
 		Assets::add_module_js('action', 'action.js');
 		Assets::add_module_css('projects', 'projects.css');
 		Assets::add_module_js('projects', 'action_board.js');
-		Template::set('project_name', $this->project_model->get_field($project_id, 'name'));
+		Template::set('project_name', $project->name);
 		Template::set('project_key', $project_key);
 		Template::set_view('detail');
 		Template::render();
@@ -490,36 +473,4 @@ class Projects extends Authenticated_Controller
 
 		return $actions;
 	}
-
-	// private function get_project_id($project_key)
-	// {
-	// 	if (! class_exists('Project_model')) {
-	// 		$this->load->model('Project_model');
-	// 	}
-
-	// 	if (! class_exists('Role_model')) {
-	// 		$this->load->model('roles/role_model');
-	// 	}
-	// 	// check user is organization owner or not
-	// 	$is_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
-	// 								->count_by('is_public', 1) == 1 ? true : false;
-	// 	// get project id
-	// 	if ($is_owner) {
-	// 		$project = $this->project_model->select('project_id, projects.name')
-	// 									->where('projects.organization_id', $this->current_user->current_organization_id)
-	// 									->find_by('projects.cost_code', $project_key);
-	// 	} else {
-	// 		$project = $this->project_model->select('pm.project_id, projects.name')
-	// 									->join('project_members pm', 'pm.project_id = projects.projet_id', 'inner')
-	// 									->where('projects.organization_id', $this->current_user->current_organization_id)
-	// 									->where('pm.user_id', $this->current_user->user_id)
-	// 									->find_by('projects.cost_code', $project_key);
-	// 	}
-
-	// 	if (! empty($project)) {
-	// 		return $project->project_id;
-	// 	}
-
-	// 	return false;
-	// }
 }

@@ -23,10 +23,20 @@ $(document).ready(function() {
 		}
 	});
 
-	refresh_action_board_multiple();
+	if ($('#board').length) {
+		refresh_action_board_multiple();
+	}
 
 	$('#board .status .actions').on('click', '.add-action button', function() {
 		var url = $('#board').data('add-action-url');
+		$.get(url).done(function(data) {
+			data = JSON.parse(data);
+			$('#bigModal .modal-content').empty().append(data.modal_content);
+		});
+	});
+
+	$('#add_action').on('click', function() {
+		var url = $('#add_action').data('add-action-url');
 		$.get(url).done(function(data) {
 			data = JSON.parse(data);
 			$('#bigModal .modal-content').empty().append(data.modal_content);
