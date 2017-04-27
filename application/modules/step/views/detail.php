@@ -70,6 +70,14 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
 						<div class="col-xs-8" id="status"><?php e(str_replace('-', ' ', $step->status))?></div>
 					</div>
+					<div class="row">
+						<div class="col-xs-4"><?php e(lang('st_point_used'))?></div>
+						<div class="col-xs-8" id="status"><?php e($point_used) ?></div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4"><?php e(lang('st_in'))?></div>
+						<div class="col-xs-8" id="status"><?php e($step->in) ?></div>
+					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div> <!-- end .AN-SINGLE-COMPONENT  -->
@@ -103,7 +111,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 						</table>
 					</div>
 
-					<button class="an-btn an-btn-primary" id="add-task"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button>
+					<!--button class="an-btn an-btn-primary" id="add-task"><?php //echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button-->
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div>
