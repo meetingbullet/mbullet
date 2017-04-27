@@ -100,6 +100,7 @@ $project_key = $project_key['0'];
 									<tr>
 										<th><?php e(lang('ac_key'))?></th>
 										<th><?php e(lang('ac_name'))?></th>
+										<th><?php e(lang('ac_point_used'))?></th>
 										<th><?php e(lang('ac_owner'))?></th>
 										<th><?php e(lang('ac_status'))?></th>
 									</tr>
@@ -109,6 +110,7 @@ $project_key = $project_key['0'];
 									<tr>
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->step_key)?></td>
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name)?></td>
+										<td><?php e($step->point_used)?></td>
 										<td><?php e($step->owner_name)?></td>
 										<td><?php e($step->status)?></td>
 									</tr>

@@ -57,7 +57,7 @@ class Action extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$point_used = $this->step_model->select('SUM(cost_of_time) AS point_used', false)
+		$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
 													->join('step_members sm', 'steps.step_id = sm.step_id')
 													->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
 													->where('action_id', $action->action_id)
@@ -85,7 +85,21 @@ class Action extends Authenticated_Controller
 									->where('action_id', $action->action_id)
 									->order_by('step_id')
 									->order_by('status')
-									->find_all();
+									->find_all();	
+
+
+		// @TODO need to optimize query
+		if ($steps) {
+			foreach ($steps as &$step) {
+				$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
+								->join('step_members sm', 'steps.step_id = sm.step_id')
+								->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
+								->where('sm.step_id', $step->step_id)
+								->find_all();
+
+				$step->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
+			}
+		}
 
 		$invited_members =  $this->user_model
 								->select('uto.user_id, email, CONCAT(first_name, " ", last_name) AS name,

@@ -155,7 +155,7 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_actions($project_id, $limit, $offset, $select = 'a.action_key, a.name, a.status')
+	public function get_actions($project_id, $limit, $offset, $select = 'a.action_key, a.name, a.status, a.action_id, a.point_value')
 	{
 		$query = $this->db->select($select)
 						->from('actions a')
@@ -170,7 +170,7 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_steps($project_id, $limit, $offset, $select = 'a.action_key, s.step_key, s.name, s.status')
+	public function get_steps($project_id, $limit, $offset, $select = 'a.action_key, s.step_key, s.name, s.status, s.step_id')
 	{
 		$query = $this->db->select($select)
 						->from('steps s')
