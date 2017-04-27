@@ -267,6 +267,7 @@ class Users extends Front_Controller
 					$this->load->library('upload', $upload_config);
 					$this->upload->do_upload('avatar');
 					$data['avatar'] = $this->upload->data();
+					$data['avatar'] = $data['avatar']['file_name'];
 				} else {
 					unset($data['avatar']);
 				}
