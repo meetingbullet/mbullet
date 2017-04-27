@@ -15,6 +15,8 @@ class Projects extends Authenticated_Controller
 		$this->load->model('project_constraint_model');
 		$this->load->model('project_expectation_model');
 		$this->load->model('project_member_model');
+		$this->load->model('step/step_model');
+		$this->load->model('action/action_model');
 
 		Assets::add_module_js('projects', 'projects.js');
 	}
@@ -262,6 +264,22 @@ class Projects extends Authenticated_Controller
 		// get actions list
 		$actions = $this->project_model->get_actions($project_id, $pagination_config['per_page'], ($actions_current_page - 1) * $pagination_config['per_page']);
 
+		// @TODO need to optimize query
+		$project->total_project_point_used = 0;
+		if ($actions) {
+			foreach ($actions as &$action) {
+				$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
+													->join('step_members sm', 'steps.step_id = sm.step_id')
+													->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
+													->where('action_id', $action->action_id)
+													->find_all();
+
+				$action->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
+
+				$project->total_project_point_used += $action->point_used;
+			}
+		}
+
 		// get steps current page
 		$steps_current_page = 1;
 		if (! empty($this->input->get('steps_page'))) {
@@ -269,6 +287,19 @@ class Projects extends Authenticated_Controller
 		}
 		// get steps list
 		$steps = $this->project_model->get_steps($project_id, $pagination_config['per_page'], ($steps_current_page - 1) * $pagination_config['per_page']);
+
+		// @TODO need to optimize query
+		if ($steps) {
+			foreach ($steps as &$step) {
+				$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
+								->join('step_members sm', 'steps.step_id = sm.step_id')
+								->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
+								->where('sm.step_id', $step->step_id)
+								->find_all();
+
+				$step->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
+			}
+		}
 
 		// get tasks current page
 		$tasks_current_page = 1;

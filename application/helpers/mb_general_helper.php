@@ -12,14 +12,14 @@ if (! function_exists('avatar_url')) {
 	 *
 	 * @return string The formatted input element, label tag and wrapping divs.
 	 */
-	function avatar_url($avatar, $email = NULL, $size = 24)
+	function avatar_url($avatar, $email = NULL, $size = 48)
 	{
 		if (! empty($avatar)) {
 			if (strstr($avatar, 'http') !== false) {
 				return $avatar;
 			} else {
 				if (file_exists('assets/images/users/' . $avatar)) {
-					return img_path() . 'users/' . $avatar;
+					return base_url('images/' . $avatar . '?assets=assets/images/users&ratio=1&width=' . $size . '&height=' . $size);
 				}
 			}
 		}

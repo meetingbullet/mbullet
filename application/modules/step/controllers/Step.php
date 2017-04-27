@@ -283,9 +283,18 @@ class Step extends Authenticated_Controller
 									->order_by('name')
 									->order_by('uto.cost_of_time', 'DESC')
 									->find_all();
+		$point_used = 0;
+		if (is_array($invited_members) && count($invited_members) > 0) {
+			foreach ($invited_members as $member) {
+				$point_used += $member->cost_of_time;
+			}
+
+			$point_used *= $step->in;
+		}
 
 		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key], true), 'inline');
 		Template::set('invited_members', $invited_members);
+		Template::set('point_used', $point_used);
 		Template::set('step', $step);
 		Template::set('tasks', $tasks);
 		Template::set('project_key', $project_key);

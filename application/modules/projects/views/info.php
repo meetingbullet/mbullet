@@ -22,6 +22,8 @@ $label = [
 			<div class="list-title">
 				<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
 				<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+				<h6 class="basis-30"><?php e(lang('pj_point_defined')) ?></h6>
+				<h6 class="basis-30"><?php e(lang('pj_point_used')) ?></h6>
 				<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
 			</div>
 
@@ -36,6 +38,12 @@ $label = [
 					</div>
 					<div class="list-name basis-50">
 						<a href="<?php e("/action/{$item->action_key}") ?>"><?php e($item->name) ?></a>
+					</div>
+					<div class="list-name basis-30">
+						<?php e($item->point_value) ?>
+					</div>
+					<div class="list-name basis-30">
+						<?php e($item->point_used) ?>
 					</div>
 					<div class="list-action basis-20">
 						<span class="msg-tag <?php echo $label[$item->status] ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
@@ -74,6 +82,7 @@ $label = [
 			<div class="list-title">
 				<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
 				<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+				<h6 class="basis-30"><?php e(lang('pj_point_used')) ?></h6>
 				<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
 			</div>
 
@@ -88,6 +97,9 @@ $label = [
 					</div>
 					<div class="list-name basis-50">
 						<a href="<?php e("/step/{$item->step_key}") ?>"><?php e($item->name) ?></a>
+					</div>
+					<div class="list-name basis-30">
+						<?php e($item->point_used) ?>
 					</div>
 					<div class="list-action basis-20">
 						<span class="msg-tag <?php echo $label[$item->status] ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
