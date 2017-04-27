@@ -265,6 +265,7 @@ class Projects extends Authenticated_Controller
 		$actions = $this->project_model->get_actions($project_id, $pagination_config['per_page'], ($actions_current_page - 1) * $pagination_config['per_page']);
 
 		// @TODO need to optimize query
+		$project->total_project_point_used = 0;
 		if ($actions) {
 			foreach ($actions as &$action) {
 				$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
@@ -274,6 +275,8 @@ class Projects extends Authenticated_Controller
 													->find_all();
 
 				$action->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
+
+				$project->total_project_point_used += $action->point_used;
 			}
 		}
 
