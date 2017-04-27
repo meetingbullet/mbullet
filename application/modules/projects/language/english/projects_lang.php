@@ -17,6 +17,9 @@ $lang['pj_created_on'] = 'Created on';
 $lang['pj_mofified_on'] = 'Modified on';
 $lang['pj_cost_unit_time'] = 'Cost/Unit of time';
 $lang['pj_back'] = 'Back';
+$lang['pj_point_defined'] = 'Point defined';
+$lang['pj_point_used'] = 'Point Used';
+$lang['pj_total_project_point_used'] = 'Total project points used';
 
 // Messages
 $lang['pj_project_successfully_created'] = 'Project successfully created';

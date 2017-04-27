@@ -150,6 +150,14 @@ label>.required {
 	max-height: none !important; 
 }
 
+.input-group .form-control {
+    position: relative;
+    z-index: 2;
+    float: left;
+    width: 100%;
+    margin-bottom: 0;
+}
+
 @media (max-width: 767px) {
 	body {
 		padding-right: 0;

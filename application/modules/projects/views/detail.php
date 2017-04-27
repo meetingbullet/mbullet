@@ -32,6 +32,8 @@
 				<div class="col-md-6 pj-detail-item"><img style="width: 24px; height: auto;" src="<?php echo avatar_url($detail['project']->avatar, $detail['project']->email) ?>" class="img-circle"/> <?php e($detail['project']->full_name) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_detail_tab_info_table_label_status') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e(str_replace('-', ' ', $detail['project']->status)) ?></div>
+				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_project_point_used') . ':' ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->total_project_point_used) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_created_on') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->created_on) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_mofified_on') . ':' ?></div>
