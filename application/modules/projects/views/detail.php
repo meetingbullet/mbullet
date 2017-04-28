@@ -1,16 +1,16 @@
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
 		<h2><?php e($project_name)?>
-			<button type="button" class="an-btn an-btn-icon small dropdown-toggle setting btn-prj-more" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+			<button type="button" class="an-btn an-btn-icon small dropdown-toggle setting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 				<i class="ion-ios-more-outline"></i>
 			</button>
 			<div class="dropdown-menu right-align">
 				<ul class="an-basic-list">
-				<li><a href="#"><? e(lang('pj_more_btn_open_pj')) ?></a></li>
-				<li><a href="#"><? e(lang('pj_more_btn_inactive_pj')) ?></a></li>
-				<li><a href="#"><? e(lang('pj_more_btn_archive_pj')) ?></a></li>
+				<li><a href="#"><?php e(lang('pj_more_btn_open_pj')) ?></a></li>
+				<li><a href="#"><?php e(lang('pj_more_btn_inactive_pj')) ?></a></li>
+				<li><a href="#"><?php e(lang('pj_more_btn_archive_pj')) ?></a></li>
 				<li role="separator" class="divider"></li>
-				<li><a href="#"><? e(lang('pj_more_btn_pj_setting')) ?></a></li>
+				<li><a href="<?php echo site_url('projects/settings/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
 				</ul>
 			</div>
 		</h2>
