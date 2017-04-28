@@ -1,7 +1,7 @@
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
 		<h2><?php e($project_name)?>
-			<button type="button" class="an-btn an-btn-icon small dropdown-toggle setting btn-prj-more" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+			<button type="button" class="an-btn an-btn-icon small dropdown-toggle setting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 				<i class="ion-ios-more-outline"></i>
 			</button>
 			<div class="dropdown-menu right-align">
