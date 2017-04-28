@@ -109,3 +109,32 @@
 #back-btn {
 	float: right;
 }
+
+.inline-inputs {
+	overflow: hidden;
+}
+
+.inline-inputs .legend {
+	color: #aaa;
+	font-style: italic;
+	padding-top: 0 !important;
+	padding-bottom: 30px !important;
+}
+
+.inline-inputs div[class^="basis"],
+.inline-inputs div[class^="col-"] {
+	float: left;
+	padding: 15px;
+}
+
+.thresholds .an-form-control {
+	margin: 0 15px;
+}
+
+.thresholds .list-title h6 {
+	text-align: center !important;
+}
+
+.margin-0 {
+	margin: 0 !important;
+}
