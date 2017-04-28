@@ -478,6 +478,45 @@ class Projects extends Authenticated_Controller
 		exit;
 	}
 
+	public function settings($project_key = null)
+	{
+		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, '*', false);
+
+		if ($project === false || $this->auth->has_permission('Project.Config.All') === false || $this->auth->has_permission('Project.Config.Joined') === false) {
+			Template::set_message(lang('pj_not_have_config_permission') , 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->input->post()) {
+			$rules = $this->project_model->get_validation_rules();
+			$this->form_validation->set_rules($rules['settings']);
+
+			if ($this->form_validation->run() !== false) {
+				$settings = $this->project_model->prep_data($this->input->post());
+				foreach ($settings as $key => $value) {
+					if (empty($value)) {
+						unset($settings[$key]);
+					}
+				}
+
+				$updated = $this->project_model->update($project->project_id, $settings);
+				if (! $updated) {
+					$error = true;
+				}
+			} else {
+				$error = true;
+			}
+
+			if (! empty($error)) {
+				Template::set_message(lang('pj_there_was_a_problem_while_updating_project_settings'), 'danger');
+			}
+		}
+
+		Assets::add_module_css('projects', 'projects.css');
+		Template::set('project', $project);
+		Template::render();
+	}
+
 	private function get_actions($project_id)
 	{
 		if (! function_exists('avatar_url')) {

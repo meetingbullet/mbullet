@@ -51,8 +51,154 @@ class Project_model extends BF_Model
             'rules' => 'trim|required|max_length[64]',
         )
     );
+
+	protected $validation_rules	= array(
+		'settings' => array(
+			array(
+				'field' => 'cost_of_time_1',
+				'label' => 'lang:pj_cost_of_time',
+				'rules' => 'trim|required'
+			),
+			array(
+				'field' => 'cost_of_time_2',
+				'label' => 'lang:pj_cost_of_time',
+				'rules' => 'trim|required'
+			),
+			array(
+				'field' => 'cost_of_time_3',
+				'label' => 'lang:pj_cost_of_time',
+				'rules' => 'trim|required'
+			),
+			array(
+				'field' => 'cost_of_time_4',
+				'label' => 'lang:pj_cost_of_time',
+				'rules' => 'trim|required'
+			),
+			array(
+				'field' => 'cost_of_time_5',
+				'label' => 'lang:pj_cost_of_time',
+				'rules' => 'trim|required'
+			),
+			array(
+				'field' => 'value_of_time_1',
+				'label' => 'lang:pj_value_of_time',
+				'rules' => 'trim|required|numeric'
+			),
+			array(
+				'field' => 'value_of_time_2',
+				'label' => 'lang:pj_cost_of_time',
+				'rules' => 'trim|required|numeric'
+			),
+			array(
+				'field' => 'value_of_time_3',
+				'label' => 'lang:pj_value_of_time',
+				'rules' => 'trim|required|numeric'
+			),
+			array(
+				'field' => 'value_of_time_4',
+				'label' => 'lang:pj_value_of_time',
+				'rules' => 'trim|required|numeric'
+			),
+			array(
+				'field' => 'value_of_time_5',
+				'label' => 'lang:pj_value_of_time',
+				'rules' => 'trim|required|numeric'
+			),
+			array(
+				'field' => 'project_no_of_hour',
+				'label' => 'lang:pj_project_no_of_hour',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'step_owner_no_of_hour',
+				'label' => 'lang:pj_step_owner_no_of_hour',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'contributor_no_of_hour',
+				'label' => 'lang:pj_contributor_no_of_hour',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'project_total_cost',
+				'label' => 'lang:pj_project_total_cost',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'step_owner_total_cost',
+				'label' => 'lang:pj_step_owner_total_cost',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'contributor_total_cost',
+				'label' => 'lang:pj_contributor_total_cost',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'project_no_of_point',
+				'label' => 'lang:pj_project_no_of_point',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'step_owner_no_of_point',
+				'label' => 'lang:pj_step_owner_no_of_point',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'contributor_no_of_point',
+				'label' => 'lang:pj_contributor_no_of_point',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'project_min_ratio',
+				'label' => 'lang:pj_project_min_ratio',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'step_owner_min_ratio',
+				'label' => 'lang:pj_step_owner_min_ratio',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'contributor_min_ratio',
+				'label' => 'lang:pj_contributor_min_ratio',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'project_min_star',
+				'label' => 'lang:pj_project_min_star',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'step_owner_min_star',
+				'label' => 'lang:pj_step_owner_min_star',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'contributor_min_star',
+				'label' => 'lang:pj_contributor_min_star',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'point_converter',
+				'label' => 'lang:pj_point_converter',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'cost',
+				'label' => 'lang:pj_cost',
+				'rules' => 'trim|numeric'
+			),
+			array(
+				'field' => 'value',
+				'label' => 'lang:pj_value',
+				'rules' => 'trim|numeric'
+			),
+		),
+    );
+
 	protected $insert_validation_rules  = array();
-	protected $skip_validation	= false;
+	protected $skip_validation	= true;
 
 	/**
 	 * Constructor
