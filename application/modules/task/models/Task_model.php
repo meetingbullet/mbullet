@@ -42,7 +42,11 @@ class Task_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	public $validation_rules		= array();
+	public $validation_rules		= array(
+		'create' => array(
+			
+		)
+	);
 	protected $insert_validation_rules  = array();
 	protected $skip_validation	= true;
 

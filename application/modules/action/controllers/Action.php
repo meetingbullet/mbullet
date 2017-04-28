@@ -331,7 +331,7 @@ class Action extends Authenticated_Controller
 				}
 			}
 		}
-dump($action);
+
 		Assets::add_module_js('action', 'create.js');
 		Template::set('project_key', $project_key);
 		Template::set('form_error', $form_error);
