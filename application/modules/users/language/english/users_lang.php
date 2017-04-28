@@ -241,3 +241,5 @@ $lang['form_validation_unique_email_check'] = 'This email address has been used 
 $lang['form_validation_confirm_required'] = 'Please agree with our Terms of Service.';
 // google sign in
 $lang['us_with_google'] = 'using Google';
+
+$lang['us_login_google_code_error'] = 'Can not validate with Google, please try again!';

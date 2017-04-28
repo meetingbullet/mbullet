@@ -105,22 +105,28 @@ class Users extends Front_Controller
 		$client->addScope("email");
 		$client->addScope("profile");
 
+		// signin by google url
 		Template::set('auth_url', $client->createAuthUrl());
-		// if logged in via google
-		$service = new Google_Service_Oauth2($client);
 
 		if (isset($_GET['error'])) {
 			Template::set_message(lang('us_failed_login_attempts'), 'danger');
 		}
 
+		// login by google account
 		if (isset($_GET['code'])) {
+			// merge user & add user to db
+			$service = new Google_Service_Oauth2($client);
 			try {
-				$client->authenticate($_GET['code']);
+				$ret = $client->authenticate($_GET['code']);
+				if (isset($ret) && ($ret['error'])) {
+					throw new Exception(lang('us_login_google_code_error'));
+				}
 				$token = $client->getAccessToken();
 				$google_user = $service->userinfo->get();
 
 				$user = $this->user_model->find_by('email', $google_user->email);
 				if (! $user) {
+					// add google user to db
 					$added = $this->user_model->insert([
 						'email' => $google_user->email,
 						'google_refresh_token' => $token['refresh_token'],
@@ -146,6 +152,7 @@ class Users extends Front_Controller
 					if (! empty($token['refresh_token'])) {
 						$update_data['google_refresh_token'] = $token['refresh_token'];
 					}
+					// merge user if email exist
 					$updated = $this->user_model->update($user->user_id, $update_data);
 
 					if (! $updated) {
@@ -168,7 +175,7 @@ class Users extends Front_Controller
 			&& true === $this->auth->login(
 				$google_user->email,
 				null,
-				false,
+				true,
 				true,
 				$token['id_token']
 			))

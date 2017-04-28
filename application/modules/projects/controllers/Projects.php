@@ -482,7 +482,21 @@ class Projects extends Authenticated_Controller
 	{
 		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, '*', false);
 
-		if ($project === false || $this->auth->has_permission('Project.Config.All') === false || $this->auth->has_permission('Project.Config.Joined') === false) {
+		if ($project === false) {
+			Template::set_message(lang('pj_not_have_config_permission') , 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		} elseif ($project !== false) {
+			if (! class_exists('Role_model')) {
+				$this->load->model('roles/role_model');
+			}
+			$is_organization_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
+													->count_by('is_public', 1) == 1 ? true : false;
+
+			if ($project->owner_id != $this->current_user->user_id && $is_organization_owner === false) {
+				Template::set_message(lang('pj_not_have_config_permission') , 'danger');
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
+		} elseif ($this->auth->has_permission('Project.Config.All') === false || $this->auth->has_permission('Project.Config.Joined') === false) {
 			Template::set_message(lang('pj_not_have_config_permission') , 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
