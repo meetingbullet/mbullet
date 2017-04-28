@@ -127,12 +127,12 @@
 	padding: 15px;
 }
 
-.thresholds .an-form-control {
-	margin: 0 15px;
+.thresholds .list-name {
+	padding-right: 15px;
 }
 
 .thresholds .list-title h6 {
-	text-align: center !important;
+	text-align: left !important;
 }
 
 .margin-0 {
