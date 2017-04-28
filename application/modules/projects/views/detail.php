@@ -6,11 +6,11 @@
 			</button>
 			<div class="dropdown-menu right-align">
 				<ul class="an-basic-list">
-				<li><a href="#"><? e(lang('pj_more_btn_open_pj')) ?></a></li>
-				<li><a href="#"><? e(lang('pj_more_btn_inactive_pj')) ?></a></li>
-				<li><a href="#"><? e(lang('pj_more_btn_archive_pj')) ?></a></li>
+				<li><a href="#"><?php e(lang('pj_more_btn_open_pj')) ?></a></li>
+				<li><a href="#"><?php e(lang('pj_more_btn_inactive_pj')) ?></a></li>
+				<li><a href="#"><?php e(lang('pj_more_btn_archive_pj')) ?></a></li>
 				<li role="separator" class="divider"></li>
-				<li><a href="#"><? e(lang('pj_more_btn_pj_setting')) ?></a></li>
+				<li><a href="<?php echo site_url('projects/settings/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
 				</ul>
 			</div>
 		</h2>
