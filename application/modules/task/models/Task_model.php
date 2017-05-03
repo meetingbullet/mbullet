@@ -53,7 +53,7 @@ class Task_model extends BF_Model
 				'field' => 'type',
 				'label' => 'lang:tk_type',
 				'rules' => 'trim|required|max_length[255]',
-			)
+			),
 		)
 	);
 	protected $insert_validation_rules  = array();

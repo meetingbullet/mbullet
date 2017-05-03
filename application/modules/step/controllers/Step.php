@@ -292,7 +292,6 @@ class Step extends Authenticated_Controller
 			$point_used *= $step->in;
 		}
 
-		Assets::add_module_js('projects', 'projects.js');
 		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key], true), 'inline');
 		Template::set('invited_members', $invited_members);
 		Template::set('point_used', $point_used);

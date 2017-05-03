@@ -12,9 +12,9 @@ class Task extends Authenticated_Controller
 
 	public function create($step_key)
 	{
-		// if (! $this->input->is_ajax_request()) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
 		$this->load->model('step/step_model');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
@@ -28,8 +28,8 @@ class Task extends Authenticated_Controller
 		if (empty($organization_members)) {
 			$organization_members = [];
 		}
-dump($step_id);
-		if ($step_id == false) {
+
+		if ($step_id === false) {
 			Template::set('message', lang('tk_not_have_permission'));
 			Template::set('message_type', 'danger');
 		} else {
@@ -39,28 +39,39 @@ dump($step_id);
 
 				if ($this->form_validation->run() !== false) {
 					$data = $this->task_model->prep_data($this->input->post());
+					$data['step_id'] = $step_id;
+					$data['owner_id'] = $this->current_user->user_id;
+					$data['created_by'] = $this->current_user->user_id;
+					$this->load->library('project');
+					$data['task_key'] = $this->project->get_next_key($step_key);
 
 					$task_id = $this->task_model->insert($data);
 					if ($task_id) {
-						$assignees = $this->input->post('assignees');
+						$assignees = $this->input->post('assignee');
 						$assignees = explode(',', $assignees);
 						if (! empty($assignees)) {
 							foreach ($assignees as $user_id) {
-								$task_members[] = [
-									'task_id' => $task_id,
-									'user_id' => $user_id
-								];
+								if (! empty($user_id)) {
+									$task_members[] = [
+										'task_id' => $task_id,
+										'user_id' => $user_id
+									];
+								}
 							}
 
-							$this->task_member_model->delete_where(['task_id' => $task_id]);
-							$inserted = $this->task_member_model->insert_batch($member_data);
-							if ($inserted) {
+							if (! empty($task_members)) {
+								$inserted = $this->task_member_model->insert_batch($task_members);
+								if ($inserted) {
+									Template::set('message', lang('tk_create_task_success'));
+									Template::set('message_type', 'success');
+								} else {
+									Template::set('message', lang('tk_add_task_member_fail'));
+									Template::set('message_type', 'danger');
+									Template::set('close_modal', 0);
+								}
+							} else {
 								Template::set('message', lang('tk_create_task_success'));
 								Template::set('message_type', 'success');
-							} else {
-								Template::set('message', lang('tk_add_task_member_fail'));
-								Template::set('message_type', 'danger');
-								Template::set('close_modal', 0);
 							}
 						} else {
 							$error = true;
