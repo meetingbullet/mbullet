@@ -535,9 +535,9 @@ class Projects extends Authenticated_Controller
 		if ($project_id !== false) {
 			$updated = $this->project_model->update($project_id, ['status' => $this->input->get('status')]);
 			if (! $updated) {
-			echo 0;
-			exit;
-		}
+				echo 0;
+				exit;
+			}
 		}
 		echo 1;
 		exit;
