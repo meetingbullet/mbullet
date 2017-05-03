@@ -16,7 +16,7 @@ $task_types = [
 	<?php echo mb_form_input('text', 'name', lang('tk_name'), true, set_value('name')) ?>
 	<?php echo mb_form_dropdown('type', $task_types, set_value('type'), lang('tk_type'), 'class="an-form-control ' . iif( form_error('type') , ' danger') .'"', '', true) ?>
 	<?php echo mb_form_input('text', 'description', lang('tk_description'), false, set_value('description')) ?>
-	<?php echo mb_form_input('text', 'team', lang('tk_resource'), false, set_value('team'), 'team select-member an-tags-input', '', lang('tk_add_team_member')) ?>
+	<?php echo mb_form_input('text', 'assignee', lang('tk_assignee'), false, set_value('assignee'), 'team select-member an-tags-input', '', lang('tk_add_team_member')) ?>
 </div>
 
 <div class="modal-footer">
@@ -41,39 +41,6 @@ $task_types = [
 		})();
 	});
 
-	$('.owner-id').selectize({
-		plugins: ['select-member'],
-		persist: false,
-		maxItems: 1,
-		valueField: 'id',
-		labelField: 'name',
-		searchField: ['name'],
-		options: [
-			<?php foreach($project_members as $user): 
-				if (strstr($user->avatar, 'http') === false) {
-					$user->avatar = avatar_url($user->avatar, $user->email);
-				}
-			?>
-			{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
-			<?php endforeach; ?>
-		],
-		render: {
-			item: function(item, escape) {
-				return '<div>' +
-					'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
-					(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
-				'</div>';
-			},
-			option: function(item, escape) {
-				return '<div>' +
-					'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
-					(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
-				'</div>';
-			}
-		},
-		create: false
-	});
-
 	$('.team').selectize({
 		plugins: ['remove_button', 'select-member'],
 		persist: false,
@@ -82,7 +49,7 @@ $task_types = [
 		labelField: 'name',
 		searchField: ['name'],
 		options: [
-			<?php foreach($project_members as $user): 
+			<?php foreach($organization_members as $user) :
 				if (strstr($user->avatar, 'http') === false) {
 					$user->avatar = avatar_url($user->avatar, $user->email);
 				}
