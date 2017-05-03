@@ -127,7 +127,7 @@
 }
 
 .inline-inputs .input-20:not(:last-child) {
-	padding-right: 5px;
+	padding-right: 15px;
 }
 
 .inline-inputs .input-50 {
@@ -136,7 +136,7 @@
 }
 
 .inline-inputs .input-50:not(:last-child) {
-	padding-right: 5px;
+	padding-right: 15px;
 }
 
 .inline-inputs div[class^="basis"],

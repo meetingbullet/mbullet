@@ -522,6 +522,7 @@ class Projects extends Authenticated_Controller
 
 		Assets::add_module_css('projects', 'projects.css');
 		Template::set('project', $project);
+		Template::set('project_key', $project_key);
 		Template::render();
 	}
 
