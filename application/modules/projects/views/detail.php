@@ -1,3 +1,10 @@
+<?php 
+$project_label = [
+	'open' => 'read',
+	'inactive' => 'draft',
+	'archive' => 'spam'
+];
+?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
 		<h2><?php e($project_name)?></h2>
@@ -5,9 +12,27 @@
 	<button id="back-btn" class="an-btn an-btn-primary-transparent dropdown-toggle setting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="ion-ios-more-outline"></i></button>
 	<div class="dropdown-menu dropdown-menu-right">
 		<ul class="an-basic-list">
-			<li><a href="#"><?php e(lang('pj_more_btn_open_pj')) ?></a></li>
-			<li><a href="#"><?php e(lang('pj_more_btn_inactive_pj')) ?></a></li>
-			<li><a href="#"><?php e(lang('pj_more_btn_archive_pj')) ?></a></li>
+			<li class="update-btn">
+			<?php if ($detail['project']->status == 'open') : ?>
+				<a style="color: #ccc"><?php e(lang('pj_more_btn_open_pj')) ?></a>
+			<?php else : ?>
+				<a href="#" data-update-project-status-url="<?php echo site_url('projects/update_project_status/' . $project_key . '?status=open') ?>" ><?php e(lang('pj_more_btn_open_pj')) ?></a>
+			<?php endif ?>
+			</li>
+			<li class="update-btn">
+				<?php if ($detail['project']->status == 'inactive') : ?>
+					<a style="color: #ccc"><?php e(lang('pj_more_btn_inactive_pj')) ?></a>
+				<?php else : ?>
+					<a href="#" data-update-project-status-url="<?php echo site_url('projects/update_project_status/' . $project_key . '?status=inactive') ?>"><?php e(lang('pj_more_btn_inactive_pj')) ?></a>
+				<?php endif ?>
+			</li>
+			<li class="update-btn">
+				<?php if ($detail['project']->status == 'archive') : ?>
+					<a style="color: #ccc"><?php e(lang('pj_more_btn_archive_pj')) ?></a>
+				<?php else : ?>
+					<a href="#" data-update-project-status-url="<?php echo site_url('projects/update_project_status/' . $project_key . '?status=archive') ?>"><?php e(lang('pj_more_btn_archive_pj')) ?></a>
+				<?php endif ?>
+			</li>
 			<li role="separator" class="divider"></li>
 			<li><a href="<?php echo site_url('projects/settings/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
 		</ul>
@@ -27,7 +52,7 @@
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_owner') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><img style="width: 24px; height: auto;" src="<?php echo avatar_url($detail['project']->avatar, $detail['project']->email) ?>" class="img-circle"/> <?php e($detail['project']->full_name) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_detail_tab_info_table_label_status') . ':' ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e(str_replace('-', ' ', $detail['project']->status)) ?></div>
+				<div class="col-md-6 pj-detail-item"><span class="msg-tag <?php echo $project_label[$detail['project']->status] ?>"><?php e($detail['project']->status) ?></span></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_project_point_used') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->total_project_point_used) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_created_on') . ':' ?></div>

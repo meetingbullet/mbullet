@@ -118,7 +118,7 @@ class Action_model extends BF_Model
 							->join('projects p', 'p.project_id = actions.project_id', 'inner')
 							->where('p.organization_id', $current_user->current_organization_id)
 							->where('(am.user_id = \'' . $current_user->user_id . '\' OR actions.owner_id = \'' . $current_user->user_id . '\')')
-							->find_by('actions.action_key', $action_key);dump($this->db->last_query());
+							->find_by('actions.action_key', $action_key);
 		}
 
 		if (! empty($action)) {
