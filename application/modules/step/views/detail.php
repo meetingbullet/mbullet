@@ -111,7 +111,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 						</table>
 					</div>
 
-					<!--button class="an-btn an-btn-primary" id="add-task"><?php //echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button-->
+					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-task-url="<?php echo site_url('task/create/' . $step_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-task"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div>
@@ -163,7 +163,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 </div>
 
 <!-- Modal -->
-<div class="modal fade" tabindex="-1" role="dialog">
+<div class="modal fade" tabindex="-1" role="dialog" id="bigModal">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
