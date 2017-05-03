@@ -507,12 +507,6 @@ class Projects extends Authenticated_Controller
 
 			if ($this->form_validation->run() !== false) {
 				$settings = $this->project_model->prep_data($this->input->post());
-				foreach ($settings as $key => $value) {
-					if (empty($value)) {
-						unset($settings[$key]);
-					}
-				}
-
 				$updated = $this->project_model->update($project->project_id, $settings);
 				if (! $updated) {
 					$error = true;
@@ -529,6 +523,24 @@ class Projects extends Authenticated_Controller
 		Assets::add_module_css('projects', 'projects.css');
 		Template::set('project', $project);
 		Template::render();
+	}
+
+	public function update_project_status($project_key)
+	{
+		if (empty($project_key) || empty($this->input->get('status'))) {
+			echo 0;
+			exit;
+		}
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user, '*', false);
+		if ($project_id !== false) {
+			$updated = $this->project_model->update($project_id, ['status' => $this->input->get('status')]);
+			if (! $updated) {
+			echo 0;
+			exit;
+		}
+		}
+		echo 1;
+		exit;
 	}
 
 	private function get_actions($project_id)
