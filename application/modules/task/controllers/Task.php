@@ -6,7 +6,6 @@ class Task extends Authenticated_Controller
 	{
 		parent::__construct();
 		$this->load->model('task_model');
-		$this->load->model('action_model');
 		$this->lang->load('task');
 	}
 
@@ -15,6 +14,8 @@ class Task extends Authenticated_Controller
 		// if (! $this->input->is_ajax_request()) {
 		// 	redirect(DEFAULT_LOGIN_LOCATION);
 		// }
+		$this->load->model('action/action_model');
+		$this->load->helper('mb_form');
 
 		$action_id = $this->action_model->get_action_id($action_key, $this->current_user);
 
@@ -48,6 +49,6 @@ class Task extends Authenticated_Controller
 			}
 		}
 
-		Template::render('ajax');
+		Template::render();
 	}
 }

@@ -1,17 +1,8 @@
 <?php
-$success_conditions = [
-	'action_gate' => lang('tk_action_gate'),
-	'action_outcome' => lang('tk_action_outcome'),
-	'implement_outcome' => lang('tk_implement_outcome'),
-	'contingency_plan' => lang('tk_contingency_plan')
-];
-
-$action_types = [
-	'decide' => lang('tk_decide'),
-	'plan' => lang('tk_plan'),
-	'prioritize' => lang('tk_prioritize'),
-	'assess' => lang('tk_assess'),
-	'review' => lang('tk_review')
+$task_types = [
+	'agenda' => lang('tk_agenda'),
+	'system_task' => lang('tk_system_task'),
+	'jira_ticket' => lang('tk_jira_ticket'),
 ];
 ?>
 <div class="modal-header">
@@ -23,8 +14,8 @@ $action_types = [
 
 <div class="container-fluid modal-body">
 	<?php echo mb_form_input('text', 'name', lang('tk_name'), true, set_value('name')) ?>
-	<?php echo mb_form_dropdown('action_type', $action_types, set_value('action_type', ! empty($action->action_type) ? $action->action_type : null), lang('tk_action_type'), 'class="an-form-control ' . iif( form_error('action_type') , ' danger') .'"', '', true) ?>
-	<?php echo mb_form_input('text', 'owner_id', lang('tk_owner'), false, set_value('owner_id', ! empty($action->owner_id) ? $action->owner_id : null), 'owner-id an-tags-input', '', lang('tk_select_team_member')) ?>
+	<?php echo mb_form_dropdown('type', $task_types, set_value('type'), lang('tk_type'), 'class="an-form-control ' . iif( form_error('type') , ' danger') .'"', '', true) ?>
+	<?php echo mb_form_input('text', 'description', lang('tk_description'), false, set_value('description')) ?>
 	<?php echo mb_form_input('text', 'team', lang('tk_resource'), false, set_value('team'), 'team select-member an-tags-input', '', lang('tk_add_team_member')) ?>
 </div>
 
