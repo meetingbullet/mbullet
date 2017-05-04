@@ -146,12 +146,12 @@ class Action extends Authenticated_Controller
 	public function create($project_key = null, $action_key = null)
 	{
 		if (empty($project_key)) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 		// get projecct id
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		if ($project_id === false) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if(! empty($action_key)) {

@@ -101,8 +101,8 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 							<tbody>
 								<?php if($tasks): foreach ($tasks as $task) : ?>
 								<tr>
-									<td><?php echo anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
-									<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name)?></td>
+									<td><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
+									<td><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
 									<td><?php e($task->owner_name)?></td>
 									<td><?php e($task->status)?></td>
 								</tr>

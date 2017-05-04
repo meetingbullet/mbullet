@@ -217,12 +217,12 @@ class Step extends Authenticated_Controller
 	public function detail($step_key = null)
 	{
 		if (empty($step_key)) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$keys = explode('-', $step_key);
 		if (empty($keys) || count($keys) < 3) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$step = $this->step_model->select('steps.*')
@@ -233,7 +233,7 @@ class Step extends Authenticated_Controller
 								->find_by('step_key', $step_key);
 
 		if (! $step) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$step_id = $step->step_id;
@@ -307,12 +307,12 @@ class Step extends Authenticated_Controller
 	public function update_status($step_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if (empty($step_key)) {
 			if (! $this->input->is_ajax_request()) {
-				redirect('/dashboard');
+				redirect(DEFAULT_LOGIN_LOCATION);
 			} else {
 				echo json_encode([
 					'message_type' => 'danger',
@@ -377,7 +377,7 @@ class Step extends Authenticated_Controller
 	public function add_team_member($step_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if (empty($step_key)) {
@@ -420,7 +420,7 @@ class Step extends Authenticated_Controller
 	public function remove_team_member($step_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if (empty($step_key)) {

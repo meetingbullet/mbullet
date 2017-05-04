@@ -10,7 +10,7 @@ $label = [
 ?>
 <div class="an-single-component with-shadow">
 	<div class="an-component-header">
-		<h6><?php e(lang('pj_detail_tab_info_table_actions')) ?></h6>
+		<h6><?php e(lang('pj_detail_tab_info_table_all_actions')) ?></h6>
 		<div class="component-header-right">
 			<div class="an-settings-button">
 				<a data-toggle="modal" data-target="#bigModal" id="add_action" data-add-action-url="<?php echo base_url('/action/create/' . $project_key) ?>" class="only-hover-setting circle" href="#"><i class="icon-plus"></i></a>
@@ -75,7 +75,7 @@ $label = [
 
 <div class="an-single-component with-shadow">
 	<div class="an-component-header">
-		<h6><?php e(lang('pj_detail_tab_info_table_steps')) ?></h6>
+		<h6><?php e(lang('pj_detail_tab_info_table_all_steps')) ?></h6>
 	</div>
 	<div class="an-component-body padding20">
 		<div class="an-user-lists user-stats">
@@ -131,7 +131,7 @@ $label = [
 
 <div class="an-single-component with-shadow">
 	<div class="an-component-header">
-		<h6><?php e(lang('pj_detail_tab_info_table_tasks')) ?></h6>
+		<h6><?php e(lang('pj_detail_tab_info_table_all_tasks')) ?></h6>
 	</div>
 	<div class="an-component-body padding20">
 		<div class="an-user-lists user-stats">
