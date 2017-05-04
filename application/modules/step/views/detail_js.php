@@ -57,8 +57,8 @@ $(document).on("submit", '.form-ajax', (e) => {
 		data: data,
 		success: (data) => {
 			data = JSON.parse(data);
-
-			if (data.close_modal === 0) {
+			
+			if (data.close_modal == 0) {
 				if ($('.modal.in').length) {
 					$('.modal.in .modal-content').html(data.modal_content);
 				} else {
