@@ -146,12 +146,12 @@ class Action extends Authenticated_Controller
 	public function create($project_key = null, $action_key = null)
 	{
 		if (empty($project_key)) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 		// get projecct id
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		if ($project_id === false) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if(! empty($action_key)) {
@@ -166,7 +166,7 @@ class Action extends Authenticated_Controller
 					$action->members = implode(',', $members);
 				} else {
 					$action->members = '';
-				}dump($action);die;
+				}
 				Template::set('action', $action);
 			}
 		}
@@ -305,7 +305,7 @@ class Action extends Authenticated_Controller
 					$form_error['other_error'] = $e->getMessage;
 				}
 			} else {
-				$form_error = array_merge($form_error, $this->form_validation->error_array());dump($form_error);
+				$form_error = array_merge($form_error, $this->form_validation->error_array());
 			}
 
 			if (count($form_error) > 0) {
@@ -331,7 +331,7 @@ class Action extends Authenticated_Controller
 				}
 			}
 		}
-dump($action);
+
 		Assets::add_module_js('action', 'create.js');
 		Template::set('project_key', $project_key);
 		Template::set('form_error', $form_error);

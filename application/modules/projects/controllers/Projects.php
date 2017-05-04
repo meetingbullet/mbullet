@@ -182,12 +182,12 @@ class Projects extends Authenticated_Controller
 	{
 		/***************** PROJECT AND USER CHECK *****************/
 		if ($project_key == null) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, 'projects.*, u.email, u.avatar, CONCAT(u.first_name, u.last_name) as full_name');
 		if ($project === false) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $project->project_id;
@@ -347,7 +347,7 @@ class Projects extends Authenticated_Controller
 	public function sort_action($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
@@ -435,7 +435,7 @@ class Projects extends Authenticated_Controller
 	public function get_action_board_data($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
@@ -458,7 +458,7 @@ class Projects extends Authenticated_Controller
 	public function get_members($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
@@ -475,6 +475,77 @@ class Projects extends Authenticated_Controller
 		}
 
 		echo json_encode($result);
+		exit;
+	}
+
+	public function settings($project_key = null)
+	{
+		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, '*', false);
+
+		if ($project === false) {
+			Template::set_message(lang('pj_not_have_config_permission') , 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		} elseif ($project !== false) {
+			if (! class_exists('Role_model')) {
+				$this->load->model('roles/role_model');
+			}
+			$is_organization_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
+													->count_by('is_public', 1) == 1 ? true : false;
+
+			if ($project->owner_id != $this->current_user->user_id && $is_organization_owner === false) {
+				Template::set_message(lang('pj_not_have_config_permission') , 'danger');
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
+		} elseif ($this->auth->has_permission('Project.Config.All') === false || $this->auth->has_permission('Project.Config.Joined') === false) {
+			Template::set_message(lang('pj_not_have_config_permission') , 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->input->post()) {
+			$rules = $this->project_model->get_validation_rules();
+			$this->form_validation->set_rules($rules['settings']);
+
+			if ($this->form_validation->run() !== false) {
+				$settings = $this->project_model->prep_data($this->input->post());
+				foreach ($settings as $key => $setting) {
+					if ($setting == '') {
+						$settings[$key] = null;
+					}
+				}
+				$updated = $this->project_model->update($project->project_id, $settings);
+				if (! $updated) {
+					$error = true;
+				}
+			} else {
+				$error = true;
+			}
+
+			if (! empty($error)) {
+				Template::set_message(lang('pj_there_was_a_problem_while_updating_project_settings'), 'danger');
+			}
+		}
+
+		Assets::add_module_css('projects', 'projects.css');
+		Template::set('project', $project);
+		Template::set('project_key', $project_key);
+		Template::render();
+	}
+
+	public function update_project_status($project_key)
+	{
+		if (empty($project_key) || empty($this->input->get('status'))) {
+			echo 0;
+			exit;
+		}
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user, '*', false);
+		if ($project_id !== false) {
+			$updated = $this->project_model->update($project_id, ['status' => $this->input->get('status')]);
+			if (! $updated) {
+				echo 0;
+				exit;
+			}
+		}
+		echo 1;
 		exit;
 	}
 

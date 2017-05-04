@@ -102,7 +102,7 @@ class Auth
 		if ($via_google === false && (empty($login) || empty($password))) {
 			Template::set_message(lang('us_fields_required'), 'danger');
 			$this->ci->form_validation->set_rules('login', '', 'required');
-    		$this->ci->form_validation->set_rules('password', '', 'required');
+			$this->ci->form_validation->set_rules('password', '', 'required');
 			$this->ci->form_validation->run();
 			return false;
 		}
@@ -216,7 +216,7 @@ class Auth
 			$google_token
 		);
 
-			// Save the login info
+		// Save the login info
 		$this->ci->user_model->update(
 			$user->user_id,
 			array(

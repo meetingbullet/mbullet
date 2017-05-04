@@ -105,22 +105,28 @@ class Users extends Front_Controller
 		$client->addScope("email");
 		$client->addScope("profile");
 
+		// signin by google url
 		Template::set('auth_url', $client->createAuthUrl());
-		// if logged in via google
-		$service = new Google_Service_Oauth2($client);
 
 		if (isset($_GET['error'])) {
 			Template::set_message(lang('us_failed_login_attempts'), 'danger');
 		}
 
-		if (isset($_GET['code'])) {
+		// login by google account
+		if (isset($_GET['code']) && isset($_GET['timezone'])) {
+			// merge user & add user to db
+			$service = new Google_Service_Oauth2($client);
 			try {
-				$client->authenticate($_GET['code']);
+				$ret = $client->authenticate($_GET['code']);
+				if (isset($ret) && ($ret['error'])) {
+					throw new Exception(lang('us_login_google_code_error'));
+				}
 				$token = $client->getAccessToken();
 				$google_user = $service->userinfo->get();
 
 				$user = $this->user_model->find_by('email', $google_user->email);
 				if (! $user) {
+					// add google user to db
 					$added = $this->user_model->insert([
 						'email' => $google_user->email,
 						'google_refresh_token' => $token['refresh_token'],
@@ -128,7 +134,8 @@ class Users extends Front_Controller
 						'first_name' => $google_user->given_name,
 						'last_name' => $google_user->family_name,
 						'avatar' => $google_user->picture,
-						'active' => 1
+						'active' => 1,
+						'timezone' => $this->input->get('timezone')
 					]);
 
 					if (! $added) {
@@ -140,12 +147,14 @@ class Users extends Front_Controller
 						'first_name' => $google_user->given_name,
 						'last_name' => $google_user->family_name,
 						'avatar' => $google_user->picture,
-						'active' => 1
+						'active' => 1,
+						'timezone' => $this->input->get('timezone')
 					];
 
 					if (! empty($token['refresh_token'])) {
 						$update_data['google_refresh_token'] = $token['refresh_token'];
 					}
+					// merge user if email exist
 					$updated = $this->user_model->update($user->user_id, $update_data);
 
 					if (! $updated) {
@@ -164,11 +173,12 @@ class Users extends Front_Controller
 				$this->input->post('password'),
 				$this->input->post('remember_me') == '1'
 			)) || (isset($_GET['code'])
+			&& isset($_GET['timezone'])
 			&& !isset($google_login_error)
 			&& true === $this->auth->login(
 				$google_user->email,
 				null,
-				false,
+				true,
 				true,
 				$token['id_token']
 			))
@@ -203,7 +213,6 @@ class Users extends Front_Controller
 		}
 
 		Assets::add_css('font-awesome/css/font-awesome.min.css');
-		Assets::add_module_js('users', 'users.js');
 		Template::set('page_title', 'Login');
 		Template::render('account');
 	}
@@ -267,6 +276,7 @@ class Users extends Front_Controller
 					$this->load->library('upload', $upload_config);
 					$this->upload->do_upload('avatar');
 					$data['avatar'] = $this->upload->data();
+					$data['avatar'] = $data['avatar']['file_name'];
 				} else {
 					unset($data['avatar']);
 				}
@@ -386,6 +396,10 @@ class Users extends Front_Controller
 						'organization' => $this->input->post('org')
 					];
 
+					if (! empty($this->input->post('timezone'))) {
+						$data['timezone'] = $this->input->post('timezone');
+					}
+
 					$added = $this->user_model->insert($data);
 					if (! $added) {
 						Template::set_message(lang('us_register_failed'), 'danger');
@@ -412,6 +426,7 @@ class Users extends Front_Controller
 			}
 		}
 
+		Assets::add_js($this->load->view('create_profile_js', [], true), 'inline');
 		Template::render('account');
 	}
 	/**

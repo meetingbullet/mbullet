@@ -109,3 +109,50 @@
 #back-btn {
 	float: right;
 }
+
+.inline-inputs {
+	overflow: hidden;
+}
+
+.inline-inputs .legend {
+	color: #aaa;
+	font-style: italic;
+	padding-top: 0 !important;
+	padding-bottom: 30px !important;
+}
+
+.inline-inputs .input-20 {
+	width: 20%;
+	float: left;
+}
+
+.inline-inputs .input-20:not(:last-child) {
+	padding-right: 15px;
+}
+
+.inline-inputs .input-50 {
+	width: 50%;
+	float: left;
+}
+
+.inline-inputs .input-50:not(:last-child) {
+	padding-right: 15px;
+}
+
+.inline-inputs div[class^="basis"],
+.inline-inputs div[class^="col-"] {
+	float: left;
+	padding: 15px;
+}
+
+.thresholds .list-name {
+	padding-right: 15px;
+}
+
+.thresholds .list-title h6 {
+	text-align: left !important;
+}
+
+.margin-0 {
+	margin: 0 !important;
+}

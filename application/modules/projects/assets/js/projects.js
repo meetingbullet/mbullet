@@ -53,4 +53,13 @@ $(document).ready(function() {
             }
         });
     });
+
+	$('li.update-btn a').click(function() {
+		var url = $(this).data('update-project-status-url');
+		$.get(url).done(function(data) {console.log(data);
+			if (data == 1) {
+				location.reload();
+			}
+		});
+	});
 });

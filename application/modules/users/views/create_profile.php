@@ -64,6 +64,7 @@
 									<label for="check-2"><?php echo sprintf(lang('us_agree_terms'), '/users/terms') ?></label>
 								</span>
 
+								<input type="hidden" name="timezone" id="timezone"/>
 								<button type="submit" name="send" class="an-btn an-btn-default fluid"><?php e(lang('us_register')); ?></button>
 							<?php echo form_close(); ?>
 

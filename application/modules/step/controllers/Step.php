@@ -8,13 +8,19 @@ class Step extends Authenticated_Controller
 		$this->lang->load('step');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
+		$this->load->helper('date');
+		
+		$this->load->model('users/user_model');
+		$this->load->model('task/task_model');
+
 		$this->load->model('step_model');
 		$this->load->model('step_member_model');
+
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
+
 		$this->load->model('projects/project_model');
 		$this->load->model('projects/project_member_model');
-		$this->load->model('users/user_model');
 
 		Assets::add_module_css('step', 'step.css');
 		Assets::add_module_js('step', 'step.js');
@@ -93,7 +99,7 @@ class Step extends Authenticated_Controller
 				Template::set('message', lang('st_step_successfully_created'));
 
 				// Just to reduce AJAX request size
-				if ($this->input->is_ajax_request()) {
+				if (IS_AJAX) {
 					Template::set('content', '');
 				}
 				
@@ -196,7 +202,7 @@ class Step extends Authenticated_Controller
 				Template::set('message', lang('st_step_successfully_updated'));
 
 				// Just to reduce AJAX request size
-				if ($this->input->is_ajax_request()) {
+				if (IS_AJAX) {
 					Template::set('content', '');
 				}
 				
@@ -217,12 +223,12 @@ class Step extends Authenticated_Controller
 	public function detail($step_key = null)
 	{
 		if (empty($step_key)) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$keys = explode('-', $step_key);
 		if (empty($keys) || count($keys) < 3) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$step = $this->step_model->select('steps.*')
@@ -233,7 +239,7 @@ class Step extends Authenticated_Controller
 								->find_by('step_key', $step_key);
 
 		if (! $step) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$step_id = $step->step_id;
@@ -241,14 +247,12 @@ class Step extends Authenticated_Controller
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
 
-		$this->load->model('projects/project_model');
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 
 		$step = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
 								->join('users u', 'u.user_id = steps.owner_id', 'left')
 								->find_by('step_id', $step_id);
 
-		$this->load->model('task/task_model');
 		$tasks = $this->task_model->select('tasks.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
 								->join('users u', 'u.user_id = tasks.owner_id', 'left')
 								->where('step_id', $step_id)->find_all();
@@ -300,26 +304,382 @@ class Step extends Authenticated_Controller
 		Template::set('project_key', $project_key);
 		Template::set('action_key', $action_key);
 		Template::set('step_key', $step_key);
+		Template::set('current_user', $this->current_user);
 		Template::set_view('detail');
 		Template::render();
 	}
 
+	public function monitor($step_key = null)
+	{
+		if (empty($step_key)) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$keys = explode('-', $step_key);
+		if (empty($keys) || count($keys) < 3) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		/*
+			To access Step Monitor, user must be owner or team member of Step
+		*/
+
+		$step = $this->step_model->select('steps.*')
+								->join('actions a', 'a.action_id = steps.action_id')
+								->join('projects p', 'a.project_id = p.project_id')
+								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
+								->limit(1)
+								->find_by('step_key', $step_key);
+
+		if (! $step) {
+			Template::set_message(lang('st_invalid_step_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$tasks = $this->task_model->select('tasks.*, 
+											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
+											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
+									->join('users u', 'u.user_id = tasks.owner_id', 'left')
+									->where('step_id', $step->step_id)->find_all();
+		
+		Assets::add_js($this->load->view('monitor_js', [
+			
+		], true), 'inline');
+		Template::set('close_modal', 0);
+		Template::set('current_user', $this->current_user);
+		Template::set('tasks', $tasks);
+		Template::set('step', $step);
+		Template::render();
+	}
+
+	public function resolve_task($task_id = null)
+	{
+		if (empty($task_id)) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		Template::set('id', 'resolve-task');
+		Template::set('close_modal', 0);
+		Template::set('current_user', $this->current_user);
+		Template::set('task_id', $task_id);
+		Template::render();
+	}
+
+	public function get_skip_votes($step_id)
+	{
+		if (empty($step_id)) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_step_key')
+			]);
+			return ;
+		}
+
+		$tasks = $this->task_model->select('tasks.task_id,
+											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
+									->join('users u', 'u.user_id = tasks.owner_id', 'left')
+									->where('step_id', $step_id)->find_all();
+
+		if ($tasks === false) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_step_key')
+			]);
+			return;
+		}
+
+		echo json_encode([
+			'message_type' => 'success',
+			'data' => $tasks
+		]);
+	}
+
+	public function vote_skip($task_id)
+	{
+		// Prevent duplicate row by MySQL Insert Ignore
+		$query = $this->db->insert_string('task_votes', [
+			'task_id' => $task_id,
+			'user_id' => $this->current_user->user_id
+		]);
+
+		$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+		$test = $this->db->query($query);
+
+		if ($test) {
+			echo 1;
+			return;
+		}
+
+		echo 0;
+	}
+
+	public function update_step_schedule() {
+
+		$step = $this->step_model->select('steps.*')
+								->join('actions a', 'a.action_id = steps.action_id')
+								->join('projects p', 'a.project_id = p.project_id')
+								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
+								->where('steps.owner_id', $this->current_user->user_id)
+								->limit(1)
+								->find($this->input->post('step_id'));
+
+		if ($step === false) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_step_key')
+			]);
+			return;
+		}
+
+		// Start step?
+		if ($this->input->post('start')) {
+			if ($step->status != 'ready') {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_invalid_step_status')
+				]);
+
+				return;
+			}
+
+			if ($step->scheduled_start_time === NULL || $step->scheduled_end_time === NULL) {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_invalid_schedule_time')
+				]);
+
+				return;
+			}
+
+			$query = $this->db->update('steps', ['status' => 'inprogress'], ['step_id' => $step->step_id]);
+
+			if ($query) {
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => lang('st_step_started')
+				]);
+
+				return;
+			}
+
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_unknown_error')
+			]);
+			return;
+		}
+
+		// Validation
+		if ( ! ( strtotime($this->input->post('scheduled_end_time')) && strtotime($this->input->post('scheduled_start_time')) ) ) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_schedule_time')
+			]);
+
+			return;
+		}
+
+		$query = $this->db->update('steps', [
+			'scheduled_start_time' => $this->input->post('scheduled_start_time'),
+			'scheduled_end_time' => $this->input->post('scheduled_end_time'),
+		], ['step_id' => $step->step_id]);
+
+		if ($query) {
+			echo json_encode([
+				'message_type' => 'success',
+				'message' => lang('st_schedule_time_saved')
+			]);
+
+			return;
+		}
+
+		echo json_encode([
+			'message_type' => 'danger',
+			'message' => lang('st_unknown_error')
+		]);
+	}
+
+	public function update_task_status()
+	{
+		$task = $this->task_model->select('tasks.*, u.timezone, s.step_id')
+								->join('steps s', 's.step_id = tasks.step_id')
+								->join('actions a', 'a.action_id = s.action_id')
+								->join('projects p', 'a.project_id = p.project_id')
+								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
+								->join('users u', 'u.user_id = ' . $this->current_user->user_id)
+								->where('s.owner_id', $this->current_user->user_id)
+								->where('s.status', 'inprogress')
+								->limit(1)
+								->find($this->input->post('task_id'));
+
+		if ($task === false) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_action')
+			]);
+			return;
+		}
+
+		// Save timezone to user's locale
+		$current_time = gmdate('Y-m-d H:i:s', gmt_to_local(time(), $task->timezone));
+
+		switch ($this->input->post('status')) {
+			case 'inprogress':
+				if ($task->status != 'open') {
+					echo json_encode([
+						'message_type' => 'danger',
+						'message' => lang('st_invalid_task_status')
+					]);
+
+					return;
+				}
+
+				// We can only start 1 task at a time
+				$task_in_progress = $this->task_model->select('tasks.*, u.timezone')
+								->join('steps s', 's.step_id = tasks.step_id')
+								->join('actions a', 'a.action_id = s.action_id')
+								->join('projects p', 'a.project_id = p.project_id')
+								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
+								->join('users u', 'u.user_id = ' . $this->current_user->user_id)
+								->where('s.owner_id', $this->current_user->user_id)
+								->where('tasks.status', 'inprogress')
+								->limit(1)
+								->find_by('tasks.step_id', $task->step_id);
+
+				if ($task_in_progress) {
+					echo json_encode([
+						'message_type' => 'danger',
+						'message' => lang('st_please_finish_other_task')
+					]);
+					return;
+				}
+				
+				$this->task_model->update($task->task_id, [
+					'status' => 'inprogress', 
+					'time_assigned' => $this->input->post('time_assigned'), 
+					'started_on' => $current_time,
+					'modified_by' => $this->current_user->user_id
+				]);
+
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => lang('st_task_started'),
+					'started_on' => $current_time
+				]);
+
+				break;
+
+			case 'jumped':
+				if ($task->status != 'inprogress') {
+					echo json_encode([
+						'message_type' => 'danger',
+						'message' => lang('st_invalid_task_status')
+					]);
+
+					return;
+				}
+
+				$this->task_model->update($task->task_id, [
+					'status' => 'jumped', 
+					'finished_on' => $current_time, 
+					'modified_by' => $this->current_user->user_id
+				]);
+
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => lang('st_task_jumped')
+				]);
+
+				break;
+			case 'skipped':
+
+				if ($task->status != 'open') {
+					echo json_encode([
+						'message_type' => 'danger',
+						'message' => lang('st_invalid_task_status')
+					]);
+
+					return;
+				}
+
+				$this->task_model->update($task->task_id, [
+					'status' => 'skipped', 
+					'modified_by' => $this->current_user->user_id
+				]);
+
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => lang('st_task_skipped')
+				]);
+
+				break;
+
+			case 'resolved':
+				if ($task->status != 'inprogress') {
+						echo json_encode([
+							'message_type' => 'danger',
+							'message' => lang('st_invalid_task_status')
+						]);
+
+						return;
+				}
+
+				$this->task_model->update($task->task_id, [
+					'status' => 'resolved',
+					'comment' => $this->input->post('comment'),
+					'modified_by' => $this->current_user->user_id
+				]);
+
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => lang('st_task_resolved')
+				]);
+
+				break;
+
+			case 'parking_lot':
+				if ($task->status != 'inprogress') {
+						echo json_encode([
+							'message_type' => 'danger',
+							'message' => lang('st_invalid_task_status')
+						]);
+
+						return;
+				}
+
+				$this->task_model->update($task->task_id, [
+					'status' => 'parking_lot',
+					'comment' => $this->input->post('comment'),
+					'modified_by' => $this->current_user->user_id
+				]);
+
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => lang('st_task_placed')
+				]);
+
+				break;
+
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_task_status')
+			]);
+			return;
+		}
+	}
+
 	public function update_status($step_key = null)
 	{
-		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if (empty($step_key)) {
-			if (! $this->input->is_ajax_request()) {
-				redirect('/dashboard');
-			} else {
-				echo json_encode([
-					'message_type' => 'danger',
-					'message' => lang('st_update_status_fail')
-				]);
-				exit;
-			}
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_update_status_fail')
+			]);
+			exit;
 		}
 
 		$step_id = $this->step_model->get_step_id($step_key, $this->current_user);
@@ -344,7 +704,7 @@ class Step extends Authenticated_Controller
 			],
 			'ready-for-review' => [
 				'icon' => 'ion-android-done-all',
-				'label' => lang('st_resolve'),
+				'label' => lang('st_resolve_step'),
 				'next_status' => 'resolved',
 			],
 			'resolved' => [
@@ -354,7 +714,7 @@ class Step extends Authenticated_Controller
 			]
 		];
 
-		$status = $this->input->get('status');
+		$status = $this->input->post('status');
 		$updated = $this->step_model->skip_validation(true)->update($step_id, [
 										'status' => $status
 									]);
@@ -368,16 +728,15 @@ class Step extends Authenticated_Controller
 
 		echo json_encode([
 			'message_type' => 'success',
-			'message' => lang('st_update_status_success'),
-			'data' => array_merge($buttons[$status], ['url' => current_url() . '?status=' . urlencode($buttons[$status]['next_status'])])
+			'message' => lang('st_update_status_success')
 		]);
 		exit;
 	}
 
 	public function add_team_member($step_key = null)
 	{
-		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if (empty($step_key)) {
@@ -419,8 +778,8 @@ class Step extends Authenticated_Controller
 
 	public function remove_team_member($step_key = null)
 	{
-		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if (empty($step_key)) {

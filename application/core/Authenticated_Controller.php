@@ -89,7 +89,9 @@ class Authenticated_Controller extends Base_Controller
 							->where('uo.enabled', 1)
 							->get();
 			if ($orgs->num_rows() > 1) {
-				redirect('/organization/choose');
+				if ($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'choose') {
+					redirect('/organization/choose');
+				}
 			} elseif ($orgs->num_rows() == 1) {
 				$sub = $orgs->row()->url;
 				// redirect to organization domain if current domain is incorrect
