@@ -182,12 +182,12 @@ class Projects extends Authenticated_Controller
 	{
 		/***************** PROJECT AND USER CHECK *****************/
 		if ($project_key == null) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, 'projects.*, u.email, u.avatar, CONCAT(u.first_name, u.last_name) as full_name');
 		if ($project === false) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $project->project_id;
@@ -347,7 +347,7 @@ class Projects extends Authenticated_Controller
 	public function sort_action($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
@@ -435,7 +435,7 @@ class Projects extends Authenticated_Controller
 	public function get_action_board_data($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
@@ -458,7 +458,7 @@ class Projects extends Authenticated_Controller
 	public function get_members($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
@@ -507,12 +507,11 @@ class Projects extends Authenticated_Controller
 
 			if ($this->form_validation->run() !== false) {
 				$settings = $this->project_model->prep_data($this->input->post());
-				foreach ($settings as $key => $value) {
-					if (empty($value)) {
-						unset($settings[$key]);
+				foreach ($settings as $key => $setting) {
+					if ($setting == '') {
+						$settings[$key] = null;
 					}
 				}
-
 				$updated = $this->project_model->update($project->project_id, $settings);
 				if (! $updated) {
 					$error = true;
@@ -528,7 +527,26 @@ class Projects extends Authenticated_Controller
 
 		Assets::add_module_css('projects', 'projects.css');
 		Template::set('project', $project);
+		Template::set('project_key', $project_key);
 		Template::render();
+	}
+
+	public function update_project_status($project_key)
+	{
+		if (empty($project_key) || empty($this->input->get('status'))) {
+			echo 0;
+			exit;
+		}
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user, '*', false);
+		if ($project_id !== false) {
+			$updated = $this->project_model->update($project_id, ['status' => $this->input->get('status')]);
+			if (! $updated) {
+				echo 0;
+				exit;
+			}
+		}
+		echo 1;
+		exit;
 	}
 
 	private function get_actions($project_id)

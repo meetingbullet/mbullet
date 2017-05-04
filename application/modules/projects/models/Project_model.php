@@ -259,11 +259,15 @@ class Project_model extends BF_Model
 		return false;
 	}
 
-	public function count_actions($project_id)
+	public function count_actions($project_id, $all = true, $user_id = null)
 	{
-		$query = $this->db->select('COUNT(*) AS total')
-						->from('actions a')
-						->where('a.project_id', $project_id)
+		$this->db->select('COUNT(*) AS total')->from('actions a');
+		if (! $all) {
+			$this->db->join('action_members am', 'am.action_id = a.action_id', 'LEFT')
+					->where('(am.user_id = \'' . $user_id . '\' OR a.owner_id = \'' . $user_id . '\')');
+		}
+		$query = $this->db->where('a.project_id', $project_id)
+						->group_by('a.action_id')
 						->get();
 		if ($query->num_rows() > 0) {
 			return $query->row()->total;
@@ -272,12 +276,35 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function count_steps($project_id)
+	public function count_steps($project_id, $all = true, $user_id = null)
 	{
-		$query = $this->db->select('COUNT(*) AS total')
-						->from('steps s')
+		$this->db->select('COUNT(*) AS total')->from('steps s');
+		if (! $all) {
+			$this->db->join('step_members sm', 'sm.step_id = s.step_id', 'LEFT')
+					->where('(sm.user_id = \'' . $user_id . '\' OR s.owner_id = \'' . $user_id . '\')');
+		}
+		$query = $this->db->join('actions a', 'a.action_id = s.action_id', 'LEFT')
+						->where('a.project_id', $project_id)
+						->group_by('s.step_id')
+						->get();
+		if ($query->num_rows() > 0) {
+			return $query->row()->total;
+		} else {
+			return 0;
+		}
+	}
+
+	public function count_tasks($project_id, $all = true, $user_id = null)
+	{
+		$this->db->select('COUNT(*) AS total')->from('tasks t');
+		if (! $all) {
+			$this->db->join('task_members tm', 'tm.task_id = t.task_id', 'LEFT')
+					->where('(tm.user_id = \'' . $user_id . '\' OR t.owner_id = \'' . $user_id . '\')');
+		}
+		$query = $this->db->join('steps s', 't.step_id = s.step_id', 'LEFT')
 						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
+						->group_by('t.task_id')
 						->get();
 		if ($query->num_rows() > 0) {
 			return $query->row()->total;
@@ -286,26 +313,15 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function count_tasks($project_id)
+	public function get_actions($project_id, $limit, $offset, $all = true, $user_id = null, $select = 'a.action_key, a.name, a.status, a.action_id, a.point_value')
 	{
-		$query = $this->db->select('COUNT(*) AS total')
-						->from('tasks t')
-						->join('steps s', 't.step_id = s.step_id', 'LEFT')
-						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
-						->where('a.project_id', $project_id)
-						->get();
-		if ($query->num_rows() > 0) {
-			return $query->row()->total;
-		} else {
-			return 0;
+		$this->db->select($select)->from('actions a');
+		if (! $all) {
+			$this->db->join('action_members am', 'am.action_id = a.action_id', 'LEFT')
+					->where('(am.user_id = \'' . $user_id . '\' OR a.owner_id = \'' . $user_id . '\')');
 		}
-	}
-
-	public function get_actions($project_id, $limit, $offset, $select = 'a.action_key, a.name, a.status, a.action_id, a.point_value')
-	{
-		$query = $this->db->select($select)
-						->from('actions a')
-						->where('a.project_id', $project_id)
+		$query = $this->db->where('a.project_id', $project_id)
+						->group_by('a.action_id')
 						->order_by('a.created_on', 'DESC')
 						->limit($limit, $offset)
 						->get();
@@ -316,12 +332,16 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_steps($project_id, $limit, $offset, $select = 'a.action_key, s.step_key, s.name, s.status, s.step_id')
+	public function get_steps($project_id, $limit, $offset, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, s.name, s.status, s.step_id')
 	{
-		$query = $this->db->select($select)
-						->from('steps s')
-						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
+		$this->db->select($select)->from('steps s');
+		if (! $all) {
+			$this->db->join('step_members sm', 'sm.step_id = s.step_id', 'LEFT')
+					->where('(sm.user_id = \'' . $user_id . '\' OR s.owner_id = \'' . $user_id . '\')');
+		}
+		$query = $this->db->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
+						->group_by('s.step_id')
 						->order_by('s.created_on', 'DESC')
 						->limit($limit, $offset)
 						->get();
@@ -332,13 +352,17 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_tasks($project_id, $limit, $offset, $select = 'a.action_key, s.step_key, t.task_key, t.name, t.status')
+	public function get_tasks($project_id, $limit, $offset, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, t.task_key, t.name, t.status')
 	{
-		$query = $this->db->select($select)
-						->from('tasks t')
-						->join('steps s', 's.step_id = t.step_id', 'LEFT')
+		$this->db->select($select)->from('tasks t');
+		if (! $all) {
+			$this->db->join('task_members tm', 'tm.task_id = t.task_id', 'LEFT')
+					->where('(tm.user_id = \'' . $user_id . '\' OR t.owner_id = \'' . $user_id . '\')');
+		}
+		$query = $this->db->join('steps s', 's.step_id = t.step_id', 'LEFT')
 						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
+						->group_by('t.task_id')
 						->order_by('t.created_on', 'DESC')
 						->limit($limit, $offset)
 						->get();
