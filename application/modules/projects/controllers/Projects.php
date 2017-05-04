@@ -182,12 +182,12 @@ class Projects extends Authenticated_Controller
 	{
 		/***************** PROJECT AND USER CHECK *****************/
 		if ($project_key == null) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, 'projects.*, u.email, u.avatar, CONCAT(u.first_name, u.last_name) as full_name');
 		if ($project === false) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $project->project_id;
@@ -347,7 +347,7 @@ class Projects extends Authenticated_Controller
 	public function sort_action($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
@@ -435,7 +435,7 @@ class Projects extends Authenticated_Controller
 	public function get_action_board_data($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
@@ -458,7 +458,7 @@ class Projects extends Authenticated_Controller
 	public function get_members($project_key = null)
 	{
 		if (! $this->input->is_ajax_request()) {
-			redirect('/dashboard');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
