@@ -507,6 +507,11 @@ class Projects extends Authenticated_Controller
 
 			if ($this->form_validation->run() !== false) {
 				$settings = $this->project_model->prep_data($this->input->post());
+				foreach ($settings as $key => $setting) {
+					if ($setting == '') {
+						$settings[$key] = null;
+					}
+				}
 				$updated = $this->project_model->update($project->project_id, $settings);
 				if (! $updated) {
 					$error = true;

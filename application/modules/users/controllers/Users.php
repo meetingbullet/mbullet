@@ -113,7 +113,7 @@ class Users extends Front_Controller
 		}
 
 		// login by google account
-		if (isset($_GET['code'])) {
+		if (isset($_GET['code']) && isset($_GET['timezone'])) {
 			// merge user & add user to db
 			$service = new Google_Service_Oauth2($client);
 			try {
@@ -134,7 +134,8 @@ class Users extends Front_Controller
 						'first_name' => $google_user->given_name,
 						'last_name' => $google_user->family_name,
 						'avatar' => $google_user->picture,
-						'active' => 1
+						'active' => 1,
+						'timezone' => $this->input->get('timezone')
 					]);
 
 					if (! $added) {
@@ -146,7 +147,8 @@ class Users extends Front_Controller
 						'first_name' => $google_user->given_name,
 						'last_name' => $google_user->family_name,
 						'avatar' => $google_user->picture,
-						'active' => 1
+						'active' => 1,
+						'timezone' => $this->input->get('timezone')
 					];
 
 					if (! empty($token['refresh_token'])) {
@@ -171,6 +173,7 @@ class Users extends Front_Controller
 				$this->input->post('password'),
 				$this->input->post('remember_me') == '1'
 			)) || (isset($_GET['code'])
+			&& isset($_GET['timezone'])
 			&& !isset($google_login_error)
 			&& true === $this->auth->login(
 				$google_user->email,
@@ -210,7 +213,6 @@ class Users extends Front_Controller
 		}
 
 		Assets::add_css('font-awesome/css/font-awesome.min.css');
-		Assets::add_module_js('users', 'users.js');
 		Template::set('page_title', 'Login');
 		Template::render('account');
 	}
@@ -394,6 +396,10 @@ class Users extends Front_Controller
 						'organization' => $this->input->post('org')
 					];
 
+					if (! empty($this->input->post('timezone'))) {
+						$data['timezone'] = $this->input->post('timezone');
+					}
+
 					$added = $this->user_model->insert($data);
 					if (! $added) {
 						Template::set_message(lang('us_register_failed'), 'danger');
@@ -420,6 +426,7 @@ class Users extends Front_Controller
 			}
 		}
 
+		Assets::add_js($this->load->view('create_profile_js', [], true), 'inline');
 		Template::render('account');
 	}
 	/**
