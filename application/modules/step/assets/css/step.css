@@ -29,3 +29,42 @@
 .user-single:last-child {
 	margin-bottom: 0;
 }
+
+.step-monitor .an-body-topbar {
+	align-items: flex-start;
+}
+
+.step-time-schedule .form-inline .input-group > .form-control {
+	width: 230px;
+	background: transparent;
+}
+
+.step-time-schedule .an-btn-danger-transparent:hover,
+.step-time-schedule .an-btn-danger-transparent:focus,
+.step-time-schedule .an-btn-danger-transparent:active {
+	background-color: initial;
+	color: #eb547c;
+}
+
+.form-td {
+	display: inline-block !important;
+	width: 150px !important;
+	text-align: center;
+	margin-bottom: 0 !important;
+}
+
+.table-task td {
+	vertical-align: middle;
+}
+
+.time-assigned {
+	cursor: pointer;
+}
+
+.btn-finish {
+	border: 1px solid #999 !important;
+};
+
+.step-time-schedule .input-group {
+	border-right: none;
+}
