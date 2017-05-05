@@ -320,6 +320,7 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+
 		/*
 			To access Step Monitor, user must be owner or team member of Step
 		*/
@@ -334,6 +335,14 @@ class Step extends Authenticated_Controller
 		if (! $step) {
 			Template::set_message(lang('st_invalid_step_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		/*
+			First time open step, update status from Open to Ready
+		*/
+		if ($step->status == 'open') {
+			$this->step_model->skip_validation(true)->update($step->step_id, ['status' => 'ready']);
+			$step->status = 'ready';
 		}
 
 		$tasks = $this->task_model->select('tasks.*, 
@@ -415,9 +424,10 @@ class Step extends Authenticated_Controller
 
 	public function update_step_schedule() {
 
-		$step = $this->step_model->select('steps.*')
+		$step = $this->step_model->select('steps.*, u.timezone')
 								->join('actions a', 'a.action_id = steps.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
+								->join('users u', 'u.user_id = ' . $this->current_user->user_id)
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
 								->where('steps.owner_id', $this->current_user->user_id)
 								->limit(1)
@@ -451,12 +461,17 @@ class Step extends Authenticated_Controller
 				return;
 			}
 
-			$query = $this->db->update('steps', ['status' => 'inprogress'], ['step_id' => $step->step_id]);
-
+			$current_time = gmdate('Y-m-d H:i:s', gmt_to_local(time(), $step->timezone));
+			$query = $this->step_model->skip_validation(1)->update($step->step_id, [
+				'status' => 'inprogress',
+				'actual_start_time' => $current_time
+			]);
+			
 			if ($query) {
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => lang('st_step_started')
+					'message' => lang('st_step_started'),
+					'actual_start_time' => $current_time
 				]);
 
 				return;
@@ -479,10 +494,10 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
-		$query = $this->db->update('steps', [
+		$query = $this->step_model->skip_validation(1)->update($step->step_id, [
 			'scheduled_start_time' => $this->input->post('scheduled_start_time'),
 			'scheduled_end_time' => $this->input->post('scheduled_end_time'),
-		], ['step_id' => $step->step_id]);
+		]);
 
 		if ($query) {
 			echo json_encode([

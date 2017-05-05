@@ -65,6 +65,21 @@
 	border: 1px solid #999 !important;
 };
 
-.step-time-schedule .input-group {
-	border-right: none;
+#scheduled-time  {
+	border-right: none !important;
+}
+
+.step-action {
+	display: inline-block;
+	margin-bottom: 20px;
+	vertical-align: middle;
+}
+
+.step-action > button {
+	height: 36px;
+}
+
+#scheduled-timer {
+	margin-top: 0;
+	margin-right: 20px;
 }
