@@ -158,6 +158,25 @@ label>.required {
     margin-bottom: 0;
 }
 
+.modal-80 {
+	width: 80%;
+}
+
+.input-group-btn .an-btn {
+	height: 36px;
+	margin:-1px;
+	border-radius: 2px;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+
+.input-group-addon {
+	display: table-cell;
+	padding: 6px 12px !important;
+	white-space: nowrap;
+    vertical-align: middle;
+}
+
 @media (max-width: 767px) {
 	body {
 		padding-right: 0;

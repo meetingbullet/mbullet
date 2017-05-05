@@ -116,6 +116,7 @@ class Task extends Authenticated_Controller
 		// Assets::add_js($this->load->view('create_js', [
 		// 	'organization_members' => $organization_members
 		// ], true), 'inline');
+		Template::set('close_modal', 0);
 		Template::set('organization_members', $organization_members);
 		Template::render();
 	}

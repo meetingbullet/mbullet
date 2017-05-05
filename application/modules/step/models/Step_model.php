@@ -67,14 +67,28 @@ class Step_model extends BF_Model
 		parent::__construct();
 	}
 
+	public function get_step_by_key($step_key, $organization_id, $select = '*', $with_owner = true)
+	{
+		$this->select($select);
+		if ($with_owner) {
+			$this->join('users u', 'u.user_id = steps.owner_id', 'left');
+		}
+
+		$step = $this->join('actions a', 'a.action_id = steps.action_id', 'inner')
+					->join('projects p', 'p.project_id = a.project_id', 'inner')
+					->where('p.organization_id', $organization_id)
+					->find_by('steps.step_key', $step_key);
+
+        if (! empty($step)) {
+            return $step;
+        }
+
+        return false;
+	}
 	
     public function get_step_id($step_key, $organization_id)
     {
-		$step = $this->select('steps.step_id')
-						->join('actions a', 'a.action_id = steps.action_id', 'inner')
-						->join('projects p', 'p.project_id = a.project_id', 'inner')
-						->where('p.organization_id', $organization_id)
-						->find_by('steps.step_key', $step_key);
+		$step = $this->get_step_by_key($step_key, $organization_id, 'steps.step_id');
 
         if (! empty($step)) {
             return $step->step_id;
