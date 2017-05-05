@@ -21,7 +21,7 @@ $project_status_labels = [
 	<div class="col-md-7 col-xs-12">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
-				<h6>Projects</h6>
+				<h6>My Projects</h6>
 				<div class="component-header-right">
 				</div>
 			</div>
@@ -81,7 +81,7 @@ $project_status_labels = [
 	<div class="col-md-5 col-xs-12">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
-				<h6>My Steps</h6>
+				<h6>Imcomming Steps</h6>
 				<div class="component-header-right">
 				</div>
 			</div>
