@@ -91,7 +91,6 @@ $lang['st_name'] = 'Name';
 $lang['st_resource'] = 'Resource';
 $lang['st_add_team_member'] = '+ Add team member';
 $lang['st_point_used'] = 'Points used';
-$lang['st_in'] = 'Time defined';
 
 // Step
 $lang['st_add_task'] = 'Add Task';

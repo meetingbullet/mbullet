@@ -10,7 +10,7 @@ $('#edit-step').click((e) => {
 
 });
 
-// Edit step
+// Open step monitor
 $('#open-step-monitor').click((e) => {
 	e.preventDefault();
 	$('.modal-monitor .modal-content').html('');

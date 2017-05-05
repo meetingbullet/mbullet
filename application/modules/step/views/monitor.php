@@ -45,18 +45,18 @@ $task_status_labels = [
 						<input type="hidden" name="scheduled_start_time" id="scheduled_start_time" value="<?php e($step->scheduled_start_time)?>" />
 						<input type="hidden" name="scheduled_end_time" id="scheduled_end_time" value="<?php e($step->scheduled_end_time)?>">
 
-						<h3 id="scheduled-timer" class="step-action hidden" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
-						<div class="an input-group <?php echo $step->status == 'ready' ? ' input-group-btn-right' : '' ?>">
+						<h3 id="scheduled-timer" class="step-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
+						<div class="an input-group <?php echo $step->status == 'open' ? ' input-group-btn-right' : '' ?>">
 							<div class="input-group-addon"><i class="ion-android-calendar"></i></div>
 							<input type="text" 
 									name="scheduled_time" 
 									class="form-control" 
 									value="<?php echo $scheduled_time ?>" 
-									placeholder="<?php e(lang('st_time_schedule'))?>" <?php echo $step->status == 'ready' ? 'readOnly' : 'disabled' ?>/>
+									placeholder="<?php e(lang('st_time_schedule'))?>" <?php echo $step->status == 'open' ? 'readOnly' : 'disabled' ?>/>
 							<span class="input-group-btn">
 								<button type="submit" 
 										name='save-time' 
-										class="an-btn an-btn-danger-transparent btn-update-step-schedule<?php echo $step->status == 'ready' ? '' : ' hidden' ?>">
+										class="an-btn an-btn-danger-transparent btn-update-step-schedule<?php echo $step->status == 'open' ? '' : ' hidden' ?>">
 									<i class="glyphicon glyphicon-floppy-disk"></i> <?php e(lang('st_save'))?>
 								</button>
 							</span>
@@ -65,7 +65,7 @@ $task_status_labels = [
 						<div class="step-action">
 							<button type="submit" 
 									name='start-step' 
-									class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'ready' ? '' : ' hidden' ?>"
+									class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' ? '' : ' hidden' ?>"
 								<?php echo is_null($step->scheduled_start_time) || is_null($step->scheduled_end_time) ? ' disabled' : '' ?> >
 								<i class="ion-ios-play"></i> <?php e(lang('st_start'))?>
 							</button>
@@ -107,7 +107,7 @@ $task_status_labels = [
 							<input type="number" name="time_assigned" class='an-form-control form-td<?php echo ($task->time_assigned == NULL ? '' : ' hidden' ) ?>' step="0.01" value="<?php e($task->time_assigned)?>"/>
 						</td>
 						<td class='text-center skip-votes'><?php e($task->skip_votes)?></td>
-						<td class='task-status basis-30' <?php echo $task->status == 'inprogress' ? "data-started-on='{$task->started_on}' data-time-assigned='{$task->time_assigned}'" : '' ?>>
+						<td class='task-status basis-30' <?php echo $task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}' data-time-assigned='{$task->time_assigned}'" : '' ?>>
 							<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 						</td>
 

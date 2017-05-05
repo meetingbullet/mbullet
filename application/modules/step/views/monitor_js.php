@@ -120,6 +120,7 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 			$('.btn-update-step-schedule').addClass('hidden');
 			$('.input-group-btn-right').removeClass('input-group-btn-right');
 			$('#scheduled-timer').data('actual-start-time', data.actual_start_time);
+			$('#scheduled-timer').data('now', data.actual_start_time);
 			update_step_timer();
 		}
 	});
@@ -165,6 +166,7 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 			$(row).find('.btn-jump').removeClass('hidden');
 
 			$(row).find('.task-status').data('started-on', data.started_on);
+			$(row).find('.task-status').data('now', data.started_on);
 
 			update_status_timer($(row).find('.task-status'));
 
@@ -311,7 +313,7 @@ function update_step_timer(clock)
 	var clock = '#scheduled-timer';
 
 	var eventTime = moment($(clock).data('actual-start-time'), 'YYYY-MM-DD HH:mm:ss').unix(),
-		currentTime = moment.utc().unix(),
+		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix(),
 		diffTime = currentTime - eventTime,
 		duration = moment.duration(diffTime * 1000, 'milliseconds'),
 		interval = 1000;
@@ -347,7 +349,7 @@ function update_status_timer(clock)
 	var task_id = $(clock).parent().data('task-id'),
 		time_assigned = $(clock).data('time-assigned'),
 		eventTime = moment($(clock).data('started-on'), 'YYYY-MM-DD HH:mm:ss').unix(),
-		currentTime = moment.utc().unix(),
+		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix(),
 		diffTime = currentTime - eventTime,
 		duration = moment.duration(diffTime * 1000, 'milliseconds'),
 		interval = 1000;
