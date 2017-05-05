@@ -17,6 +17,17 @@ $('#open-step-monitor').click((e) => {
 
 	$.get('<?php e(site_url('step/monitor/' . $step_key)) ?>', (data) => {
 		data = JSON.parse(data);
+
+		if (data.modal_content == '') {
+			$.notify({
+				message: data.message
+			}, {
+				type: data.message_type,
+				z_index: 1051
+			});
+			return;
+		}
+
 		$('.modal-monitor .modal-content').html(data.modal_content);
 		$('.modal-monitor').modal({backdrop: "static"});
 	});

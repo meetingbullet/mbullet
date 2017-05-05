@@ -337,13 +337,6 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		/*
-			First time open step, update status from Open to Ready
-		*/
-		if ($step->status == 'open') {
-			$this->step_model->skip_validation(true)->update($step->step_id, ['status' => 'ready']);
-			$step->status = 'ready';
-		}
 
 		$tasks = $this->task_model->select('tasks.*, 
 											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
@@ -351,6 +344,21 @@ class Step extends Authenticated_Controller
 									->join('users u', 'u.user_id = tasks.owner_id', 'left')
 									->where('step_id', $step->step_id)->find_all();
 		
+		// We can't start without Tasks
+		if ($tasks === false) {
+			Template::set('message_type', 'warning');
+			Template::set('message', lang('st_cannot_start_step_without_any_task'));
+			Template::set('content', '');
+			Template::render();
+			return;
+		}
+
+		// First time open step, update status from Open to Ready
+		if ($step->status == 'open') {
+			$this->step_model->skip_validation(true)->update($step->step_id, ['status' => 'ready']);
+			$step->status = 'ready';
+		}
+
 		Assets::add_js($this->load->view('monitor_js', [
 			
 		], true), 'inline');
