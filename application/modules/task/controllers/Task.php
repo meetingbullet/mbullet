@@ -21,12 +21,41 @@ class Task extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+
 		$step_id = $this->project->get_object_id('step', $step_key);
 
 		if (empty($step_id)) {
 			Template::set_message(lang('tk_step_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+
+		$keys = explode('-', $step_key);
+		if (empty($keys) || count($keys) < 3) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$project_key = $keys[0];
+
+		$this->load->model('projects/project_model');
+		$this->load->model('projects/project_member_model');
+
+		// get projecct id
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		if ($project_id === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		&& $this->auth->has_permission('Project.Edit.All') === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$this->load->model('step/step_model');
+		$this->load->helper('mb_form');
+		$this->load->helper('mb_general');
+
+		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
 
 		if (! $this->project->has_permission('step', $step_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
