@@ -7,6 +7,15 @@ $label = [
 	'ready-for-review' => 'spam',
 	'resolved' => 'unread'
 ];
+
+$task_status_labels = [
+	'open' => 'label label-default label-bordered',
+	'inprogress' => 'label label-warning label-bordered',
+	'resolved' => 'label label-success label-bordered',
+	'jumped' => 'label label-info label-bordered',
+	'skipped' => 'label label-success label-bordered',
+	'parking_lot' => 'label label-info label-bordered',
+];
 ?>
 <div class="an-single-component with-shadow">
 	<div class="an-component-header">
@@ -154,7 +163,7 @@ $label = [
 						<a href="<?php e("/task/{$item->task_key}") ?>"><?php e($item->name) ?></a>
 					</div>
 					<div class="list-action basis-20">
-						<span class="msg-tag <?php echo $label[$item->status] ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
+						<span class="msg-tag <?php echo isset($task_status_labels[$item->status]) ? $task_status_labels[$item->status] : 'label label-default' ?>"><?php e(lang('pj_' . $item->status)) ?></span>
 					</div>
 				</div> <!-- end .USER-LIST-SINGLE -->
 
