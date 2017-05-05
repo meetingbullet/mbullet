@@ -47,6 +47,7 @@ $lang['st_update'] = 'Update';
 $lang['st_save'] = 'Save';
 $lang['st_start'] = 'Start';
 $lang['st_skip'] = 'Skip';
+$lang['st_join'] = 'Join';
 $lang['st_vote_skip'] = 'Vote Skip';
 $lang['st_voted_skip'] = 'Voted Skip';
 $lang['st_jump'] = 'Jump';
@@ -73,6 +74,7 @@ $lang['st_please_finish_other_task'] = 'Please finish other task before start a 
 $lang['st_task_placed'] = 'Task is placed in parking lot';
 $lang['st_invalid_action'] = 'Invalid Action';
 $lang['st_cannot_start_step_without_any_task'] = 'Cannot start step without any task';
+$lang['st_waiting_for_start'] = 'Waiting for start';
 
 // Field
 $lang['st_detail'] = 'Detail';

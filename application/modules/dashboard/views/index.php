@@ -115,7 +115,8 @@ $step_status_labels = [
 										data-scheduled-start-time="<?php e($step->scheduled_start_time) ?>" 
 										data-now="<?php e($now)?>">
 								</span>
-								<button class="an-btn an-btn-primary btn-open-step-monitor<?php e($step->status == 'inprogress' ? '' : ' hidden')?>" 
+
+								<button class="an-btn an-btn-primary btn-open-step-monitor<?php e($step->status == 'inprogress' ? '' : ' hidden' . ($step->owner_id == $current_user->user_id ? ' is-owner' : ''))?> " 
 										data-step-key="<?php e($step->step_key)?>">
 									<?php echo ($step->owner_id == $current_user->user_id ? lang('st_open') : lang('st_join')) ?>
 								</button>

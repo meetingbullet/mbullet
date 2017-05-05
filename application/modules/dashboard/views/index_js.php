@@ -32,6 +32,17 @@ $('.step-timer.ready').each((i, item) => {
 		diffTime = currentTime - eventTime,
 		duration = moment.duration(diffTime * 1000, 'milliseconds');
 
+	if (diffTime <= 0) {
+		if ($(item).parent().find('.btn-open-step-monitor').hasClass('is-owner')) {
+			$(item).parent().find('.btn-open-step-monitor').text('<?php e(lang('st_start'))?>');
+			$(item).parent().find('.btn-open-step-monitor').removeClass('hidden');
+		} else {
+			$(item).text('<?php e(lang('st_waiting_for_start'))?>');
+		}
+
+		return;
+	}
+
 	var d = moment.duration(duration).days(),
 		h = moment.duration(duration).hours(),
 		m = moment.duration(duration).minutes(),
