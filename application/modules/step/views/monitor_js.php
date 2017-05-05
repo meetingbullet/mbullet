@@ -143,6 +143,9 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 
 		if (data.message_type == 'success') {
 			$('.modal-monitor').modal('hide');
+			setTimeout(() => {
+				location.reload();
+			}, 1500);
 		}
 	});
 
