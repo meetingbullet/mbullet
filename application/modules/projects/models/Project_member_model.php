@@ -51,4 +51,10 @@ class Project_member_model extends BF_Model
 	{
 		parent::__construct();
 	}
+
+	public function is_project_member($project_id, $user_id)
+	{
+		return (boolean) $this->where('user_id', $user_id)
+							->find_by('project_id', $project_id);
+	}
 }
