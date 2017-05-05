@@ -170,6 +170,13 @@ label>.required {
 	border-bottom-left-radius: 0px;
 }
 
+.input-group-addon {
+	display: table-cell;
+	padding: 6px 12px !important;
+	white-space: nowrap;
+    vertical-align: middle;
+}
+
 @media (max-width: 767px) {
 	body {
 		padding-right: 0;

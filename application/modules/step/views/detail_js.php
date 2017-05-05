@@ -21,6 +21,11 @@ $('#open-step-monitor').click((e) => {
 		$('.modal-monitor').modal();
 		$('.modal-monitor').modal({backdrop: "static"});
 	});
+
+	if ($(this).hasClass('step-open')) {
+		$(this).removeClass('step-open');
+		$(this).find('span').text('<?php echo lang('st_open_step_monitor')?>')
+	}
 });
 
 $('#start-step').click((e) => {

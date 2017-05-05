@@ -9,16 +9,35 @@ $task_status_labels = [
 ];
 ?>
 
-var update_status_timer_intervals = [];
+var update_step_timer_interval,
+	update_status_timer_intervals = [];
 
 // Update skip votes periodly
 var update_skip_votes_interval = -1;
+
+// Clear all updater 
+$('.modal-monitor').on('hidden.bs.modal', function () {
+	clearInterval(update_step_timer_interval);
+	clearInterval(update_skip_votes_interval);
+
+	$.each(update_status_timer_intervals, (i, item) => {
+		clearInterval(item);
+	});
+})
 
 // Disable all Start task if there is a "In Progress" Task
 if ($('.label-inprogress').length) {
 	$('.btn-start-task').prop('disabled', true);
 	$('.btn-finish').prop('disabled', true);
 	update_skip_votes_interval = setInterval(update_skip_votes, 3500);
+}
+
+if ($('.label-inprogress').length == 0 && $('.label-open').length == 0) {
+	$('.btn-finish').prop('disabled', false);
+}
+
+if ($('#scheduled-timer').data('actual-start-time')) {
+	update_step_timer()
 }
 
 $('input[name="scheduled_time"]').daterangepicker({
@@ -92,12 +111,15 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			$('.btn-update-step-schedule').toggleClass('hidden');
-			$('.btn-start-step').toggleClass('hidden');
 			$('.btn-finish').toggleClass('hidden');
+			$('.btn-start-step').toggleClass('hidden');
 
-			$('.btn-skip').removeClass('hidden');
-			$('.btn-start-task').removeClass('hidden');
+			$('tr[data-task-status="open"] .btn-skip').removeClass('hidden');
+			$('tr[data-task-status="open"] .btn-start-task').removeClass('hidden');
+
+			$('.btn-update-step-schedule').addClass('hidden');
+			$('#scheduled-timer').data('actual-start-time', data.actual_start_time);
+			update_step_timer();
 		}
 	});
 
@@ -272,6 +294,43 @@ $('.task-status').each((index, item) => {
 		update_status_timer(item);
 	}
 });
+
+
+function update_step_timer(clock)
+{
+	var clock = '#scheduled-timer';
+
+	var eventTime = moment($(clock).data('actual-start-time'), 'YYYY-MM-DD HH:mm:ss').unix(),
+		currentTime = moment.utc().unix(),
+		diffTime = currentTime - eventTime,
+		duration = moment.duration(diffTime * 1000, 'milliseconds'),
+		interval = 1000;
+		
+	$(clock).removeClass('hidden');
+
+	update_step_timer_interval = setInterval(function(){
+
+		duration = moment.duration(duration.asMilliseconds() + interval, 'milliseconds');
+		var d = moment.duration(duration).days(),
+			h = moment.duration(duration).hours(),
+			m = moment.duration(duration).minutes(),
+			s = moment.duration(duration).seconds();
+
+		m = m == '0' ? '0' + m : m;
+		s = s == '0' ? '0' + s : s;
+
+		if (h > 0) {
+			m += h * 60;
+		}
+
+		if (d > 0) {
+			m += d * 24 * 60;
+		}
+
+		$(clock).html(m + ':' + s);
+
+	}, interval);
+}
 
 function update_status_timer(clock)
 {
