@@ -384,12 +384,6 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
-		// First time open step, update status from Open to Ready
-		if ($step->status == 'open') {
-			$this->step_model->skip_validation(true)->update($step->step_id, ['status' => 'ready']);
-			$step->status = 'ready';
-		}
-
 		Assets::add_js($this->load->view('monitor_js', [
 			
 		], true), 'inline');
@@ -397,6 +391,7 @@ class Step extends Authenticated_Controller
 		Template::set('current_user', $this->current_user);
 		Template::set('tasks', $tasks);
 		Template::set('step', $step);
+		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::render();
 	}
 
@@ -500,10 +495,10 @@ class Step extends Authenticated_Controller
 				return;
 			}
 
-			$current_time = gmdate('Y-m-d H:i:s', gmt_to_local(time(), $step->timezone));
+			$current_time = gmdate('Y-m-d H:i:s');
 			$query = $this->step_model->skip_validation(1)->update($step->step_id, [
 				'status' => 'inprogress',
-				'actual_start_time' => $current_time
+				'actual_start_time' => $current_time,
 			]);
 			
 			if ($query) {
@@ -534,6 +529,7 @@ class Step extends Authenticated_Controller
 		}
 
 		$query = $this->step_model->skip_validation(1)->update($step->step_id, [
+			'status' => 'ready',
 			'scheduled_start_time' => $this->input->post('scheduled_start_time'),
 			'scheduled_end_time' => $this->input->post('scheduled_end_time'),
 		]);
@@ -575,7 +571,7 @@ class Step extends Authenticated_Controller
 		}
 
 		// Save timezone to user's locale
-		$current_time = gmdate('Y-m-d H:i:s', gmt_to_local(time(), $task->timezone));
+		$current_time = gmdate('Y-m-d H:i:s');
 
 		switch ($this->input->post('status')) {
 			case 'inprogress':
