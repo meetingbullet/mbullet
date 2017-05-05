@@ -61,6 +61,18 @@ class Step extends Authenticated_Controller
 		$project_key = explode('-', $action_key);
 		$project_key = $project_key[0];
 
+		// get projecct id
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		if ($project_id === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		&& $this->auth->has_permission('Project.Edit.All') === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 
 		Assets::add_js($this->load->view('create_js', [
@@ -123,6 +135,25 @@ class Step extends Authenticated_Controller
 	{
 
 		if (empty($step_key)) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$keys = explode('-', $step_key);
+		if (empty($keys) || count($keys) < 3) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$project_key = $keys[0];
+
+		// get projecct id
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		if ($project_id === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		&& $this->auth->has_permission('Project.Edit.All') === false) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -231,27 +262,27 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step = $this->step_model->select('steps.*')
-								->join('actions a', 'a.action_id = steps.action_id')
-								->join('projects p', 'a.project_id = p.project_id')
-								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
-								->limit(1)
-								->find_by('step_key', $step_key);
+		$project_key = $keys[0];
+		$action_key = $keys[0] . '-' . $keys[1];
+
+		// get projecct id
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		if ($project_id === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		&& $this->auth->has_permission('Project.View.All') === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name');
 
 		if (! $step) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
-
 		$step_id = $step->step_id;
-
-		$project_key = $keys[0];
-		$action_key = $keys[0] . '-' . $keys[1];
-
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
-
-		$step = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
-								->join('users u', 'u.user_id = steps.owner_id', 'left')
-								->find_by('step_id', $step_id);
 
 		$tasks = $this->task_model->select('tasks.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
 								->join('users u', 'u.user_id = tasks.owner_id', 'left')
@@ -697,7 +728,7 @@ class Step extends Authenticated_Controller
 			exit;
 		}
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user);
+		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
 		if (! $step_id) {
 			echo json_encode([
 				'message_type' => 'danger',
@@ -759,7 +790,7 @@ class Step extends Authenticated_Controller
 			exit;
 		}
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user);
+		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
 		if (! $step_id) {
 			echo 0;
 			exit;
@@ -802,7 +833,7 @@ class Step extends Authenticated_Controller
 			exit;
 		}
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user);
+		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
 		if (! $step_id) {
 			echo 0;
 			exit;

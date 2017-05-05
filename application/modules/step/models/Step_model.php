@@ -67,32 +67,28 @@ class Step_model extends BF_Model
 		parent::__construct();
 	}
 
-	
-    public function get_step_id($step_key, $current_user)
-    {
-        if (! class_exists('Role_model')) {
-            $this->load->model('roles/role_model');
+	public function get_step_by_key($step_key, $organization_id, $select = '*', $with_owner = true)
+	{
+		$this->select($select);
+		if ($with_owner) {
+			$this->join('users u', 'u.user_id = steps.owner_id', 'left');
+		}
+
+		$step = $this->join('actions a', 'a.action_id = steps.action_id', 'inner')
+					->join('projects p', 'p.project_id = a.project_id', 'inner')
+					->where('p.organization_id', $organization_id)
+					->find_by('steps.step_key', $step_key);
+
+        if (! empty($step)) {
+            return $step;
         }
 
-		// check user is organization owner or not
-		$is_owner = $this->role_model->where('role_id', $current_user->role_ids[$current_user->current_organization_id])
-									->count_by('is_public', 1) == 1 ? true : false;
-		// get project id
-		if ($is_owner) {
-			$step = $this->select('steps.step_id')
-							->join('actions a', 'a.action_id = steps.action_id', 'inner')
-							->join('projects p', 'p.project_id = a.project_id', 'inner')
-							->where('p.organization_id', $current_user->current_organization_id)
-							->find_by('steps.step_key', $step_key);
-		} else {
-			$step = $this->select('steps.step_id')
-							->join('step_members sm', 'sm.step_id = steps.step_id', 'left')
-							->join('actions a', 'a.action_id = steps.action_id', 'inner')
-							->join('projects p', 'p.project_id = a.project_id', 'inner')
-							->where('p.organization_id', $current_user->current_organization_id)
-							->where('(sm.user_id = \'' . $current_user->user_id . '\' OR steps.owner_id = \'' . $current_user->user_id . '\')')
-							->find_by('steps.step_key', $step_key);
-		}
+        return false;
+	}
+	
+    public function get_step_id($step_key, $organization_id)
+    {
+		$step = $this->get_step_by_key($step_key, $organization_id, 'steps.step_id');
 
         if (! empty($step)) {
             return $step->step_id;

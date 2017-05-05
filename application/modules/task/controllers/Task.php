@@ -15,11 +15,34 @@ class Task extends Authenticated_Controller
 		if (! $this->input->is_ajax_request()) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+
+		$keys = explode('-', $step_key);
+		if (empty($keys) || count($keys) < 3) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$project_key = $keys[0];
+
+		$this->load->model('projects/project_model');
+		$this->load->model('projects/project_member_model');
+
+		// get projecct id
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		if ($project_id === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		&& $this->auth->has_permission('Project.Edit.All') === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
 		$this->load->model('step/step_model');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user);
+		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
 
 		if (! class_exists('User_model')) {
 			$this->load->model('users/user_model');
