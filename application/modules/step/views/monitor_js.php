@@ -328,18 +328,15 @@ function update_step_timer(clock)
 			m = moment.duration(duration).minutes(),
 			s = moment.duration(duration).seconds();
 
+		h = h < 9 ? '0' + h : h;
 		m = m < 9 ? '0' + m : m;
 		s = s < 9 ? '0' + s : s;
 
-		if (h > 0) {
-			m += h * 60;
-		}
-
 		if (d > 0) {
-			m += d * 24 * 60;
+			h += d * 24;
 		}
 
-		$(clock).html(m + ':' + s);
+		$(clock).html(h + ':' + m + ':' + s);
 
 	}, interval);
 }

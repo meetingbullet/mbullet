@@ -47,11 +47,15 @@ $('.step-timer.ready').each((i, item) => {
 		h = moment.duration(duration).hours(),
 		m = moment.duration(duration).minutes(),
 		s = moment.duration(duration).seconds();
-console.log(item);
+
 	d = d == '0' ? '' : d + 'd';
 	h = h == '0' ? '' : h + 'h';
 	m = m == '0' ? '' : m + 'm';
 	s = s == '0' ? '' : s + 's';
 
 	$(item).text('<?php e(lang('st_in')) ?> ' + d + ' ' + h + ' ' + m);
+
+	if ($(item).text().trim() == 'in') {
+		$(item).text('');
+	}
 });
