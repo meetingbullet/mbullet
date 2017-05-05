@@ -72,6 +72,7 @@ $lang['st_time_alotted'] = 'Time alotted for %s has been reached.';
 $lang['st_please_finish_other_task'] = 'Please finish other task before start a new task';
 $lang['st_task_placed'] = 'Task is placed in parking lot';
 $lang['st_invalid_action'] = 'Invalid Action';
+$lang['st_cannot_start_step_without_any_task'] = 'Cannot start step without any task';
 
 // Field
 $lang['st_detail'] = 'Detail';
