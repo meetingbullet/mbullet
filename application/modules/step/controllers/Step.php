@@ -9,6 +9,7 @@ class Step extends Authenticated_Controller
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
 		$this->load->helper('date');
+		$this->load->library('project');
 		
 		$this->load->model('users/user_model');
 		$this->load->model('task/task_model');
@@ -351,17 +352,16 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		if (! $this->project->has_permission('step', $step_key, 'Project.View.All')) {
+			$this->auth->restrict();
+		}
+
 
 		/*
 			To access Step Monitor, user must be owner or team member of Step
 		*/
 
-		$step = $this->step_model->select('steps.*')
-								->join('actions a', 'a.action_id = steps.action_id')
-								->join('projects p', 'a.project_id = p.project_id')
-								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
-								->limit(1)
-								->find_by('step_key', $step_key);
+		$step = $this->step_model->find_by('step_key', $step_key);
 
 		if (! $step) {
 			Template::set_message(lang('st_invalid_step_key'), 'danger');
