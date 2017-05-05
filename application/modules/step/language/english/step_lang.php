@@ -71,6 +71,7 @@ $lang['st_task_saved'] = 'Task saved';
 $lang['st_time_alotted'] = 'Time alotted for %s has been reached.';
 $lang['st_please_finish_other_task'] = 'Please finish other task before start a new task';
 $lang['st_task_placed'] = 'Task is placed in parking lot';
+$lang['st_invalid_action'] = 'Invalid Action';
 
 // Field
 $lang['st_detail'] = 'Detail';

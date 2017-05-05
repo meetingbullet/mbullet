@@ -55,13 +55,15 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 		<i class="<?php echo $buttons[$step->status]['icon'] ?>"></i> <?php echo $buttons[$step->status]['label'] ?>
 	</a>-->
 
-	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
-		<i class="ion-person-stalker"></i> 
-		<?php echo lang($step->owner_id == $current_user->user_id ? 'st_open_step_monitor' :  'st_join_step_monitor')?>
-	</a>
-
-	<a class="an-btn an-btn-primary <?php echo $step->status == 'open' && $step->owner_id == $current_user->user_id ? '' : ' hidden'?>" id="start-step">
-		<i class="ion-ios-play"></i> <?php echo lang('st_start_step') ?>
+	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'open' ? ' step-open' : ''?><?php echo $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
+		<i class="ion-ios-eye"></i> 
+		<?php 
+			if ($step->status == 'open') {
+				echo lang('st_start_step');
+			} else {
+				echo lang($step->owner_id == $current_user->user_id ? 'st_open_step_monitor' :  'st_join_step_monitor');
+			}
+		?>
 	</a>
 </div>
 
