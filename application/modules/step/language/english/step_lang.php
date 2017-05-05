@@ -77,6 +77,8 @@ $lang['st_invalid_action'] = 'Invalid Action';
 $lang['st_cannot_start_step_without_any_task'] = 'Cannot start step without any task';
 $lang['st_waiting_for_start'] = 'Waiting for start';
 $lang['st_please_resolve_all_task_before_finish'] = 'Please resolve all tasks before finish';
+$lang['st_action_key_does_not_exist'] = 'Action key does not exist';
+$lang['st_step_key_does_not_exist'] = 'Step key does not exist';
 
 // Field
 $lang['st_detail'] = 'Detail';

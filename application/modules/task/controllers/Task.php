@@ -5,25 +5,33 @@ class Task extends Authenticated_Controller
 	public function __construct()
 	{
 		parent::__construct();
+		$this->load->library('project');
+		$this->lang->load('task');
+		$this->load->helper('mb_form');
+		$this->load->helper('mb_general');
+		$this->load->model('step/step_model');
+		$this->load->model('users/user_model');
 		$this->load->model('task_model');
 		$this->load->model('task_member_model');
-		$this->lang->load('task');
 	}
 
 	public function create($step_key)
 	{
-		if (! $this->input->is_ajax_request()) {
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
-		$this->load->model('step/step_model');
-		$this->load->helper('mb_form');
-		$this->load->helper('mb_general');
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user);
+		$step_id = $this->project->get_object_id('step', $step_key);
 
-		if (! class_exists('User_model')) {
-			$this->load->model('users/user_model');
+		if (empty($step_id)) {
+			Template::set_message(lang('tk_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+
+		if (! $this->project->has_permission('step', $step_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
+		}
+
 		$organization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 		if (empty($organization_members)) {
 			$organization_members = [];

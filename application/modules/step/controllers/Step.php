@@ -44,9 +44,19 @@ class Step extends Authenticated_Controller
 
 	public function create($action_key = null)
 	{
-
 		if (empty($action_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$action_id = $this->project->get_object_id('action', $action_key);
+
+		if (empty($action_id)) {
+			Template::set_message(lang('st_action_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->project->has_permission('action', $action_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
 		}
 
 		$action = $this->action_model->select('action_id')
@@ -125,6 +135,17 @@ class Step extends Authenticated_Controller
 
 		if (empty($step_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step_id = $this->project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->project->has_permission('step', $step_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
 		}
 
 		$step = $this->step_model->select('steps.*, p.project_id')
@@ -232,6 +253,17 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$step_id = $this->project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->project->has_permission('step', $step_id, 'Project.View.All')) {
+			$this->auth->restrict();
+		}
+
 		$step = $this->step_model->select('steps.*')
 								->join('actions a', 'a.action_id = steps.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
@@ -323,10 +355,14 @@ class Step extends Authenticated_Controller
 
 		$step_id = $this->project->get_object_id('step', $step_key);
 
+		if (empty($step_id)) {
+			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
 		if (! $this->project->has_permission('step', $step_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
-
 
 		/*
 			To access Step Monitor, user must be owner or team member of Step

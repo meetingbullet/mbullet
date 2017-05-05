@@ -5,7 +5,7 @@ class Action extends Authenticated_Controller
 	public function __construct()
 	{
 		parent::__construct();
-
+		$this->load->library('project');
 		$this->lang->load('action');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
@@ -39,6 +39,17 @@ class Action extends Authenticated_Controller
 		if (empty($action_key)) {
 			Template::set_message(lang('ac_invalid_action_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$action_id = $this->project->get_object_id('action', $action_key);
+
+		if (empty($action_id)) {
+			Template::set_message(lang('ac_action_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->project->has_permission('action', $action_id, 'Project.View.All')) {
+			$this->auth->restrict();
 		}
 
 		$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name, pm.user_id AS member_id, p.owner_id AS project_owner_id')
@@ -146,8 +157,21 @@ class Action extends Authenticated_Controller
 	public function create($project_key = null, $action_key = null)
 	{
 		if (empty($project_key)) {
+			Template::set_message(lang('ac_action_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+		
+		$project_id = $this->project->get_object_id('project', $project_key);
+
+		if (empty($project_id)) {
+			Template::set_message(lang('ac_project_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->project->has_permission('project', $project_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
+		}
+
 		// get projecct id
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
 		if ($project_id === false) {

@@ -15,3 +15,5 @@ $lang['tk_add_team_member'] = 'Add team member';
 $lang['tk_create'] = 'Create';
 $lang['tk_cancel'] = 'Cancel';
 $lang['tk_add_task_member_fail'] = 'Unable to add task members.';
+$lang['tk_task_key_does_not_exist'] = 'Task key does not exist';
+$lang['tk_step_key_does_not_exist'] = 'Step key does not exist';

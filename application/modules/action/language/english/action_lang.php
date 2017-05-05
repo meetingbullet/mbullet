@@ -39,6 +39,8 @@ $lang['unable_add_action_members'] = 'Unable to add action members.';
 $lang['unable_create_action'] = 'Unable to create action.';
 $lang['unable_update_action'] = 'Unable to update action.';
 $lang['ac_invalid_action_key'] = 'Invalid action key';
+$lang['ac_project_key_does_not_exist'] = 'Project key does not exist';
+$lang['ac_action_key_does_not_exist'] = 'Action key does not exist';
 $lang['update_success'] = 'Update action successfully.';
 
 // Field
