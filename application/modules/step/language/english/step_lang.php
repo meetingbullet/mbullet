@@ -63,6 +63,7 @@ $lang['st_invalid_step_key'] = 'Invalid step key';
 $lang['st_invalid_schedule_time'] = 'Invalid schedule time';
 $lang['st_task_started'] = 'Task started';
 $lang['st_step_started'] = 'Step started';
+$lang['st_step_finished'] = 'Step finished';
 $lang['st_invalid_task_status'] = 'Invalid task status';
 $lang['st_invalid_step_status'] = 'Invalid step status';
 $lang['st_task_jumped'] = 'Task jumped';
@@ -75,6 +76,7 @@ $lang['st_task_placed'] = 'Task is placed in parking lot';
 $lang['st_invalid_action'] = 'Invalid Action';
 $lang['st_cannot_start_step_without_any_task'] = 'Cannot start step without any task';
 $lang['st_waiting_for_start'] = 'Waiting for start';
+$lang['st_please_resolve_all_task_before_finish'] = 'Please resolve all tasks before finish';
 
 // Field
 $lang['st_detail'] = 'Detail';

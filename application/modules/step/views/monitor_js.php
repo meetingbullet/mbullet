@@ -128,6 +128,27 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 	return false;
 });
 
+$(document).on('click.monitor', '.btn-finish', (e) => {
+	e.preventDefault();
+
+	$.post($('.form-step-schedule').attr('action'),  $('.form-step-schedule').serialize() + '&finish=1', (result) => {
+		data = JSON.parse(result);
+
+		$.notify({
+			message: data.message
+		}, {
+			type: data.message_type,
+			z_index: 1051
+		});
+
+		if (data.message_type == 'success') {
+			$('.modal-monitor').modal('hide');
+		}
+	});
+
+	return false;
+});
+
 $(document).on('keyup.monitor', '.form-td', (e) => {
 	if ($(e.target).val() <= 0) {
 		$(e.target).addClass('danger');
@@ -202,6 +223,10 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 			$(e.target).addClass('hidden');
 			$(row).find('.btn-start-task').addClass('hidden');
 			$(row).find('.task-status').html('<span class="<?php e($task_status_labels['skipped'])?>"><?php e(lang('st_skipped'))?></span>');
+
+			if ($('.label-open, .label-inprogress').length == 0) {
+				$('.btn-finish').prop('disabled', false);
+			}
 		}
 	});
 });
@@ -236,6 +261,10 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 					$(item).prop('disabled', false);
 				}
 			});
+
+			if ($('.label-open, .label-inprogress').length == 0) {
+				$('.btn-finish').prop('disabled', false);
+			}
 		}
 	});
 });
@@ -263,6 +292,10 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 			$('.btn-start-task').prop('disabled', false);
 			$('#task-' + task_id).find('.btn-jump').addClass('hidden');
 			$('#task-' + task_id).find('.task-status').html('<span class="<?php e($task_status_labels['resolved'])?>"><?php e(lang('st_resolved'))?></span>');
+
+			if ($('.label-open, .label-inprogress').length == 0) {
+				$('.btn-finish').prop('disabled', false);
+			}
 		}
 	});
 });
@@ -290,6 +323,10 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 			$('.btn-start-task').prop('disabled', false);
 			$('#task-' + task_id).find('.btn-jump').addClass('hidden');
 			$('#task-' + task_id).find('.task-status').html('<span class="<?php e($task_status_labels['parking_lot'])?>"><?php e(lang('st_parking_lot'))?></span>');
+
+			if ($('.label-open, .label-inprogress').length == 0) {
+				$('.btn-finish').prop('disabled', false);
+			}
 		}
 	});
 });
@@ -368,7 +405,7 @@ function update_status_timer(clock)
 				s = moment.duration(duration).seconds();
 
 			// Time alotted for Task
-			if (duration.asMinutes() >= time_assigned) {
+			if (duration.asMinutes() >= time_assigned && $('.step-monitor').data('is-owner') == '1') {
 				if (update_status_timer_intervals[task_id]) {
 					clearInterval(update_status_timer_intervals[task_id]);
 

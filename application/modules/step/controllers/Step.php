@@ -487,6 +487,51 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
+		// Finish step
+		if ($this->input->post('finish')) {
+			if ($step->status != 'inprogress') {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_invalid_step_status')
+				]);
+
+				return;
+			}
+
+			$tasks = $this->task_model->select('task_key')->where('step_id', $step->step_id)->where('(status = "inprogress" OR status ="open")', null, false)->find_all();
+
+			if ($tasks) {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_please_resolve_all_task_before_finish')
+				]);
+
+				return;
+			}
+
+			$current_time = gmdate('Y-m-d H:i:s');
+			$query = $this->step_model->skip_validation(1)->update($step->step_id, [
+				'status' => 'finished',
+				'actual_end_time' => $current_time,
+			]);
+			
+			if ($query) {
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => lang('st_step_finished'),
+					'actual_end_time' => $current_time
+				]);
+
+				return;
+			}
+
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_unknown_error')
+			]);
+			return;
+		}
+
 		// Validation
 		if ( ! ( strtotime($this->input->post('scheduled_end_time')) && strtotime($this->input->post('scheduled_start_time')) ) ) {
 			echo json_encode([
