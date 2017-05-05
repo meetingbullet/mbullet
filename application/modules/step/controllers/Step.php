@@ -321,7 +321,9 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->project->has_permission('step', $step_key, 'Project.View.All')) {
+		$step_id = $this->project->get_object_id('step', $step_key);
+
+		if (! $this->project->has_permission('step', $step_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
 
