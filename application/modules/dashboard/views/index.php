@@ -6,6 +6,12 @@ $step_status_labels = [
 	'finished' => 'label label-success label-bordered',
 	'ready' => 'label label-info label-bordered',
 ];
+
+$project_status_labels = [
+	'open' => 'label label-default label-bordered',
+	'inactive' => 'label label-warning label-bordered',
+	'archive' => 'label label-success label-bordered',
+];
 ?>
 
 <button class="an-btn an-btn-primary" id="create" style="margin: 30px 0">Create Project</button>
@@ -57,7 +63,9 @@ $step_status_labels = [
 								<?php e($project->first_name .' '. $project->last_name)?>
 							</div>
 							<div class="list-state basis-10">
-								<?php e($project->status)?>
+								<span class="msg-tag <?php echo $project_status_labels[$project->status] ?>">
+									<?php e($project->status)?>
+								</span>
 							</div>
 							<div class="list-action basis-20">
 								<?php e($project->created_on)?>
