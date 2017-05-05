@@ -149,7 +149,6 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-
 		$step_id = $this->project->get_object_id('step', $step_key);
 
 		if (empty($step_id)) {
@@ -159,6 +158,7 @@ class Step extends Authenticated_Controller
 
 		if (! $this->project->has_permission('step', $step_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
+		}
 
 		$keys = explode('-', $step_key);
 		if (empty($keys) || count($keys) < 3) {
@@ -284,7 +284,6 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-<<<<<<< application/modules/step/controllers/Step.php
 		$step_id = $this->project->get_object_id('step', $step_key);
 
 		if (empty($step_id)) {
@@ -302,10 +301,8 @@ class Step extends Authenticated_Controller
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
 								->limit(1)
 								->find_by('step_key', $step_key);
-=======
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
->>>>>>> application/modules/step/controllers/Step.php
 
 		// get projecct id
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);

@@ -37,7 +37,7 @@ class Action extends Authenticated_Controller
 	public function detail($action_key)
 	{
 		if (empty($action_key)) {
-			Template::set_message(lang('ac_invalid_action_key'), 'danger');
+			Template::set_message(lang('ac_action_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -64,13 +64,7 @@ class Action extends Authenticated_Controller
 			User must be in the project member or is project owner
 		*/
 		if (! $action) {
-			Template::set_message(lang('ac_invalid_action_key'), 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
-
-		if ($this->auth->has_permission('Project.View.All') === false
-		&& $action->project_owner_id != $this->current_user->user_id
-		&& $action->member_id != $this->current_user->user_id) {
+			Template::set_message(lang('ac_action_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -80,7 +74,6 @@ class Action extends Authenticated_Controller
 													->where('action_id', $action->action_id)
 													->find_all();
 
-		$action->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
 
 		if (isset($_POST['update'])) {
 			$next_status = 'resolved';
@@ -96,6 +89,8 @@ class Action extends Authenticated_Controller
 									->limit(1)
 									->find_by('action_key', $action_key);
 		}
+		
+		$action->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
 
 		$steps = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
 									->join('users u', 'u.user_id = steps.owner_id')
