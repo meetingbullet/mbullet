@@ -23,7 +23,7 @@ $task_status_labels = [
 	'parking_lot' => 'label label-info label-bordered',
 ];
 ?>
-<div data-step-id="<?php e($step->step_id)?>" class="step-monitor">
+<div data-step-id="<?php e($step->step_id)?>" class="step-monitor" data-is-owner="<?php echo $step->owner_id == $current_user->user_id ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>

@@ -60,24 +60,24 @@ class Project
 	 */
 	public function get_object_id($object_type, $object_key)
 	{
-		switch ($object) {
+		switch ($object_type) {
 			case 'project':
-				$query = $this->ci->db->select('project_id p')->from('projects')->where('project_key', $object_key)->where('organization_id', $this->ci->auth->current_organization_id)->get();
+				$query = $this->ci->db->select('project_id')->from('projects')->where('cost_code', $object_key)->where('organization_id', $this->ci->auth->user()->current_organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->project_id;
 				else return false;
 				break;
 			case 'action':
-				$query = $this->ci->db->select('a.action_id')->from('actions a')->join('project p', 'p.project_id = a.project_id')->where('a.action_key', $object_key)->where('p.organization_id', $this->ci->auth->current_organization_id)->get();
+				$query = $this->ci->db->select('a.action_id')->from('actions a')->join('projects p', 'p.project_id = a.project_id')->where('a.action_key', $object_key)->where('p.organization_id', $this->ci->auth->user()->current_organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->action_id;
 				else return false;
 				break;
 			case 'step':
-				$query = $this->ci->db->select('s.step_id')->from('steps s')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('s.step_key', $object_key)->where('p.organization_id', $this->ci->auth->current_organization_id)->get();
+				$query = $this->ci->db->select('s.step_id')->from('steps s')->join('actions a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('s.step_key', $object_key)->where('p.organization_id', $this->ci->auth->user()->current_organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->step_id;
 				else return false;
 				break;
 			case 'task':
-				$query = $this->ci->db->select('t.task_id')->from('tasks t')->join('steps s', 's.step_id = t.step_id')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.task_key', $object_key)->where('p.organization_id', $this->ci->auth->current_organization_id)->get();
+				$query = $this->ci->db->select('t.task_id')->from('tasks t')->join('steps s', 's.step_id = t.step_id')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.task_key', $object_key)->where('p.organization_id', $this->ci->auth->user()->current_organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->task_id;
 				else return false;
 				break;

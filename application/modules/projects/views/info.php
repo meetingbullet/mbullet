@@ -1,11 +1,10 @@
 <?php
 $label = [
-	'open' => 'read',
-	'inprogress' => 'draft',
-	'in-progress' => 'draft',
-	'ready' => 'spam',
-	'ready-for-review' => 'spam',
-	'resolved' => 'unread'
+	'open' => 'label label-default label-bordered',
+	'inprogress' => 'label label-warning label-bordered',
+	'ready' => 'label label-success label-bordered',
+	'finished' => 'label label-info label-bordered',
+	'resolved' => 'label label-success label-bordered'
 ];
 
 $task_status_labels = [

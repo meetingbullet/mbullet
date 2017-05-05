@@ -44,9 +44,19 @@ class Step extends Authenticated_Controller
 
 	public function create($action_key = null)
 	{
-
 		if (empty($action_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$action_id = $this->project->get_object_id('action', $action_key);
+
+		if (empty($action_id)) {
+			Template::set_message(lang('st_action_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->project->has_permission('action', $action_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
 		}
 
 		$action = $this->action_model->select('action_id')
@@ -137,6 +147,17 @@ class Step extends Authenticated_Controller
 
 		if (empty($step_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step_id = $this->project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->project->has_permission('step', $step_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
 		}
 
 		$keys = explode('-', $step_key);
@@ -263,6 +284,23 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$step_id = $this->project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->project->has_permission('step', $step_id, 'Project.View.All')) {
+			$this->auth->restrict();
+		}
+
+		$step = $this->step_model->select('steps.*')
+								->join('actions a', 'a.action_id = steps.action_id')
+								->join('projects p', 'a.project_id = p.project_id')
+								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
+								->limit(1)
+								->find_by('step_key', $step_key);
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
 
@@ -352,10 +390,16 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->project->has_permission('step', $step_key, 'Project.View.All')) {
-			$this->auth->restrict();
+		$step_id = $this->project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		if (! $this->project->has_permission('step', $step_id, 'Project.View.All')) {
+			$this->auth->restrict();
+		}
 
 		/*
 			To access Step Monitor, user must be owner or team member of Step
@@ -506,6 +550,51 @@ class Step extends Authenticated_Controller
 					'message_type' => 'success',
 					'message' => lang('st_step_started'),
 					'actual_start_time' => $current_time
+				]);
+
+				return;
+			}
+
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_unknown_error')
+			]);
+			return;
+		}
+
+		// Finish step
+		if ($this->input->post('finish')) {
+			if ($step->status != 'inprogress') {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_invalid_step_status')
+				]);
+
+				return;
+			}
+
+			$tasks = $this->task_model->select('task_key')->where('step_id', $step->step_id)->where('(status = "inprogress" OR status ="open")', null, false)->find_all();
+
+			if ($tasks) {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_please_resolve_all_task_before_finish')
+				]);
+
+				return;
+			}
+
+			$current_time = gmdate('Y-m-d H:i:s');
+			$query = $this->step_model->skip_validation(1)->update($step->step_id, [
+				'status' => 'finished',
+				'actual_end_time' => $current_time,
+			]);
+			
+			if ($query) {
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => lang('st_step_finished'),
+					'actual_end_time' => $current_time
 				]);
 
 				return;

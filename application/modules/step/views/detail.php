@@ -56,12 +56,11 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 	</a>-->
 
 	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'open' ? ' step-open' : ''?><?php echo $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
-		<i class="ion-ios-eye"></i> 
 		<?php 
 			if ($step->status == 'open') {
-				echo lang('st_start_step');
+				echo '<i class="ion-ios-play"></i> '. lang('st_start_step');
 			} else {
-				echo lang($step->owner_id == $current_user->user_id ? 'st_open_step_monitor' :  'st_join_step_monitor');
+				echo '<i class="ion-ios-eye"></i> ' . lang($step->owner_id == $current_user->user_id ? 'st_open_step_monitor' :  'st_join_step_monitor');
 			}
 		?>
 	</a>
@@ -92,8 +91,8 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 						<div class="col-xs-8" id="status"><?php e($point_used) ?></div>
 					</div>
 					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_in'))?></div>
-						<div class="col-xs-8" id="status"><?php e($step->in) ?></div>
+						<div class="col-xs-4"><?php e(ucfirst(lang('st_in')))?></div>
+						<div class="col-xs-8" id="status"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
