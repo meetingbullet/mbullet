@@ -91,8 +91,8 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 						<div class="col-xs-8" id="status"><?php e($point_used) ?></div>
 					</div>
 					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_in'))?></div>
-						<div class="col-xs-8" id="status"><?php e($step->in) ?></div>
+						<div class="col-xs-4"><?php e(ucfirst(lang('st_in')))?></div>
+						<div class="col-xs-8" id="status"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
