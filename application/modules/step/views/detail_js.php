@@ -18,7 +18,6 @@ $('#open-step-monitor').click((e) => {
 	$.get('<?php e(site_url('step/monitor/' . $step_key)) ?>', (data) => {
 		data = JSON.parse(data);
 		$('.modal-monitor .modal-content').html(data.modal_content);
-		$('.modal-monitor').modal();
 		$('.modal-monitor').modal({backdrop: "static"});
 	});
 

@@ -46,7 +46,7 @@ $task_status_labels = [
 						<input type="hidden" name="scheduled_end_time" id="scheduled_end_time" value="<?php e($step->scheduled_end_time)?>">
 
 						<h3 id="scheduled-timer" class="step-action hidden" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
-						<div class="an input-group">
+						<div class="an input-group <?php echo $step->status == 'ready' ? ' input-group-btn-right' : '' ?>">
 							<div class="input-group-addon"><i class="ion-android-calendar"></i></div>
 							<input type="text" 
 									name="scheduled_time" 
