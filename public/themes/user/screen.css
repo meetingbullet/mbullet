@@ -172,9 +172,13 @@ label>.required {
 
 .input-group-addon {
 	display: table-cell;
-	padding: 6px 12px !important;
+	padding: 4px 12px !important;
 	white-space: nowrap;
     vertical-align: middle;
+}
+
+.input-group.input-group-btn-right {
+	border-right: none !important; 
 }
 
 @media (max-width: 767px) {

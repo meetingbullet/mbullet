@@ -118,6 +118,7 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 			$('tr[data-task-status="open"] .btn-start-task').removeClass('hidden');
 
 			$('.btn-update-step-schedule').addClass('hidden');
+			$('.input-group-btn-right').removeClass('input-group-btn-right');
 			$('#scheduled-timer').data('actual-start-time', data.actual_start_time);
 			update_step_timer();
 		}
@@ -126,13 +127,15 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 	return false;
 });
 
-$(document).on('keyup', '.form-td', (e) => {
+$(document).on('keyup.monitor', '.form-td', (e) => {
 	if ($(e.target).val() <= 0) {
 		$(e.target).addClass('danger');
 		$(e.target).parent().parent().find('.btn-start-task').prop('disabled', true);
 	} else {
-		$(e.target).parent().parent().find('.btn-start-task').prop('disabled', false);
-		$(e.target).removeClass('danger');
+		if ($('.label-inprogress').length === 0) {
+			$(e.target).parent().parent().find('.btn-start-task').prop('disabled', false);
+			$(e.target).removeClass('danger');
+		}
 	}
 });
 
@@ -166,6 +169,9 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 			update_status_timer($(row).find('.task-status'));
 
 			$('.btn-start-task').prop('disabled', true);
+
+			$(row).find('input[name="time_assigned"]').addClass('hidden');
+			$(row).find('.time-assigned').text($(row).find('input[name="time_assigned"]').val());
 		}
 	});
 });
@@ -223,7 +229,11 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 			clearInterval(update_status_timer_intervals[task_id]);
 			$(row).find('.task-status').html('<span class="<?php e($task_status_labels['jumped'])?>"><?php e(lang('st_jumped'))?></span>');
 
-			$('.btn-start-task').prop('disabled', false);
+			$('.btn-start-task').each((i, item) => {
+				if ( $(item).parent().parent().find('input[name="time_assigned"]').val() ) {
+					$(item).prop('disabled', false);
+				}
+			});
 		}
 	});
 });
@@ -316,8 +326,8 @@ function update_step_timer(clock)
 			m = moment.duration(duration).minutes(),
 			s = moment.duration(duration).seconds();
 
-		m = m == '0' ? '0' + m : m;
-		s = s == '0' ? '0' + s : s;
+		m = m < 9 ? '0' + m : m;
+		s = s < 9 ? '0' + s : s;
 
 		if (h > 0) {
 			m += h * 60;
