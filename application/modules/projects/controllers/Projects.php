@@ -185,12 +185,18 @@ class Projects extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, 'projects.*, u.email, u.avatar, CONCAT(u.first_name, u.last_name) as full_name');
+		$project = $this->project_model->get_project_by_key($project_key, $this->current_user->current_organization_id, 'projects.*, u.email, u.avatar, CONCAT(u.first_name, u.last_name) as full_name');
 		if ($project === false) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_id = $project->project_id;
+
+		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		&& $this->auth->has_permission('Project.View.All') === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
 		/***************** PROJECT DETAIL *****************/
 		$constraint = $this->project_constraint_model->find($project_id);
 		$expectation = $this->project_expectation_model->find($project_id);
@@ -350,7 +356,7 @@ class Projects extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
 
 		// $project_id = 1; // test
 		$action_id = trim($this->input->get('action_id'));
@@ -438,7 +444,7 @@ class Projects extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
 		// $project_id = 1; // test
 		if ($project_id !== false) {
 			$actions = $this->get_actions($project_id);
@@ -461,7 +467,7 @@ class Projects extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
 		if ($project_id !== false) {
 			$members = $this->db->select('u.user_id, CONCAT(u.first_name, u.last_name) as full_name')
 								->from('users u')
@@ -480,25 +486,22 @@ class Projects extends Authenticated_Controller
 
 	public function settings($project_key = null)
 	{
-		$project = $this->project_model->get_project_by_key($project_key, $this->current_user, '*', false);
+		$project = $this->project_model->get_project_by_key($project_key, $this->current_user->current_organization_id, '*', false);
 
 		if ($project === false) {
-			Template::set_message(lang('pj_not_have_config_permission') , 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		} elseif ($project !== false) {
 			if (! class_exists('Role_model')) {
 				$this->load->model('roles/role_model');
 			}
-			$is_organization_owner = $this->role_model->where('role_id', $this->current_user->role_ids[$this->current_user->current_organization_id])
-													->count_by('is_public', 1) == 1 ? true : false;
 
-			if ($project->owner_id != $this->current_user->user_id && $is_organization_owner === false) {
+			if ($this->project_model->is_project_owner($project->project_id, $this->current_user->user_id) === false
+			&& $this->project_member_model->is_project_member($project->project_id, $this->current_user->user_id) === false
+			&& $this->auth->has_permission('Project.Config.All') === false
+			&& $this->auth->has_permission('Project.Config.Joined') === false) {
 				Template::set_message(lang('pj_not_have_config_permission') , 'danger');
 				redirect(DEFAULT_LOGIN_LOCATION);
 			}
-		} elseif ($this->auth->has_permission('Project.Config.All') === false || $this->auth->has_permission('Project.Config.Joined') === false) {
-			Template::set_message(lang('pj_not_have_config_permission') , 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if ($this->input->post()) {
@@ -537,7 +540,7 @@ class Projects extends Authenticated_Controller
 			echo 0;
 			exit;
 		}
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user, '*', false);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id, '*', false);
 		if ($project_id !== false) {
 			$updated = $this->project_model->update($project_id, ['status' => $this->input->get('status')]);
 			if (! $updated) {

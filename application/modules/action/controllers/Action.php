@@ -52,8 +52,14 @@ class Action extends Authenticated_Controller
 			Permission to access this page:
 			User must be in the project member or is project owner
 		*/
-		if (! $action || $action->project_owner_id != $this->current_user->user_id && $action->member_id != $this->current_user->user_id) {
+		if (! $action) {
 			Template::set_message(lang('ac_invalid_action_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->auth->has_permission('Project.View.All') === false
+		&& $action->project_owner_id != $this->current_user->user_id
+		&& $action->member_id != $this->current_user->user_id) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -148,14 +154,21 @@ class Action extends Authenticated_Controller
 		if (empty($project_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+
 		// get projecct id
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user);
+		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
 		if ($project_id === false) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		&& $this->auth->has_permission('Project.Edit.All') === false) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
 		if(! empty($action_key)) {
-			$action = $this->action_model->get_action_by_key($action_key, $this->current_user, 'actions.*');
+			$action = $this->action_model->get_action_by_key($action_key, $this->current_user->current_organization_id, 'actions.*');
 			if ($action !== false) {
 				$action->members = $this->action_member_model->select('user_id')->find_all_by('action_id', $action->action_id);
 				if (! empty($action->members)) {

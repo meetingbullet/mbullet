@@ -210,36 +210,22 @@ class Project_model extends BF_Model
 		parent::__construct();
 	}
 
-	public function get_project_by_key($project_key, $current_user, $select = '*', $with_owner = true)
+	public function is_project_owner($project_id, $user_id)
 	{
-		if (! class_exists('Role_model')) {
-			$this->load->model('roles/role_model');
+		return (boolean) $this->where('owner_id', $user_id)
+							->find_by('project_id', $project_id);
+	}
+
+	public function get_project_by_key($project_key, $organization_id, $select = '*', $with_owner = true)
+	{
+		$this->select($select);
+
+		if ($with_owner === true) {
+			$this->join('users u', 'u.user_id = projects.owner_id', 'LEFT');
 		}
-		// check user is organization owner or not
-		$is_owner = $this->role_model->where('role_id', $current_user->role_ids[$current_user->current_organization_id])
-									->count_by('is_public', 1) == 1 ? true : false;
-		// get project id
-		if ($is_owner) {
-			$this->select($select);
 
-			if ($with_owner === true) {
-				$this->join('users u', 'u.user_id = projects.owner_id', 'LEFT');
-			}
-
-			$project = $this->where('projects.organization_id', $current_user->current_organization_id)
-							->find_by('projects.cost_code', $project_key);
-		} else {
-			$this->select($select);
-
-			if ($with_owner === true) {
-				$this->join('users u', 'u.user_id = projects.owner_id', 'LEFT');
-			}
-
-			$project = $this->join('project_members pm', 'pm.project_id = projects.project_id', 'INNER')
-							->where('projects.organization_id', $current_user->current_organization_id)
-							->where('pm.user_id', $current_user->user_id)
-							->find_by('projects.cost_code', $project_key);
-		}
+		$project = $this->where('projects.organization_id', $organization_id)
+						->find_by('projects.cost_code', $project_key);
 
 		if (! empty($project)) {
 			return $project;
@@ -248,9 +234,9 @@ class Project_model extends BF_Model
 		return false;
 	}
 
-	public function get_project_id($project_key, $current_user)
+	public function get_project_id($project_key, $organization_id)
 	{
-		$project = $this->get_project_by_key($project_key, $current_user, 'projects.project_id', false);
+		$project = $this->get_project_by_key($project_key, $organization_id, 'projects.project_id', false);
 
 		if (! empty($project)) {
 			return $project->project_id;

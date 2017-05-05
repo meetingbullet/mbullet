@@ -122,3 +122,11 @@ $lang['pj_contributor_min_star'] = 'Contributor minimum # of stars';
 $lang['pj_there_was_a_problem_while_updating_project_settings'] = 'There was a problem while updating project settings.';
 $lang['pj_cost_of_time_legend'] = 'Cost/Unit of Time: measured in T-Shirts, can be calibrated by entering in fractions/percents which sum to 1/100 when all values from "XS" to "XL" are added, or by entering any rational number.';
 $lang['pj_value_of_time_legend'] = 'Value/Unit of Time: measured in Stars, can be calibrated by entering either a quality rating (5=Excellent, 4=Good, 3=Average, 2=Below Average 1=Poor) or a letter grade (5=A, 4=B, 3=C, 2=D, 1=F).';
+
+// Tasks
+$lang['pj_inprogress'] = 'In Progress';
+$lang['pj_skipped'] = 'Skipped';
+$lang['pj_jumped'] = 'Jumped';
+$lang['pj_open'] = 'Open';
+$lang['pj_parking_lot'] = 'Parking Lot';
+$lang['pj_resolved'] = 'Resolved';
