@@ -22,7 +22,7 @@ $('.btn-open-step-monitor').click((e) => {
 
 	if ($(this).hasClass('step-open')) {
 		$(this).removeClass('step-open');
-		$(this).find('span').text('<?php echo lang('st_open_step_monitor')?>')
+		$(this).find('span').text('<?php echo lang('st_monitor')?>')
 	}
 });
 
