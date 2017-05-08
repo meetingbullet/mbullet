@@ -29,10 +29,6 @@ $project_status_labels = [
 				<div class="an-user-lists">
 					<div class="list-title">
 						<h6 class="basis-10">
-							<span class="an-custom-checkbox">
-								<input type="checkbox" id="check-1">
-								<label for="check-1"></label>
-							</span>
 							ID
 						</h6>
 						<h6 class="basis-30">Project Name</h6>
@@ -46,11 +42,6 @@ $project_status_labels = [
 						<?php foreach($projects as $project): ?>
 						<div class="list-user-single">
 							<div class="list-name basis-10">
-								<span class="an-custom-checkbox">
-									<input type="checkbox" id="check-2">
-									<label for="check-2"></label>
-								</span>
-
 								<?php e($project->project_id)?>
 							</div>
 							<div class="list-date basis-30">
@@ -89,10 +80,6 @@ $project_status_labels = [
 				<div class="an-user-lists">
 					<div class="list-title">
 						<h6 class="basis-40">
-							<span class="an-custom-checkbox">
-								<input type="checkbox" id="check-2">
-								<label for="check-2"></label>
-							</span>
 							Step
 						</h6>
 						<h6 class="basis-20">Owner</h6>
@@ -104,10 +91,6 @@ $project_status_labels = [
 						<?php foreach($my_steps as $step): ?>
 						<div class="list-user-single">
 							<div class="list-date basis-40">
-								<span class="an-custom-checkbox">
-									<input type="checkbox" id="check-2">
-									<label for="check-2"></label>
-								</span>
 								<?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?>
 							</div>
 							<div class="list-text basis-20">
@@ -124,7 +107,7 @@ $project_status_labels = [
 										data-now="<?php e($now)?>">
 								</span>
 
-								<button class="an-btn an-btn-primary btn-open-step-monitor<?php e($step->status == 'inprogress' ? '' : ' hidden' . ($step->owner_id == $current_user->user_id ? ' is-owner' : ''))?> " 
+								<button class="an-btn an-btn-small an-btn-primary btn-open-step-monitor<?php e($step->status == 'inprogress' ? '' : ' hidden' . ($step->owner_id == $current_user->user_id ? ' is-owner' : ''))?> " 
 										data-step-key="<?php e($step->step_key)?>">
 									<?php echo ($step->owner_id == $current_user->user_id ? lang('st_open') : lang('st_join')) ?>
 								</button>

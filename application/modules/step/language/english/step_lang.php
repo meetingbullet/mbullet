@@ -25,6 +25,7 @@ $lang['st_second'] = 'second';
 $lang['st_months'] = 'months';
 $lang['st_weeks'] = 'weeks';
 $lang['st_time_assigned'] = 'Time assigned';
+$lang['st_time_assigned_min'] = 'Time assigned (mins)';
 $lang['st_skip_votes'] = 'Skip votes';
 $lang['st_in_progress'] = 'In Progress';
 $lang['st_inprogress'] = 'In Progress';
@@ -53,6 +54,7 @@ $lang['st_voted_skip'] = 'Voted Skip';
 $lang['st_jump'] = 'Jump';
 $lang['st_finish'] = 'Finish';
 $lang['st_open_step_monitor'] = 'Open Step Monitor';
+$lang['st_set_up'] = 'Set up';
 
 // Message
 $lang['st_step_successfully_created'] = 'Step successfully created';
@@ -97,6 +99,8 @@ $lang['st_name'] = 'Name';
 $lang['st_resource'] = 'Resource';
 $lang['st_add_team_member'] = '+ Add team member';
 $lang['st_point_used'] = 'Points used';
+$lang['st_description'] = 'Description';
+$lang['st_assignee'] = 'Assignee';
 
 // Step
 $lang['st_add_task'] = 'Add Task';
