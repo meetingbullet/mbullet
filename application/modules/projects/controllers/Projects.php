@@ -281,13 +281,7 @@ class Projects extends Authenticated_Controller
 		$project->total_project_point_used = 0;
 		if ($actions) {
 			foreach ($actions as &$action) {
-				$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
-													->join('step_members sm', 'steps.step_id = sm.step_id')
-													->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
-													->where('action_id', $action->action_id)
-													->find_all();
-
-				$action->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
+				$action->point_used = number_format($this->project->total_point_used('action', $action->action_id), 2);
 
 				$project->total_project_point_used += $action->point_used;
 			}
@@ -304,13 +298,7 @@ class Projects extends Authenticated_Controller
 		// @TODO need to optimize query
 		if ($steps) {
 			foreach ($steps as &$step) {
-				$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
-								->join('step_members sm', 'steps.step_id = sm.step_id')
-								->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
-								->where('sm.step_id', $step->step_id)
-								->find_all();
-
-				$step->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
+				$step->point_used = number_format($this->project->total_point_used('step', $step->step_id), 2);
 			}
 		}
 
