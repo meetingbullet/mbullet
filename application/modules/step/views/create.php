@@ -38,7 +38,7 @@
 								<input type="number" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in', 0)) ?>" step="0.1">
 							</div>
 							<div class="col-md-3">
-								<?php e(lang('st_hours'))?>
+								<?php e(lang('st_minutes'))?>
 							</div>
 						</div>
 					</div>

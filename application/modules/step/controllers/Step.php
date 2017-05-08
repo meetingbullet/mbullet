@@ -8,11 +8,13 @@ class Step extends Authenticated_Controller
 		$this->lang->load('step');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
+		$this->load->helper('text');
 		$this->load->helper('date');
 		$this->load->library('project');
 		
 		$this->load->model('users/user_model');
 		$this->load->model('task/task_model');
+		$this->load->model('task/task_member_model');
 
 		$this->load->model('step_model');
 		$this->load->model('step_member_model');
@@ -327,8 +329,10 @@ class Step extends Authenticated_Controller
 								->join('users u', 'u.user_id = tasks.owner_id', 'left')
 								->where('step_id', $step_id)->find_all();
 
-		if (! class_exists('User_model')) {
-			$this->load->model('users', 'user_model');
+		if ($tasks) {
+			foreach ($tasks as &$task) {
+				$task->members = $this->task_member_model->select('avatar, email')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
+			}
 		}
 
 		$invited_members =  $this->user_model
@@ -428,6 +432,11 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
+		foreach ($tasks as &$task) {
+			$task->members = $this->task_member_model->select('avatar, email')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
+		}
+
+
 		Assets::add_js($this->load->view('monitor_js', [
 			
 		], true), 'inline');
@@ -452,7 +461,7 @@ class Step extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function get_skip_votes($step_id)
+	public function get_monitor_data($step_id)
 	{
 		if (empty($step_id)) {
 			echo json_encode([
@@ -462,7 +471,7 @@ class Step extends Authenticated_Controller
 			return ;
 		}
 
-		$tasks = $this->task_model->select('tasks.task_id,
+		$tasks = $this->task_model->select('tasks.task_id, tasks.status, tasks.started_on, tasks.time_assigned, 
 											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
 									->join('users u', 'u.user_id = tasks.owner_id', 'left')
 									->where('step_id', $step_id)->find_all();
@@ -477,7 +486,8 @@ class Step extends Authenticated_Controller
 
 		echo json_encode([
 			'message_type' => 'success',
-			'data' => $tasks
+			'data' => $tasks,
+			'current_time' => gmdate('Y-m-d H:i:s')
 		]);
 	}
 
@@ -544,8 +554,20 @@ class Step extends Authenticated_Controller
 				'status' => 'inprogress',
 				'actual_start_time' => $current_time,
 			]);
-			
+
 			if ($query) {
+				if ( is_array($this->input->post('time_assigned')) ) {
+					$task_data = [];
+					foreach ($this->input->post('time_assigned') as $task_id => $time_assigned) {
+						$task_data[] = [
+							'task_id' => $task_id,
+							'time_assigned' => $time_assigned
+						];
+					}
+
+					$this->task_model->skip_validation(1)->update_batch($task_data, 'task_id');
+				}
+
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_step_started'),
