@@ -7,6 +7,7 @@ Assets::add_js('bootstrap.min.js');
 $inline  = '$(".dropdown-toggle").dropdown();';
 $inline .= '$(".tooltips").tooltip();';
 Assets::add_js($inline, 'inline');
+Assets::add_css(['animate.min.css', 'vendor-styles.css', 'styles.css']);
 
 ?>
 <!doctype html>
@@ -27,10 +28,6 @@ Assets::add_js($inline, 'inline');
 
 	<!-- Theme CSS -->
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
-	<link href="<?php echo Template::theme_url("css/animate.min.css"); ?>" rel="stylesheet">
-	<link href="<?php echo Template::theme_url("css/vendor-styles.css"); ?>" rel="stylesheet">
-	<link href="<?php echo Template::theme_url("css/styles.css"); ?>" rel="stylesheet" >
-	<link href="<?php echo Template::theme_url("screen.css"); ?>" rel="stylesheet" >
 
 	<link rel="shortcut icon" href="<?php echo base_url(); ?>favicon.ico">
 
