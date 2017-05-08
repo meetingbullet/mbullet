@@ -1,4 +1,5 @@
 <?php
+$is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 $scheduled_end_time = null;
 
@@ -23,7 +24,7 @@ $task_status_labels = [
 	'parking_lot' => 'label label-info label-bordered',
 ];
 ?>
-<div data-step-id="<?php e($step->step_id)?>" class="step-monitor">
+<div data-step-id="<?php e($step->step_id)?>" class="step-monitor" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
@@ -65,11 +66,11 @@ $task_status_labels = [
 						<div class="step-action">
 							<button type="submit" 
 									name='start-step' 
-									class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' ? '' : ' hidden' ?>"
+									class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>"
 								<?php echo is_null($step->scheduled_start_time) || is_null($step->scheduled_end_time) ? ' disabled' : '' ?> >
 								<i class="ion-ios-play"></i> <?php e(lang('st_start'))?>
 							</button>
-							<button class="an-btn an-btn-success btn-finish<?php echo $step->status == 'inprogress' ? '' : ' hidden' ?>" disabled>
+							<button class="an-btn an-btn-success btn-finish<?php echo $step->status == 'inprogress' && $is_owner ? '' : ' hidden' ?>" disabled>
 								<i class="ion-ios-checkmark-outline"></i> <?php e(lang('st_finish'))?>
 							</button>
 						</div>
@@ -89,7 +90,9 @@ $task_status_labels = [
 				<thead>
 					<tr>
 						<th><?php e(lang('st_name'))?></th>
-						<th class='text-center'><?php e(lang('st_time_assigned'))?></th>
+						<th><?php e(lang('st_description'))?></th>
+						<th><?php e(lang('st_assignee'))?></th>
+						<th class='text-center'><?php e(lang('st_time_assigned_min'))?></th>
 						<th class='text-center'><?php e(lang('st_skip_votes'))?></th>
 						<th><?php e(lang('st_status'))?></th>
 						<th><?php e(lang('st_action'))?></th>
@@ -98,33 +101,43 @@ $task_status_labels = [
 				<tbody>
 					<?php if($tasks): foreach ($tasks as $task) : ?>
 					<tr id='task-<?php e($task->task_id)?>' data-task-id='<?php e($task->task_id)?>' data-task-status='<?php e($task->status)?>'>
-						<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
-						<td class='text-center'>
+						<td class="basis-10"><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
+						<td class="basis-40"><?php echo word_limiter($task->description, 24)?></td>
+						<td class="basis-10">
+							<ul class="list-inline list-member">
+								<?php if ($task->members) {
+									foreach ($task->members as $member) {
+										echo '<li><div class="avatar" style="background-image: url(\'' . avatar_url($member->avatar, $member->email) . '\')"></div></li>';
+									}
+								} ?>
+							</ul>
+						</td>
+						<td class='text-center basis-10'>
 							<span class="time-assigned">
 								<?php e($task->time_assigned)?>
 							</span>
 
-							<input type="number" name="time_assigned" class='an-form-control form-td<?php echo ($task->time_assigned == NULL ? '' : ' hidden' ) ?>' step="0.01" value="<?php e($task->time_assigned)?>"/>
+							<input type="number" name="time_assigned" data-task-id='<?php e($task->task_id)?>' class='an-form-control form-td<?php echo ($task->time_assigned == NULL && $is_owner ? '' : ' hidden' ) ?>' step="0.01" value="<?php e($task->time_assigned)?>"/>
 						</td>
-						<td class='text-center skip-votes'><?php e($task->skip_votes)?></td>
-						<td class='task-status basis-30' <?php echo $task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}' data-time-assigned='{$task->time_assigned}'" : '' ?>>
+						<td class='text-center skip-votes basis-10'><?php e($task->skip_votes)?></td>
+						<td class='task-status basis-20' <?php echo $task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}' data-time-assigned='{$task->time_assigned}'" : '' ?>>
 							<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 						</td>
 
-						<?php if ($step->owner_id == $current_user->user_id): ?>
-						<td>
-							<button class="an-btn an-btn-primary btn-start-task<?php e($step->status == 'inprogress' && $task->status == 'open' ? '' : ' hidden')?>"<?php e($task->time_assigned ? '' : ' disabled')?>>
+						<?php if ($is_owner): ?>
+						<td class='basis-10'>
+							<button class="an-btn an-btn-small an-btn-primary btn-start-task<?php e($step->status == 'inprogress' && $task->status == 'open' ? '' : ' hidden')?>"<?php e($task->time_assigned ? '' : ' disabled')?>>
 								<?php e(lang('st_start'))?>
 							</button>
-							<button class="an-btn an-btn-primary btn-skip<?php e($step->status == 'inprogress' && $task->status == 'open' ? '' : ' hidden')?>"><?php e(lang('st_skip'))?></button>
-							<button class="an-btn an-btn-primary btn-jump<?php e($task->status == 'inprogress' ? '' : ' hidden')?>"><?php e(lang('st_jump'))?></button>
+							<button class="an-btn an-btn-small an-btn-primary btn-skip<?php e($step->status == 'inprogress' && $task->status == 'open' ? '' : ' hidden')?>"><?php e(lang('st_skip'))?></button>
+							<button class="an-btn an-btn-small an-btn-primary btn-jump<?php e($task->status == 'inprogress' ? '' : ' hidden')?>"><?php e(lang('st_jump'))?></button>
 						</td>
 						<?php else: ?>
-						<td>
+						<td class='basis-10'>
 							<?php if ($task->voted_skip == 0):?>
-							<button class="an-btn an-btn-primary btn-vote-skip<?php e($task->status == 'inprogress' ? '' : ' hidden')?>"><?php e(lang('st_vote_skip'))?></button>
+							<button class="an-btn an-btn-small an-btn-primary btn-vote-skip <?php echo $task->status == 'resolved' || $task->status == 'skipped' || $task->status == 'jumped' || $task->status == 'parking_lot' ? ' hidden' : ''?>"><?php e(lang('st_vote_skip'))?></button>
 							<?php else: ?>
-							<button class="an-btn an-btn-primary-transparent<?php e($task->status == 'inprogress' ? '' : ' hidden')?>" disabled><?php e(lang('st_voted_skip'))?></button>
+							<button class="an-btn an-btn-small an-btn-primary-transparent" disabled><?php e(lang('st_voted_skip'))?></button>
 							<?php endif; ?>
 						</td>
 						<?php endif; ?>

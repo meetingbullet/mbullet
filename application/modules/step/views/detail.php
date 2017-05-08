@@ -9,6 +9,23 @@ $cost_of_time_to_badge = [
 	'warning',	// XL
 ];
 
+$label = [
+	'open' => 'label label-default label-bordered',
+	'inprogress' => 'label label-warning label-bordered',
+	'ready' => 'label label-success label-bordered',
+	'finished' => 'label label-info label-bordered',
+	'resolved' => 'label label-success label-bordered'
+];
+
+$task_status_labels = [
+	'open' => 'label label-default label-bordered',
+	'inprogress' => 'label label-warning label-bordered',
+	'resolved' => 'label label-success label-bordered',
+	'jumped' => 'label label-info label-bordered',
+	'skipped' => 'label label-success label-bordered',
+	'parking_lot' => 'label label-info label-bordered',
+];
+
 $buttons = [
 	'open' => [
 		'icon' => 'ion-ios-play',
@@ -37,9 +54,6 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<?php echo anchor(site_url('project/' . $project_key), $project_key) ?> /
-		<?php e($step_key) ?>
-
 		<h2><?php e($step->name)?></h2>
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
@@ -56,19 +70,18 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 	</a>-->
 
 	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'open' ? ' step-open' : ''?><?php echo $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
-		<i class="ion-ios-eye"></i> 
 		<?php 
 			if ($step->status == 'open') {
-				echo lang('st_start_step');
+				echo '<i class="ion-ios-play"></i> '. lang('st_set_up');
 			} else {
-				echo lang($step->owner_id == $current_user->user_id ? 'st_open_step_monitor' :  'st_join_step_monitor');
+				echo '<i class="ion-ios-eye"></i> ' . lang($step->owner_id == $current_user->user_id ? 'st_open_step_monitor' :  'st_join_step_monitor');
 			}
 		?>
 	</a>
 </div>
 
 <div class="row">
-	<div class="col-md-8">
+	<div class="col-md-9">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_detail'))?> </h6>
@@ -85,15 +98,18 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
-						<div class="col-xs-8" id="status"><?php e(str_replace('-', ' ', $step->status))?></div>
+						<div class="col-xs-8" id="status">
+							<span class="<?php e($label[$step->status])?>"><?php e(lang('st_' . $step->status))?></span>
+						</div>
+
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_point_used'))?></div>
 						<div class="col-xs-8" id="status"><?php e($point_used) ?></div>
 					</div>
 					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_in'))?></div>
-						<div class="col-xs-8" id="status"><?php e($step->in) ?></div>
+						<div class="col-xs-4"><?php e(ucfirst(lang('st_in')))?></div>
+						<div class="col-xs-8" id="status"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -111,17 +127,29 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 								<tr>
 									<th><?php e(lang('st_key'))?></th>
 									<th><?php e(lang('st_name'))?></th>
-									<th><?php e(lang('st_owner'))?></th>
+									<th><?php e(lang('st_description'))?></th>
+									<th><?php e(lang('st_assignee'))?></th>
 									<th><?php e(lang('st_status'))?></th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php if($tasks): foreach ($tasks as $task) : ?>
 								<tr>
-									<td><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
-									<td><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
-									<td><?php e($task->owner_name)?></td>
-									<td><?php e($task->status)?></td>
+									<td class='basis-10'><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
+									<td class='basis-15'><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
+									<td class='basis-30'><?php echo word_limiter($task->description, 35)?></td>
+									<td class='basis-20'>
+										<ul class="list-inline list-member">
+											<?php if ($task->members) {
+												foreach ($task->members as $member) {
+													echo '<li><div class="avatar" style="background-image: url(\'' . avatar_url($member->avatar, $member->email) . '\')"></div></li>';
+												}
+											} ?>
+										</ul>
+									</td>
+									<td class='basis-10'>
+										<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
+									</td>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
@@ -134,7 +162,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 		</div>
 	</div>
 
-	<div class="col-md-4">
+	<div class="col-md-3">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_resource'))?></h6>

@@ -9,6 +9,14 @@ $cost_of_time_to_badge = [
 	'warning',	// XL
 ];
 
+$step_label = [
+	'open' => 'label label-default label-bordered',
+	'inprogress' => 'label label-warning label-bordered',
+	'ready' => 'label label-success label-bordered',
+	'finished' => 'label label-info label-bordered',
+	'resolved' => 'label label-success label-bordered'
+];
+
 $action_button = [
 	'open' => [
 		'an-btn-primary',
@@ -112,7 +120,7 @@ $project_key = $project_key['0'];
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name)?></td>
 										<td><?php e($step->point_used)?></td>
 										<td><?php e($step->owner_name)?></td>
-										<td><?php e($step->status)?></td>
+										<td><span class="<?php echo $step_label[$step->status] ?>"><?php e($step->status)?></span></td>
 									</tr>
 									<?php endforeach; endif;?>
 								</tbody>

@@ -25,6 +25,7 @@ $lang['st_second'] = 'second';
 $lang['st_months'] = 'months';
 $lang['st_weeks'] = 'weeks';
 $lang['st_time_assigned'] = 'Time assigned';
+$lang['st_time_assigned_min'] = 'Time assigned (mins)';
 $lang['st_skip_votes'] = 'Skip votes';
 $lang['st_in_progress'] = 'In Progress';
 $lang['st_inprogress'] = 'In Progress';
@@ -53,6 +54,7 @@ $lang['st_voted_skip'] = 'Voted Skip';
 $lang['st_jump'] = 'Jump';
 $lang['st_finish'] = 'Finish';
 $lang['st_open_step_monitor'] = 'Open Step Monitor';
+$lang['st_set_up'] = 'Set up';
 
 // Message
 $lang['st_step_successfully_created'] = 'Step successfully created';
@@ -63,6 +65,7 @@ $lang['st_invalid_step_key'] = 'Invalid step key';
 $lang['st_invalid_schedule_time'] = 'Invalid schedule time';
 $lang['st_task_started'] = 'Task started';
 $lang['st_step_started'] = 'Step started';
+$lang['st_step_finished'] = 'Step finished';
 $lang['st_invalid_task_status'] = 'Invalid task status';
 $lang['st_invalid_step_status'] = 'Invalid step status';
 $lang['st_task_jumped'] = 'Task jumped';
@@ -75,6 +78,9 @@ $lang['st_task_placed'] = 'Task is placed in parking lot';
 $lang['st_invalid_action'] = 'Invalid Action';
 $lang['st_cannot_start_step_without_any_task'] = 'Cannot start step without any task';
 $lang['st_waiting_for_start'] = 'Waiting for start';
+$lang['st_please_resolve_all_task_before_finish'] = 'Please resolve all tasks before finish';
+$lang['st_action_key_does_not_exist'] = 'Action key does not exist';
+$lang['st_step_key_does_not_exist'] = 'Step key does not exist';
 
 // Field
 $lang['st_detail'] = 'Detail';
@@ -93,6 +99,8 @@ $lang['st_name'] = 'Name';
 $lang['st_resource'] = 'Resource';
 $lang['st_add_team_member'] = '+ Add team member';
 $lang['st_point_used'] = 'Points used';
+$lang['st_description'] = 'Description';
+$lang['st_assignee'] = 'Assignee';
 
 // Step
 $lang['st_add_task'] = 'Add Task';

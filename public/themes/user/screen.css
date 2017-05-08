@@ -133,6 +133,10 @@ label>.required {
 	margin-bottom: 0;
 }
 
+.list-member.list-inline .avatar {
+	margin: 0;
+}
+
 .list-member .avatar {
 	width: 25px;
 	height: 25px;
@@ -179,6 +183,10 @@ label>.required {
 
 .input-group.input-group-btn-right {
 	border-right: none !important; 
+}
+
+.basis-15 {
+	width: 15%;
 }
 
 @media (max-width: 767px) {

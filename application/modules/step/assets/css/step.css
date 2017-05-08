@@ -83,3 +83,7 @@
 	margin-top: 0;
 	margin-right: 20px;
 }
+
+.table-task tr {
+	min-height: 52px;
+}

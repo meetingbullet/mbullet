@@ -6,6 +6,7 @@ class Projects extends Authenticated_Controller
 	{
 		parent::__construct();
 		$this->lang->load('projects');
+		$this->load->library('project');
 		$this->load->library('form_validation');
 		$this->load->library('invite/invitation');
 		$this->load->helper('mb_form_helper');
@@ -183,6 +184,12 @@ class Projects extends Authenticated_Controller
 		/***************** PROJECT AND USER CHECK *****************/
 		if ($project_key == null) {
 			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$project_id = $this->project->get_object_id('project', $project_key);
+
+		if (! $this->project->has_permission('project', $project_id, 'Project.View.All')) {
+			$this->auth->restrict();
 		}
 
 		$project = $this->project_model->get_project_by_key($project_key, $this->current_user->current_organization_id, 'projects.*, u.email, u.avatar, CONCAT(u.first_name, u.last_name) as full_name');
