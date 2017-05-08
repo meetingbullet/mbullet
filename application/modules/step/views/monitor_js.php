@@ -274,7 +274,7 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 			$(row).find('.btn-start-task').addClass('hidden');
 			$(row).find('.task-status').html('<span class="<?php e($task_status_labels['skipped'])?>"><?php e(lang('st_skipped'))?></span>');
 
-			if ($('.label-open, .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -312,7 +312,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 				}
 			});
 
-			if ($('.label-open, .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -343,7 +343,7 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 			$('#task-' + task_id).find('.btn-jump').addClass('hidden');
 			$('#task-' + task_id).find('.task-status').html('<span class="<?php e($task_status_labels['resolved'])?>"><?php e(lang('st_resolved'))?></span>');
 
-			if ($('.label-open, .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -374,7 +374,7 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 			$('#task-' + task_id).find('.btn-jump').addClass('hidden');
 			$('#task-' + task_id).find('.task-status').html('<span class="<?php e($task_status_labels['parking_lot'])?>"><?php e(lang('st_parking_lot'))?></span>');
 
-			if ($('.label-open, .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
