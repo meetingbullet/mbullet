@@ -87,3 +87,7 @@
 .table-task tr {
 	min-height: 52px;
 }
+
+.task-status, .task-action {
+	white-space: nowrap;
+}
