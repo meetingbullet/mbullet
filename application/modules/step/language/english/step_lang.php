@@ -53,8 +53,10 @@ $lang['st_vote_skip'] = 'Vote Skip';
 $lang['st_voted_skip'] = 'Voted Skip';
 $lang['st_jump'] = 'Jump';
 $lang['st_finish'] = 'Finish';
-$lang['st_open_step_monitor'] = 'Open Step Monitor';
+$lang['st_monitor'] = 'Monitor';
 $lang['st_set_up'] = 'Set up';
+$lang['st_join'] = 'Join';
+
 
 // Message
 $lang['st_step_successfully_created'] = 'Step successfully created';

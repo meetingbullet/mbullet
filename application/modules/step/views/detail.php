@@ -75,7 +75,7 @@ $members = array_column($invited_members, 'user_id');
 			if ($step->status == 'open') {
 				echo '<i class="ion-ios-play"></i> '. lang('st_set_up');
 			} else {
-				echo '<i class="ion-ios-eye"></i> ' . lang($step->owner_id == $current_user->user_id ? 'st_open_step_monitor' :  'st_join_step_monitor');
+				echo '<i class="ion-ios-play"></i> ' . lang($step->owner_id == $current_user->user_id ? 'st_monitor' :  'st_join');
 			}
 		?>
 	</a>
