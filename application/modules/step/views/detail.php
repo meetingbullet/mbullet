@@ -9,6 +9,14 @@ $cost_of_time_to_badge = [
 	'warning',	// XL
 ];
 
+$label = [
+	'open' => 'label label-default label-bordered',
+	'inprogress' => 'label label-warning label-bordered',
+	'ready' => 'label label-success label-bordered',
+	'finished' => 'label label-info label-bordered',
+	'resolved' => 'label label-success label-bordered'
+];
+
 $task_status_labels = [
 	'open' => 'label label-default label-bordered',
 	'inprogress' => 'label label-warning label-bordered',
@@ -90,7 +98,10 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
-						<div class="col-xs-8" id="status"><?php e(str_replace('-', ' ', $step->status))?></div>
+						<div class="col-xs-8" id="status">
+							<span class="<?php e($label[$step->status])?>"><?php e(lang('st_' . $step->status))?></span>
+						</div>
+
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_point_used'))?></div>
