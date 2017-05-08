@@ -101,9 +101,9 @@ $task_status_labels = [
 				<tbody>
 					<?php if($tasks): foreach ($tasks as $task) : ?>
 					<tr id='task-<?php e($task->task_id)?>' data-task-id='<?php e($task->task_id)?>' data-task-status='<?php e($task->status)?>'>
-						<td class="basis-10"><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
-						<td class="basis-40"><?php echo word_limiter($task->description, 24)?></td>
-						<td class="basis-10">
+						<td class=""><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
+						<td class=""><?php echo word_limiter($task->description, 24)?></td>
+						<td class="">
 							<ul class="list-inline list-member">
 								<?php if ($task->members) {
 									foreach ($task->members as $member) {
@@ -112,20 +112,20 @@ $task_status_labels = [
 								} ?>
 							</ul>
 						</td>
-						<td class='text-center basis-10'>
+						<td class='text-center '>
 							<span class="time-assigned">
 								<?php e($task->time_assigned)?>
 							</span>
 
 							<input type="number" name="time_assigned" data-task-id='<?php e($task->task_id)?>' class='an-form-control form-td<?php echo ($task->time_assigned == NULL && $is_owner ? '' : ' hidden' ) ?>' step="0.01" value="<?php e($task->time_assigned)?>"/>
 						</td>
-						<td class='text-center skip-votes basis-10'><?php e($task->skip_votes)?></td>
-						<td class='task-status basis-10' <?php echo $task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}' data-time-assigned='{$task->time_assigned}'" : '' ?>>
+						<td class='text-center skip-votes '><?php e($task->skip_votes)?></td>
+						<td class='task-status ' <?php echo $task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}' data-time-assigned='{$task->time_assigned}'" : '' ?>>
 							<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 						</td>
 
 						<?php if ($is_owner): ?>
-						<td class='task-action basis-10'>
+						<td class='task-action '>
 							<button class="an-btn an-btn-small an-btn-primary btn-start-task<?php e($step->status == 'inprogress' && $task->status == 'open' ? '' : ' hidden')?>"<?php e($task->time_assigned ? '' : ' disabled')?>>
 								<?php e(lang('st_start'))?>
 							</button>
@@ -133,7 +133,7 @@ $task_status_labels = [
 							<button class="an-btn an-btn-small an-btn-primary btn-jump<?php e($task->status == 'inprogress' ? '' : ' hidden')?>"><?php e(lang('st_jump'))?></button>
 						</td>
 						<?php else: ?>
-						<td class='basis-10'>
+						<td class=''>
 							<?php if ($task->voted_skip == 0):?>
 							<button class="an-btn an-btn-small an-btn-primary btn-vote-skip <?php echo $task->status == 'resolved' || $task->status == 'skipped' || $task->status == 'jumped' || $task->status == 'parking_lot' ? ' hidden' : ''?>"><?php e(lang('st_vote_skip'))?></button>
 							<?php else: ?>

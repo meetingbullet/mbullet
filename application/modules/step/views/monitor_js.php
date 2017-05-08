@@ -59,6 +59,8 @@ if ($('#scheduled-timer').data('actual-start-time')) {
 }
 
 $('input[name="scheduled_time"]').daterangepicker({
+	startDate: moment().format('MMM DD, H:mm'),
+	endDate: moment().format('MMM DD, H:mm'),
 	timePicker: true,
 	timePicker24Hour: true,
 	opens: 'left',
@@ -151,6 +153,7 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 
 			$('tr[data-task-status="open"] .btn-skip').removeClass('hidden');
 			$('tr[data-task-status="open"] .btn-start-task').removeClass('hidden');
+			$('tr[data-task-status="open"] .btn-start-task').prop('disabled', false);
 
 			$('.btn-update-step-schedule').addClass('hidden');
 			$('.input-group-btn-right').removeClass('input-group-btn-right');
@@ -412,9 +415,9 @@ function update_step_timer(clock)
 			m = moment.duration(duration).minutes(),
 			s = moment.duration(duration).seconds();
 
-		h = h < 9 ? '0' + h : h;
-		m = m < 9 ? '0' + m : m;
-		s = s < 9 ? '0' + s : s;
+		h = h <= 9 ? '0' + h : h;
+		m = m <= 9 ? '0' + m : m;
+		s = s <= 9 ? '0' + s : s;
 
 		if (d > 0) {
 			h += d * 24;
@@ -472,10 +475,15 @@ function update_status_timer(clock)
 				}
 			}
 
-			d = d == '0' ? '' : d + (d > 1 ? ' <?php e(lang('st_days'))?> ' : ' <?php e(lang('st_day'))?> ');
-			h = h == '0' ? '' : h + (h > 1 ? ' <?php e(lang('st_hours'))?> ' : ' <?php e(lang('st_hour'))?> ');
-			m = m == '0' ? '' : m + (m > 1 ? ' <?php e(lang('st_minutes'))?> ' : ' <?php e(lang('st_minute'))?> ');
-			s = s == '0' ? '' : s + (s > 1 ? ' <?php e(lang('st_seconds'))?>' : ' <?php e(lang('st_second'))?>');
+			d = d <= 9 ? '0' + d : d;
+			h = h <= 9 ? '0' + h : h;
+			m = m <= 9 ? '0' + m : m;
+			s = s <= 9 ? '0' + s : s;
+			
+			d = d == '00' ? '' : d + (d > 1 ? ' <?php e(lang('st_days'))?> ' : ' <?php e(lang('st_day'))?> ');
+			h = h == '00' ? '' : h + (h > 1 ? ' <?php e(lang('st_hours'))?> ' : ' <?php e(lang('st_hour'))?> ');
+			m = m == '00' ? '' : m + (m > 1 ? ' <?php e(lang('st_minutes'))?> ' : ' <?php e(lang('st_minute'))?> ');
+			s = s == '00' ? '' : s + (s > 1 ? ' <?php e(lang('st_seconds'))?>' : ' <?php e(lang('st_second'))?>');
 
 			$d.text(d);
 			$h.text(h);
