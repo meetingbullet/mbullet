@@ -51,6 +51,7 @@ $buttons = [
 
 $action_key = explode('-', $step_key);
 $action_key = $action_key['0'] . '-' . $action_key[1];
+$members = array_column($invited_members, 'user_id');
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
@@ -68,7 +69,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 	>
 		<i class="<?php echo $buttons[$step->status]['icon'] ?>"></i> <?php echo $buttons[$step->status]['label'] ?>
 	</a>-->
-
+	<?php if (in_array($current_user->user_id, $members) || $step->owner_id == $current_user->user_id) : ?>
 	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'open' ? ' step-open' : ''?><?php echo $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
 		<?php 
 			if ($step->status == 'open') {
@@ -78,6 +79,7 @@ $action_key = $action_key['0'] . '-' . $action_key[1];
 			}
 		?>
 	</a>
+	<?php endif; ?>
 </div>
 
 <div class="row">
