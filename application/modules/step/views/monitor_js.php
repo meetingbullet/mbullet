@@ -509,6 +509,16 @@ function update_monitor()
 			return;
 		}
 
+		if ( ! (data.step.status == 'open' || data.step.status == 'ready' || data.step.status == 'inprogress') ) {
+			$.notify({
+				message: '<?php e(lang('st_step_finished'))?>'
+			}, {
+				type: 'success',
+				z_index: 1051
+			});
+			$('.modal-monitor').modal('hide');
+		}
+
 		$.each(data.data, (index, item) => {
 			old_vote = parseInt($('#task-' + item.task_id + ' .skip-votes').text());
 			old_status = $('#task-' + item.task_id).data('task-status');

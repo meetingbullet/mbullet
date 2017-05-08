@@ -481,6 +481,7 @@ class Step extends Authenticated_Controller
 		echo json_encode([
 			'message_type' => 'success',
 			'data' => $tasks,
+			'step' => $this->step_model->select('status')->limit(1)->find($step_id),
 			'current_time' => gmdate('Y-m-d H:i:s')
 		]);
 	}
