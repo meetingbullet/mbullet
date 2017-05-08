@@ -68,13 +68,6 @@ class Action extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
-													->join('step_members sm', 'steps.step_id = sm.step_id')
-													->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
-													->where('action_id', $action->action_id)
-													->find_all();
-
-
 		if (isset($_POST['update'])) {
 			$next_status = 'resolved';
 
@@ -90,7 +83,7 @@ class Action extends Authenticated_Controller
 									->find_by('action_key', $action_key);
 		}
 		
-		$action->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
+		$action->point_used = number_format($this->project->total_point_used('action', $action->action_id), 2);
 
 		$steps = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
 									->join('users u', 'u.user_id = steps.owner_id')
@@ -109,7 +102,7 @@ class Action extends Authenticated_Controller
 								->where('sm.step_id', $step->step_id)
 								->find_all();
 
-				$step->point_used = $point_used && count($point_used) > 0 && is_numeric($point_used[0]->point_used) ? $point_used[0]->point_used : 0;
+				$step->point_used = number_format($this->project->total_point_used('step', $step->step_id), 2);
 			}
 		}
 

@@ -53,8 +53,10 @@ $lang['st_vote_skip'] = 'Vote Skip';
 $lang['st_voted_skip'] = 'Voted Skip';
 $lang['st_jump'] = 'Jump';
 $lang['st_finish'] = 'Finish';
-$lang['st_open_step_monitor'] = 'Open Step Monitor';
+$lang['st_monitor'] = 'Monitor';
 $lang['st_set_up'] = 'Set up';
+$lang['st_join'] = 'Join';
+
 
 // Message
 $lang['st_step_successfully_created'] = 'Step successfully created';
@@ -112,6 +114,8 @@ $lang['st_ready'] = 'Ready for review';
 $lang['st_resolved'] = 'Resolved';
 $lang['st_mask_as_ready'] = 'Mark as \'Ready for Review\'';
 $lang['st_resolve'] = 'Resolve';
+$lang['st_finished'] = 'Finished';
+$lang['st_resolved'] = 'Resolved';
 $lang['st_resolve_step'] = 'Resolve Step';
 $lang['st_reopen'] = 'Re-open Step';
 $lang['st_update_status_fail'] = 'Unable to update step\'s status.';

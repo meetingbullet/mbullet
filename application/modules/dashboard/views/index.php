@@ -14,11 +14,61 @@ $project_status_labels = [
 ];
 ?>
 
-<button class="an-btn an-btn-primary" id="create" style="margin: 30px 0">Create Project</button>
-<button class="an-btn an-btn-success" id="invite" style="margin: 30px 0">Invite User</button>
+<button class="an-btn an-btn-primary" id="create" style="margin-bottom: 30px">Create Project</button>
+<button class="an-btn an-btn-success" id="invite" style="margin-bottom: 30px">Invite User</button>
 
 <div class="row">
-	<div class="col-md-7 col-xs-12">
+	<div class="col-xs-12">
+		<div class="an-single-component with-shadow">
+			<div class="an-component-header">
+				<h6>Imcomming Steps</h6>
+				<div class="component-header-right">
+				</div>
+			</div>
+			<div class="an-component-body">
+				<div class="an-user-lists">
+					<div class="list-title">
+						<h6 class="basis-40">
+							Step
+						</h6>
+						<h6 class="basis-20">Owner</h6>
+						<h6 class="basis-10">Status</h6>
+						<h6 class="basis-30"></h6>
+					</div>
+
+					<div class="an-lists-body">
+						<?php foreach($my_steps as $step): ?>
+						<div class="list-user-single">
+							<div class="list-date basis-40">
+								<?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?>
+							</div>
+							<div class="list-text basis-20">
+								<?php e($step->owner_name)?>
+							</div>
+							<div class="list-state basis-10">
+								<span class="msg-tag <?php echo $step_status_labels[$step->status] ?>">
+									<?php e($step->status)?>
+								</span>
+							</div>
+							<div class="list-action basis-30">
+								<span class="text-info<?php e($step->status == 'ready' ? ' ready' : ' hidden')?> step-timer"
+										data-scheduled-start-time="<?php e($step->scheduled_start_time) ?>" 
+										data-now="<?php e($now)?>">
+								</span>
+
+								<button class="an-btn an-btn-small an-btn-primary btn-open-step-monitor<?php e($step->status == 'inprogress' ? '' : ' hidden' . ($step->owner_id == $current_user->user_id ? ' is-owner' : ''))?> " 
+										data-step-key="<?php e($step->step_key)?>">
+									<?php echo ($step->owner_id == $current_user->user_id ? lang('st_open') : lang('st_join')) ?>
+								</button>
+							</div>
+						</div> <!-- end .USER-LIST-SINGLE -->
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div> <!-- end .AN-COMPONENT-BODY -->
+		</div> <!-- end .an-single-component -->
+	</div>
+	<div class="col-xs-12">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6>My Projects</h6>
@@ -69,56 +119,7 @@ $project_status_labels = [
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div> <!-- end .an-single-component -->
 	</div>
-	<div class="col-md-5 col-xs-12">
-		<div class="an-single-component with-shadow">
-			<div class="an-component-header">
-				<h6>Imcomming Steps</h6>
-				<div class="component-header-right">
-				</div>
-			</div>
-			<div class="an-component-body">
-				<div class="an-user-lists">
-					<div class="list-title">
-						<h6 class="basis-40">
-							Step
-						</h6>
-						<h6 class="basis-20">Owner</h6>
-						<h6 class="basis-10">Status</h6>
-						<h6 class="basis-30"></h6>
-					</div>
 
-					<div class="an-lists-body">
-						<?php foreach($my_steps as $step): ?>
-						<div class="list-user-single">
-							<div class="list-date basis-40">
-								<?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?>
-							</div>
-							<div class="list-text basis-20">
-								<?php e($step->owner_name)?>
-							</div>
-							<div class="list-state basis-10">
-								<span class="msg-tag <?php echo $step_status_labels[$step->status] ?>">
-									<?php e($step->status)?>
-								</span>
-							</div>
-							<div class="list-action basis-30">
-								<span class="text-info<?php e($step->status == 'ready' ? ' ready' : ' hidden')?> step-timer"
-										data-scheduled-start-time="<?php e($step->scheduled_start_time) ?>" 
-										data-now="<?php e($now)?>">
-								</span>
-
-								<button class="an-btn an-btn-small an-btn-primary btn-open-step-monitor<?php e($step->status == 'inprogress' ? '' : ' hidden' . ($step->owner_id == $current_user->user_id ? ' is-owner' : ''))?> " 
-										data-step-key="<?php e($step->step_key)?>">
-									<?php echo ($step->owner_id == $current_user->user_id ? lang('st_open') : lang('st_join')) ?>
-								</button>
-							</div>
-						</div> <!-- end .USER-LIST-SINGLE -->
-						<?php endforeach; ?>
-					</div>
-				</div>
-			</div> <!-- end .AN-COMPONENT-BODY -->
-		</div> <!-- end .an-single-component -->
-	</div>
 </div>
 
 
