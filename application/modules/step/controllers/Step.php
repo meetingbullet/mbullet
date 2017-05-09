@@ -75,16 +75,16 @@ class Step extends Authenticated_Controller
 		$project_key = $project_key[0];
 
 		// get projecct id
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
-		if ($project_id === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// $project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		// if ($project_id === false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
-		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		&& $this->auth->has_permission('Project.Edit.All') === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		// && $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		// && $this->auth->has_permission('Project.Edit.All') === false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 
@@ -170,16 +170,16 @@ class Step extends Authenticated_Controller
 		$project_key = $keys[0];
 
 		// get projecct id
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
-		if ($project_id === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// $project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		// if ($project_id === false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
-		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		&& $this->auth->has_permission('Project.Edit.All') === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		// && $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		// && $this->auth->has_permission('Project.Edit.All') === false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
 		$step = $this->step_model->select('steps.*, p.project_id')
 								->join('actions a', 'a.action_id = steps.action_id')
@@ -306,17 +306,22 @@ class Step extends Authenticated_Controller
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
 
-		// get projecct id
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
-		if ($project_id === false) {
+		$project_id = $this->project->get_object_id('project', $project_key);
+		if (empty($project_id)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		&& $this->auth->has_permission('Project.View.All') === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// get projecct id
+		// $project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		// if ($project_id === false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
+
+		// if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		// && $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		// && $this->auth->has_permission('Project.View.All') === false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
 		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name');
 
