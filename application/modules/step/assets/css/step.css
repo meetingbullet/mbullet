@@ -34,11 +34,6 @@
 	align-items: flex-start;
 }
 
-.step-time-schedule .form-inline .input-group > .form-control {
-	width: 200px;
-	background: transparent;
-}
-
 .step-time-schedule .an-btn-danger-transparent:hover,
 .step-time-schedule .an-btn-danger-transparent:focus,
 .step-time-schedule .an-btn-danger-transparent:active {
@@ -76,11 +71,8 @@
 }
 
 input[name="scheduled_time"] {
-	background-color: white !important;
-}
-
-.input-group-schedule {
-	margin-top: 15px;
+	width: auto !important;
+	background-color: transparent !important;
 }
 
 .step-action > button {

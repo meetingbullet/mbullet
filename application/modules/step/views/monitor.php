@@ -3,10 +3,10 @@ $is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
 if ($step->scheduled_start_time) {
-	$scheduled_start_time = new DateTime($step->scheduled_start_time);
-	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, strtotime($step->scheduled_start_time));
+	$scheduled_start_time = strtotime($step->scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
 
-	$scheduled_start_time = date_format($scheduled_start_time, 'M d, H:i');
+	$scheduled_start_time = gmdate('M d, H:i', $scheduled_start_time);
 	$scheduled_end_time = gmdate('M d, H:i', $scheduled_end_time);
 }
 
@@ -96,7 +96,7 @@ $task_status_labels = [
 						<th><?php e(lang('st_assignee'))?></th>
 						<th class='text-center'><?php e(lang('st_time_assigned_min'))?></th>
 						<th class='text-center'><?php e(lang('st_skip_votes'))?></th>
-						<th class="basis-15"><?php e(lang('st_status'))?></th>
+						<th class="basis-30"><?php e(lang('st_status'))?></th>
 						<th><?php e(lang('st_action'))?></th>
 					</tr>
 				</thead>
