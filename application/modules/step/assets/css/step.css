@@ -35,7 +35,7 @@
 }
 
 .step-time-schedule .form-inline .input-group > .form-control {
-	width: 230px;
+	width: 200px;
 	background: transparent;
 }
 
@@ -73,6 +73,14 @@
 	display: inline-block;
 	margin-bottom: 20px;
 	vertical-align: middle;
+}
+
+input[name="scheduled_time"] {
+	background-color: white !important;
+}
+
+.input-group-schedule {
+	margin-top: 15px;
 }
 
 .step-action > button {

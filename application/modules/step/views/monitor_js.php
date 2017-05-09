@@ -59,6 +59,7 @@ if ($('#scheduled-timer').data('actual-start-time')) {
 }
 
 $('input[name="scheduled_time"]').daterangepicker({
+	singleDatePicker: true,
 	startDate: moment().format('MMM DD, H:mm'),
 	endDate: moment().format('MMM DD, H:mm'),
 	timePicker: true,
@@ -69,9 +70,8 @@ $('input[name="scheduled_time"]').daterangepicker({
 		format: 'MMM DD, H:mm'
 	}
 }, (start, end) => {
-	$('#scheduled_start_time').val(start.format('YYYY-MM-DD HH:mm:ss'));
-	$('#scheduled_end_time').val(end.format('YYYY-MM-DD HH:mm:ss'));
-	$('input[name="scheduled_time"]').val(start.format('MMM DD, H:mm') + ' - ' + end.format('MMM DD, H:mm'));
+	$('input[name="scheduled_start_time"]').val(start.format('YYYY-MM-DD HH:mm:ss'));
+	$('input[name="scheduled_time"]').val(start.format('MMM DD, H:mm'));
 });
 
 // Prevent duplicate binding function
@@ -99,7 +99,24 @@ $(document).on('click.monitor', '.btn-vote-skip', (e) => {
 $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 	e.preventDefault();
 
-	$.post($('.form-step-schedule').attr('action'), $('.form-step-schedule').serialize(), (result) => {
+	var time_assigned_data = "";
+	var is_set_time = true;
+
+	$('.table-task tr input[name="time_assigned"]').each((i, item) => {
+		if ($(item).val() != '' && $(item).val() > 0) {
+			time_assigned_data += "&time_assigned["+ $(item).data('task-id') +"]=" + $(item).val();
+			$(item).removeClass('danger');
+		} else {
+			$(item).addClass('danger');
+			is_set_time = false;
+		}
+	});
+
+	if (! is_set_time) {
+		return false;
+	}
+
+	$.post($('.form-step-schedule').attr('action'), $('.form-step-schedule').serialize() + time_assigned_data, (result) => {
 		data = JSON.parse(result);
 
 		$.notify({
@@ -110,7 +127,12 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			$('.btn-start-step').prop('disabled', false);
+			// $('.btn-start-step').prop('disabled', false);
+
+			$('.modal-monitor').modal('hide');
+			setTimeout(() => {
+				location.reload();
+			}, 600);
 		}
 	});
 
