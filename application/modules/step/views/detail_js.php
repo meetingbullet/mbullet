@@ -13,6 +13,10 @@ $('#edit-step').click((e) => {
 // Open step monitor
 $('#open-step-monitor').click((e) => {
 	e.preventDefault();
+
+	// Adjust diff between server and client on counters
+	$(document).data('ajax-start-time', moment().unix());
+	
 	$('.modal-monitor .modal-content').html('');
 
 	$.get('<?php e(site_url('step/monitor/' . $step_key)) ?>', (data) => {

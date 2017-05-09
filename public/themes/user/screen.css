@@ -247,3 +247,12 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	text-align: center;
 	margin-right: 10px;
 }
+
+.user-avatar {
+	display: inline-block;
+	border-radius: 50%;
+}
+
+.user-name {
+	vertical-align: middle;
+}

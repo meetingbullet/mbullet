@@ -1,7 +1,10 @@
 // Open step monitor
 $('.btn-open-step-monitor').click((e) => {
-	var key = $(e.target).data('step-key');
 	e.preventDefault();
+	var key = $(e.target).data('step-key');
+
+	// Adjust diff between server and client on counters
+	$(document).data('ajax-start-time', moment().unix());
 
 	$.get('<?php e(site_url('step/monitor/')) ?>' + key, (data) => {
 		data = JSON.parse(data);

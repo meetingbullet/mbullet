@@ -18,6 +18,7 @@ $project_status_labels = [
 <button class="an-btn an-btn-success" id="invite" style="margin-bottom: 30px">Invite User</button>
 
 <div class="row">
+<?php if (is_array($my_steps) && count($my_steps) > 0) { ?>
 	<div class="col-xs-12">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
@@ -43,7 +44,7 @@ $project_status_labels = [
 								<?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?>
 							</div>
 							<div class="list-text basis-20">
-								<?php e($step->owner_name)?>
+								<?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?>
 							</div>
 							<div class="list-state basis-10">
 								<span class="msg-tag <?php echo $step_status_labels[$step->status] ?>">
@@ -68,6 +69,7 @@ $project_status_labels = [
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div> <!-- end .an-single-component -->
 	</div>
+<?php } ?>
 	<div class="col-xs-12">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
@@ -95,13 +97,13 @@ $project_status_labels = [
 								<?php e($project->project_id)?>
 							</div>
 							<div class="list-date basis-30">
-								<?php echo anchor(site_url() . 'projects/' . $project->cost_code, $project->name); ?>
+								<?php echo anchor(site_url() . 'project/' . $project->cost_code, $project->name); ?>
 							</div>
 							<div class="list-date basis-20">
 								<?php e($project->cost_code)?>
 							</div>
 							<div class="list-text basis-30">
-								<?php e($project->first_name .' '. $project->last_name)?>
+								<?php echo display_user($project->email, $project->first_name, $project->last_name, $project->avatar); ?>
 							</div>
 							<div class="list-state basis-10">
 								<span class="msg-tag <?php echo $project_status_labels[$project->status] ?>">
@@ -153,6 +155,6 @@ $project_status_labels = [
 </div>
 
 <script>
-	var CREATE_PROJECT_URL = '<?php echo site_url('projects/create')?>';
+	var CREATE_PROJECT_URL = '<?php echo site_url('project/create')?>';
 	var INVITE_USER_URL = '<?php echo site_url('admin/team/invite')?>';
 </script>

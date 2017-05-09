@@ -23,7 +23,7 @@ if (! is_null($this->uri->segment(1))) {
 			$project = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
 			$breadcrumb[] = [
 				'name' => $project,
-				'path' => 'projects/' . $project
+				'path' => 'project/' . $project
 			];
 
 			$breadcrumb[] = [
@@ -37,7 +37,7 @@ if (! is_null($this->uri->segment(1))) {
 
 			$breadcrumb[] = [
 				'name' => $project,
-				'path' => 'projects/' . $project
+				'path' => 'project/' . $project
 			];
 
 			$breadcrumb[] = [
@@ -57,7 +57,7 @@ if (! is_null($this->uri->segment(1))) {
 
 			$breadcrumb[] = [
 				'name' => $project,
-				'path' => 'projects/' . $project
+				'path' => 'project/' . $project
 			];
 
 			$breadcrumb[] = [

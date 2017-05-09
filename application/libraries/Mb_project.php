@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Project
+class Mb_project
 {
 	private $ci;
 

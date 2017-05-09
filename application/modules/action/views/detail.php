@@ -42,16 +42,13 @@ $project_key = $project_key['0'];
 
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<h5 class='breakcumb'>
-			<?php echo $action_key ?>
-		</h5>
 		<h2><?php e($action->name)?></h2>
 
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
 <?php echo form_open() ?>
 <div class="btn-block">
-	<?php echo anchor(site_url('projects/' . $project_key), '<i class="ion-android-arrow-back"></i> ' . lang('ac_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
+	<?php echo anchor(site_url('project/' . $project_key), '<i class="ion-android-arrow-back"></i> ' . lang('ac_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a data-toggle="modal" data-target="#bigModal" id="update-action" data-update-action-url="<?php echo site_url('action/create/' . $project_key . '/' . $action_key) ?>" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('ac_edit')?></a>
 
 	<button name='update' class='an-btn <?php echo $action_button[$action->status][0] ?>' <?php echo $action->status == 'resolved' ? ' disabled' : ''?>>
