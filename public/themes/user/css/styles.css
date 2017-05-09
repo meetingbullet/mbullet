@@ -6464,6 +6464,28 @@ input[type="button"].btn-block {
 }
 
 /** baodg: relative long group **/
+.input-group {
+    position: relative;
+    display: table;
+    border-collapse: separate;
+	width: 100%;
+}
+
+.input-group-addon {
+	padding: 6px 12px;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1;
+	color: #555;
+	text-align: center;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.input-group .form-control, .input-group-addon{
+    display: table-cell;
+}
+
 .an.input-group {
 	outline: 0;
     background-color: transparent;
