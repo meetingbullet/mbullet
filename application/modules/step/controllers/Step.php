@@ -364,6 +364,7 @@ class Step extends Authenticated_Controller
 									->join('projects p', 'p.project_id = ' . $project_id)
 									->order_by('name')
 									->order_by('uto.cost_of_time', 'DESC')
+									->as_array()
 									->find_all();
 									
 		$point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
