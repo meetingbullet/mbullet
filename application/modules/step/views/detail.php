@@ -102,7 +102,7 @@ $members = array_column($invited_members, 'user_id');
 				<div class="an-helper-block step-detail">
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_owner'))?></div>
-						<div class="col-xs-8"><?php e($step->owner_name)?></div>
+						<div class="col-xs-8"><?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_goal'))?></div>
@@ -151,13 +151,11 @@ $members = array_column($invited_members, 'user_id');
 									<td class='basis-15'><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
 									<td class='basis-30'><?php echo word_limiter($task->description, 35)?></td>
 									<td class='basis-20'>
-										<ul class="list-inline list-member">
-											<?php if ($task->members) {
-												foreach ($task->members as $member) {
-													echo '<li><div class="avatar" style="background-image: url(\'' . avatar_url($member->avatar, $member->email) . '\')"></div></li>';
-												}
-											} ?>
-										</ul>
+										<?php if ($task->members) {
+											foreach ($task->members as $member) {
+												echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
+											}
+										} ?>
 									</td>
 									<td class='basis-10'>
 										<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
@@ -185,16 +183,13 @@ $members = array_column($invited_members, 'user_id');
 				<div class="an-helper-block">
 					<div class="an-input-group">
 						<ul class="list-unstyled list-member">
-							<?php if ($invited_members): foreach ($invited_members as $user): 
-								$user['avatar'] = avatar_url($user['avatar'], $user['email']);
-							?>
+							<?php if ($invited_members) { foreach ($invited_members as $user) { ?>
 							<li>
-								<div class="avatar" style="background-image: url('<?php echo $user['avatar'] ?>')"></div>
-								<?php e($user['name'])?>
+								<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
 
 								<span class="badge badge-<?php e($cost_of_time_to_badge[$user['cost_of_time']])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
 							</li>
-							<?php endforeach; endif;?>
+							<?php } } ?>
 						</ul>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
@@ -209,22 +204,22 @@ $members = array_column($invited_members, 'user_id');
 				<div class="an-helper-block step-detail">
 					<?php if ($scheduled_start_time): ?>
 					<div class="row">
-						<div class="col-xs-6"><?php e(lang('st_scheduled_start_time'))?></div>
-						<div class="col-xs-6"><?php e($scheduled_start_time)?></div>
+						<div class="col-xs-5"><?php e(lang('st_scheduled_start_time'))?></div>
+						<div class="col-xs-7"><?php e($scheduled_start_time)?></div>
 					</div>
 					<div class="row">
-						<div class="col-xs-6"><?php e(lang('st_scheduled_end_time'))?></div>
-						<div class="col-xs-6"><?php e($scheduled_end_time)?></div>
+						<div class="col-xs-5"><?php e(lang('st_scheduled_end_time'))?></div>
+						<div class="col-xs-7"><?php e($scheduled_end_time)?></div>
 					</div>
 					<hr/>
 					<?php endif; ?>
 					<div class="row">
-						<div class="col-xs-6"><?php e(lang('st_created'))?></div>
-						<div class="col-xs-6"><?php e($step->created_on)?></div>
+						<div class="col-xs-5"><?php e(lang('st_created'))?></div>
+						<div class="col-xs-7"><?php e($step->created_on)?></div>
 					</div>
 					<div class="row">
-						<div class="col-xs-6"><?php e(lang('st_updated'))?></div>
-						<div class="col-xs-6"><?php e($step->modified_on)?></div>
+						<div class="col-xs-5"><?php e(lang('st_updated'))?></div>
+						<div class="col-xs-7"><?php e($step->modified_on)?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->

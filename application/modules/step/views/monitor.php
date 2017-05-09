@@ -107,13 +107,11 @@ $task_status_labels = [
 						<td class=""><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
 						<td class=""><?php echo word_limiter($task->description, 24)?></td>
 						<td class="">
-							<ul class="list-inline list-member">
-								<?php if ($task->members) {
-									foreach ($task->members as $member) {
-										echo '<li><div class="avatar" style="background-image: url(\'' . avatar_url($member->avatar, $member->email) . '\')"></div></li>';
-									}
-								} ?>
-							</ul>
+							<?php if ($task->members) {
+								foreach ($task->members as $member) {
+									echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
+								}
+							} ?>
 						</td>
 						<td class='text-center '>
 							<span class="time-assigned">

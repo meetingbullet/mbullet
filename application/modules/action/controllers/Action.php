@@ -52,7 +52,7 @@ class Action extends Authenticated_Controller
 			$this->auth->restrict();
 		}
 
-		$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name, pm.user_id AS member_id, p.owner_id AS project_owner_id')
+		$action = $this->action_model->select('actions.*, u.email, u.first_name, u.last_name, u.avatar, pm.user_id AS member_id, p.owner_id AS project_owner_id')
 									->join('users u', 'u.user_id = actions.owner_id')
 									->join('projects p', 'p.project_id = actions.project_id')
 									->join('project_members pm', 'pm.project_id = actions.project_id AND pm.user_id = ' . $this->current_user->user_id, 'LEFT')
@@ -77,7 +77,7 @@ class Action extends Authenticated_Controller
 
 			$this->action_model->update($action->action_id, ['status' => $next_status]);
 
-			$action = $this->action_model->select('actions.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+			$action = $this->action_model->select('actions.*, u.email, u.first_name, u.last_name, u.avatar')
 									->join('users u', 'u.user_id = actions.owner_id')
 									->limit(1)
 									->find_by('action_key', $action_key);
@@ -85,7 +85,7 @@ class Action extends Authenticated_Controller
 		
 		$action->point_used = number_format($this->mb_project->total_point_used('action', $action->action_id), 2);
 
-		$steps = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+		$steps = $this->step_model->select('steps.*, u.email, u.first_name, u.last_name, u.avatar')
 									->join('users u', 'u.user_id = steps.owner_id')
 									->where('action_id', $action->action_id)
 									->order_by('step_id')
@@ -107,7 +107,7 @@ class Action extends Authenticated_Controller
 		}
 
 		$invited_members =  $this->user_model
-								->select('uto.user_id, email, CONCAT(first_name, " ", last_name) AS name,
+								->select('uto.user_id, email, email, first_name, last_name, avatar,
 									avatar, cost_of_time, 
 									IF(
 										uto.cost_of_time = 1, 
