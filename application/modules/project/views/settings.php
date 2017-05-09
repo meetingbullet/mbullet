@@ -182,7 +182,7 @@
 
 	<div class="pull-right">
 		<button class="an-btn an-btn-success" type="submit"><?php echo lang('pj_update') ?></button>
-		<a href="<?php echo site_url('projects/' . $project_key) ?>" class="an-btn an-btn-info"><?php echo lang('pj_back') ?></a>
+		<a href="<?php echo site_url('project/' . $project_key) ?>" class="an-btn an-btn-info"><?php echo lang('pj_back') ?></a>
 	</div>
 </div>
 <?php echo form_close() ?>

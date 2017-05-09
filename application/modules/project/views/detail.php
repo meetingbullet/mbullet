@@ -16,25 +16,25 @@ $project_label = [
 			<?php if ($detail['project']->status == 'open') : ?>
 				<a style="color: #ccc"><?php e(lang('pj_more_btn_open_pj')) ?></a>
 			<?php else : ?>
-				<a href="#" data-update-project-status-url="<?php echo site_url('projects/update_project_status/' . $project_key . '?status=open') ?>" ><?php e(lang('pj_more_btn_open_pj')) ?></a>
+				<a href="#" data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=open') ?>" ><?php e(lang('pj_more_btn_open_pj')) ?></a>
 			<?php endif ?>
 			</li>
 			<li class="update-btn">
 				<?php if ($detail['project']->status == 'inactive') : ?>
 					<a style="color: #ccc"><?php e(lang('pj_more_btn_inactive_pj')) ?></a>
 				<?php else : ?>
-					<a href="#" data-update-project-status-url="<?php echo site_url('projects/update_project_status/' . $project_key . '?status=inactive') ?>"><?php e(lang('pj_more_btn_inactive_pj')) ?></a>
+					<a href="#" data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=inactive') ?>"><?php e(lang('pj_more_btn_inactive_pj')) ?></a>
 				<?php endif ?>
 			</li>
 			<li class="update-btn">
 				<?php if ($detail['project']->status == 'archive') : ?>
 					<a style="color: #ccc"><?php e(lang('pj_more_btn_archive_pj')) ?></a>
 				<?php else : ?>
-					<a href="#" data-update-project-status-url="<?php echo site_url('projects/update_project_status/' . $project_key . '?status=archive') ?>"><?php e(lang('pj_more_btn_archive_pj')) ?></a>
+					<a href="#" data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=archive') ?>"><?php e(lang('pj_more_btn_archive_pj')) ?></a>
 				<?php endif ?>
 			</li>
 			<li role="separator" class="divider"></li>
-			<li><a href="<?php echo site_url('projects/settings/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
+			<li><a href="<?php echo site_url('project/settings/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
 		</ul>
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->

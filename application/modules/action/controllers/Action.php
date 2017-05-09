@@ -5,7 +5,7 @@ class Action extends Authenticated_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->library('project');
+		$this->load->library('mb_project');
 		$this->lang->load('action');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
@@ -13,8 +13,8 @@ class Action extends Authenticated_Controller
 		$this->load->model('step/step_model');
 		$this->load->model('users/user_model');
 		$this->load->model('action_member_model');
-		$this->load->model('projects/project_model');
-		$this->load->model('projects/project_member_model');
+		$this->load->model('project/project_model');
+		$this->load->model('project/project_member_model');
 
 		Assets::add_module_css('action', 'action.css');
 	}
@@ -41,14 +41,14 @@ class Action extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$action_id = $this->project->get_object_id('action', $action_key);
+		$action_id = $this->mb_project->get_object_id('action', $action_key);
 
 		if (empty($action_id)) {
 			Template::set_message(lang('ac_action_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->project->has_permission('action', $action_id, 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('action', $action_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
 
@@ -83,7 +83,7 @@ class Action extends Authenticated_Controller
 									->find_by('action_key', $action_key);
 		}
 		
-		$action->point_used = number_format($this->project->total_point_used('action', $action->action_id), 2);
+		$action->point_used = number_format($this->mb_project->total_point_used('action', $action->action_id), 2);
 
 		$steps = $this->step_model->select('steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
 									->join('users u', 'u.user_id = steps.owner_id')
@@ -102,7 +102,7 @@ class Action extends Authenticated_Controller
 								->where('sm.step_id', $step->step_id)
 								->find_all();
 
-				$step->point_used = number_format($this->project->total_point_used('step', $step->step_id), 2);
+				$step->point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
 			}
 		}
 
@@ -155,14 +155,14 @@ class Action extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 		
-		$project_id = $this->project->get_object_id('project', $project_key);
+		$project_id = $this->mb_project->get_object_id('project', $project_key);
 
 		if (empty($project_id)) {
 			Template::set_message(lang('ac_project_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->project->has_permission('project', $project_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
@@ -204,9 +204,8 @@ class Action extends Authenticated_Controller
 		$error_message = '';
 		if ($this->input->post()) {
 			// generate action key
-			$this->load->library('project');
 			if(empty($action_key)) {
-				$_POST['action_key'] = $this->project->get_next_key($project_key);
+				$_POST['action_key'] = $this->mb_project->get_next_key($project_key);
 			} else {
 				$_POST['action_key'] = $action->action_key;
 			}

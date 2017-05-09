@@ -95,7 +95,7 @@ $project_status_labels = [
 								<?php e($project->project_id)?>
 							</div>
 							<div class="list-date basis-30">
-								<?php echo anchor(site_url() . 'projects/' . $project->cost_code, $project->name); ?>
+								<?php echo anchor(site_url() . 'project/' . $project->cost_code, $project->name); ?>
 							</div>
 							<div class="list-date basis-20">
 								<?php e($project->cost_code)?>
@@ -153,6 +153,6 @@ $project_status_labels = [
 </div>
 
 <script>
-	var CREATE_PROJECT_URL = '<?php echo site_url('projects/create')?>';
+	var CREATE_PROJECT_URL = '<?php echo site_url('project/create')?>';
 	var INVITE_USER_URL = '<?php echo site_url('admin/team/invite')?>';
 </script>

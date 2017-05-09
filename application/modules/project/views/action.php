@@ -1,4 +1,4 @@
-<div id="board" data-add-action-url="<?php echo base_url('/action/create/' . $project_key) ?>" data-drag-drop-url="<?php echo base_url('/projects/sort_action/' . $project_key) ?>" data-refresh-url="<?php echo base_url('/projects/get_action_board_data/' . $project_key) ?>">
+<div id="board" data-add-action-url="<?php echo base_url('/action/create/' . $project_key) ?>" data-drag-drop-url="<?php echo base_url('/project/sort_action/' . $project_key) ?>" data-refresh-url="<?php echo base_url('/project/get_action_board_data/' . $project_key) ?>">
 	<div id="loading"></div>
 	<div class="col-md-3 status" id="open">
 		<label><?php echo lang('pj_open_label') ?></label>

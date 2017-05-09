@@ -6,7 +6,7 @@ class Dashboard extends Authenticated_Controller
 	{
 		parent::__construct();
 		$this->lang->load('step/step');
-		$this->load->model('projects/project_model');
+		$this->load->model('project/project_model');
 		$this->load->model('step/step_model');
 		$this->load->model('step/step_member_model');
 

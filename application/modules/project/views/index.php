@@ -10,5 +10,5 @@
 </div>
 
 <script>
-	var CREATE_PROJECT_URL = '<?php echo site_url('projects/create')?>';
+	var CREATE_PROJECT_URL = '<?php echo site_url('project/create')?>';
 </script>

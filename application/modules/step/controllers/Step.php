@@ -10,7 +10,7 @@ class Step extends Authenticated_Controller
 		$this->load->helper('mb_general');
 		$this->load->helper('text');
 		$this->load->helper('date');
-		$this->load->library('project');
+		$this->load->library('mb_project');
 		
 		$this->load->model('users/user_model');
 		$this->load->model('task/task_model');
@@ -22,8 +22,8 @@ class Step extends Authenticated_Controller
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
 
-		$this->load->model('projects/project_model');
-		$this->load->model('projects/project_member_model');
+		$this->load->model('project/project_model');
+		$this->load->model('project/project_member_model');
 
 		Assets::add_module_css('step', 'step.css');
 		Assets::add_module_js('step', 'step.js');
@@ -50,14 +50,14 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$action_id = $this->project->get_object_id('action', $action_key);
+		$action_id = $this->mb_project->get_object_id('action', $action_key);
 
 		if (empty($action_id)) {
 			Template::set_message(lang('st_action_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->project->has_permission('action', $action_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('action', $action_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
@@ -101,8 +101,7 @@ class Step extends Authenticated_Controller
 				$data['owner_id'] = $this->current_user->user_id;
 			}
 
-			$this->load->library('project');
-			$data['step_key'] = $this->project->get_next_key($action_key);
+			$data['step_key'] = $this->mb_project->get_next_key($action_key);
 
 			if ($id = $this->step_model->insert($data)) {
 				if ($team = $this->input->post('team')) {
@@ -151,14 +150,14 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->project->get_object_id('step', $step_key);
+		$step_id = $this->mb_project->get_object_id('step', $step_key);
 
 		if (empty($step_id)) {
 			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->project->has_permission('step', $step_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('step', $step_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
@@ -286,14 +285,14 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->project->get_object_id('step', $step_key);
+		$step_id = $this->mb_project->get_object_id('step', $step_key);
 
 		if (empty($step_id)) {
 			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->project->has_permission('step', $step_id, 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('step', $step_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
 
@@ -362,7 +361,7 @@ class Step extends Authenticated_Controller
 									->order_by('uto.cost_of_time', 'DESC')
 									->find_all();
 									
-		$point_used = number_format($this->project->total_point_used('step', $step->step_id), 2);
+		$point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
 
 		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key], true), 'inline');
 		Template::set('invited_members', $invited_members);
@@ -388,14 +387,14 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->project->get_object_id('step', $step_key);
+		$step_id = $this->mb_project->get_object_id('step', $step_key);
 
 		if (empty($step_id)) {
 			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->project->has_permission('step', $step_id, 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('step', $step_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
 
