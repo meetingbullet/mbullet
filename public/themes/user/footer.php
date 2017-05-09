@@ -19,6 +19,7 @@
 	<script src="<?php echo Template::theme_url("js-plugins/owl.carousel.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/Chart.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/circle-progress.min.js"); ?>" type="text/javascript"></script>
+	<script src="<?php echo Template::theme_url("js-plugins/bootstrap-datetimepicker.min.js"); ?>" type="text/javascript"></script>
 
 	<script src="<?php echo Template::theme_url("js/customize-chart.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js/scripts.js"); ?>" type="text/javascript"></script>

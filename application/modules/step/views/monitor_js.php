@@ -58,21 +58,27 @@ if ($('#scheduled-timer').data('actual-start-time')) {
 	update_step_timer()
 }
 
-$('input[name="scheduled_time"]').daterangepicker({
-	singleDatePicker: true,
-	startDate: moment().format('MMM DD, H:mm'),
-	endDate: moment().format('MMM DD, H:mm'),
-	timePicker: true,
-	timePicker24Hour: true,
-	opens: 'left',
-	autoUpdateInput: false,
-	locale: {
-		format: 'MMM DD, H:mm'
-	}
-}, (start, end) => {
-	$('input[name="scheduled_start_time"]').val(start.format('YYYY-MM-DD HH:mm:ss'));
-	$('input[name="scheduled_time"]').val(start.format('MMM DD, H:mm'));
+$('#datetimepicker1').datetimepicker({
+	format: 'MMM DD, H:mm'
+}).on('dp.change', function (ev) {
+	$('input[name="scheduled_start_time"]').val(ev.date.format('YYYY-MM-DD HH:mm:ss'));
 });
+
+// $('input[name="scheduled_time"]').daterangepicker({
+// 	singleDatePicker: true,
+// 	startDate: moment().format('MMM DD, H:mm'),
+// 	endDate: moment().format('MMM DD, H:mm'),
+// 	timePicker: true,
+// 	timePicker24Hour: true,
+// 	opens: 'left',
+// 	autoUpdateInput: false,
+// 	locale: {
+// 		format: 'MMM DD, H:mm'
+// 	}
+// }, (start, end) => {
+// 	$('input[name="scheduled_start_time"]').val(start.format('YYYY-MM-DD HH:mm:ss'));
+// 	$('input[name="scheduled_time"]').val(start.format('MMM DD, H:mm'));
+// });
 
 // Prevent duplicate binding function
 $(document).off('.monitor');
