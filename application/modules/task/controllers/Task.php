@@ -5,7 +5,7 @@ class Task extends Authenticated_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->library('project');
+		$this->load->library('mb_project');
 		$this->lang->load('task');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
@@ -22,7 +22,7 @@ class Task extends Authenticated_Controller
 		}
 
 
-		$step_id = $this->project->get_object_id('step', $step_key);
+		$step_id = $this->mb_project->get_object_id('step', $step_key);
 
 		if (empty($step_id)) {
 			Template::set_message(lang('tk_step_key_does_not_exist'), 'danger');
@@ -36,28 +36,28 @@ class Task extends Authenticated_Controller
 
 		$project_key = $keys[0];
 
-		$this->load->model('projects/project_model');
-		$this->load->model('projects/project_member_model');
+		$this->load->model('project/project_model');
+		$this->load->model('project/project_member_model');
 
 		// get projecct id
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
-		if ($project_id === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// $project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
+		// if ($project_id === false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
-		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		&& $this->auth->has_permission('Project.Edit.All') === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
+		// && $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
+		// && $this->auth->has_permission('Project.Edit.All') === false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
 		$this->load->model('step/step_model');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
+		// $step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
 
-		if (! $this->project->has_permission('step', $step_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('step', $step_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
@@ -79,8 +79,7 @@ class Task extends Authenticated_Controller
 					$data['step_id'] = $step_id;
 					$data['owner_id'] = $this->current_user->user_id;
 					$data['created_by'] = $this->current_user->user_id;
-					$this->load->library('project');
-					$data['task_key'] = $this->project->get_next_key($step_key);
+					$data['task_key'] = $this->mb_project->get_next_key($step_key);
 
 					$task_id = $this->task_model->insert($data);
 					if ($task_id) {

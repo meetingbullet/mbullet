@@ -29,7 +29,7 @@ var status_label = {
 
 
 var update_step_timer_interval,
-	update_status_timer_intervals = [];
+	update_task_timer_intervals = [];
 
 // Update skip votes periodly
 var update_monitor_interval = setInterval(update_monitor, 3000);
@@ -39,7 +39,7 @@ $('.modal-monitor').on('hidden.bs.modal', function () {
 	clearInterval(update_step_timer_interval);
 	clearInterval(update_monitor_interval);
 
-	$.each(update_status_timer_intervals, (i, item) => {
+	$.each(update_task_timer_intervals, (i, item) => {
 		clearInterval(item);
 	});
 })
@@ -59,6 +59,9 @@ if ($('#scheduled-timer').data('actual-start-time')) {
 }
 
 $('input[name="scheduled_time"]').daterangepicker({
+	singleDatePicker: true,
+	startDate: moment().format('MMM DD, H:mm'),
+	endDate: moment().format('MMM DD, H:mm'),
 	timePicker: true,
 	timePicker24Hour: true,
 	opens: 'left',
@@ -67,9 +70,8 @@ $('input[name="scheduled_time"]').daterangepicker({
 		format: 'MMM DD, H:mm'
 	}
 }, (start, end) => {
-	$('#scheduled_start_time').val(start.format('YYYY-MM-DD HH:mm:ss'));
-	$('#scheduled_end_time').val(end.format('YYYY-MM-DD HH:mm:ss'));
-	$('input[name="scheduled_time"]').val(start.format('MMM DD, H:mm') + ' - ' + end.format('MMM DD, H:mm'));
+	$('input[name="scheduled_start_time"]').val(start.format('YYYY-MM-DD HH:mm:ss'));
+	$('input[name="scheduled_time"]').val(start.format('MMM DD, H:mm'));
 });
 
 // Prevent duplicate binding function
@@ -97,7 +99,24 @@ $(document).on('click.monitor', '.btn-vote-skip', (e) => {
 $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 	e.preventDefault();
 
-	$.post($('.form-step-schedule').attr('action'), $('.form-step-schedule').serialize(), (result) => {
+	var time_assigned_data = "";
+	var is_set_time = true;
+
+	$('.table-task tr input[name="time_assigned"]').each((i, item) => {
+		if ($(item).val() != '' && $(item).val() > 0) {
+			time_assigned_data += "&time_assigned["+ $(item).data('task-id') +"]=" + $(item).val();
+			$(item).removeClass('danger');
+		} else {
+			$(item).addClass('danger');
+			is_set_time = false;
+		}
+	});
+
+	if (! is_set_time) {
+		return false;
+	}
+
+	$.post($('.form-step-schedule').attr('action'), $('.form-step-schedule').serialize() + time_assigned_data, (result) => {
 		data = JSON.parse(result);
 
 		$.notify({
@@ -108,7 +127,12 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			$('.btn-start-step').prop('disabled', false);
+			// $('.btn-start-step').prop('disabled', false);
+
+			$('.modal-monitor').modal('hide');
+			setTimeout(() => {
+				location.reload();
+			}, 600);
 		}
 	});
 
@@ -151,6 +175,7 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 
 			$('tr[data-task-status="open"] .btn-skip').removeClass('hidden');
 			$('tr[data-task-status="open"] .btn-start-task').removeClass('hidden');
+			$('tr[data-task-status="open"] .btn-start-task').prop('disabled', false);
 
 			$('.btn-update-step-schedule').addClass('hidden');
 			$('.input-group-btn-right').removeClass('input-group-btn-right');
@@ -214,6 +239,8 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 						? $(row).find('input[name="time_assigned"]').val()
 						: $(row).find('.time-assigned').text();
 
+	$(document).data('ajax-start-time', moment().unix());
+
 	$.post('<?php echo site_url('step/update_task_status') ?>', {
 		task_id: $(e.target).parent().parent().data('task-id'), 
 		status: 'inprogress', 
@@ -236,7 +263,7 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 			$(row).find('.task-status').data('started-on', data.started_on);
 			$(row).find('.task-status').data('now', data.started_on);
 
-			update_status_timer($(row).find('.task-status'));
+			update_task_timer($(row).find('.task-status'));
 
 			$('.btn-start-task').prop('disabled', true);
 
@@ -271,7 +298,7 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 			$(row).find('.btn-start-task').addClass('hidden');
 			$(row).find('.task-status').html('<span class="<?php e($task_status_labels['skipped'])?>"><?php e(lang('st_skipped'))?></span>');
 
-			if ($('.label-open, .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -300,7 +327,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
-			clearInterval(update_status_timer_intervals[task_id]);
+			clearInterval(update_task_timer_intervals[task_id]);
 			$(row).find('.task-status').html('<span class="<?php e($task_status_labels['jumped'])?>"><?php e(lang('st_jumped'))?></span>');
 
 			$('.btn-start-task').each((i, item) => {
@@ -309,7 +336,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 				}
 			});
 
-			if ($('.label-open, .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -340,7 +367,7 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 			$('#task-' + task_id).find('.btn-jump').addClass('hidden');
 			$('#task-' + task_id).find('.task-status').html('<span class="<?php e($task_status_labels['resolved'])?>"><?php e(lang('st_resolved'))?></span>');
 
-			if ($('.label-open, .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -371,7 +398,7 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 			$('#task-' + task_id).find('.btn-jump').addClass('hidden');
 			$('#task-' + task_id).find('.task-status').html('<span class="<?php e($task_status_labels['parking_lot'])?>"><?php e(lang('st_parking_lot'))?></span>');
 
-			if ($('.label-open, .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -385,9 +412,9 @@ $(document).on('click.monitor', '.time-assigned', (e) => {
 	}
 });
 
-$('.task-status').each((index, item) => {
+$('.table-task .task-status').each((index, item) => {
 	if ( $(item).data('started-on') ) {
-		update_status_timer(item);
+		update_task_timer(item);
 	}
 });
 
@@ -397,10 +424,15 @@ function update_step_timer(clock)
 	var clock = '#scheduled-timer';
 
 	var eventTime = moment($(clock).data('actual-start-time'), 'YYYY-MM-DD HH:mm:ss').unix(),
-		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix(),
+		ajax_start_time = $(document).data('ajax-start-time'),
+		request_time = ajax_start_time ? ((moment().unix() - ajax_start_time) / 2) : 0,
+		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix() + request_time,
 		diffTime = currentTime - eventTime,
 		duration = moment.duration(diffTime * 1000, 'milliseconds'),
 		interval = 1000;
+
+	// console.log('currentTime - eventTime', currentTime - eventTime);
+	// console.log(' Math.round(request_time)', Math.round(request_time));
 		
 	$(clock).removeClass('hidden');
 
@@ -412,9 +444,9 @@ function update_step_timer(clock)
 			m = moment.duration(duration).minutes(),
 			s = moment.duration(duration).seconds();
 
-		h = h < 9 ? '0' + h : h;
-		m = m < 9 ? '0' + m : m;
-		s = s < 9 ? '0' + s : s;
+		h = h <= 9 ? '0' + h : h;
+		m = m <= 9 ? '0' + m : m;
+		s = s <= 9 ? '0' + s : s;
 
 		if (d > 0) {
 			h += d * 24;
@@ -425,16 +457,21 @@ function update_step_timer(clock)
 	}, interval);
 }
 
-function update_status_timer(clock)
+function update_task_timer(clock)
 {
 	var task_id = $(clock).parent().data('task-id'),
 		time_assigned = $(clock).data('time-assigned'),
+		ajax_start_time = $(document).data('ajax-start-time'),
+		request_time = ajax_start_time ? ((moment().unix() - ajax_start_time) / 2) : 0;
 		eventTime = moment($(clock).data('started-on'), 'YYYY-MM-DD HH:mm:ss').unix(),
-		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix(),
+		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix() + request_time,
 		diffTime = currentTime - eventTime,
 		duration = moment.duration(diffTime * 1000, 'milliseconds'),
 		interval = 1000;
-		
+	
+	// console.log('Request time diff:', request_time);
+	// console.log('Time diff:', diffTime);
+
 	// Show $(clock)
 	$(clock).html('<span class="label label-warning label-inprogress label-bordered"><?php e(lang('st_in_progress'))?></span> ');
 
@@ -443,7 +480,7 @@ function update_status_timer(clock)
 		$m = $('<span class="minutes" ></span>').appendTo($(clock)),
 		$s = $('<span class="seconds" ></span>').appendTo($(clock));
 
-		update_status_timer_intervals[task_id] = setInterval(function(){
+		update_task_timer_intervals[task_id] = setInterval(function(){
 
 			duration = moment.duration(duration.asMilliseconds() + interval, 'milliseconds');
 			var d = moment.duration(duration).days(),
@@ -453,8 +490,8 @@ function update_status_timer(clock)
 
 			// Time alotted for Task
 			if (duration.asMinutes() >= time_assigned && $('.step-monitor').data('is-owner') == '1') {
-				if (update_status_timer_intervals[task_id]) {
-					clearInterval(update_status_timer_intervals[task_id]);
+				if (update_task_timer_intervals[task_id]) {
+					clearInterval(update_task_timer_intervals[task_id]);
 
 					$.getJSON('<?php echo site_url('step/resolve_task/') ?>' + task_id, (data) => {
 						if (data.message != '') {
@@ -472,10 +509,15 @@ function update_status_timer(clock)
 				}
 			}
 
-			d = d == '0' ? '' : d + (d > 1 ? ' <?php e(lang('st_days'))?> ' : ' <?php e(lang('st_day'))?> ');
-			h = h == '0' ? '' : h + (h > 1 ? ' <?php e(lang('st_hours'))?> ' : ' <?php e(lang('st_hour'))?> ');
-			m = m == '0' ? '' : m + (m > 1 ? ' <?php e(lang('st_minutes'))?> ' : ' <?php e(lang('st_minute'))?> ');
-			s = s == '0' ? '' : s + (s > 1 ? ' <?php e(lang('st_seconds'))?>' : ' <?php e(lang('st_second'))?>');
+			d = d <= 9 ? '0' + d : d;
+			h = h <= 9 ? '0' + h : h;
+			m = m <= 9 ? '0' + m : m;
+			s = s <= 9 ? '0' + s : s;
+			
+			d = d == '00' ? '' : d + (d > 1 ? ' <?php e(lang('st_days'))?> ' : ' <?php e(lang('st_day'))?> ');
+			h = h == '00' ? '' : h + (h > 1 ? ' <?php e(lang('st_hours'))?> ' : ' <?php e(lang('st_hour'))?> ');
+			m = m == '00' ? '' : m + (m > 1 ? ' <?php e(lang('st_minutes'))?> ' : ' <?php e(lang('st_minute'))?> ');
+			s = s == '00' ? '' : s + (s > 1 ? ' <?php e(lang('st_seconds'))?>' : ' <?php e(lang('st_second'))?>');
 
 			$d.text(d);
 			$h.text(h);
@@ -487,6 +529,8 @@ function update_status_timer(clock)
 
 function update_monitor()
 {
+	$(document).data('ajax-start-time', moment().unix());
+
 	$.get('<?php e(site_url('step/get_monitor_data/'))?>' + $('.step-monitor').data('step-id'), (result) => {
 		data = JSON.parse(result);
 
@@ -499,6 +543,16 @@ function update_monitor()
 			});
 
 			return;
+		}
+
+		if ( ! (data.step.status == 'open' || data.step.status == 'ready' || data.step.status == 'inprogress') ) {
+			$.notify({
+				message: '<?php e(lang('st_step_finished'))?>'
+			}, {
+				type: 'success',
+				z_index: 1051
+			});
+			$('.modal-monitor').modal('hide');
 		}
 
 		$.each(data.data, (index, item) => {
@@ -520,10 +574,10 @@ function update_monitor()
 					$('#task-' + item.task_id + ' .label').data('started-on', item.started_on);
 					$('#task-' + item.task_id + ' .label').data('now', item.current_time);
 
-					update_status_timer($('#task-' + item.task_id + ' .task-status'));
+					update_task_timer($('#task-' + item.task_id + ' .task-status'));
 				} else {
-					if (update_status_timer_intervals[item.task_id]) {
-						clearInterval(update_status_timer_intervals[item.task_id]);
+					if (update_task_timer_intervals[item.task_id]) {
+						clearInterval(update_task_timer_intervals[item.task_id]);
 						$('#task-' + item.task_id + ' .task-status > span').text('');
 					}
 

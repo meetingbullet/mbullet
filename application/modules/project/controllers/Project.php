@@ -1,12 +1,12 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 // before each method need to verify user
-class Projects extends Authenticated_Controller
+class Project extends Authenticated_Controller
 {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->lang->load('projects');
-		$this->load->library('project');
+		$this->lang->load('project');
+		$this->load->library('mb_project');
 		$this->load->library('form_validation');
 		$this->load->library('invite/invitation');
 		$this->load->helper('mb_form_helper');
@@ -19,7 +19,7 @@ class Projects extends Authenticated_Controller
 		$this->load->model('step/step_model');
 		$this->load->model('action/action_model');
 
-		Assets::add_module_js('projects', 'projects.js');
+		Assets::add_module_js('project', 'projects.js');
 	}
 
 	public function _remap($method, $params = array())
@@ -186,9 +186,9 @@ class Projects extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$project_id = $this->project->get_object_id('project', $project_key);
+		$project_id = $this->mb_project->get_object_id('project', $project_key);
 
-		if (! $this->project->has_permission('project', $project_id, 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('project', $project_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
 
@@ -281,7 +281,7 @@ class Projects extends Authenticated_Controller
 		$project->total_project_point_used = 0;
 		if ($actions) {
 			foreach ($actions as &$action) {
-				$action->point_used = number_format($this->project->total_point_used('action', $action->action_id), 2);
+				$action->point_used = number_format($this->mb_project->total_point_used('action', $action->action_id), 2);
 
 				$project->total_project_point_used += $action->point_used;
 			}
@@ -298,7 +298,7 @@ class Projects extends Authenticated_Controller
 		// @TODO need to optimize query
 		if ($steps) {
 			foreach ($steps as &$step) {
-				$step->point_used = number_format($this->project->total_point_used('step', $step->step_id), 2);
+				$step->point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
 			}
 		}
 
@@ -331,14 +331,10 @@ class Projects extends Authenticated_Controller
 		/*---------------------------------- Report TAB ----------------------------------*/
 		Template::set('report_tab_data', []);
 
-		if (! function_exists('avatar_url')) {
-			$this->load->helper('mb_general');
-		}
-
 		Assets::add_module_css('action', 'action.css');
 		Assets::add_module_js('action', 'action.js');
-		Assets::add_module_css('projects', 'projects.css');
-		Assets::add_module_js('projects', 'action_board.js');
+		Assets::add_module_css('project', 'projects.css');
+		Assets::add_module_js('project', 'action_board.js');
 		Template::set('project_name', $project->name);
 		Template::set('project_key', $project_key);
 		Template::set_view('detail');
@@ -523,7 +519,7 @@ class Projects extends Authenticated_Controller
 			}
 		}
 
-		Assets::add_module_css('projects', 'projects.css');
+		Assets::add_module_css('project', 'projects.css');
 		Template::set('project', $project);
 		Template::set('project_key', $project_key);
 		Template::render();
@@ -549,9 +545,6 @@ class Projects extends Authenticated_Controller
 
 	private function get_actions($project_id)
 	{
-		if (! function_exists('avatar_url')) {
-			$this->load->helper('mb_general');
-		}
 		// get all project actions, sort by sort order
 		$all_actions = $this->db->select('a.action_id, a.action_key, a.name, a.status, IF (a.modified_on IS NULL, a.created_on, a.modified_on) AS sort_time, u.avatar, u.email')
 								->from('actions a')

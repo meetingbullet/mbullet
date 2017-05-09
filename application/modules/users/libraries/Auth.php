@@ -284,7 +284,12 @@ class Auth
 		}
 
 		// Ensure user_token is still equivalent to SHA1 of the user_id and password_hash.
-		if (sha1($this->ci->session->userdata('user_id') . $user->password_hash . $user->google_id_token)
+		// if (sha1($this->ci->session->userdata('user_id') . $user->password_hash . $user->google_id_token)
+		// 	!== $this->ci->session->userdata('user_token')
+		// ) {
+		// 	return false;
+		// }
+		if (sha1($this->ci->session->userdata('user_id') . $user->password_hash)
 			!== $this->ci->session->userdata('user_token')
 		) {
 			return false;
@@ -689,7 +694,8 @@ class Auth
 			array(
 				'user_id'	 => $userId,
 				'auth_custom' => $login,
-				'user_token'  => sha1($userId . $hash . $google_token),
+				// 'user_token'  => sha1($userId . $hash . $google_token),
+				'user_token'  => sha1($userId . $hash),
 				'identity'	=> $login,
 				'role_ids'	 => $roleIds,
 				'logged_in'   => true,
