@@ -192,7 +192,7 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_members = $this->step_member_model->where('step_id', $step->step_id)->find_all();
+		$step_members = $this->step_member_model->where('step_id', $step->step_id)->as_array()->find_all();
 		$step_members = $step_members && count($step_members) > 0 ? array_column($step_members, 'user_id') : [];
 		Template::set('step_members', $step_members);
 		Template::set('step', $step);
