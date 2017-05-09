@@ -176,13 +176,13 @@ $members = array_column($invited_members, 'user_id');
 					<div class="an-input-group">
 						<ul class="list-unstyled list-member">
 							<?php if ($invited_members): foreach ($invited_members as $user): 
-								$user->avatar = avatar_url($user->avatar, $user->email);
+								$user['avatar'] = avatar_url($user['avatar'], $user['email']);
 							?>
 							<li>
-								<div class="avatar" style="background-image: url('<?php echo $user->avatar ?>')"></div>
-								<?php e($user->name)?>
+								<div class="avatar" style="background-image: url('<?php echo $user['avatar'] ?>')"></div>
+								<?php e($user['name'])?>
 
-								<span class="badge badge-<?php e($cost_of_time_to_badge[$user->cost_of_time])?> badge-bordered pull-right"><?php e($user->cost_of_time_name)?></span>
+								<span class="badge badge-<?php e($cost_of_time_to_badge[$user['cost_of_time']])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
 							</li>
 							<?php endforeach; endif;?>
 						</ul>
