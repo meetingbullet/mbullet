@@ -29,7 +29,7 @@ var status_label = {
 
 
 var update_step_timer_interval,
-	update_status_timer_intervals = [];
+	update_task_timer_intervals = [];
 
 // Update skip votes periodly
 var update_monitor_interval = setInterval(update_monitor, 3000);
@@ -39,7 +39,7 @@ $('.modal-monitor').on('hidden.bs.modal', function () {
 	clearInterval(update_step_timer_interval);
 	clearInterval(update_monitor_interval);
 
-	$.each(update_status_timer_intervals, (i, item) => {
+	$.each(update_task_timer_intervals, (i, item) => {
 		clearInterval(item);
 	});
 })
@@ -217,6 +217,8 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 						? $(row).find('input[name="time_assigned"]').val()
 						: $(row).find('.time-assigned').text();
 
+	$(document).data('ajax-start-time', moment().unix());
+
 	$.post('<?php echo site_url('step/update_task_status') ?>', {
 		task_id: $(e.target).parent().parent().data('task-id'), 
 		status: 'inprogress', 
@@ -239,7 +241,7 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 			$(row).find('.task-status').data('started-on', data.started_on);
 			$(row).find('.task-status').data('now', data.started_on);
 
-			update_status_timer($(row).find('.task-status'));
+			update_task_timer($(row).find('.task-status'));
 
 			$('.btn-start-task').prop('disabled', true);
 
@@ -303,7 +305,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
-			clearInterval(update_status_timer_intervals[task_id]);
+			clearInterval(update_task_timer_intervals[task_id]);
 			$(row).find('.task-status').html('<span class="<?php e($task_status_labels['jumped'])?>"><?php e(lang('st_jumped'))?></span>');
 
 			$('.btn-start-task').each((i, item) => {
@@ -388,9 +390,9 @@ $(document).on('click.monitor', '.time-assigned', (e) => {
 	}
 });
 
-$('.task-status').each((index, item) => {
+$('.table-task .task-status').each((index, item) => {
 	if ( $(item).data('started-on') ) {
-		update_status_timer(item);
+		update_task_timer(item);
 	}
 });
 
@@ -400,10 +402,15 @@ function update_step_timer(clock)
 	var clock = '#scheduled-timer';
 
 	var eventTime = moment($(clock).data('actual-start-time'), 'YYYY-MM-DD HH:mm:ss').unix(),
-		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix(),
+		ajax_start_time = $(document).data('ajax-start-time'),
+		request_time = ajax_start_time ? ((moment().unix() - ajax_start_time) / 2) : 0,
+		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix() + request_time,
 		diffTime = currentTime - eventTime,
 		duration = moment.duration(diffTime * 1000, 'milliseconds'),
 		interval = 1000;
+
+	// console.log('currentTime - eventTime', currentTime - eventTime);
+	// console.log(' Math.round(request_time)', Math.round(request_time));
 		
 	$(clock).removeClass('hidden');
 
@@ -428,16 +435,21 @@ function update_step_timer(clock)
 	}, interval);
 }
 
-function update_status_timer(clock)
+function update_task_timer(clock)
 {
 	var task_id = $(clock).parent().data('task-id'),
 		time_assigned = $(clock).data('time-assigned'),
+		ajax_start_time = $(document).data('ajax-start-time'),
+		request_time = ajax_start_time ? ((moment().unix() - ajax_start_time) / 2) : 0;
 		eventTime = moment($(clock).data('started-on'), 'YYYY-MM-DD HH:mm:ss').unix(),
-		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix(),
+		currentTime = moment($(clock).data('now'), 'YYYY-MM-DD HH:mm:ss').unix() + request_time,
 		diffTime = currentTime - eventTime,
 		duration = moment.duration(diffTime * 1000, 'milliseconds'),
 		interval = 1000;
-		
+	
+	// console.log('Request time diff:', request_time);
+	// console.log('Time diff:', diffTime);
+
 	// Show $(clock)
 	$(clock).html('<span class="label label-warning label-inprogress label-bordered"><?php e(lang('st_in_progress'))?></span> ');
 
@@ -446,7 +458,7 @@ function update_status_timer(clock)
 		$m = $('<span class="minutes" ></span>').appendTo($(clock)),
 		$s = $('<span class="seconds" ></span>').appendTo($(clock));
 
-		update_status_timer_intervals[task_id] = setInterval(function(){
+		update_task_timer_intervals[task_id] = setInterval(function(){
 
 			duration = moment.duration(duration.asMilliseconds() + interval, 'milliseconds');
 			var d = moment.duration(duration).days(),
@@ -456,8 +468,8 @@ function update_status_timer(clock)
 
 			// Time alotted for Task
 			if (duration.asMinutes() >= time_assigned && $('.step-monitor').data('is-owner') == '1') {
-				if (update_status_timer_intervals[task_id]) {
-					clearInterval(update_status_timer_intervals[task_id]);
+				if (update_task_timer_intervals[task_id]) {
+					clearInterval(update_task_timer_intervals[task_id]);
 
 					$.getJSON('<?php echo site_url('step/resolve_task/') ?>' + task_id, (data) => {
 						if (data.message != '') {
@@ -495,6 +507,8 @@ function update_status_timer(clock)
 
 function update_monitor()
 {
+	$(document).data('ajax-start-time', moment().unix());
+
 	$.get('<?php e(site_url('step/get_monitor_data/'))?>' + $('.step-monitor').data('step-id'), (result) => {
 		data = JSON.parse(result);
 
@@ -538,10 +552,10 @@ function update_monitor()
 					$('#task-' + item.task_id + ' .label').data('started-on', item.started_on);
 					$('#task-' + item.task_id + ' .label').data('now', item.current_time);
 
-					update_status_timer($('#task-' + item.task_id + ' .task-status'));
+					update_task_timer($('#task-' + item.task_id + ' .task-status'));
 				} else {
-					if (update_status_timer_intervals[item.task_id]) {
-						clearInterval(update_status_timer_intervals[item.task_id]);
+					if (update_task_timer_intervals[item.task_id]) {
+						clearInterval(update_task_timer_intervals[item.task_id]);
 						$('#task-' + item.task_id + ' .task-status > span').text('');
 					}
 

@@ -120,7 +120,7 @@ $task_status_labels = [
 							<input type="number" name="time_assigned" data-task-id='<?php e($task->task_id)?>' class='an-form-control form-td<?php echo ($task->time_assigned == NULL && $is_owner ? '' : ' hidden' ) ?>' step="0.01" value="<?php e($task->time_assigned)?>"/>
 						</td>
 						<td class='text-center skip-votes '><?php e($task->skip_votes)?></td>
-						<td class='task-status ' <?php echo $task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}' data-time-assigned='{$task->time_assigned}'" : '' ?>>
+						<td class='task-status' <?php echo "data-time-assigned='{$task->time_assigned}' " . ($task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}'" : '') ?>>
 							<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 						</td>
 
