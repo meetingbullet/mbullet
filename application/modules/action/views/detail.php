@@ -42,9 +42,6 @@ $project_key = $project_key['0'];
 
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<h5 class='breakcumb'>
-			<?php echo $action_key ?>
-		</h5>
 		<h2><?php e($action->name)?></h2>
 
 	</div>

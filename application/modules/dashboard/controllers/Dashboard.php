@@ -16,7 +16,7 @@ class Dashboard extends Authenticated_Controller
 
 	public function index()
 	{
-		$projects = $this->project_model->select('projects.*, u.first_name, u.last_name')
+		$projects = $this->project_model->select('projects.*, u.first_name, u.last_name, u.email, u.avatar')
 										->join('users u', 'u.user_id = projects.owner_id')
 										->join('project_members pm', 'projects.project_id = pm.project_id AND pm.user_id = ' . $this->current_user->user_id)
 										->find_all();
@@ -24,14 +24,14 @@ class Dashboard extends Authenticated_Controller
 		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
 
 
-		$my_steps = $this->step_model->select('steps.*,  CONCAT(u.first_name, " ", u.last_name) as owner_name')
+		$my_steps = $this->step_model->select('steps.*, u.first_name, u.last_name, u.email, u.avatar')
 									->join('users u', 'u.user_id = steps.owner_id')
 									->where('(status = "ready" OR status = "inprogress")', null, false)
 									->where('owner_id', $this->current_user->user_id)
 									->find_all();
 		$my_steps = $my_steps && count($my_steps) > 0 ? $my_steps : [];
 
-		$member_steps = $this->step_member_model->select('s.*,  CONCAT(u.first_name, " ", u.last_name) as owner_name')
+		$member_steps = $this->step_member_model->select('s.*, u.first_name, u.last_name, u.email, u.avatar')
 									->join('steps s', 's.step_id = step_members.step_id')
 									->join('users u', 'u.user_id = step_members.user_id')
 									->where('(status = "ready" OR status = "inprogress")', null, false)

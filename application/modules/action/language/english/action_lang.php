@@ -44,7 +44,7 @@ $lang['ac_action_key_does_not_exist'] = 'Action key does not exist';
 $lang['update_success'] = 'Update action successfully.';
 
 // Field
-$lang['ac_detail'] = 'Detail';
+$lang['ac_detail'] = 'Action Detail';
 $lang['ac_steps'] = 'Steps';
 $lang['ac_component_steps'] = 'Component / Steps';
 $lang['ac_type'] = 'Type';

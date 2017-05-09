@@ -18,6 +18,7 @@ $project_status_labels = [
 <button class="an-btn an-btn-success" id="invite" style="margin-bottom: 30px">Invite User</button>
 
 <div class="row">
+<?php if (is_array($my_steps) && count($my_steps) > 0) { ?>
 	<div class="col-xs-12">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
@@ -43,7 +44,7 @@ $project_status_labels = [
 								<?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?>
 							</div>
 							<div class="list-text basis-20">
-								<?php e($step->owner_name)?>
+								<?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?>
 							</div>
 							<div class="list-state basis-10">
 								<span class="msg-tag <?php echo $step_status_labels[$step->status] ?>">
@@ -68,6 +69,7 @@ $project_status_labels = [
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div> <!-- end .an-single-component -->
 	</div>
+<?php } ?>
 	<div class="col-xs-12">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
@@ -101,7 +103,7 @@ $project_status_labels = [
 								<?php e($project->cost_code)?>
 							</div>
 							<div class="list-text basis-30">
-								<?php e($project->first_name .' '. $project->last_name)?>
+								<?php echo display_user($project->email, $project->first_name, $project->last_name, $project->avatar); ?>
 							</div>
 							<div class="list-state basis-10">
 								<span class="msg-tag <?php echo $project_status_labels[$project->status] ?>">
