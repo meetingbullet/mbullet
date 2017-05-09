@@ -63,10 +63,11 @@ $task_status_labels = [
 							<div class="an input-group input-group-schedule <?php echo $step->status == 'open' ? ' input-group-btn-right' : '' ?>">
 								<div class="input-group-addon"><i class="ion-android-calendar"></i></div>
 								<input type="text" 
+										id="datetimepicker1"
 										name="scheduled_time" 
 										class="form-control" 
 										value="<?php echo $scheduled_start_time ?>" 
-										placeholder="<?php e(lang('st_time_schedule'))?>" <?php echo $step->status == 'open' ? 'readOnly' : 'disabled' ?>/>
+										placeholder="<?php e(lang('st_scheduled_start_time'))?>" <?php echo $step->status == 'open' ? '' : 'disabled' ?>/>
 								<span class="input-group-btn">
 									<button type="submit" 
 											name='save-time' 

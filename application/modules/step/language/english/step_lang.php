@@ -36,6 +36,8 @@ $lang['st_parking_lot'] = 'Parking Lot';
 $lang['st_resolved'] = 'Resolved';
 $lang['st_resolve_task'] = 'Resolve Task';
 $lang['st_comment_topics'] = 'Comments / topics';
+$lang['st_scheduled_start_time'] = 'Scheduled start time';
+$lang['st_scheduled_end_time'] = 'Scheduled end time';
 
 // Action
 $lang['st_action'] = 'Action';

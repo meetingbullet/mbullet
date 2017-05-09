@@ -1,5 +1,15 @@
 <?php
 
+$scheduled_start_time = null;
+
+if ($step->scheduled_start_time) {
+	$scheduled_start_time = strtotime($step->scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
+
+	$scheduled_start_time = gmdate('Y-m-d H:i:s', $scheduled_start_time);
+	$scheduled_end_time = gmdate('Y-m-d H:i:s', $scheduled_end_time);
+}
+
 $cost_of_time_to_badge = [
 	'', // Skip cost_of_time_to_badge[0]
 	'default',	// XS
@@ -197,13 +207,24 @@ $members = array_column($invited_members, 'user_id');
 			</div>
 			<div class="an-component-body">
 				<div class="an-helper-block step-detail">
+					<?php if ($scheduled_start_time): ?>
 					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_created'))?></div>
-						<div class="col-xs-8"><?php e($step->created_on)?></div>
+						<div class="col-xs-6"><?php e(lang('st_scheduled_start_time'))?></div>
+						<div class="col-xs-6"><?php e($scheduled_start_time)?></div>
 					</div>
 					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_updated'))?></div>
-						<div class="col-xs-8"><?php e($step->modified_on)?></div>
+						<div class="col-xs-6"><?php e(lang('st_scheduled_end_time'))?></div>
+						<div class="col-xs-6"><?php e($scheduled_end_time)?></div>
+					</div>
+					<hr/>
+					<?php endif; ?>
+					<div class="row">
+						<div class="col-xs-6"><?php e(lang('st_created'))?></div>
+						<div class="col-xs-6"><?php e($step->created_on)?></div>
+					</div>
+					<div class="row">
+						<div class="col-xs-6"><?php e(lang('st_updated'))?></div>
+						<div class="col-xs-6"><?php e($step->modified_on)?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
