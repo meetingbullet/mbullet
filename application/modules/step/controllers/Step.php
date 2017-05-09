@@ -305,7 +305,7 @@ class Step extends Authenticated_Controller
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
 
-		$project_id = $this->project->get_object_id('project', $project_key);
+		$project_id = $this->mb_project->get_object_id('project', $project_key);
 		if (empty($project_id)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
@@ -539,7 +539,7 @@ class Step extends Authenticated_Controller
 				return;
 			}
 
-			if ($step->scheduled_start_time === NULL || $step->scheduled_end_time === NULL) {
+			if ($step->scheduled_start_time === NULL) {
 				echo json_encode([
 					'message_type' => 'danger',
 					'message' => lang('st_invalid_schedule_time')
@@ -629,7 +629,7 @@ class Step extends Authenticated_Controller
 		}
 
 		// Validation
-		if ( ! ( strtotime($this->input->post('scheduled_end_time')) && strtotime($this->input->post('scheduled_start_time')) ) ) {
+		if ( ! strtotime($this->input->post('scheduled_start_time')) ) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('st_invalid_schedule_time')
@@ -640,11 +640,21 @@ class Step extends Authenticated_Controller
 
 		$query = $this->step_model->skip_validation(1)->update($step->step_id, [
 			'status' => 'ready',
-			'scheduled_start_time' => $this->input->post('scheduled_start_time'),
-			'scheduled_end_time' => $this->input->post('scheduled_end_time'),
+			'scheduled_start_time' => $this->input->post('scheduled_start_time')
 		]);
 
 		if ($query) {
+			if ( is_array($this->input->post('time_assigned')) ) {
+				$task_data = [];
+				foreach ($this->input->post('time_assigned') as $task_id => $time_assigned) {
+					$task_data[] = [
+						'task_id' => $task_id,
+						'time_assigned' => $time_assigned
+					];
+				}
+
+				$this->task_model->skip_validation(1)->update_batch($task_data, 'task_id');
+			}
 			echo json_encode([
 				'message_type' => 'success',
 				'message' => lang('st_schedule_time_saved')

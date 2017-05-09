@@ -1,19 +1,16 @@
 <?php
 $is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
-$scheduled_end_time = null;
 
 if ($step->scheduled_start_time) {
-	$scheduled_start_time = new DateTime($step->scheduled_start_time);
-	$scheduled_start_time = date_format($scheduled_start_time, 'M d, H:i');
+	$scheduled_start_time = strtotime($step->scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
+
+	$scheduled_start_time = gmdate('M d, H:i', $scheduled_start_time);
+	$scheduled_end_time = gmdate('M d, H:i', $scheduled_end_time);
 }
 
-if ($step->scheduled_end_time) {
-	$scheduled_end_time = new DateTime($step->scheduled_end_time);
-	$scheduled_end_time = date_format($scheduled_end_time, 'M d, H:i');
-}
-
-$scheduled_time = $scheduled_start_time && $scheduled_end_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : '';
+$scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
 
 $task_status_labels = [
 	'open' => 'label label-default label-bordered',
@@ -32,53 +29,58 @@ $task_status_labels = [
 	</div> <!-- end MODAL-HEADER -->
 	<?php endif; ?>
 
-	<div class="an-body-topbar">
-		<div class="an-page-title">
-			<div class="an-bootstrap-custom-tab">
-				<h2><?php e($step->name . ' - ' . lang('st_dashboard'))?></h2>
-			</div>
-		</div>
-		<div class="pull-right">
-			<div class="an-bootstrap-custom-tab">
-				<div class="step-time-schedule">
-					<?php echo form_open(site_url('step/update_step_schedule'), ['class' => 'form-inline form-step-schedule']) ?>
-						<input type="hidden" name="step_id" value="<?php e($step->step_id) ?>">
-						<input type="hidden" name="scheduled_start_time" id="scheduled_start_time" value="<?php e($step->scheduled_start_time)?>" />
-						<input type="hidden" name="scheduled_end_time" id="scheduled_end_time" value="<?php e($step->scheduled_end_time)?>">
+	<?php echo form_open(site_url('step/update_step_schedule'), ['class' => 'form-inline form-step-schedule']) ?>
+		<input type="hidden" name="scheduled_start_time" />
+		<div class="an-body-topbar">
+			<div class="an-page-title">
+				<div class="an-bootstrap-custom-tab">
+					<h2><?php e($step->name . ' - ' . lang('st_dashboard'))?></h2>
 
-						<h3 id="scheduled-timer" class="step-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
-						<div class="an input-group <?php echo $step->status == 'open' ? ' input-group-btn-right' : '' ?>">
-							<div class="input-group-addon"><i class="ion-android-calendar"></i></div>
-							<input type="text" 
-									name="scheduled_time" 
-									class="form-control" 
-									value="<?php echo $scheduled_time ?>" 
-									placeholder="<?php e(lang('st_time_schedule'))?>" <?php echo $step->status == 'open' ? 'readOnly' : 'disabled' ?>/>
-							<span class="input-group-btn">
-								<button type="submit" 
-										name='save-time' 
-										class="an-btn an-btn-danger-transparent btn-update-step-schedule<?php echo $step->status == 'open' ? '' : ' hidden' ?>">
-									<i class="glyphicon glyphicon-floppy-disk"></i> <?php e(lang('st_save'))?>
-								</button>
-							</span>
-						</div>
-
-						<div class="step-action">
-							<button type="submit" 
-									name='start-step' 
-									class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>"
-								<?php echo is_null($step->scheduled_start_time) || is_null($step->scheduled_end_time) ? ' disabled' : '' ?> >
-								<i class="ion-ios-play"></i> <?php e(lang('st_start'))?>
-							</button>
-							<button class="an-btn an-btn-success btn-finish<?php echo $step->status == 'inprogress' && $is_owner ? '' : ' hidden' ?>" disabled>
-								<i class="ion-ios-checkmark-outline"></i> <?php e(lang('st_finish'))?>
-							</button>
-						</div>
-					<?php echo form_close() ?>
+					<?php if ($scheduled_time): ?>
+					<h5 class='text-muted'><?php e($scheduled_time)?></h5>
+					<?php endif; ?>
 				</div>
 			</div>
-		</div>
-	</div> <!-- end AN-BODY-TOPBAR -->
+			<div class="pull-right">
+				<div class="an-bootstrap-custom-tab">
+					<div class="step-time-schedule">
+							<input type="hidden" name="step_id" value="<?php e($step->step_id) ?>">
+
+							<h3 id="scheduled-timer" class="step-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
+							
+							<?php if ($scheduled_time): ?>
+							<div class="step-action">
+								<button type="submit" 
+										name='start-step' 
+										class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>"
+									<i class="ion-ios-play"></i> <?php e(lang('st_start'))?>
+								</button>
+								<button class="an-btn an-btn-success btn-finish<?php echo $step->status == 'inprogress' && $is_owner ? '' : ' hidden' ?>" disabled>
+									<i class="ion-ios-checkmark-outline"></i> <?php e(lang('st_finish'))?>
+								</button>
+							</div>
+							<?php else: ?>
+							<div class="an input-group input-group-schedule <?php echo $step->status == 'open' ? ' input-group-btn-right' : '' ?>">
+								<div class="input-group-addon"><i class="ion-android-calendar"></i></div>
+								<input type="text" 
+										name="scheduled_time" 
+										class="form-control" 
+										value="<?php echo $scheduled_start_time ?>" 
+										placeholder="<?php e(lang('st_time_schedule'))?>" <?php echo $step->status == 'open' ? 'readOnly' : 'disabled' ?>/>
+								<span class="input-group-btn">
+									<button type="submit" 
+											name='save-time' 
+											class="an-btn an-btn-danger btn-update-step-schedule<?php echo $step->status == 'open' ? '' : ' hidden' ?>">
+										<i class="glyphicon glyphicon-floppy-disk"></i> <?php e(lang('st_save'))?>
+									</button>
+								</span>
+							</div>
+							<?php endif; ?>
+					</div>
+				</div>
+			</div>
+		</div> <!-- end AN-BODY-TOPBAR -->
+	<?php echo form_close() ?>
 
 
 	<div class="an-single-component with-shadow">
@@ -94,7 +96,7 @@ $task_status_labels = [
 						<th><?php e(lang('st_assignee'))?></th>
 						<th class='text-center'><?php e(lang('st_time_assigned_min'))?></th>
 						<th class='text-center'><?php e(lang('st_skip_votes'))?></th>
-						<th><?php e(lang('st_status'))?></th>
+						<th class="basis-30"><?php e(lang('st_status'))?></th>
 						<th><?php e(lang('st_action'))?></th>
 					</tr>
 				</thead>
