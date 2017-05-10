@@ -7,7 +7,6 @@ class Step extends Authenticated_Controller
 		parent::__construct();
 		$this->lang->load('step');
 		$this->load->helper('mb_form');
-		$this->load->helper('mb_general');
 		$this->load->helper('text');
 		$this->load->helper('date');
 		$this->load->library('mb_project');
@@ -296,12 +295,6 @@ class Step extends Authenticated_Controller
 			$this->auth->restrict();
 		}
 
-		$step = $this->step_model->select('steps.*')
-								->join('actions a', 'a.action_id = steps.action_id')
-								->join('projects p', 'a.project_id = p.project_id')
-								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
-								->limit(1)
-								->find_by('step_key', $step_key);
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
 
@@ -310,24 +303,11 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		// get projecct id
-		// $project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
-		// if ($project_id === false) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
-
-		// if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		// && $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		// && $this->auth->has_permission('Project.View.All') === false) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
-
 		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, u.email, u.first_name, u.last_name, u.avatar');
 
 		if (! $step) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
-		$step_id = $step->step_id;
 
 		$tasks = $this->task_model->select('tasks.*, u.email, u.first_name, u.last_name, u.avatar')
 								->join('users u', 'u.user_id = tasks.owner_id', 'left')
@@ -339,33 +319,7 @@ class Step extends Authenticated_Controller
 			}
 		}
 
-		$invited_members =  $this->user_model
-								->select('uto.user_id, email, first_name, last_name, avatar,
-									avatar, cost_of_time, 
-									IF(
-										uto.cost_of_time = 1, 
-										p.cost_of_time_1,
-										IF(
-											uto.cost_of_time = 2, 
-											p.cost_of_time_2,
-											IF(
-												uto.cost_of_time = 3, 
-												p.cost_of_time_3,
-												IF(
-													uto.cost_of_time = 4, 
-													p.cost_of_time_4,
-													p.cost_of_time_5
-												)
-											)
-										)
-									) AS cost_of_time_name', false)
-									->join('step_members sm', 'sm.user_id = users.user_id AND sm.step_id = ' . $step_id)
-									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id)
-									->join('projects p', 'p.project_id = ' . $project_id)
-									->order_by('name')
-									->order_by('uto.cost_of_time', 'DESC')
-									->as_array()
-									->find_all();
+		$invited_members = $this->step_member_model->get_step_member($step_id);
 									
 		$point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
 
@@ -415,6 +369,8 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$step->members =  
+
 
 		$tasks = $this->task_model->select('tasks.*, 
 											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
@@ -437,6 +393,72 @@ class Step extends Authenticated_Controller
 
 
 		Assets::add_js($this->load->view('monitor_js', [
+			'step_key' => $step_key
+		], true), 'inline');
+		Template::set('close_modal', 0);
+		Template::set('current_user', $this->current_user);
+		Template::set('tasks', $tasks);
+		Template::set('step', $step);
+		Template::set('now', gmdate('Y-m-d H:i:s'));
+		Template::render();
+	}
+
+	public function decider($step_key = null)
+	{
+		if (empty($step_key)) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$keys = explode('-', $step_key);
+		if (empty($keys) || count($keys) < 3) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step_id = $this->mb_project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->mb_project->has_permission('step', $step_id, 'Project.View.All')) {
+			$this->auth->restrict();
+		}
+
+		/*
+			To access Step Monitor, user must be owner or team member of Step
+		*/
+
+		$step = $this->step_model->select('*, (actual_end_time - actual_start_time) / 60 AS actual_elapsed_time')->find_by('step_key', $step_key);
+
+		if (! $step) {
+			Template::set_message(lang('st_invalid_step_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step->members = $this->step_member_model->get_step_member($step_id);
+
+		$tasks = $this->task_model->select('tasks.*, 
+											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
+											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
+									->join('users u', 'u.user_id = tasks.owner_id', 'left')
+									->where('step_id', $step->step_id)->find_all();
+		
+		// We can't start without Tasks
+		if ($tasks === false) {
+			Template::set('message_type', 'warning');
+			Template::set('message', lang('st_cannot_start_step_without_any_task'));
+			Template::set('content', '');
+			Template::render();
+			return;
+		}
+
+		foreach ($tasks as &$task) {
+			$task->members = $this->task_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
+		}
+
+
+		Assets::add_js($this->load->view('decider_js', [
 			
 		], true), 'inline');
 		Template::set('close_modal', 0);

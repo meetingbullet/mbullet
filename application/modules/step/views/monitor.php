@@ -6,8 +6,8 @@ if ($step->scheduled_start_time) {
 	$scheduled_start_time = strtotime($step->scheduled_start_time);
 	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
 
-	$scheduled_start_time = gmdate('M d, H:i', $scheduled_start_time);
-	$scheduled_end_time = gmdate('M d, H:i', $scheduled_end_time);
+	$scheduled_start_time = date('M d, H:i', $scheduled_start_time);
+	$scheduled_end_time = date('M d, H:i', $scheduled_end_time);
 }
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
@@ -152,7 +152,7 @@ $task_status_labels = [
 
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('monitor_js', [
-			
+		'step_key' => $step_key
 	], true) . '</script>';
 }
 ?>

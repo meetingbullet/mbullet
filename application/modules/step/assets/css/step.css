@@ -90,3 +90,23 @@
 .task-status, .task-action {
 	white-space: nowrap;
 }
+
+.decider-step-container .an-component-header + .an-component-body{
+	max-height: 120px;
+	overflow: auto;
+}
+
+.an-helper-block .confirmation-status {
+	margin-bottom: 0;
+}
+
+.note {
+	width: 80%;
+	margin-bottom: 0;
+}
+
+.btn-close-out-step {
+	vertical-align: bottom;
+	margin-left: 30px;
+	margin-bottom: 6px;
+}

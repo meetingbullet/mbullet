@@ -234,9 +234,28 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 
 		if (data.message_type == 'success') {
 			$('.modal-monitor').modal('hide');
-			setTimeout(() => {
-				location.reload();
-			}, 1500);
+
+			// Open step decider if is owner
+			if ($('.step-monitor').data('is-owner') == '1') {
+				$('#step-decider .modal-content').html('');
+
+				$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+					data = JSON.parse(data);
+
+					if (data.modal_content == '') {
+						$.notify({
+							message: data.message
+						}, {
+							type: data.message_type,
+							z_index: 1051
+						});
+						return;
+					}
+
+					$('#step-decider .modal-content').html(data.modal_content);
+					$('#step-decider').modal({backdrop: "static"});
+				});
+			}
 		}
 	});
 
