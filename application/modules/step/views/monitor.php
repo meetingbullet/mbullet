@@ -65,7 +65,7 @@ $task_status_labels = [
 								<input type="text" 
 										id="datetimepicker1"
 										name="scheduled_time" 
-										class="form-control" 
+										class="form-control an-form-control schedule-time" 
 										value="<?php echo $scheduled_start_time ?>" 
 										placeholder="<?php e(lang('st_scheduled_start_time'))?>" <?php echo $step->status == 'open' ? '' : 'disabled' ?>/>
 								<span class="input-group-btn">
