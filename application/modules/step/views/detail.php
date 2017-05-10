@@ -215,7 +215,7 @@ $members = array_column($invited_members, 'user_id');
 					<?php endif; ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_created'))?></div>
-						<div class="col-xs-7"><?php e($step->created_on)?></div>
+						<div class="col-xs-7"><?php e(display_time($step->created_on))?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_updated'))?></div>
