@@ -3,8 +3,6 @@ $is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
 if ($step->scheduled_start_time) {
-	$scheduled_start_time = strtotime($step->scheduled_start_time);
-
 	$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $step->scheduled_start_time);
 	$scheduled_end_time->modify('+' . $step->in . ' ' . $step->in_type);
 
@@ -54,11 +52,11 @@ $task_status_labels = [
 							<div class="step-action">
 								<button type="submit" 
 										name='start-step' 
-										class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>"
+										class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>">
 									<i class="ion-ios-play"></i> <?php e(lang('st_start'))?>
 								</button>
 								<button class="an-btn an-btn-success btn-finish<?php echo $step->status == 'inprogress' && $is_owner ? '' : ' hidden' ?>" disabled>
-									<i class="ion-ios-checkmark-outline"></i> <?php e(lang('st_finish'))?>
+									<i class="ion-checkmark"></i> <?php e(lang('st_finish'))?>
 								</button>
 							</div>
 							<?php else: ?>
