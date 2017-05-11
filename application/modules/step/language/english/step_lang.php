@@ -7,6 +7,7 @@ $lang['st_dashboard'] = 'Dashboard';
 $lang['st_time_schedule'] = 'Time schedule';
 $lang['st_step_monitor'] = 'Step Monitor';
 $lang['st_join_step_monitor'] = 'Join Step Monitor';
+$lang['st_evaluation'] = 'Evaluation';
 
 // Field
 $lang['st_name'] = 'Name';
@@ -38,6 +39,22 @@ $lang['st_resolve_task'] = 'Resolve Task';
 $lang['st_comment_topics'] = 'Comments / topics';
 $lang['st_scheduled_start_time'] = 'Scheduled start time';
 $lang['st_scheduled_end_time'] = 'Scheduled end time';
+$lang['st_closed'] = 'Closed';
+$lang['st_open_parking_lot'] = 'Open Parking Lot';
+$lang['st_close_parking_lot'] = 'Close Parking Lot';
+$lang['st_started'] = 'Started';
+$lang['st_duration'] = 'Duration';
+$lang['st_confirm_status'] = 'Confirm status';
+$lang['st_rate'] = 'Rate';
+$lang['st_scheduled'] = 'Scheduled';
+$lang['st_actual'] = 'Actual';
+$lang['st_attendees'] = 'Attendees';
+$lang['st_start_time'] = 'Start time';
+$lang['st_end_time'] = 'End time';
+$lang['st_elapsed_time'] = 'Elapsed time';
+$lang['st_notes'] = 'Notes';
+$lang['st_point_value'] = 'Point value';
+$lang['st_submit'] = 'Submit';
 
 // Action
 $lang['st_action'] = 'Action';

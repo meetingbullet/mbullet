@@ -18,6 +18,7 @@ class Step extends Authenticated_Controller
 
 		$this->load->model('step_model');
 		$this->load->model('step_member_model');
+		$this->load->model('step_member_rate_model');
 
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
@@ -973,5 +974,79 @@ class Step extends Authenticated_Controller
 
 		// Prevent duplicate row by MySQL Insert Ignore
 		echo (int) $this->step_member_model->delete_where(['user_id' => $user_id, 'step_id' => $step_id]);
+	}
+
+	public function evaluator($step_key)
+	{
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (empty($step_key)) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$keys = explode('-', $step_key);
+		if (empty($keys) || count($keys) < 3) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step_id = $this->mb_project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->mb_project->has_permission('step', $step_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
+		}
+
+		/*
+			To access Step Monitor, user must be owner or team member of Step
+		*/
+
+		$step = $this->step_model->find_by('step_key', $step_key);
+
+		if (! $step) {
+			Template::set_message(lang('st_invalid_step_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$step->members = $this->step_member_model
+							->select('u.user_id, avatar, email, first_name, last_name')
+							->join('users u', 'u.user_id = step_members.user_id')
+							->where('u.user_id !=', $this->current_user->user_id)
+							->where('step_id', $step_id)
+							->find_all();
+
+		$tasks = $this->task_model->select('tasks.*, 
+											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
+											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
+									->join('users u', 'u.user_id = tasks.owner_id', 'left')
+									->where('step_id', $step->step_id)->find_all();
+		if (is_array($tasks) && count($tasks) > 0) {
+			foreach ($tasks as &$task) {
+				$task->members = $this->task_member_model
+									->select('avatar, email, first_name, last_name')
+									->join('users u', 'u.user_id = task_members.user_id')
+									->where('task_id', $task->task_id)
+									->find_all();
+			}
+		}
+
+		if ($this->input->post()) {
+			
+		}
+
+		$point_used = number_format($this->mb_project->total_point_used('step', $step_id), 2);
+		Template::set('point_used', $point_used);
+		Template::set('step', $step);
+		Template::set('tasks', $tasks);
+		if ($this->input->is_ajax_request()) {
+			Template::render('ajax');
+		} else {
+			Template::render();
+		}
 	}
 }
