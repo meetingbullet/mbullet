@@ -34,6 +34,9 @@ $task_status_labels = [
 	'jumped' => 'label label-info label-bordered',
 	'skipped' => 'label label-success label-bordered',
 	'parking_lot' => 'label label-info label-bordered',
+	'closed' => 'label label-default label-bordered',
+	'closed_parking_lot' => 'label label-primary label-bordered',
+	'open_parking_lot' => 'label label-primary label-bordered',
 ];
 
 $buttons = [
@@ -72,13 +75,6 @@ $members = array_column($invited_members, 'user_id');
 <div class="btn-block">
 	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a href='#' id="edit-step" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
-	<!--<a class="an-btn an-btn-primary" 
-		id="change-step-status" 
-		data-next-status="<?php echo $buttons[$step->status]['next_status'] ?>" 
-		data-update-status-url="<?php echo base_url('/step/update_status/' . $step_key . '?status=' . urlencode($buttons[$step->status]['next_status'])) ?>"
-	>
-		<i class="<?php echo $buttons[$step->status]['icon'] ?>"></i> <?php echo $buttons[$step->status]['label'] ?>
-	</a>-->
 	<?php if (in_array($current_user->user_id, $members) || $step->owner_id == $current_user->user_id) : ?>
 	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'open' ? ' step-open' : ''?><?php echo $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
 		<?php 
@@ -106,7 +102,7 @@ $members = array_column($invited_members, 'user_id');
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_goal'))?></div>
-						<div class="col-xs-8"><?php e($step->goal)?></div>
+						<div class="col-xs-8 step-goal"><?php echo word_limiter($step->goal, 100)?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
@@ -142,6 +138,9 @@ $members = array_column($invited_members, 'user_id');
 									<th><?php e(lang('st_description'))?></th>
 									<th><?php e(lang('st_assignee'))?></th>
 									<th><?php e(lang('st_status'))?></th>
+									<?php if ($step->status == 'finished') : ?>
+									<th><?php e(lang('st_confirmation_status'))?></th>
+									<?php endif ?>
 								</tr>
 							</thead>
 							<tbody>
@@ -149,7 +148,7 @@ $members = array_column($invited_members, 'user_id');
 								<tr>
 									<td class='basis-10'><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
 									<td class='basis-15'><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
-									<td class='basis-30'><?php echo word_limiter($task->description, 35)?></td>
+									<td class='basis-20'><?php echo word_limiter($task->description, 20)?></td>
 									<td class='basis-20'>
 										<?php if ($task->members) {
 											foreach ($task->members as $member) {
@@ -157,8 +156,11 @@ $members = array_column($invited_members, 'user_id');
 											}
 										} ?>
 									</td>
-									<td class='basis-10'>
+									<td class='basis-10 task-status'>
 										<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
+									</td>
+									<td class='basis-10 task-status'>
+										<span class="<?php e($task_status_labels[$task->confirm_status] . ' label-' . $task->confirm_status)?>"><?php e(lang('st_' . $task->confirm_status))?></span>
 									</td>
 								</tr>
 								<?php endforeach; endif; ?>

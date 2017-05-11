@@ -8,6 +8,7 @@ $lang['st_time_schedule'] = 'Time schedule';
 $lang['st_step_monitor'] = 'Step Monitor';
 $lang['st_join_step_monitor'] = 'Join Step Monitor';
 $lang['st_decider'] = 'Decider';
+$lang['st_step_decider'] = 'Step Decider';
 
 // Field
 $lang['st_name'] = 'Name';
@@ -50,6 +51,9 @@ $lang['st_actual'] = 'Actual';
 $lang['st_scheduled'] = 'Scheduled';
 $lang['st_attendees'] = 'Attendees';
 $lang['st_notes'] = 'Notes';
+$lang['st_closed'] = 'Closed';
+$lang['st_open_parking_lot'] = 'Open parking lot';
+$lang['st_closed_parking_lot'] = 'Closed parking lot';
 
 // Action
 $lang['st_action'] = 'Action';
@@ -100,6 +104,9 @@ $lang['st_please_resolve_all_task_before_finish'] = 'Please resolve all tasks be
 $lang['st_action_key_does_not_exist'] = 'Action key does not exist';
 $lang['st_step_key_does_not_exist'] = 'Step key does not exist';
 $lang['st_write_a_note_here'] = 'Write a note here...';
+$lang['st_all_task_confirmed_step_closed_out'] = 'All tasks confirmed. Step is now closed';
+$lang['st_unknown_error'] = 'Unknown error';
+$lang['st_please_select_all_confirmation_status'] = 'Please select all confirmation status';
 
 // Field
 $lang['st_detail'] = 'Detail';

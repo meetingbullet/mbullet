@@ -21,6 +21,10 @@ $task_status_labels = [
 	'parking_lot' => 'label label-info label-bordered',
 ];
 
+$confirmation_status = [
+	'closed', 'skipped', 'resolved', 'open_parking_lot', 'closed_parking_lot'
+];
+
 $cost_of_time_to_badge = [
 	'', // Skip cost_of_time_to_badge[0]
 	'default',	// XS
@@ -30,15 +34,15 @@ $cost_of_time_to_badge = [
 	'warning',	// XL
 ];
 ?>
-<div class="step-decider an-helper-block" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
+<div class="step-decider" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-		<h4 class="modal-title"><?php e(lang('st_step_monitor'))?></h4>
+		<h4 class="modal-title"><?php e(lang('st_step_decider'))?></h4>
 	</div> <!-- end MODAL-HEADER -->
 	<?php endif; ?>
 
-	<?php echo form_open('', ['class' => 'form-inline form-step-decider']) ?>
+	<?php echo form_open(site_url('step/update_decider/' . $step->step_key), ['class' => 'form-inline form-step-decider an-helper-block']) ?>
 		<div class="an-body-topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
@@ -53,7 +57,7 @@ $cost_of_time_to_badge = [
 			<div class="col-md-5">
 				<div class="an-single-component with-shadow">
 					<div class="an-component-body an-helper-block">
-						<table class="table table-striped table-task">
+						<table class="table table-striped table-step-time">
 							<thead>
 								<tr>
 									<th></th>
@@ -118,7 +122,7 @@ $cost_of_time_to_badge = [
 				<h6><?php e(lang('st_tasks'))?></h6>
 			</div>
 			<div class="an-component-body an-helper-block">
-				<table class="table table-striped table-task">
+				<table class="table table-striped table-step-time">
 					<thead>
 						<tr>
 							<th><?php e(lang('st_name'))?></th>
@@ -140,9 +144,9 @@ $cost_of_time_to_badge = [
 								</span>
 							</td>
 							<td>
-								<select name="<?php e($task->task_key) ?>" class="confirmation-status an-form-control">
+								<select name="tasks[<?php e($task->task_key) ?>]" class="confirmation-status an-form-control">
 									<option disabled selected value><?php e(lang('st_select_an_option')) ?></option>
-									<?php foreach ($task_status_labels as $status => $nothing) {
+									<?php foreach ($confirmation_status as $status) {
 										echo "<option value='{$status}'>". lang('st_' . $status) ."</option>";
 									} ?>
 								</select>

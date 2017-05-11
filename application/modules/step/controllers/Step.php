@@ -469,6 +469,82 @@ class Step extends Authenticated_Controller
 		Template::render();
 	}
 
+	public function update_decider($step_key)
+	{
+		if (empty($step_key)) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_step_key_does_not_exist')
+			]);
+			return;
+		}
+
+		$keys = explode('-', $step_key);
+		if (empty($keys) || count($keys) < 3) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_step_key_does_not_exist')
+			]);
+			return;
+		}
+
+		$step_id = $this->mb_project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_step_key_does_not_exist')
+			]);
+			return;
+		}
+
+		if (! $this->mb_project->has_permission('step', $step_id, 'Project.View.All')) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_action')
+			]);
+			return;
+		}
+
+		if (! is_array($this->input->post('tasks')) && count($this->input->post('tasks')) == 0) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_action')
+			]);
+			return;
+		}
+
+		// Prepare data
+
+		$task_data = [];
+
+		foreach ($this->input->post('tasks') as $task_key => $confirmation_status) {
+			$task_data[] = [
+				'task_key' => $task_key,
+				'confirm_status' => $confirmation_status,
+				'modified_by' => $this->current_user->user_id
+			];
+		}
+
+		if ($this->task_model->update_batch($task_data, 'task_key') ) {
+
+			if ($this->input->post('note')) {
+				$this->step_model->skip_validation(TRUE)->update($step_id, ['notes' => $this->input->post('note')]);
+			}
+
+			echo json_encode([
+				'message_type' => 'success',
+				'message' => lang('st_all_task_confirmed_step_closed_out')
+			]);
+			return;
+		}
+
+		echo json_encode([
+			'message_type' => 'danger',
+			'message' => lang('st_unknown_error')
+		]);
+	}
+
 	public function resolve_task($task_id = null)
 	{
 		if (empty($task_id)) {

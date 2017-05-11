@@ -92,7 +92,7 @@
 }
 
 .decider-step-container .an-component-header + .an-component-body{
-	max-height: 120px;
+	max-height: 150px;
 	overflow: auto;
 }
 
@@ -100,13 +100,27 @@
 	margin-bottom: 0;
 }
 
-.note {
+#note {
 	width: 80%;
+	margin-right: 30px;
 	margin-bottom: 0;
 }
 
 .btn-close-out-step {
 	vertical-align: bottom;
-	margin-left: 30px;
 	margin-bottom: 6px;
+}
+
+.form-step-decider {
+	max-height: 800px;
+	overflow: auto;
+}
+
+.table-step-time {
+	margin-bottom: 0;
+}
+
+.step-goal {
+	max-height: 200px;
+	overflow: hidden;
 }

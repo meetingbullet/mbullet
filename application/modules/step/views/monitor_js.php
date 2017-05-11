@@ -64,22 +64,6 @@ $('#datetimepicker1').datetimepicker({
 	$('input[name="scheduled_start_time"]').val(ev.date.format('YYYY-MM-DD HH:mm:ss'));
 });
 
-// $('input[name="scheduled_time"]').daterangepicker({
-// 	singleDatePicker: true,
-// 	startDate: moment().format('MMM DD, H:mm'),
-// 	endDate: moment().format('MMM DD, H:mm'),
-// 	timePicker: true,
-// 	timePicker24Hour: true,
-// 	opens: 'left',
-// 	autoUpdateInput: false,
-// 	locale: {
-// 		format: 'MMM DD, H:mm'
-// 	}
-// }, (start, end) => {
-// 	$('input[name="scheduled_start_time"]').val(start.format('YYYY-MM-DD HH:mm:ss'));
-// 	$('input[name="scheduled_time"]').val(start.format('MMM DD, H:mm'));
-// });
-
 // Prevent duplicate binding function
 $(document).off('.monitor');
 
@@ -485,13 +469,13 @@ function update_step_timer(clock)
 			m = moment.duration(duration).minutes(),
 			s = moment.duration(duration).seconds();
 
-		h = h <= 9 ? '0' + h : h;
-		m = m <= 9 ? '0' + m : m;
-		s = s <= 9 ? '0' + s : s;
-
 		if (d > 0) {
 			h += d * 24;
 		}
+
+		h = h <= 9 ? '0' + h : h;
+		m = m <= 9 ? '0' + m : m;
+		s = s <= 9 ? '0' + s : s;
 
 		$(clock).html(h + ':' + m + ':' + s);
 
@@ -547,14 +531,13 @@ function update_task_timer(clock)
 				}
 			}
 
-			h = h <= 9 ? '0' + h : h;
-			m = m <= 9 ? '0' + m : m;
-			s = s <= 9 ? '0' + s : s;
-
 			if (d > 0) {
 				h += d * 24;
 			}
-			
+
+			h = h <= 9 ? '0' + h : h;
+			m = m <= 9 ? '0' + m : m;
+			s = s <= 9 ? '0' + s : s;
 
 			$time.text(h + ':' + m + ':' + s);
 
@@ -587,6 +570,28 @@ function update_monitor()
 				z_index: 1051
 			});
 			$('.modal-monitor').modal('hide');
+
+			// Open step decider if is owner
+			if ($('.step-monitor').data('is-owner') == '1') {
+				$('#step-decider .modal-content').html('');
+
+				$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+					data = JSON.parse(data);
+
+					if (data.modal_content == '') {
+						$.notify({
+							message: data.message
+						}, {
+							type: data.message_type,
+							z_index: 1051
+						});
+						return;
+					}
+
+					$('#step-decider .modal-content').html(data.modal_content);
+					$('#step-decider').modal({backdrop: "static"});
+				});
+			}
 		}
 
 		$.each(data.data, (index, item) => {
