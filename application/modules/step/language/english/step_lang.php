@@ -54,7 +54,8 @@ $lang['st_notes'] = 'Notes';
 $lang['st_closed'] = 'Closed';
 $lang['st_open_parking_lot'] = 'Open parking lot';
 $lang['st_closed_parking_lot'] = 'Closed parking lot';
-
+$lang['st_scheduled_duration'] = 'Scheduled duration';
+$lang['st_actual_duration'] = 'Actual duration';
 // Action
 $lang['st_action'] = 'Action';
 $lang['st_create'] = 'Create';
@@ -143,7 +144,7 @@ $lang['st_update_status_success'] = 'Updated step\'s status successful.';
 
 $lang['st_actual_start_time'] = 'Actual start time';
 $lang['st_actual_end_time'] = 'Actual end time';
-$lang['st_actual_end_time_still_inprogress'] = 'Still In-progress';
+$lang['st_actual_end_time_still_inprogress'] = 'Still in-progress';
 
 $lang['st_open'] = 'Open';
 $lang['st_ready'] = 'Ready';

@@ -303,7 +303,7 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, u.email, u.first_name, u.last_name, u.avatar');
+		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, (actual_end_time - actual_start_time) / 60 AS actual_elapsed_time, u.email, u.first_name, u.last_name, u.avatar');
 
 		if (! $step) {
 			redirect(DEFAULT_LOGIN_LOCATION);
