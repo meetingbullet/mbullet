@@ -141,9 +141,9 @@ $lang['st_reopen'] = 'Re-open Step';
 $lang['st_update_status_fail'] = 'Unable to update step\'s status.';
 $lang['st_update_status_success'] = 'Updated step\'s status successful.';
 
-$lang['st_actual_start_time'] = '';
-$lang['st_actual_end_time'] = '';
-$lang['st_actual_end_time_still_inprogress'] = ''
+$lang['st_actual_start_time'] = 'Actual start time';
+$lang['st_actual_end_time'] = 'Actual end time';
+$lang['st_actual_end_time_still_inprogress'] = 'Still In-progress';
 
 $lang['st_open'] = 'Open';
 $lang['st_ready'] = 'Ready';

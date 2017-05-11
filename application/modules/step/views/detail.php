@@ -218,12 +218,14 @@ $members = array_column($invited_members, 'user_id');
 					<?php if ($step->actual_start_time): ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_actual_start_time'))?></div>
-						<div class="col-xs-7"><?php e(display_time($step->$actual_start_time)); ?></div>
+						<div class="col-xs-7"><?php e(display_time($step->actual_start_time)); ?></div>
 					</div>
 
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_actual_end_time'))?></div>
-						<div class="col-xs-7"><?php e((! empty($step->$actual_end_time)) ? display_time($step->$actual_end_time) : lang('st_actual_end_time_still_inprogress')); ?></div>
+						<?php if ($step->status == 'inprogress') { ?>
+						<div class="col-xs-7"><?php e((! empty($step->actual_end_time)) ? display_time($step->actual_end_time) : lang('st_actual_end_time_still_inprogress')); ?></div>
+						<?php } ?>
 					</div>
 					<hr/>
 					<?php endif; ?>
