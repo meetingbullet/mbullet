@@ -93,7 +93,7 @@ $cost_of_time_to_badge = [
 						<h6><?php e(lang('st_goal'))?></h6>
 					</div>
 					<div class="an-component-body an-helper-block">
-						<?php echo word_limiter($step->goal, 100)?>
+						<?php echo nl2br($step->goal)?>
 					</div> <!-- end .AN-COMPONENT-BODY -->
 				</div>
 			</div>
