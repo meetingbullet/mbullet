@@ -63,10 +63,11 @@ $task_status_labels = [
 							<div class="an input-group input-group-schedule <?php echo $step->status == 'open' ? ' input-group-btn-right' : '' ?>">
 								<div class="input-group-addon"><i class="ion-android-calendar"></i></div>
 								<input type="text" 
+										id="datetimepicker1"
 										name="scheduled_time" 
 										class="form-control" 
 										value="<?php echo $scheduled_start_time ?>" 
-										placeholder="<?php e(lang('st_time_schedule'))?>" <?php echo $step->status == 'open' ? 'readOnly' : 'disabled' ?>/>
+										placeholder="<?php e(lang('st_scheduled_start_time'))?>" <?php echo $step->status == 'open' ? '' : 'disabled' ?>/>
 								<span class="input-group-btn">
 									<button type="submit" 
 											name='save-time' 
@@ -106,13 +107,11 @@ $task_status_labels = [
 						<td class=""><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
 						<td class=""><?php echo word_limiter($task->description, 24)?></td>
 						<td class="">
-							<ul class="list-inline list-member">
-								<?php if ($task->members) {
-									foreach ($task->members as $member) {
-										echo '<li><div class="avatar" style="background-image: url(\'' . avatar_url($member->avatar, $member->email) . '\')"></div></li>';
-									}
-								} ?>
-							</ul>
+							<?php if ($task->members) {
+								foreach ($task->members as $member) {
+									echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
+								}
+							} ?>
 						</td>
 						<td class='text-center '>
 							<span class="time-assigned">

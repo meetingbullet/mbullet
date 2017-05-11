@@ -67,7 +67,7 @@ $project_key = $project_key['0'];
 					<div class="an-helper-block action-detail">
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_owner'))?></div>
-							<div class="col-xs-8"><?php e($action->owner_name)?></div>
+							<div class="col-xs-8"><?php echo display_user($action->email, $action->first_name, $action->last_name, $action->avatar); ?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_success_condition'))?></div>
@@ -113,11 +113,11 @@ $project_key = $project_key['0'];
 								<tbody>
 									<?php if (is_array($steps)) : foreach ($steps as $step): ?>
 									<tr>
-										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->step_key)?></td>
-										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name)?></td>
-										<td><?php e($step->point_used)?></td>
-										<td><?php e($step->owner_name)?></td>
-										<td><span class="<?php echo $step_label[$step->status] ?>"><?php e($step->status)?></span></td>
+										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->step_key); ?></td>
+										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?></td>
+										<td><?php e($step->point_used); ?></td>
+										<td><?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?></td>
+										<td><span class="<?php echo $step_label[$step->status]; ?>"><?php e($step->status)?></span></td>
 									</tr>
 									<?php endforeach; endif;?>
 								</tbody>
@@ -138,16 +138,13 @@ $project_key = $project_key['0'];
 				<div class="an-component-body">
 					<div class="an-helper-block">
 						<ul class="list-unstyled list-member">
-							<?php if (is_array($invited_members)) : foreach ($invited_members as $user): 
-								$user->avatar = avatar_url($user->avatar, $user->email);
-							?>
+							<?php if (is_array($invited_members)) { foreach ($invited_members as $user) { ?>
 							<li>
-								<div class="avatar" style="background-image: url('<?php echo $user->avatar ?>')"></div>
-								<?php e($user->name)?>
+								<?php echo display_user($user->email, $user->first_name, $user->last_name, $user->avatar); ?>
 
 								<span class="badge badge-<?php e($cost_of_time_to_badge[$user->cost_of_time])?> badge-bordered pull-right"><?php e($user->cost_of_time_name)?></span>
 							</li>
-							<?php endforeach; endif; ?>
+							<?php } } ?>
 						</ul>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
@@ -161,7 +158,7 @@ $project_key = $project_key['0'];
 					<div class="an-helper-block action-detail">
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_created'))?></div>
-							<div class="col-xs-8"><?php e($action->created_on)?></div>
+							<div class="col-xs-8"><?php e(display_time($action->created_on))?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_updated'))?></div>

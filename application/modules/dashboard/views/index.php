@@ -111,7 +111,7 @@ $project_status_labels = [
 								</span>
 							</div>
 							<div class="list-action basis-20">
-								<?php e($project->created_on)?>
+								<?php e(display_time($project->created_on))?>
 							</div>
 						</div> <!-- end .USER-LIST-SINGLE -->
 						<?php endforeach; ?>

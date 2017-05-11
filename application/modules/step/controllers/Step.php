@@ -322,25 +322,25 @@ class Step extends Authenticated_Controller
 		// 	redirect(DEFAULT_LOGIN_LOCATION);
 		// }
 
-		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, CONCAT(u.first_name, " ", u.last_name) as owner_name');
+		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, u.email, u.first_name, u.last_name, u.avatar');
 
 		if (! $step) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 		$step_id = $step->step_id;
 
-		$tasks = $this->task_model->select('tasks.*, CONCAT(u.first_name, " ", u.last_name) as owner_name')
+		$tasks = $this->task_model->select('tasks.*, u.email, u.first_name, u.last_name, u.avatar')
 								->join('users u', 'u.user_id = tasks.owner_id', 'left')
 								->where('step_id', $step_id)->find_all();
 
 		if ($tasks) {
 			foreach ($tasks as &$task) {
-				$task->members = $this->task_member_model->select('avatar, email')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
+				$task->members = $this->task_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
 			}
 		}
 
 		$invited_members =  $this->user_model
-								->select('uto.user_id, email, CONCAT(first_name, " ", last_name) AS name,
+								->select('uto.user_id, email, first_name, last_name, avatar,
 									avatar, cost_of_time, 
 									IF(
 										uto.cost_of_time = 1, 
@@ -432,7 +432,7 @@ class Step extends Authenticated_Controller
 		}
 
 		foreach ($tasks as &$task) {
-			$task->members = $this->task_member_model->select('avatar, email')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
+			$task->members = $this->task_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
 		}
 
 

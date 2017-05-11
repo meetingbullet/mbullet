@@ -50,13 +50,13 @@ $project_label = [
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_cost_code') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->cost_code) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_owner') . ':' ?></div>
-				<div class="col-md-6 pj-detail-item"><img style="width: 24px; height: auto;" src="<?php echo avatar_url($detail['project']->avatar, $detail['project']->email) ?>" class="img-circle"/> <?php e($detail['project']->full_name) ?></div>
+				<div class="col-md-6 pj-detail-item"><?php echo display_user($detail['project']->email, $detail['project']->first_name, $detail['project']->last_name, $detail['project']->avatar); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_detail_tab_info_table_label_status') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><span class="msg-tag <?php echo $project_label[$detail['project']->status] ?>"><?php e($detail['project']->status) ?></span></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_project_point_used') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->total_project_point_used) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_created_on') . ':' ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->created_on) ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(display_time($detail['project']->created_on)) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_mofified_on') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->modified_on) ?></div>
 			</div> <!-- end .AN-COMPONENT-BODY -->

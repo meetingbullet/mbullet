@@ -192,7 +192,7 @@ class Project extends Authenticated_Controller
 			$this->auth->restrict();
 		}
 
-		$project = $this->project_model->get_project_by_key($project_key, $this->current_user->current_organization_id, 'projects.*, u.email, u.avatar, CONCAT(u.first_name, u.last_name) as full_name');
+		$project = $this->project_model->get_project_by_key($project_key, $this->current_user->current_organization_id, 'projects.*, u.email, u.avatar, u.first_name, u.last_name');
 		if ($project === false) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
