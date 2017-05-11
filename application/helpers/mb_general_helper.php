@@ -67,7 +67,7 @@ if (! function_exists('display_time')) {
 	 */
 	function display_time($time, $timezone = null, $format = 'M j, Y h:i A')
 	{
-		date_default_timezone_set('UTC');
+		// date_default_timezone_set('UTC');
 		$timestamp = strtotime($time);
 		if ($timestamp === false) {
 			return false;

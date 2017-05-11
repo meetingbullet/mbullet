@@ -9,6 +9,7 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('project/project_model');
 		$this->load->model('step/step_model');
 		$this->load->model('step/step_member_model');
+		$this->load->helper('date');
 
 		Assets::add_module_js('dashboard', 'dashboard.js');
 		Assets::add_module_css('step', 'step.css');

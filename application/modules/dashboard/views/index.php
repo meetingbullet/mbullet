@@ -29,12 +29,11 @@ $project_status_labels = [
 			<div class="an-component-body">
 				<div class="an-user-lists">
 					<div class="list-title">
-						<h6 class="basis-40">
-							Step
-						</h6>
+						<h6 class="basis-40">Step</h6>
 						<h6 class="basis-20">Owner</h6>
 						<h6 class="basis-10">Status</h6>
-						<h6 class="basis-30"></h6>
+						<h6 class="basis-20">Start in</h6>
+						<h6 class="basis-10">Action</h6>
 					</div>
 
 					<div class="an-lists-body">
@@ -51,16 +50,46 @@ $project_status_labels = [
 									<?php e($step->status)?>
 								</span>
 							</div>
-							<div class="list-action basis-30">
-								<span class="text-info<?php e($step->status == 'ready' ? ' ready' : ' hidden')?> step-timer"
-										data-scheduled-start-time="<?php e($step->scheduled_start_time) ?>" 
-										data-now="<?php e($now)?>">
-								</span>
-
-								<button class="an-btn an-btn-small an-btn-primary btn-open-step-monitor<?php e($step->status == 'inprogress' ? '' : ' hidden' . ($step->owner_id == $current_user->user_id ? ' is-owner' : ''))?> " 
-										data-step-key="<?php e($step->step_key)?>">
-									<?php echo ($step->owner_id == $current_user->user_id ? lang('st_open') : lang('st_join')) ?>
+							<div class="list-time basis-20">
+								<?php
+								if ($step->status == 'ready') {
+									echo relative_time(strtotime(user_time(strtotime($step->scheduled_start_time))));
+								} elseif ($step->status == 'inprogress') {
+									echo relative_time(strtotime(user_time(strtotime($step->actual_start_time))));
+								}
+								?>
+							</div>
+							<div class="list-action basis-10">
+								<?php
+								// is owner
+								if ($step->owner_id == $current_user->user_id) {
+									if ($step->status == 'ready') {
+										if ($step->scheduled_start_time <= date('YmdHis')) {
+											// start
+								?>
+								<button class="an-btn an-btn-small an-btn-primary btn-open-step-monitor" data-step-key="<?php e($step->step_key)?>">
+									<i class="ion-ios-play"></i> <?php echo lang('st_start'); ?>
 								</button>
+								<?php
+										}
+									} elseif ($step->status == 'inprogress') {
+								?>
+								<button class="an-btn an-btn-small an-btn-primary btn-open-step-monitor" data-step-key="<?php e($step->step_key)?>">
+									<i class="ion-android-open"></i> <?php echo lang('st_open'); ?>
+								</button>
+								<?php
+									}
+								} else {
+									// member only
+									if ($step->status == 'inprogress') {
+								?>
+								<button class="an-btn an-btn-small an-btn-primary btn-open-step-monitor" data-step-key="<?php e($step->step_key)?>">
+									<i class="ion-link"></i> <?php echo lang('st_join'); ?>
+								</button>
+								<?php
+									}
+								}
+								?>
 							</div>
 						</div> <!-- end .USER-LIST-SINGLE -->
 						<?php endforeach; ?>
