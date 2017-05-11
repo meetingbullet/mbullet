@@ -56,7 +56,7 @@ $project_label = [
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_project_point_used') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->total_project_point_used) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_created_on') . ':' ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->created_on) ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(display_time($detail['project']->created_on)) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_mofified_on') . ':' ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->modified_on) ?></div>
 			</div> <!-- end .AN-COMPONENT-BODY -->
