@@ -205,21 +205,33 @@ $members = array_column($invited_members, 'user_id');
 					<?php if ($scheduled_start_time): ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_scheduled_start_time'))?></div>
-						<div class="col-xs-7"><?php e($scheduled_start_time)?></div>
+						<div class="col-xs-7"><?php e(display_time($scheduled_start_time)); ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_scheduled_end_time'))?></div>
-						<div class="col-xs-7"><?php e($scheduled_end_time)?></div>
+						<div class="col-xs-7"><?php e(display_time($scheduled_end_time)); ?></div>
+					</div>
+					<hr/>
+					<?php endif; ?>
+					<?php if ($step->actual_start_time): ?>
+					<div class="row">
+						<div class="col-xs-5"><?php e(lang('st_actual_start_time'))?></div>
+						<div class="col-xs-7"><?php e(display_time($step->$actual_start_time)); ?></div>
+					</div>
+
+					<div class="row">
+						<div class="col-xs-5"><?php e(lang('st_actual_end_time'))?></div>
+						<div class="col-xs-7"><?php e((! empty($step->$actual_end_time)) ? display_time($step->$actual_end_time) : lang('st_actual_end_time_still_inprogress')); ?></div>
 					</div>
 					<hr/>
 					<?php endif; ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_created'))?></div>
-						<div class="col-xs-7"><?php e(display_time($step->created_on))?></div>
+						<div class="col-xs-7"><?php e(display_time($step->created_on)); ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_updated'))?></div>
-						<div class="col-xs-7"><?php e($step->modified_on)?></div>
+						<div class="col-xs-7"><?php e(display_time($step->modified_on)); ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->

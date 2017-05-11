@@ -65,7 +65,7 @@ if (! function_exists('display_time')) {
 	 * @param string $format (optional)
 	 * @return string time in local timezone
 	 */
-	function display_time($time, $timezone = null, $format = 'Y-m-d H:i:s')
+	function display_time($time, $timezone = null, $format = 'M j, Y h:i A')
 	{
 		date_default_timezone_set('UTC');
 		$timestamp = strtotime($time);
@@ -74,7 +74,7 @@ if (! function_exists('display_time')) {
 		}
 
 		$ci =& get_instance();
-		$ci->load->helper('BF_date');
+		$ci->load->helper('date');
 
 		return user_time($timestamp, $timezone, $format);
 	}
