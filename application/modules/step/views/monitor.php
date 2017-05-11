@@ -4,10 +4,12 @@ $scheduled_start_time = null;
 
 if ($step->scheduled_start_time) {
 	$scheduled_start_time = strtotime($step->scheduled_start_time);
-	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
 
-	$scheduled_start_time = date('M d, H:i', $scheduled_start_time);
-	$scheduled_end_time = date('M d, H:i', $scheduled_end_time);
+	$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $step->scheduled_start_time);
+	$scheduled_end_time->modify('+' . $step->in . ' ' . $step->in_type);
+
+	$scheduled_start_time = display_time($step->scheduled_start_time);
+	$scheduled_end_time = display_time($scheduled_end_time->format('Y-m-d H:i:s'));
 }
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
