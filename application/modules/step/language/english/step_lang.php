@@ -54,7 +54,8 @@ $lang['st_notes'] = 'Notes';
 $lang['st_closed'] = 'Closed';
 $lang['st_open_parking_lot'] = 'Open parking lot';
 $lang['st_closed_parking_lot'] = 'Closed parking lot';
-
+$lang['st_scheduled_duration'] = 'Scheduled duration';
+$lang['st_actual_duration'] = 'Actual duration';
 // Action
 $lang['st_action'] = 'Action';
 $lang['st_create'] = 'Create';
@@ -133,15 +134,20 @@ $lang['st_select_an_option'] = '- Select an option -';
 $lang['st_add_task'] = 'Add Task';
 $lang['st_edit'] = 'Edit';
 $lang['st_start_step'] = 'Start Step';
-$lang['st_open'] = 'Open';
-$lang['st_inprogress'] = 'In progress';
-$lang['st_ready'] = 'Ready for review';
 $lang['st_resolved'] = 'Resolved';
 $lang['st_mask_as_ready'] = 'Mark as \'Ready for Review\'';
 $lang['st_resolve'] = 'Resolve';
-$lang['st_finished'] = 'Finished';
-$lang['st_resolved'] = 'Resolved';
 $lang['st_resolve_step'] = 'Resolve Step';
 $lang['st_reopen'] = 'Re-open Step';
 $lang['st_update_status_fail'] = 'Unable to update step\'s status.';
 $lang['st_update_status_success'] = 'Updated step\'s status successful.';
+
+$lang['st_actual_start_time'] = 'Actual start time';
+$lang['st_actual_end_time'] = 'Actual end time';
+$lang['st_actual_end_time_still_inprogress'] = 'Still in-progress';
+
+$lang['st_open'] = 'Open';
+$lang['st_ready'] = 'Ready';
+$lang['st_inprogress'] = 'In progress';
+$lang['st_finished'] = 'Finished';
+$lang['st_resolved'] = 'Resolved';
