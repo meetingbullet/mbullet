@@ -64,7 +64,7 @@ $project_status_labels = [
 								// is owner
 								if ($step->owner_id == $current_user->user_id) {
 									if ($step->status == 'ready') {
-										if ($step->scheduled_start_time <= date('YmdHis')) {
+										if ($step->scheduled_start_time <= date('Y-m-d H:i:s')) {
 											// start
 								?>
 								<button class="an-btn an-btn-small an-btn-primary btn-open-step-monitor" data-step-key="<?php e($step->step_key)?>">
