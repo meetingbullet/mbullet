@@ -470,7 +470,7 @@ function update_step_timer(clock)
 			s = moment.duration(duration).seconds();
 
 		if (d > 0) {
-			h += d * 24;
+			h = parseInt(h) + d * 24;
 		}
 
 		h = h <= 9 ? '0' + h : h;
@@ -532,7 +532,7 @@ function update_task_timer(clock)
 			}
 
 			if (d > 0) {
-				h += d * 24;
+				h = parseInt(h) + d * 24;
 			}
 
 			h = h <= 9 ? '0' + h : h;

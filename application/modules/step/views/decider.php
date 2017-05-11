@@ -171,7 +171,7 @@ $cost_of_time_to_badge = [
 
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('decider_js', [
-			
+		'action_key' => $action_key
 	], true) . '</script>';
 }
 ?>

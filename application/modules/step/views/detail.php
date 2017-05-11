@@ -244,6 +244,13 @@ $members = array_column($invited_members, 'user_id');
 	</div>
 </div>
 
+<div id="create-step" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
 <div id="bigModal" class="modal modal-edit fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">

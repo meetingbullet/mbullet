@@ -436,8 +436,8 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$action_key = $keys[0] . '-' . $keys[1];
 		$step->members = $this->step_member_model->get_step_member($step_id);
-
 		$tasks = $this->task_model->select('tasks.*, 
 											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
 											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
@@ -459,7 +459,7 @@ class Step extends Authenticated_Controller
 
 
 		Assets::add_js($this->load->view('decider_js', [
-			
+			'action_key' => $action_key
 		], true), 'inline');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
