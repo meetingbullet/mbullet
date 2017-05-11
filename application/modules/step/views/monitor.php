@@ -6,8 +6,8 @@ if ($step->scheduled_start_time) {
 	$scheduled_start_time = strtotime($step->scheduled_start_time);
 	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
 
-	$scheduled_start_time = gmdate('M d, H:i', $scheduled_start_time);
-	$scheduled_end_time = gmdate('M d, H:i', $scheduled_end_time);
+	$scheduled_start_time = date('M d, H:i', $scheduled_start_time);
+	$scheduled_end_time = date('M d, H:i', $scheduled_end_time);
 }
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
@@ -36,7 +36,7 @@ $task_status_labels = [
 				<div class="an-bootstrap-custom-tab">
 					<h2><?php e($step->name . ' - ' . lang('st_dashboard'))?></h2>
 
-					<?php if ($scheduled_time): ?>
+					<?php if ($step->status != 'open'): ?>
 					<h5 class='text-muted'><?php e($scheduled_time)?></h5>
 					<?php endif; ?>
 				</div>
@@ -48,7 +48,7 @@ $task_status_labels = [
 
 							<h3 id="scheduled-timer" class="step-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
 							
-							<?php if ($scheduled_time): ?>
+							<?php if ($step->status != 'open'): ?>
 							<div class="step-action">
 								<button type="submit" 
 										name='start-step' 
@@ -65,7 +65,7 @@ $task_status_labels = [
 								<input type="text" 
 										id="datetimepicker1"
 										name="scheduled_time" 
-										class="form-control" 
+										class="form-control an-form-control schedule-time" 
 										value="<?php echo $scheduled_start_time ?>" 
 										placeholder="<?php e(lang('st_scheduled_start_time'))?>" <?php echo $step->status == 'open' ? '' : 'disabled' ?>/>
 								<span class="input-group-btn">
@@ -152,7 +152,7 @@ $task_status_labels = [
 
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('monitor_js', [
-			
+		'step_key' => $step_key
 	], true) . '</script>';
 }
 ?>
