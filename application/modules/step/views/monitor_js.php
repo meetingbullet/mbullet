@@ -64,22 +64,6 @@ $('#datetimepicker1').datetimepicker({
 	$('input[name="scheduled_start_time"]').val(ev.date.format('YYYY-MM-DD HH:mm:ss'));
 });
 
-// $('input[name="scheduled_time"]').daterangepicker({
-// 	singleDatePicker: true,
-// 	startDate: moment().format('MMM DD, H:mm'),
-// 	endDate: moment().format('MMM DD, H:mm'),
-// 	timePicker: true,
-// 	timePicker24Hour: true,
-// 	opens: 'left',
-// 	autoUpdateInput: false,
-// 	locale: {
-// 		format: 'MMM DD, H:mm'
-// 	}
-// }, (start, end) => {
-// 	$('input[name="scheduled_start_time"]').val(start.format('YYYY-MM-DD HH:mm:ss'));
-// 	$('input[name="scheduled_time"]').val(start.format('MMM DD, H:mm'));
-// });
-
 // Prevent duplicate binding function
 $(document).off('.monitor');
 
@@ -118,9 +102,22 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 		}
 	});
 
+	if (moment($('input[name="scheduled_start_time"]').val()).isValid()) {
+		$('#datetimepicker1').removeClass('danger');
+	} else {
+		$('#datetimepicker1').addClass('danger');
+	}
+
 	if (! is_set_time) {
+		$.notify({
+			message: '<?php e(lang('st_invalid_assigned_time'))?>'
+		}, {
+			type: 'danger',
+			z_index: 1051
+		});
 		return false;
 	}
+
 
 	$.post($('.form-step-schedule').attr('action'), $('.form-step-schedule').serialize() + time_assigned_data, (result) => {
 		data = JSON.parse(result);
@@ -134,11 +131,14 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 
 		if (data.message_type == 'success') {
 			// $('.btn-start-step').prop('disabled', false);
+			$('#datetimepicker1').removeClass('danger');
 
 			$('.modal-monitor').modal('hide');
 			setTimeout(() => {
 				location.reload();
 			}, 600);
+		} else {
+			$('#datetimepicker1').addClass('danger');
 		}
 	});
 
@@ -218,9 +218,28 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 
 		if (data.message_type == 'success') {
 			$('.modal-monitor').modal('hide');
-			setTimeout(() => {
-				location.reload();
-			}, 1500);
+
+			// Open step decider if is owner
+			if ($('.step-monitor').data('is-owner') == '1') {
+				$('#step-decider .modal-content').html('');
+
+				$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+					data = JSON.parse(data);
+
+					if (data.modal_content == '') {
+						$.notify({
+							message: data.message
+						}, {
+							type: data.message_type,
+							z_index: 1051
+						});
+						return;
+					}
+
+					$('#step-decider .modal-content').html(data.modal_content);
+					$('#step-decider').modal({backdrop: "static"});
+				});
+			}
 		}
 	});
 
@@ -450,13 +469,13 @@ function update_step_timer(clock)
 			m = moment.duration(duration).minutes(),
 			s = moment.duration(duration).seconds();
 
-		h = h <= 9 ? '0' + h : h;
-		m = m <= 9 ? '0' + m : m;
-		s = s <= 9 ? '0' + s : s;
-
 		if (d > 0) {
 			h += d * 24;
 		}
+
+		h = h <= 9 ? '0' + h : h;
+		m = m <= 9 ? '0' + m : m;
+		s = s <= 9 ? '0' + s : s;
 
 		$(clock).html(h + ':' + m + ':' + s);
 
@@ -481,10 +500,7 @@ function update_task_timer(clock)
 	// Show $(clock)
 	$(clock).html('<span class="label label-warning label-inprogress label-bordered"><?php e(lang('st_in_progress'))?></span> ');
 
-	var $d = $('<span class="days" ></span>').appendTo($(clock)),
-		$h = $('<span class="hours" ></span>').appendTo($(clock)),
-		$m = $('<span class="minutes" ></span>').appendTo($(clock)),
-		$s = $('<span class="seconds" ></span>').appendTo($(clock));
+	var $time = $('<span class="time" ></span>').appendTo($(clock));
 
 		update_task_timer_intervals[task_id] = setInterval(function(){
 
@@ -515,20 +531,15 @@ function update_task_timer(clock)
 				}
 			}
 
-			d = d <= 9 ? '0' + d : d;
+			if (d > 0) {
+				h += d * 24;
+			}
+
 			h = h <= 9 ? '0' + h : h;
 			m = m <= 9 ? '0' + m : m;
 			s = s <= 9 ? '0' + s : s;
-			
-			d = d == '00' ? '' : d + (d > 1 ? ' <?php e(lang('st_days'))?> ' : ' <?php e(lang('st_day'))?> ');
-			h = h == '00' ? '' : h + (h > 1 ? ' <?php e(lang('st_hours'))?> ' : ' <?php e(lang('st_hour'))?> ');
-			m = m == '00' ? '' : m + (m > 1 ? ' <?php e(lang('st_minutes'))?> ' : ' <?php e(lang('st_minute'))?> ');
-			s = s == '00' ? '' : s + (s > 1 ? ' <?php e(lang('st_seconds'))?>' : ' <?php e(lang('st_second'))?>');
 
-			$d.text(d);
-			$h.text(h);
-			$m.text(m);
-			$s.text(s);
+			$time.text(h + ':' + m + ':' + s);
 
 		}, interval);
 }
@@ -559,6 +570,28 @@ function update_monitor()
 				z_index: 1051
 			});
 			$('.modal-monitor').modal('hide');
+
+			// Open step decider if is owner
+			if ($('.step-monitor').data('is-owner') == '1') {
+				$('#step-decider .modal-content').html('');
+
+				$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+					data = JSON.parse(data);
+
+					if (data.modal_content == '') {
+						$.notify({
+							message: data.message
+						}, {
+							type: data.message_type,
+							z_index: 1051
+						});
+						return;
+					}
+
+					$('#step-decider .modal-content').html(data.modal_content);
+					$('#step-decider').modal({backdrop: "static"});
+				});
+			}
 		}
 
 		$.each(data.data, (index, item) => {

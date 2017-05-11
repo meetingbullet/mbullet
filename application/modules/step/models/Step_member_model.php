@@ -50,4 +50,39 @@ class Step_member_model extends BF_Model
 	{
 		parent::__construct();
 	}
+
+	public function get_step_member($step_id)
+	{
+		$query = $this->select('uto.user_id, email, first_name, last_name, CONCAT(first_name, " ", last_name) AS fullname, avatar,
+							avatar, cost_of_time, 
+							IF(
+								uto.cost_of_time = 1, 
+								p.cost_of_time_1,
+								IF(
+									uto.cost_of_time = 2, 
+									p.cost_of_time_2,
+									IF(
+										uto.cost_of_time = 3, 
+										p.cost_of_time_3,
+										IF(
+											uto.cost_of_time = 4, 
+											p.cost_of_time_4,
+											p.cost_of_time_5
+										)
+									)
+								)
+							) AS cost_of_time_name', false)
+							->join('users u', 'step_members.user_id = u.user_id')
+							->join('steps s', 'step_members.step_id = s.step_id')
+							->join('actions a', 's.action_id = a.action_id')
+							->join('projects p', 'p.project_id = a.project_id')
+							->join('user_to_organizations uto', 'u.user_id = uto.user_id AND enabled = 1 AND uto.organization_id = ' . $this->auth->user()->current_organization_id)
+							->where('step_members.step_id', $step_id)
+							->order_by('fullname')
+							->order_by('uto.cost_of_time', 'DESC')
+							->as_array()
+							->find_all();
+
+		return $query ? $query : [];
+	}
 }
