@@ -36,7 +36,7 @@ $task_status_labels = [
 				<div class="an-bootstrap-custom-tab">
 					<h2><?php e($step->name . ' - ' . lang('st_dashboard'))?></h2>
 
-					<?php if ($scheduled_time): ?>
+					<?php if ($step->status != 'open'): ?>
 					<h5 class='text-muted'><?php e($scheduled_time)?></h5>
 					<?php endif; ?>
 				</div>
@@ -48,7 +48,7 @@ $task_status_labels = [
 
 							<h3 id="scheduled-timer" class="step-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
 							
-							<?php if ($scheduled_time): ?>
+							<?php if ($step->status != 'open'): ?>
 							<div class="step-action">
 								<button type="submit" 
 										name='start-step' 

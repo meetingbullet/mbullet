@@ -529,7 +529,9 @@ class Step extends Authenticated_Controller
 		if ($this->task_model->update_batch($task_data, 'task_key') ) {
 
 			if ($this->input->post('note')) {
-				$this->step_model->skip_validation(TRUE)->update($step_id, ['notes' => $this->input->post('note')]);
+				$this->step_model->skip_validation(TRUE)->update($step_id, [
+					'notes' => $this->input->post('note')
+				]);
 			}
 
 			echo json_encode([
