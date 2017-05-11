@@ -138,7 +138,7 @@ $members = array_column($invited_members, 'user_id');
 									<th><?php e(lang('st_description'))?></th>
 									<th><?php e(lang('st_assignee'))?></th>
 									<th><?php e(lang('st_status'))?></th>
-									<?php if ($step->status == 'finished') : ?>
+									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
 									<th><?php e(lang('st_confirmation_status'))?></th>
 									<?php endif ?>
 								</tr>
@@ -159,9 +159,11 @@ $members = array_column($invited_members, 'user_id');
 									<td class='basis-10 task-status'>
 										<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 									</td>
+									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
 									<td class='basis-10 task-status'>
 										<span class="<?php e($task_status_labels[$task->confirm_status] . ' label-' . $task->confirm_status)?>"><?php e(lang('st_' . $task->confirm_status))?></span>
 									</td>
+									<?php endif ?>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
