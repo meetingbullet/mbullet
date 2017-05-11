@@ -37,9 +37,22 @@ $(document).on('submit.decider', '.form-step-decider', (e) => {
 
 		if (data.message_type == 'success') {
 			$('#step-decider').modal('hide');
-			setTimeout(() => {
-				location.reload() 
-			}, 600);
+
+			/* 
+				If one of the tasks is marked as Closed Parking Lot the step owner is redirected to 
+				the Step creation screen and prompted to create a new step to resolve the Closed Parking Lot task.
+			*/
+			if ($('.confirmation-status option[value="closed_parking_lot"]:selected').length > 0) {
+				$.get('<?php e(site_url('step/create/' . $action_key)) ?>', (data) => {
+					data = JSON.parse(data);
+					$('#create-step .modal-content').html(data.modal_content);
+					$('#create-step').modal({backdrop: "static"});
+				});
+			} else {
+				setTimeout(() => {
+					location.reload() 
+				}, 600);
+			}
 		}
 	})
 
