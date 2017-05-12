@@ -438,7 +438,7 @@ class Step extends Authenticated_Controller
 
 		$action_key = $keys[0] . '-' . $keys[1];
 		$step->members = $this->step_member_model->get_step_member($step_id);
-		$tasks = $this->task_model->select('tasks.*, 
+		$tasks = $this->task_model->select('tasks.*, (finished_on - started_on) / 60 AS duration, 
 											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
 											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
 									->join('users u', 'u.user_id = tasks.owner_id', 'left')

@@ -56,6 +56,32 @@ $('#start-step').click((e) => {
 	});
 });
 
+// Open step decider if there is a task without confirmed status
+if ($('#step-status').data('is-owner') == '1' && ($('#step-status').data('status') == 'resolved' || $('#step-status').data('status') == 'finished')) {
+	$('.table-detail-task tr').each((i, item) => {
+		if ($(item).data('confirm-status') == '') {
+			$('#step-decider .modal-content').html('');
+
+			$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+				data = JSON.parse(data);
+
+				if (data.modal_content == '') {
+					$.notify({
+						message: data.message
+					}, {
+						type: data.message_type,
+						z_index: 1051
+					});
+					return;
+				}
+
+				$('#step-decider .modal-content').html(data.modal_content);
+				$('#step-decider').modal({backdrop: "static"});
+			});
+		}
+	});
+}
+
 // Set form-ajax to work inside a modal
 $(document).on("submit", '.form-ajax', (e) => {
 	e.preventDefault();
