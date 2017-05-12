@@ -1,3 +1,10 @@
+// Read more Notes & Goal
+$('.step-goal, .step-notes').readmore({
+	speed: 300,
+	moreLink: '<a class=\'readmore rm-more\' href="#"><?php e(lang('show_more'))?></a>',
+	lessLink: '<a class=\'readmore rm-less\' href="#"><?php e(lang('show_less'))?></a>'
+});
+
 // Edit step
 $('#edit-step').click((e) => {
 	e.preventDefault();

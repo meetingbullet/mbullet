@@ -120,7 +120,10 @@
 	margin-bottom: 0;
 }
 
-.step-goal, .step-note-container {
-	max-height: 300px;
-	overflow: auto;
+.step-goal, .step-notes {
+	overflow: hidden;
+}
+
+.step-goal-container {
+	position: relative;
 }

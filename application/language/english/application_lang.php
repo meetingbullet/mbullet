@@ -318,3 +318,9 @@ $lang['invalid_migration_filename']		= 'Wrong migration filename: %s - %s';
 // Form validation labels (for CI 3.0, should be fixed in 3.0.1)
 //------------------------------------------------------------------------------
 $lang['form_validation_bf_users'] = 'Users';
+
+//------------------------------------------------------------------------------
+// Read more
+//------------------------------------------------------------------------------
+$lang['show_more'] = 'Show more';
+$lang['show_less'] = 'Show less';
