@@ -34,6 +34,7 @@ $project_label = [
 				<?php endif ?>
 			</li>
 			<li role="separator" class="divider"></li>
+			<li class="update-info-btn"><a href="#" data-toggle="modal" data-target="#bigModal" data-update-project-url="<?php echo site_url('project/update/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_update')) ?></a></li>
 			<li><a href="<?php echo site_url('project/settings/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
 		</ul>
 	</div>
@@ -178,7 +179,7 @@ $project_label = [
 	</div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="bigModal" tabindex="-1" role="dialog" aria-labelledby="bigModalLabel">
+<div class="modal fade" id="bigModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="bigModalLabel">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>

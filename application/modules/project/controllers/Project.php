@@ -69,7 +69,67 @@ class Project extends Authenticated_Controller
 		Template::render();
 	}
 
-	private function save_project($type = 'insert')
+	public function update($project_key)
+	{
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+		$project_id = $this->mb_project->get_object_id('project', $project_key);
+
+		if (empty($project_id)) {
+			Template::set_message(lang('st_project_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
+		}
+		// Get invite emails
+		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
+
+		$project = $this->project_model->join('project_constraints pc', 'pc.project_id = projects.project_id', 'left')
+									->join('project_expectations pe', 'pe.project_id = projects.project_id', 'left')
+									->find_by('projects.project_id', $project_id);
+		
+		$project_members = $this->project_member_model->select('email')
+													->join('users u', 'u.user_id = project_members.user_id', 'inner')
+													->as_array()
+													->find_all_by('project_id', $project_id);
+		
+		if (! empty($project_members)) {
+			$project_members = array_column($project_members, 'email');
+			$project->invite_team = implode(',', $project_members);
+		}
+		Template::set('project', $project);
+
+		if (isset($_POST['save'])) {
+			if ($this->save_project('update', $project_id)) {
+				Template::set('close_modal', 1);
+				Template::set('message_type', 'success');
+				Template::set('message', lang('pj_project_successfully_created'));
+
+				// Just to reduce AJAX request size
+				if ($this->input->is_ajax_request()) {
+					Template::set('content', '');
+				}
+				
+				Template::render();
+				return;
+			} else {
+				Template::set('close_modal', 0);
+				Template::set('message_type', 'danger');
+				Template::render();
+				return;
+			}
+		}
+
+		Template::set('close_modal', 0);
+		Template::set('message_type', null);
+		Template::set('message', '');
+		Template::render();
+	}
+
+	private function save_project($type = 'insert', $project_id = null)
 	{
 		$data = $this->input->post();
 		$project_data = $this->project_model->prep_data($data);
@@ -98,7 +158,7 @@ class Project extends Authenticated_Controller
 
 		$check_cost_code = $this->project_model->where('organization_id', $this->current_user->current_organization_id)->find_by('cost_code', $project_data['cost_code']);
 
-		if ($check_cost_code !== false) {
+		if ($check_cost_code !== false && ($type == 'insert' || ($type == 'update' && $check_cost_code->project_id != $project_id))) {
 			Template::set('message', lang('pj_duplicated_cost_code'));
 			return false;
 		}
@@ -173,7 +233,80 @@ class Project extends Authenticated_Controller
 
 			$this->project_member_model->insert_batch($project_members);
 		} else {
+			if (empty($project_id)) {
+				return false;
+			}
 
+			$project_data['organization_id'] = $this->current_user->current_organization_id;
+			$project_data['owner_id'] = $project_data['created_by'] = $this->current_user->user_id;
+			$project_data['cost_code'] = strtoupper($project_data['cost_code']);
+
+			$project_old_cost_code = $this->project_model->get_field($project_id, 'cost_code');
+
+			$project_updated = $this->project_model->update($project_id, $project_data);
+			if ($project_updated === false) {
+				logit('update project failed');
+				return false;
+			}
+
+			if ($project_data['cost_code'] != $project_old_cost_code) {
+				$this->update_childs($project_data['cost_code'], $project_id);
+			}
+
+			$this->project_constraint_model->update($project_id, $data['constraints']);
+			$this->project_expectation_model->update($project_id, $data['expectations']);
+
+			/*
+				For now, we're going to add invited members immediately into project members
+				because all of their account is already created and is in inviter's organization
+
+				We need to point the unregistered emails to the "User invite" after functionality is finished.
+			*/
+
+			$project_members = [];
+			$project_members[$this->current_user->user_id] = [
+					'project_id' => $project_id,
+					'user_id' => $this->current_user->user_id
+			];
+
+			$invited_team = $this->input->post('invite_team');
+			$invited_team = explode(',', $invited_team);
+
+			$registered_users = $this->user_model->select('users.user_id, email')
+									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id, 'RIGHT')
+									->where_in('email', $invited_team)
+									->find_all();
+
+			if ($invited_team) {
+				foreach ($invited_team as $email) {
+					if (! $registered_users) {
+						// $this->invitation->generate($email, $this->current_user);
+						continue;
+					}
+
+					foreach ($registered_users as $user) {
+						$is_found = false;
+
+						if ($user->email == $email) {
+							$project_members[$user->user_id] = [
+								'project_id' => $project_id,
+								'user_id' => $user->user_id
+							];
+
+							$is_found = true;
+							break;
+						}
+
+						// Invite to the party
+						if ( ! $is_found) {
+							// $this->invitation->generate($email, $this->current_user);
+						}
+					}
+				}
+			}
+
+			$this->project_member_model->delete_where(['project_id' => $project_id]);
+			$this->project_member_model->insert_batch($project_members);
 		}
 
 		return true;
@@ -583,5 +716,42 @@ class Project extends Authenticated_Controller
 		];
 
 		return $actions;
+	}
+
+	private function update_childs($new_cost_code, $project_id)
+	{
+		$actions = $this->project_model->get_actions($project_id, null, null, true, null, 'a.action_key, a.action_id', true);
+		$steps = $this->project_model->get_steps($project_id, null, null, true, null, 's.step_key, s.step_id', true);
+		$tasks = $this->project_model->get_tasks($project_id, null, null, true, null, 't.task_key, t.task_id', true);
+
+		if (! empty($actions)) {
+			foreach ($actions as &$action) {
+				$keys = explode('-', $action['action_key']);
+				$keys[0] = $new_cost_code;
+				$action['action_key'] = implode('-', $keys);
+			}
+
+			$this->db->update_batch('actions', $actions, 'action_id');
+		}
+
+		if (! empty($steps)) {
+			foreach ($steps as &$step) {
+				$keys = explode('-', $step['step_key']);
+				$keys[0] = $new_cost_code;
+				$step['step_key'] = implode('-', $keys);
+			}
+
+			$this->db->update_batch('steps', $steps, 'step_id');
+		}
+
+		if (! empty($tasks)) {
+			foreach ($tasks as &$task) {
+				$keys = explode('-', $task['task_key']);
+				$keys[0] = $new_cost_code;
+				$task['task_key'] = implode('-', $keys);
+			}
+
+			$this->db->update_batch('tasks', $tasks, 'task_id');
+		}
 	}
 }

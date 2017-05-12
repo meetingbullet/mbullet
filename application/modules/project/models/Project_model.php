@@ -299,60 +299,75 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_actions($project_id, $limit, $offset, $all = true, $user_id = null, $select = 'a.action_key, a.name, a.status, a.action_id, a.point_value')
+	public function get_actions($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, a.name, a.status, a.action_id, a.point_value', $as_array = false)
 	{
 		$this->db->select($select)->from('actions a');
 		if (! $all) {
 			$this->db->join('action_members am', 'am.action_id = a.action_id', 'LEFT')
 					->where('(am.user_id = \'' . $user_id . '\' OR a.owner_id = \'' . $user_id . '\')');
 		}
-		$query = $this->db->where('a.project_id', $project_id)
+		$this->db->where('a.project_id', $project_id)
 						->group_by('a.action_id')
-						->order_by('a.created_on', 'DESC')
-						->limit($limit, $offset)
-						->get();
+						->order_by('a.created_on', 'DESC');
+		if (! (empty($limit) && empty($offset))) {
+			$this->db->limit($limit, $offset);
+		}
+		$query = $this->db->get();
 		if ($query->num_rows() > 0) {
+			if ($as_array) {
+				return $query->result_array();
+			}
 			return $query->result();
 		} else {
 			return [];
 		}
 	}
 
-	public function get_steps($project_id, $limit, $offset, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, s.name, s.status, s.step_id')
+	public function get_steps($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, s.name, s.status, s.step_id', $as_array = false)
 	{
 		$this->db->select($select)->from('steps s');
 		if (! $all) {
 			$this->db->join('step_members sm', 'sm.step_id = s.step_id', 'LEFT')
 					->where('(sm.user_id = \'' . $user_id . '\' OR s.owner_id = \'' . $user_id . '\')');
 		}
-		$query = $this->db->join('actions a', 'a.action_id = s.action_id', 'LEFT')
+		$this->db->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
 						->group_by('s.step_id')
-						->order_by('s.created_on', 'DESC')
-						->limit($limit, $offset)
-						->get();
+						->order_by('s.created_on', 'DESC');
+		if (! (empty($limit) && empty($offset))) {
+			$this->db->limit($limit, $offset);
+		}
+		$query = $this->db->get();
 		if ($query->num_rows() > 0) {
+			if ($as_array) {
+				return $query->result_array();
+			}
 			return $query->result();
 		} else {
 			return [];
 		}
 	}
 
-	public function get_tasks($project_id, $limit, $offset, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, t.task_key, t.name, t.status')
+	public function get_tasks($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, t.task_key, t.name, t.status', $as_array = false)
 	{
 		$this->db->select($select)->from('tasks t');
 		if (! $all) {
 			$this->db->join('task_members tm', 'tm.task_id = t.task_id', 'LEFT')
 					->where('(tm.user_id = \'' . $user_id . '\' OR t.owner_id = \'' . $user_id . '\')');
 		}
-		$query = $this->db->join('steps s', 's.step_id = t.step_id', 'LEFT')
+		$this->db->join('steps s', 's.step_id = t.step_id', 'LEFT')
 						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
 						->group_by('t.task_id')
-						->order_by('t.created_on', 'DESC')
-						->limit($limit, $offset)
-						->get();
+						->order_by('t.created_on', 'DESC');
+		if (! (empty($limit) && empty($offset))) {
+			$this->db->limit($limit, $offset);
+		}
+		$query = $this->db->get();
 		if ($query->num_rows() > 0) {
+			if ($as_array) {
+				return $query->result_array();
+			}
 			return $query->result();
 		} else {
 			return [];
