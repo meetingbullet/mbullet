@@ -7,6 +7,8 @@ $lang['st_dashboard'] = 'Dashboard';
 $lang['st_time_schedule'] = 'Time schedule';
 $lang['st_step_monitor'] = 'Step Monitor';
 $lang['st_join_step_monitor'] = 'Join Step Monitor';
+$lang['st_decider'] = 'Decider';
+$lang['st_step_decider'] = 'Step Decider';
 $lang['st_evaluation'] = 'Evaluation';
 
 // Field
@@ -53,6 +55,12 @@ $lang['st_start_time'] = 'Start time';
 $lang['st_end_time'] = 'End time';
 $lang['st_elapsed_time'] = 'Elapsed time';
 $lang['st_notes'] = 'Notes';
+$lang['st_closed_parking_lot'] = 'Closed parking lot';
+$lang['st_scheduled_duration'] = 'Scheduled duration';
+$lang['st_actual_duration'] = 'Actual duration';
+$lang['st_closed'] = 'Closed';
+$lang['st_close_parking_lot'] = 'Close Parking Lot';
+$lang['st_elapsed_time'] = 'Elapsed time';
 $lang['st_point_value'] = 'Point value';
 $lang['st_submit'] = 'Submit';
 $lang['st_there_was_a_problem_while_rating_attendees_and_tasks'] = 'There was a problem while rating attendees and tasks.';

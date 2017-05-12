@@ -92,6 +92,10 @@ input[name="scheduled_time"] {
 	white-space: nowrap;
 }
 
+.step-goal-container {
+	position: relative;
+}
+
 .attendee {
 	display: table;
 	width: 100%;
@@ -134,6 +138,10 @@ input[name="scheduled_time"] {
 .rating > .half:before { 
 	content: "\f4b1";
 	position: absolute;
+}
+
+.attendee > .rating {
+	float: right;
 }
 
 .rating > label {
