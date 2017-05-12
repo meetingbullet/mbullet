@@ -106,22 +106,22 @@ $members = array_column($invited_members, 'user_id');
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
-						<div class="col-xs-8" id="status">
-							<span class="<?php e($label[$step->status])?>"><?php e(lang('st_' . $step->status))?></span>
+						<div class="col-xs-8">
+							<span class="<?php e($label[$step->status])?>" id="step-status" data-status="<?php e($step->status)?>" data-is-owner="<?php e($step->owner_id == $current_user->user_id ? 1 : 0)?>"><?php e(lang('st_' . $step->status))?></span>
 						</div>
 
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_point_used')) ?></div>
-						<div class="col-xs-8" id="status"><?php e($point_used) ?></div>
+						<div class="col-xs-8"><?php e($point_used) ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_scheduled_duration')) ?></div>
-						<div class="col-xs-8" id="status"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
+						<div class="col-xs-8"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(ucfirst(lang('st_actual_duration')))?></div>
-						<div class="col-xs-8" id="status"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></div>
+						<div class="col-xs-8"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -134,7 +134,7 @@ $members = array_column($invited_members, 'user_id');
 			<div class="an-component-body">
 				<div class="an-helper-block">
 					<div class="an-scrollable-x">
-						<table class="table table-striped">
+						<table class="table table-striped table-detail-task">
 							<thead>
 								<tr>
 									<th><?php e(lang('st_key'))?></th>
@@ -149,7 +149,7 @@ $members = array_column($invited_members, 'user_id');
 							</thead>
 							<tbody>
 								<?php if($tasks): foreach ($tasks as $task) : ?>
-								<tr>
+								<tr data-confirm-status="<?php e($task->confirm_status) ?>">
 									<td class='basis-10'><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
 									<td class='basis-15'><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
 									<td class='basis-20'><?php echo word_limiter($task->description, 20)?></td>
@@ -165,7 +165,9 @@ $members = array_column($invited_members, 'user_id');
 									</td>
 									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
 									<td class='basis-10 task-status'>
+										<?php if ( isset($task_status_labels[$task->confirm_status]) ): ?>
 										<span class="<?php e($task_status_labels[$task->confirm_status] . ' label-' . $task->confirm_status)?>"><?php e(lang('st_' . $task->confirm_status))?></span>
+										<?php endif; ?>
 									</td>
 									<?php endif ?>
 								</tr>

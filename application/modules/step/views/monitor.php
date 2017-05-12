@@ -34,7 +34,7 @@ $task_status_labels = [
 		<div class="an-body-topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
-					<h2><?php e($step->name . ' - ' . lang('st_dashboard'))?></h2>
+					<h2><?php e($step->name)?></h2>
 
 					<?php if ($step->status != 'open'): ?>
 					<h5 class='text-muted'><?php e($scheduled_time)?></h5>

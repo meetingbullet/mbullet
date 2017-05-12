@@ -155,14 +155,14 @@ $project_status_labels = [
 
 
 <!-- Modal -->
-<div class="modal fade" id="bigModal" tabindex="-1" role="dialog" aria-labelledby="bigModalLabel">
+<div class="modal fade" id="bigModal" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
 	</div>
 </div>
 
-<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="bigModalLabel">
+<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 		</div>
@@ -177,6 +177,20 @@ $project_status_labels = [
 </div>
 
 <div id="resolve-task" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
+<div id="step-decider" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-80" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
+<div id="create-step" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
