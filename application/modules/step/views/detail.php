@@ -102,7 +102,12 @@ $members = array_column($invited_members, 'user_id');
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_goal'))?></div>
-						<div class="col-xs-8 step-goal"><?php echo word_limiter($step->goal, 100)?></div>
+						<div class="col-xs-8">
+							<div class="step-goal-container">
+								<div class="step-goal">
+									<?php echo $step->goal?></div>
+								</div>
+							</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
@@ -213,7 +218,7 @@ $members = array_column($invited_members, 'user_id');
 			</div>
 			<div class="an-component-body">
 				<div class="an-helper-block">
-					<div class="an-input-group step-note-container">
+					<div class="an-input-group step-notes">
 						<?php echo nl2br($step->notes) ?>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
