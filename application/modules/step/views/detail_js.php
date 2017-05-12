@@ -49,6 +49,28 @@ $('#open-step-monitor').click((e) => {
 	}
 });
 
+// Open step decider
+$('#open-step-decider').click((e) => {
+	e.preventDefault();
+
+	$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+		data = JSON.parse(data);
+
+		if (data.modal_content == '') {
+			$.notify({
+				message: data.message
+			}, {
+				type: data.message_type,
+				z_index: 1051
+			});
+			return;
+		}
+
+		$('#step-decider .modal-content').html(data.modal_content);
+		$('#step-decider').modal({backdrop: "static"});
+	});
+});
+
 $('#start-step').click((e) => {
 	e.preventDefault();
 	var _this = this;

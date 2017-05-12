@@ -30,7 +30,8 @@ $task_status_labels = [
 	<?php endif; ?>
 
 	<?php echo form_open(site_url('step/update_step_schedule'), ['class' => 'form-inline form-step-schedule']) ?>
-		<input type="hidden" name="scheduled_start_time" />
+		<input type="hidden" name="scheduled_start_time"/>
+
 		<div class="an-body-topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
