@@ -15,6 +15,7 @@ class Step extends Authenticated_Controller
 		$this->load->model('users/user_model');
 		$this->load->model('task/task_model');
 		$this->load->model('task/task_member_model');
+		$this->load->model('task/task_rate_model');
 
 		$this->load->model('step_model');
 		$this->load->model('step_member_model');
@@ -1036,17 +1037,83 @@ class Step extends Authenticated_Controller
 		}
 
 		if ($this->input->post()) {
-			
+			$rules = [
+				[
+					'field' => 'attendee_rate[]',
+					'label' => 'lang:st_attendees',
+					'rules' => 'required'
+				],
+				[
+					'field' => 'task_rate[]',
+					'label' => 'lang:st_tasks',
+					'rules' => 'required',
+				],
+			];
+
+			$this->form_validation->set_rules($rules);
+			if ($this->form_validation->run() !== false) {
+				if (count($this->input->post('attendee_rate')) > 0) {
+					$attendee_rate_data = [];
+					foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
+						$attendee_rate_data[] = [
+							'step_id' => $step_id,
+							'user_id' => $this->current_user->user_id,
+							'attendee_id' => $attendee_id,
+							'rate' => $rate
+						];
+					}
+
+					$attendees_rated = $this->step_member_rate_model->insert_batch($attendee_rate_data);
+					if (empty($attendees_rated)) {
+						$insert_error = true;
+					}
+				}
+
+				if (count($this->input->post('task_rate'))) {
+					$task_rate_data = [];
+					foreach ($this->input->post('task_rate') as $task_id => $rate) {
+						$task_rate_data[] = [
+							'task_id' => $task_id,
+							'user_id' => $this->current_user->user_id,
+							'rate' => $rate
+						];
+					}
+
+					$tasks_rated = $this->task_rate_model->insert_batch($task_rate_data);
+					if (empty($tasks_rated)) {
+						$insert_error = true;
+					}
+				}
+
+				if (empty($insert_error)) {
+					Template::set('message', lang('st_rating_success'));
+					Template::set('message_type', 'success');
+					Template::set('close_modal', 0);
+				}
+
+			} else {
+				$validation_error = true;
+			}
+		} else {
+			$validation_error = true;
+		}
+
+		if (! empty($validation_error)) {
+			Template::set('message', lang('st_need_to_vote_all_tasks_and_attendees'));
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 0);
+		}
+
+		if (! empty($insert_error)) {
+			Template::set('message', lang('st_there_was_a_problem_while_rating_attendees_and_tasks'));
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 0);
 		}
 
 		$point_used = number_format($this->mb_project->total_point_used('step', $step_id), 2);
 		Template::set('point_used', $point_used);
 		Template::set('step', $step);
 		Template::set('tasks', $tasks);
-		if ($this->input->is_ajax_request()) {
-			Template::render('ajax');
-		} else {
-			Template::render();
-		}
+		Template::render('ajax');
 	}
 }

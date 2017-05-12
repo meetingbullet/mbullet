@@ -109,6 +109,10 @@ input[name="scheduled_time"] {
 	overflow: hidden;
 }
 
+.attendee > .rating {
+	float: right;
+}
+
 /****** Style Star Rating Widget *****/
 .rating {
 	float:left;

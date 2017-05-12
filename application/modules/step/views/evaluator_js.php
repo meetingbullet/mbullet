@@ -4,7 +4,7 @@ $(document).ready(function() {
 		$.post({
 			url: $('#step-name').data('evaluator-url'),
 			data: $('.form-ajax').serialize()
-		}).done(function(data) {
+		}).done(function(data) {console.log(data);
 			data = JSON.parse(data);
 			if (data.close_modal === 0) {
 				$('.modal-monitor-evaluator .modal-content').html(data.modal_content);

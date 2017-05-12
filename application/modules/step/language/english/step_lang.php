@@ -55,6 +55,9 @@ $lang['st_elapsed_time'] = 'Elapsed time';
 $lang['st_notes'] = 'Notes';
 $lang['st_point_value'] = 'Point value';
 $lang['st_submit'] = 'Submit';
+$lang['st_there_was_a_problem_while_rating_attendees_and_tasks'] = 'There was a problem while rating attendees and tasks.';
+$lang['st_need_to_vote_all_tasks_and_attendees'] = 'All of the tasks and attendees need to be rated.';
+$lang['st_rating_success'] = 'Tasks and Attendees are rated successfully.';
 
 // Action
 $lang['st_action'] = 'Action';

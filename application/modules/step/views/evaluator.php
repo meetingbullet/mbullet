@@ -18,15 +18,10 @@ $task_status_labels = [
 <?php echo form_open('', ['class' => 'form-inline form-ajax form-step-schedule']) ?>
 <div style="display:none" class="rating">
 	<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
-	<!--input type="radio" id="star4half" name="attendee_rate[<?php echo $member->user_id ?>]" value="4.5" /><label class="half" for="star4half" title="4.5 stars"></label-->
 	<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
-	<!--input type="radio" id="star3half" name="attendee_rate[<?php echo $member->user_id ?>]" value="3.5" /><label class="half" for="star3half" title="3.5 stars"></label-->
 	<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
-	<!--input type="radio" id="star2half" name="attendee_rate[<?php echo $member->user_id ?>]" value="2.5" /><label class="half" for="star2half" title="2.5 stars"></label-->
 	<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
-	<!--input type="radio" id="star1half" name="attendee_rate[<?php echo $member->user_id ?>]" value="1.5" /><label class="half" for="star1half" title="1.5 stars"></label-->
 	<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
-	<!--input type="radio" id="starhalf" name="attendee_rate[<?php echo $member->user_id ?>]" value="0.5" /><label class="half" for="starhalf" title="0.5 stars"></label-->
 </div>
 <div class="step-monitor">
 	<div class="modal-header">
