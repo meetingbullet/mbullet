@@ -197,6 +197,14 @@ $project_status_labels = [
 	</div>
 </div>
 
+<div class="modal waiting-modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<?php echo '<p class="text-center">' . lang('st_waiting_evaluator') . '</p>' ?>
+		</div>
+	</div>
+</div>
+
 <script>
 	var CREATE_PROJECT_URL = '<?php echo site_url('project/create')?>';
 	var INVITE_USER_URL = '<?php echo site_url('admin/team/invite')?>';
