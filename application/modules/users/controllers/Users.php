@@ -258,42 +258,71 @@ class Users extends Front_Controller
 		$this->load->config('address');
 		$this->load->helper('address');
 
-		if (isset($_POST['save'])) {
+		$old_password_matched = true;
+		if (isset($_POST['save']) || isset($_POST['save_password'])) {
 			$user_id = $this->current_user->user_id;
 			$user = $this->user_model->find($user_id);
 			$rules = $this->user_model->get_validation_rules();
-			$this->form_validation->set_rules($rules['profile']);
+			$this->form_validation->set_rules(isset($_POST['save']) ? $rules['profile'] : $rules['change_password']);
 
 			if ($this->form_validation->run() !== false) {
-				$data = $this->user_model->prep_data($this->input->post());
+				if (isset($_POST['save_password'])) {
+					if (! $this->auth->check_password($this->input->post('current_password'), $user->password_hash)) {
+						$old_password_matched = false;
+					}
+				}
 
-				if ($data['avatar']['size'] > 0) {
-					if ($user->avatar) {
-						@unlink($upload_config['upload_path'] . $user->avatar);
+				if ($old_password_matched) {
+					$data = $this->user_model->prep_data($this->input->post());
+					if (isset($_POST['save'])) {
+						if ($data['avatar']['size'] > 0) {
+							if ($user->avatar) {
+								@unlink($upload_config['upload_path'] . $user->avatar);
+							}
+
+							$upload_config = $this->config->load('upload');
+							$this->load->library('upload', $upload_config);
+							$this->upload->do_upload('avatar');
+							$data['avatar'] = $this->upload->data();
+							$data['avatar'] = $data['avatar']['file_name'];
+						} else {
+							unset($data['avatar']);
+						}
 					}
 
-					$upload_config = $this->config->load('upload');
-					$this->load->library('upload', $upload_config);
-					$this->upload->do_upload('avatar');
-					$data['avatar'] = $this->upload->data();
-					$data['avatar'] = $data['avatar']['file_name'];
+					// User cannot change his email
+					// unset($data['email']);
+					if ($data['email'] != $user->email) {
+						$change_email = true;
+						$data['google_id_token'] = null;
+						$data['google_refresh_token'] = null;
+					}
+
+					if ($this->input->post('new_password')) {
+						$password = $this->auth->hash_password($this->input->post('new_password'));
+						$data['password_hash'] = $password['hash'];
+					}
+
+					$updated = $this->user_model->skip_validation(true)->update($user_id, $data);
+
+					if (! $updated) {
+						Template::set_message(lang('us_profile_updated_error'), 'danger');
+					} else {
+						Template::set_message(lang('us_profile_updated_success'), 'success');
+						if (! empty($change_email)) {
+							// Now send the email
+							$this->load->library('emailer/emailer');
+							$email_data = array(
+								'to'	  => $data['email'],
+								'subject' => lang('us_change_email_subject'),
+								'message' => 'You \'ve recently changed your password. Click <a href="' . site_url('/login') . '">here</a> to login again.',
+							);
+							$this->emailer->send($email_data, true);
+							$this->logout();
+						}
+					}
 				} else {
-					unset($data['avatar']);
-				}
-
-				// User cannot change his email
-				unset($data['email']);
-
-				if (isset($data['password'])) {
-					$data['password'] = $this->auth->hash_password($data['password']);
-				}
-
-				$updated = $this->user_model->update($user_id, $data);
-
-				if (! $updated) {
-					Template::set_message(lang('us_profile_updated_error'), 'danger');
-				} else {
-					Template::set_message(lang('us_profile_updated_success'), 'success');
+					Template::set_message(lang('us_wrong_current_password'), 'danger');
 				}
 			} else {
 				Template::set_message(validation_errors(), 'danger');
@@ -302,7 +331,10 @@ class Users extends Front_Controller
 
 		// Get the current user information.
 		$user = $this->user_model->find($this->current_user->user_id);
-
+		Assets::add_js($this->load->view('profile_js', [
+			'email' => $this->current_user->email
+		], true), 'inline');
+		Template::set('old_password_matched', $old_password_matched);
 		Template::set('user', $user);
 		Template::set('languages', unserialize($this->settings_lib->item('site.languages')));
 		Template::set_view('profile');
@@ -507,9 +539,9 @@ class Users extends Front_Controller
 	public function forgot_password()
 	{
 		// If the user is logged in, go home.
-		if ($this->auth->is_logged_in() !== false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// if ($this->auth->is_logged_in() !== false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
 		if (isset($_POST['send'])) {
 			// Validate the form to ensure a valid email was entered.
@@ -519,7 +551,15 @@ class Users extends Front_Controller
 				$user = $this->user_model->find_by('email', $this->input->post('email'));
 				if ($user === false) {
 					// No user found with the entered email address.
-					Template::set_message(lang('us_invalid_email'), 'danger');
+					if (! $this->input->is_ajax_request()) {
+						Template::set_message(lang('us_invalid_email'), 'danger');
+					} else {
+						echo json_encode([
+							'status' => 0,
+							'message' => lang('us_invalid_email')
+						]);
+						exit;
+					}
 				} else {
 					// User exists, create a hash to confirm the reset request.
 					$this->load->helper('string');
@@ -548,13 +588,37 @@ class Users extends Front_Controller
 					);
 
 					if ($this->emailer->send($data)) {
-						Template::set_message(lang('us_reset_pass_message'), 'success');
+						if (! $this->input->is_ajax_request()) {
+							Template::set_message(lang('us_reset_pass_message'), 'success');
+						} else {
+							echo json_encode([
+								'status' => 1,
+								'message' => lang('us_reset_pass_message')
+							]);
+							exit;
+						}
 					} else {
-						Template::set_message(lang('us_reset_pass_error') . $this->emailer->error, 'danger');
+						if (! $this->input->is_ajax_request()) {
+							Template::set_message(lang('us_reset_pass_error') . $this->emailer->error, 'danger');
+						} else {
+							echo json_encode([
+								'status' => 0,
+								'message' => lang('us_reset_pass_error') . $this->emailer->error
+							]);
+							exit;
+						}
 					}
 				}
 			} else {
-				Template::set_message(validation_errors(), 'danger');
+				if (! $this->input->is_ajax_request()) {
+					Template::set_message(validation_errors(), 'danger');
+				} else {
+					echo json_encode([
+						'status' => 0,
+						'message' => validation_errors()
+					]);
+					exit;
+				}
 			}
 		}
 
@@ -580,9 +644,9 @@ class Users extends Front_Controller
 	public function reset_password($email = '', $code = '')
 	{
 		// If the user is logged in, go home.
-		if ($this->auth->is_logged_in() !== false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		// if ($this->auth->is_logged_in() !== false) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
 
 		// Bonfire may have stored the email and code in the session.
 		if (empty($code) && $this->session->userdata('pass_check')) {
