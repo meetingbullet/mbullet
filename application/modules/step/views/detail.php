@@ -88,7 +88,7 @@ $members = array_column($invited_members, 'user_id');
 			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary'>
 				<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
 			</a>
-			<?php else: ?>
+			<?php elseif ($step->status == 'inprogress') : ?>
 			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary'>
 				<i class="ion-ios-play"></i> <?php e(lang('st_join')); ?>
 			</a>
