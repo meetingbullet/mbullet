@@ -593,6 +593,26 @@ function update_monitor()
 					$('#step-decider .modal-content').html(data.modal_content);
 					$('#step-decider').modal({backdrop: "static"});
 				});
+			} else {
+				$('.wating-modal').modal({
+					backdrop: 'static'
+				});
+				var interval = setInterval(function(){
+					$.get('<?php echo site_url('step/check_state/' . $step_key) ?>').done(function(data) {
+						if (data == 1) {
+							clearInterval(interval);
+							$('.wating-modal').modal('hide');
+
+							$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+								data = JSON.parse(data);
+								$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+								$('.modal-monitor-evaluator').modal({
+									backdrop: 'static'
+								});
+							});
+						}
+					});
+				}, 3000);
 			}
 		}
 

@@ -1107,12 +1107,14 @@ class Step extends Authenticated_Controller
 			To access Step Monitor, user must be owner or team member of Step
 		*/
 
-		$step = $this->step_model->find_by('step_key', $step_key);
+		$step = $this->step_model->select('*, (actual_end_time - actual_start_time) / 60 AS actual_elapsed_time')->find($step_id);
 
 		if (! $step) {
 			Template::set_message(lang('st_invalid_step_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+
+		$step->scheduled_end_time = $step->scheduled_start_time . ($step->in != 0 ? (' + ' . $step->in . ' ' . ($step->in == 1 ? rtrim($step->in_type, 's') : $step->in_type)) : '');
 
 		$step->members = $this->step_member_model
 							->select('u.user_id, avatar, email, first_name, last_name')
@@ -1215,5 +1217,33 @@ class Step extends Authenticated_Controller
 		Template::set('step', $step);
 		Template::set('tasks', $tasks);
 		Template::render('ajax');
+	}
+
+	public function check_state($step_key)
+	{
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (empty($step_key)) {
+			echo 0;
+			exit;
+		}
+
+		$step_id = $this->mb_project->get_object_id('step', $step_key);
+
+		if (empty($step_id)) {
+			echo 0;
+			exit;
+		}
+
+		$step = $this->step_model->find($step_id);
+		if ($step->manage_state != 'evaluate') {
+			echo 0;
+			exit;
+		}
+
+		echo 1;
+		exit;
 	}
 }

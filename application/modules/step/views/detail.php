@@ -65,10 +65,10 @@ $buttons = [
 $action_key = explode('-', $step_key);
 $action_key = $action_key['0'] . '-' . $action_key[1];
 $members = array_column($invited_members, 'user_id');
-?><button id="test">test</button>
+?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<h2 id="step-name" data-evaluator-url="<?php echo site_url('step/evaluator/' . $step_key) ?>"><?php e($step->name)?></h2>
+		<h2 id="step-name"><?php e($step->name)?></h2>
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
 
@@ -316,6 +316,14 @@ $members = array_column($invited_members, 'user_id');
 <div class="modal modal-monitor-evaluator fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-80" role="document">
 		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
+<div class="modal waiting-modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<?php echo '<p class="text-center">' . lang('st_waiting_evaluator') . '</p>' ?>
 		</div>
 	</div>
 </div>

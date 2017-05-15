@@ -2,10 +2,10 @@ $(document).ready(function() {
 	$('#submit_evaluator').click(function(e) {
 		e.preventDefault();
 		$.post({
-			url: $('#step-name').data('evaluator-url'),
+			url: '<?php echo site_url('step/evaluator/' . $step_key) ?>',
 			data: $('.form-ajax').serialize()
-		}).done(function(data) {console.log(data);
-			data = JSON.parse(data);
+		}).done(function(data) {
+			data = JSON.parse(data);console.log(data);
 			if (data.close_modal === 0) {
 				$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
 			} else {

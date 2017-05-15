@@ -26,7 +26,7 @@ $task_status_labels = [
 <div class="step-monitor">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-		<h4 class="modal-title"><?php e(lang('st_step_monitor'))?></h4>
+		<h4 class="modal-title"><?php e(lang('st_step_evaluator'))?></h4>
 	</div> <!-- end MODAL-HEADER -->
 
 	<div class="an-body-topbar">
@@ -51,18 +51,18 @@ $task_status_labels = [
 					<tbody>
 						<tr>
 							<td><strong><?php echo lang('st_start_time') ?></strong></td>
-							<td class="text-center"><?php e($step->scheduled_start_time) ?></td>
-							<td class="text-center"><?php e($step->actual_start_time) ?></td>
+							<td class="text-center"><?php e(display_time($step->scheduled_start_time)) ?></td>
+							<td class="text-center"><?php e(display_time($step->actual_start_time)) ?></td>
 						</tr>
 						<tr>
 							<td><strong><?php echo lang('st_end_time') ?></strong></td>
-							<td class="text-center"><?php //e($step->scheduled_end_time) ?></td>
-							<td class="text-center"><?php e($step->actual_end_time) ?></td>
+							<td class="text-center"><?php e(display_time($step->scheduled_end_time)) ?></td>
+							<td class="text-center"><?php e(display_time($step->actual_end_time)) ?></td>
 						</tr>
 						<tr>
 							<td><strong><?php echo lang('st_elapsed_time') ?></strong></td>
-							<td class="text-center"></td>
-							<td class="text-center"></td>
+							<td class="text-center"><?php e($step->in . ' ' . $step->in_type) ?></td>
+							<td class="text-center"><?php e(rtrim($step->actual_elapsed_time, 0) . ' ' . lang('st_minutes')) ?></td>
 						</tr>
 					</tbody>
 				</table>
@@ -87,6 +87,7 @@ $task_status_labels = [
 				<h6><?php e(lang('st_attendees'))?></h6>
 			</div>
 			<div class="an-component-body an-helper-block">
+			<?php if (is_array($step->members) && count($step->members) > 0) : ?>
 				<?php foreach ($step->members as $member) : ?>
 				<div class="attendee">
 					<div class="info"><?php echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar) ?></div>
@@ -104,6 +105,7 @@ $task_status_labels = [
 					</div>
 				</div>
 				<?php endforeach ?>
+			<?php endif ?>
 			</div>
 		</div>
 	</div>

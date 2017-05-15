@@ -51,10 +51,24 @@ $(document).on('submit.decider', '.form-step-decider', (e) => {
 					// Open Evaluator for Owner
 					$('#create-step').on('hidden.bs.modal', function () {
 						console.log('@Bao: Open Evaluator for Owner !!!');
+						$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+							data = JSON.parse(data);
+							$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+							$('.modal-monitor-evaluator').modal({
+								backdrop: 'static'
+							});
+						});
 					});
 				});
 			} else {
 				console.log('@Bao: Open Evaluator for Owner !!!');
+				$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+					data = JSON.parse(data);
+					$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+					$('.modal-monitor-evaluator').modal({
+						backdrop: 'static'
+					});
+				});
 			}
 		}
 	})

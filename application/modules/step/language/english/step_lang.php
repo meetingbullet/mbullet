@@ -10,6 +10,7 @@ $lang['st_join_step_monitor'] = 'Join Step Monitor';
 $lang['st_decider'] = 'Decider';
 $lang['st_step_decider'] = 'Step Decider';
 $lang['st_evaluation'] = 'Evaluation';
+$lang['st_step_evaluator'] = 'Step Evaluator';
 
 // Field
 $lang['st_name'] = 'Name';
@@ -119,6 +120,7 @@ $lang['st_write_a_note_here'] = 'Write a note here...';
 $lang['st_all_task_confirmed_step_closed_out'] = 'All tasks confirmed. Step is now closed';
 $lang['st_unknown_error'] = 'Unknown error';
 $lang['st_please_select_all_confirmation_status'] = 'Please select all confirmation status';
+$lang['st_waiting_evaluator'] = 'Waiting for Step owner evaluation.';
 
 // Field
 $lang['st_detail'] = 'Detail';
