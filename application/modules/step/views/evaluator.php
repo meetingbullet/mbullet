@@ -1,10 +1,35 @@
 <?php
+
+if ($step->scheduled_start_time) {
+	// Fix add StrToTime with Float number
+	if ( (int) $step->in !== $step->in ) {
+		switch ($step->in_type) {
+			case 'weeks':
+				$step->in *= 7;
+			case 'days':
+				$step->in *= 24;
+			case 'hours':
+				$step->in *= 60;
+			case 'minutes':
+				$step->in *= 60;
+		}
+	}
+
+	$scheduled_start_time = strtotime($step->scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $step->in . ' seconds', $scheduled_start_time);
+	$step->in = round( $step->in / 60, 2);
+	$step->in_type = 'minutes';
+
+	$scheduled_start_time = date('Y-m-d H:i:s', $scheduled_start_time);
+	$scheduled_end_time = date('Y-m-d H:i:s', $scheduled_end_time);
+}
+
 $task_confirm_status_labels = [
 	'closed' => 'label label-default label-bordered',
 	'skipped' => 'label label-warning label-bordered',
 	'resolved' => 'label label-success label-bordered',
 	'open_parking_lot' => 'label label-info label-bordered',
-	'close_parking_lot' => 'label label-success label-bordered'
+	'closed_parking_lot' => 'label label-success label-bordered'
 ];
 $task_status_labels = [
 	'open' => 'label label-default label-bordered',
@@ -51,18 +76,18 @@ $task_status_labels = [
 					<tbody>
 						<tr>
 							<td><strong><?php echo lang('st_start_time') ?></strong></td>
-							<td class="text-center"><?php e(display_time($step->scheduled_start_time)) ?></td>
+							<td class="text-center"><?php e(display_time($scheduled_start_time)) ?></td>
 							<td class="text-center"><?php e(display_time($step->actual_start_time)) ?></td>
 						</tr>
 						<tr>
 							<td><strong><?php echo lang('st_end_time') ?></strong></td>
-							<td class="text-center"><?php e(display_time($step->scheduled_end_time)) ?></td>
+							<td class="text-center"><?php e(display_time($scheduled_end_time)) ?></td>
 							<td class="text-center"><?php e(display_time($step->actual_end_time)) ?></td>
 						</tr>
 						<tr>
 							<td><strong><?php echo lang('st_elapsed_time') ?></strong></td>
 							<td class="text-center"><?php e($step->in . ' ' . $step->in_type) ?></td>
-							<td class="text-center"><?php e(rtrim($step->actual_elapsed_time, 0) . ' ' . lang('st_minutes')) ?></td>
+							<td class="text-center"><?php e(round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes')) ?></td>
 						</tr>
 					</tbody>
 				</table>
@@ -137,7 +162,7 @@ $task_status_labels = [
 							if (! empty($task->started_on) && ! empty($task->finished_on)) {
 								$duration = strtotime($task->finished_on) - strtotime($task->started_on);
 								if ($duration >= 0) {
-									echo ($duration / 60) . ' ' . lang(($duration == 1 ? 'st_minute' : 'st_minutes'));
+									echo round($duration / 60, 2) . ' ' . lang(($duration == 1 ? 'st_minute' : 'st_minutes'));
 								}
 							}
 							?>
@@ -189,7 +214,7 @@ $task_status_labels = [
 			</div>
 
 			<div class="col-md-4">
-				<button type="submit" id="submit_evaluator" class="btn btn-primary pull-right" name="save"><?php echo lang('st_submit') ?></button>
+				<button type="submit" id="submit_evaluator" class="an-btn an-btn-primary pull-right" name="save"><?php echo lang('st_submit') ?></button>
 			</div>
 		</div>
 	</div>
