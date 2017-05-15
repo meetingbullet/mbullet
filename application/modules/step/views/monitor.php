@@ -42,6 +42,7 @@ $task_status_labels = [
 					<?php endif; ?>
 				</div>
 			</div>
+			<?php if ($is_owner): ?>
 			<div class="pull-right">
 				<div class="an-bootstrap-custom-tab">
 					<div class="step-time-schedule">
@@ -81,6 +82,7 @@ $task_status_labels = [
 					</div>
 				</div>
 			</div>
+			<?php endif; ?>
 		</div> <!-- end AN-BODY-TOPBAR -->
 	<?php echo form_close() ?>
 
