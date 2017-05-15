@@ -49,6 +49,7 @@ $cost_of_time_to_badge = [
 	'primary',	// L
 	'warning',	// XL
 ];
+
 ?>
 <div class="step-decider" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
@@ -94,7 +95,7 @@ $cost_of_time_to_badge = [
 								</tr>
 								<tr>
 									<td><?php e(lang('st_elapsed_time')) ?></td>
-									<td><?php echo $step->in . ' ' . lang('st_' . $step->in_type) ?></td>
+									<td><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
 									<td><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></td>
 								</tr>
 							</tbody>
