@@ -60,7 +60,7 @@
 	border: 1px solid #30907f !important;
 };
 
-#scheduled-time  {
+#scheduled-time {
 	border-right: none !important;
 }
 
@@ -89,6 +89,81 @@
 
 .task-status, .task-action {
 	white-space: nowrap;
+}
+
+.step-goal-container {
+	position: relative;
+}
+
+.attendee {
+	display: table;
+	width: 100%;
+}
+
+.attendee > div {
+	float: left;
+}
+
+.attendee .info {
+	margin: 5px;
+}
+
+.modal-content {
+	overflow: hidden;
+}
+
+.attendee > .rating {
+	float: right;
+}
+
+/****** Style Star Rating Widget *****/
+.rating {
+	float:left;
+}
+
+.rating > input {
+	display: none;
+}
+
+.rating > label:before {
+	margin-top: 2px;
+	padding:0px 5px 0px 5px;
+	font-size: 1.25em;
+	font-family: 'Ionicons';
+	display: inline-block;
+	content: "\f4b3";
+}
+
+.rating > .half:before { 
+	content: "\f4b1";
+	position: absolute;
+}
+
+.attendee > .rating {
+	float: right;
+}
+
+.rating > label {
+	float: right;
+	margin:4px 1px 0px 0px;
+	color:#D8D8D8;
+	height:25px;
+}
+
+/***** CSS Magic to Highlight Stars on Hover *****/
+
+.rating > input:checked ~ label,
+.rating:not(:checked) > label:hover, /* hover current star */
+.rating:not(:checked) > label:hover ~ label {
+	color:#FFD700 !important;
+	cursor:pointer;
+}/* hover previous stars in list */
+
+.rating > input:checked + label:hover, /* hover current star when changing rating */
+.rating > label:hover ~ input:checked ~ label, /* lighten current selection */
+.rating > input:checked ~ label:hover ~ label {
+	color:#FFED85 !important;
+	cursor:pointer;
 }
 
 .decider-step-container .an-component-header + .an-component-body{

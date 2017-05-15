@@ -9,6 +9,8 @@ $lang['st_step_monitor'] = 'Step Monitor';
 $lang['st_join_step_monitor'] = 'Join Step Monitor';
 $lang['st_decider'] = 'Decider';
 $lang['st_step_decider'] = 'Step Decider';
+$lang['st_evaluation'] = 'Evaluation';
+$lang['st_step_evaluator'] = 'Step Evaluator';
 
 // Field
 $lang['st_name'] = 'Name';
@@ -40,22 +42,32 @@ $lang['st_resolve_task'] = 'Resolve Task';
 $lang['st_comment_topics'] = 'Comments / topics';
 $lang['st_scheduled_start_time'] = 'Scheduled start time';
 $lang['st_scheduled_end_time'] = 'Scheduled end time';
-$lang['st_meeting_status'] = 'Meeting Status';
+$lang['st_closed'] = 'Closed';
+$lang['st_open_parking_lot'] = 'Open Parking Lot';
+$lang['st_close_parking_lot'] = 'Close Parking Lot';
+$lang['st_started'] = 'Started';
 $lang['st_duration'] = 'Duration';
-$lang['st_started_on'] = 'Started on';
-$lang['st_confirmation_status'] = 'Confimation Status';
+$lang['st_confirm_status'] = 'Confirm status';
+$lang['st_rate'] = 'Rate';
+$lang['st_scheduled'] = 'Scheduled';
+$lang['st_actual'] = 'Actual';
+$lang['st_attendees'] = 'Attendees';
 $lang['st_start_time'] = 'Start time';
 $lang['st_end_time'] = 'End time';
 $lang['st_elapsed_time'] = 'Elapsed time';
-$lang['st_actual'] = 'Actual';
-$lang['st_scheduled'] = 'Scheduled';
-$lang['st_attendees'] = 'Attendees';
 $lang['st_notes'] = 'Notes';
-$lang['st_closed'] = 'Closed';
-$lang['st_open_parking_lot'] = 'Open parking lot';
 $lang['st_closed_parking_lot'] = 'Closed parking lot';
 $lang['st_scheduled_duration'] = 'Scheduled duration';
 $lang['st_actual_duration'] = 'Actual duration';
+$lang['st_close_parking_lot'] = 'Close Parking Lot';
+$lang['st_point_value'] = 'Point value';
+$lang['st_submit'] = 'Submit';
+$lang['st_there_was_a_problem_while_rating_attendees_and_tasks'] = 'There was a problem while rating attendees and tasks.';
+$lang['st_need_to_vote_all_tasks_and_attendees'] = 'All of the tasks and attendees need to be rated.';
+$lang['st_rating_success'] = 'Tasks and Attendees are rated successfully.';
+$lang['st_meeting_status'] = 'Meeting Status';
+$lang['st_started_on'] = 'Started on';
+$lang['st_confirmation_status'] = 'Confimation Status';
 // Action
 $lang['st_action'] = 'Action';
 $lang['st_create'] = 'Create';
@@ -108,6 +120,7 @@ $lang['st_write_a_note_here'] = 'Write a note here...';
 $lang['st_all_task_confirmed_step_closed_out'] = 'All tasks confirmed. Step is now closed';
 $lang['st_unknown_error'] = 'Unknown error';
 $lang['st_please_select_all_confirmation_status'] = 'Please select all confirmation status';
+$lang['st_waiting_evaluator'] = 'Waiting for Step owner evaluation.';
 
 // Field
 $lang['st_detail'] = 'Detail';
