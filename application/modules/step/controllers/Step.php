@@ -7,7 +7,6 @@ class Step extends Authenticated_Controller
 		parent::__construct();
 		$this->lang->load('step');
 		$this->load->helper('mb_form');
-		$this->load->helper('mb_general');
 		$this->load->helper('text');
 		$this->load->helper('date');
 		$this->load->library('mb_project');
@@ -530,6 +529,7 @@ class Step extends Authenticated_Controller
 
 			if ($this->input->post('note')) {
 				$this->step_model->skip_validation(TRUE)->update($step_id, [
+					'manage_state' => 'evaluate',
 					'notes' => $this->input->post('note')
 				]);
 			}
@@ -709,6 +709,7 @@ class Step extends Authenticated_Controller
 			$current_time = gmdate('Y-m-d H:i:s');
 			$query = $this->step_model->skip_validation(1)->update($step->step_id, [
 				'status' => 'finished',
+				'manage_state' => 'decide',
 				'actual_end_time' => $current_time,
 			]);
 			
@@ -741,6 +742,7 @@ class Step extends Authenticated_Controller
 
 		$query = $this->step_model->skip_validation(1)->update($step->step_id, [
 			'status' => 'ready',
+			'manage_state' => 'monitor',
 			'scheduled_start_time' => $this->input->post('scheduled_start_time')
 		]);
 

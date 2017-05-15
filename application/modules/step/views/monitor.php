@@ -3,11 +3,11 @@ $is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
 if ($step->scheduled_start_time) {
-	$scheduled_start_time = strtotime($step->scheduled_start_time);
-	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
+	$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $step->scheduled_start_time);
+	$scheduled_end_time->modify('+' . $step->in . ' ' . $step->in_type);
 
-	$scheduled_start_time = gmdate('M d, H:i', $scheduled_start_time);
-	$scheduled_end_time = gmdate('M d, H:i', $scheduled_end_time);
+	$scheduled_start_time = display_time($step->scheduled_start_time);
+	$scheduled_end_time = display_time($scheduled_end_time->format('Y-m-d H:i:s'));
 }
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
@@ -30,13 +30,14 @@ $task_status_labels = [
 	<?php endif; ?>
 
 	<?php echo form_open(site_url('step/update_step_schedule'), ['class' => 'form-inline form-step-schedule']) ?>
-		<input type="hidden" name="scheduled_start_time" />
+		<input type="hidden" name="scheduled_start_time"/>
+
 		<div class="an-body-topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
-					<h2><?php e($step->name . ' - ' . lang('st_dashboard'))?></h2>
+					<h2><?php e($step->name)?></h2>
 
-					<?php if ($scheduled_time): ?>
+					<?php if ($step->status != 'open'): ?>
 					<h5 class='text-muted'><?php e($scheduled_time)?></h5>
 					<?php endif; ?>
 				</div>
@@ -48,15 +49,15 @@ $task_status_labels = [
 
 							<h3 id="scheduled-timer" class="step-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
 							
-							<?php if ($scheduled_time): ?>
+							<?php if ($step->status != 'open'): ?>
 							<div class="step-action">
 								<button type="submit" 
 										name='start-step' 
-										class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>"
+										class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>">
 									<i class="ion-ios-play"></i> <?php e(lang('st_start'))?>
 								</button>
 								<button class="an-btn an-btn-success btn-finish<?php echo $step->status == 'inprogress' && $is_owner ? '' : ' hidden' ?>" disabled>
-									<i class="ion-ios-checkmark-outline"></i> <?php e(lang('st_finish'))?>
+									<i class="ion-checkmark"></i> <?php e(lang('st_finish'))?>
 								</button>
 							</div>
 							<?php else: ?>
@@ -65,7 +66,7 @@ $task_status_labels = [
 								<input type="text" 
 										id="datetimepicker1"
 										name="scheduled_time" 
-										class="form-control" 
+										class="form-control an-form-control schedule-time" 
 										value="<?php echo $scheduled_start_time ?>" 
 										placeholder="<?php e(lang('st_scheduled_start_time'))?>" <?php echo $step->status == 'open' ? '' : 'disabled' ?>/>
 								<span class="input-group-btn">
@@ -152,7 +153,7 @@ $task_status_labels = [
 
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('monitor_js', [
-			
+		'step_key' => $step_key
 	], true) . '</script>';
 }
 ?>

@@ -2,6 +2,7 @@
 
 // General
 $lang['pj_create_project']			= 'Create Project';
+$lang['pj_update_project'] = 'Update Project';
 $lang['pj_constraints']				= 'Constraints';
 $lang['pj_expectations']			= 'Expectations';
 $lang['pj_resolved_label'] = 'Resolved';
@@ -48,6 +49,7 @@ $lang['pj_goal'] 			= 'Goal';
 $lang['pj_invite_team'] 			= 'Invite team';
 $lang['pj_member_email'] 			= 'Member email';
 $lang['pj_create'] 			= 'Create';
+$lang['pj_update'] 			= 'Update';
 $lang['pj_cancel'] 			= 'Cancel';
 $lang['pj_total_point_project'] = 'Total Points/Project';
 $lang['pj_total_point_action'] = 'Total Points/Action';
@@ -67,6 +69,7 @@ $lang['pj_more_btn_open_pj'] = 'Open this project';
 $lang['pj_more_btn_inactive_pj'] = 'Set this project Inactive';
 $lang['pj_more_btn_archive_pj'] = 'Archive this project';
 $lang['pj_more_btn_pj_setting'] = 'Project settings';
+$lang['pj_more_btn_pj_update'] = 'Update this project';
 $lang['pj_detail_tab_info'] = 'Info';
 $lang['pj_detail_tab_action'] = 'Action';
 $lang['pj_detail_tab_report'] = 'Report';

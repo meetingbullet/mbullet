@@ -9,6 +9,7 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('project/project_model');
 		$this->load->model('step/step_model');
 		$this->load->model('step/step_member_model');
+		$this->load->helper('date');
 
 		Assets::add_module_js('dashboard', 'dashboard.js');
 		Assets::add_module_css('step', 'step.css');
@@ -32,7 +33,7 @@ class Dashboard extends Authenticated_Controller
 		$my_steps = $my_steps && count($my_steps) > 0 ? $my_steps : [];
 
 		$member_steps = $this->step_member_model->select('s.*, u.first_name, u.last_name, u.email, u.avatar')
-									->join('steps s', 's.step_id = step_members.step_id')
+									->join('steps s', 's.step_id = step_members.step_id AND s.owner_id != ' . $this->current_user->user_id)
 									->join('users u', 'u.user_id = step_members.user_id')
 									->where('(status = "ready" OR status = "inprogress")', null, false)
 									->where('step_members.user_id', $this->current_user->user_id)

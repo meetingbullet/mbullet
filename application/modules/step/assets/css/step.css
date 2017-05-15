@@ -70,9 +70,8 @@
 	vertical-align: middle;
 }
 
-input[name="scheduled_time"] {
-	width: auto !important;
-	background-color: transparent !important;
+.form-inline .input-group > .form-control.schedule-time {
+	width: auto;
 }
 
 .step-action > button {
@@ -165,4 +164,41 @@ input[name="scheduled_time"] {
 .rating > input:checked ~ label:hover ~ label {
 	color:#FFED85 !important;
 	cursor:pointer;
+}
+
+.decider-step-container .an-component-header + .an-component-body{
+	max-height: 150px;
+	overflow: auto;
+}
+
+.an-helper-block .confirmation-status {
+	margin-bottom: 0;
+}
+
+#note {
+	width: 80%;
+	margin-right: 30px;
+	margin-bottom: 0;
+}
+
+.btn-close-out-step {
+	vertical-align: bottom;
+	margin-bottom: 6px;
+}
+
+.form-step-decider {
+	max-height: 800px;
+	overflow: auto;
+}
+
+.table-step-time {
+	margin-bottom: 0;
+}
+
+.step-goal, .step-notes {
+	overflow: hidden;
+}
+
+.step-goal-container {
+	position: relative;
 }

@@ -55,3 +55,27 @@ if (! function_exists('display_user')) {
 		return $html;
 	}
 }
+
+if (! function_exists('display_time')) {
+	/**
+	 * Return time following the local timezone
+	 *
+	 * @param string $time (Y-m-d H:i:s)
+	 * @param string $timezone
+	 * @param string $format (optional)
+	 * @return string time in local timezone
+	 */
+	function display_time($time, $timezone = null, $format = 'M j, Y h:i A')
+	{
+		// date_default_timezone_set('UTC');
+		$timestamp = strtotime($time);
+		if ($timestamp === false) {
+			return false;
+		}
+
+		$ci =& get_instance();
+		$ci->load->helper('date');
+
+		return user_time($timestamp, $timezone, $format);
+	}
+}

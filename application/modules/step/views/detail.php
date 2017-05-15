@@ -34,6 +34,9 @@ $task_status_labels = [
 	'jumped' => 'label label-info label-bordered',
 	'skipped' => 'label label-success label-bordered',
 	'parking_lot' => 'label label-info label-bordered',
+	'closed' => 'label label-default label-bordered',
+	'closed_parking_lot' => 'label label-primary label-bordered',
+	'open_parking_lot' => 'label label-primary label-bordered',
 ];
 
 $buttons = [
@@ -72,23 +75,20 @@ $members = array_column($invited_members, 'user_id');
 <div class="btn-block">
 	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a href='#' id="edit-step" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
-	<!--<a class="an-btn an-btn-primary" 
-		id="change-step-status" 
-		data-next-status="<?php echo $buttons[$step->status]['next_status'] ?>" 
-		data-update-status-url="<?php echo base_url('/step/update_status/' . $step_key . '?status=' . urlencode($buttons[$step->status]['next_status'])) ?>"
-	>
-		<i class="<?php echo $buttons[$step->status]['icon'] ?>"></i> <?php echo $buttons[$step->status]['label'] ?>
-	</a>-->
 	<?php if (in_array($current_user->user_id, $members) || $step->owner_id == $current_user->user_id) : ?>
 	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'open' ? ' step-open' : ''?><?php echo $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
 		<?php 
 			if ($step->status == 'open') {
 				echo '<i class="ion-ios-play"></i> '. lang('st_set_up');
 			} else {
-				echo '<i class="ion-ios-play"></i> ' . lang($step->owner_id == $current_user->user_id ? 'st_monitor' :  'st_join');
+				echo '<i class="ion-ios-play"></i> ' . lang($step->owner_id == $current_user->user_id ? ($step->status == 'ready' ? 'st_start' : 'st_monitor') :  'st_join');
 			}
 		?>
 	</a>
+	<?php endif; ?>
+
+	<?php if ($step->manage_state == 'decide'): ?>
+	<a href='#' id="open-step-decider" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
 	<?php endif; ?>
 </div>
 
@@ -106,22 +106,31 @@ $members = array_column($invited_members, 'user_id');
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_goal'))?></div>
-						<div class="col-xs-8"><?php e($step->goal)?></div>
+						<div class="col-xs-8">
+							<div class="step-goal-container">
+								<div class="step-goal">
+									<?php echo $step->goal?></div>
+								</div>
+							</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
-						<div class="col-xs-8" id="status">
-							<span class="<?php e($label[$step->status])?>"><?php e(lang('st_' . $step->status))?></span>
+						<div class="col-xs-8">
+							<span class="<?php e($label[$step->status])?>" id="step-status" data-status="<?php e($step->status)?>" data-is-owner="<?php e($step->owner_id == $current_user->user_id ? 1 : 0)?>"><?php e(lang('st_' . $step->status))?></span>
 						</div>
 
 					</div>
 					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_point_used'))?></div>
-						<div class="col-xs-8" id="status"><?php e($point_used) ?></div>
+						<div class="col-xs-4"><?php e(lang('st_point_used')) ?></div>
+						<div class="col-xs-8"><?php e($point_used) ?></div>
 					</div>
 					<div class="row">
-						<div class="col-xs-4"><?php e(ucfirst(lang('st_in')))?></div>
-						<div class="col-xs-8" id="status"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
+						<div class="col-xs-4"><?php e(lang('st_scheduled_duration')) ?></div>
+						<div class="col-xs-8"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4"><?php e(ucfirst(lang('st_actual_duration')))?></div>
+						<div class="col-xs-8"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -134,7 +143,7 @@ $members = array_column($invited_members, 'user_id');
 			<div class="an-component-body">
 				<div class="an-helper-block">
 					<div class="an-scrollable-x">
-						<table class="table table-striped">
+						<table class="table table-striped table-detail-task">
 							<thead>
 								<tr>
 									<th><?php e(lang('st_key'))?></th>
@@ -142,14 +151,17 @@ $members = array_column($invited_members, 'user_id');
 									<th><?php e(lang('st_description'))?></th>
 									<th><?php e(lang('st_assignee'))?></th>
 									<th><?php e(lang('st_status'))?></th>
+									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
+									<th><?php e(lang('st_confirmation_status'))?></th>
+									<?php endif ?>
 								</tr>
 							</thead>
 							<tbody>
 								<?php if($tasks): foreach ($tasks as $task) : ?>
-								<tr>
+								<tr data-confirm-status="<?php e($task->confirm_status) ?>">
 									<td class='basis-10'><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
 									<td class='basis-15'><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
-									<td class='basis-30'><?php echo word_limiter($task->description, 35)?></td>
+									<td class='basis-20'><?php echo word_limiter($task->description, 20)?></td>
 									<td class='basis-20'>
 										<?php if ($task->members) {
 											foreach ($task->members as $member) {
@@ -157,9 +169,16 @@ $members = array_column($invited_members, 'user_id');
 											}
 										} ?>
 									</td>
-									<td class='basis-10'>
+									<td class='basis-10 task-status'>
 										<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 									</td>
+									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
+									<td class='basis-10 task-status'>
+										<?php if ( isset($task_status_labels[$task->confirm_status]) ): ?>
+										<span class="<?php e($task_status_labels[$task->confirm_status] . ' label-' . $task->confirm_status)?>"><?php e(lang('st_' . $task->confirm_status))?></span>
+										<?php endif; ?>
+									</td>
+									<?php endif ?>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
@@ -196,6 +215,21 @@ $members = array_column($invited_members, 'user_id');
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div> <!-- end .AN-SINGLE-COMPONENT  -->
 
+		<?php if (! empty($step->notes)) : ?>
+		<div class="an-single-component with-shadow">
+			<div class="an-component-header">
+				<h6><?php e(lang('st_notes'))?></h6>
+			</div>
+			<div class="an-component-body">
+				<div class="an-helper-block">
+					<div class="an-input-group step-notes">
+						<?php echo nl2br($step->notes) ?>
+					</div>
+				</div> <!-- end .AN-HELPER-BLOCK -->
+			</div> <!-- end .AN-COMPONENT-BODY -->
+		</div> <!-- end .AN-SINGLE-COMPONENT  -->
+		<?php endif; ?>
+
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_date'))?></h6>
@@ -205,21 +239,37 @@ $members = array_column($invited_members, 'user_id');
 					<?php if ($scheduled_start_time): ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_scheduled_start_time'))?></div>
-						<div class="col-xs-7"><?php e($scheduled_start_time)?></div>
+						<div class="col-xs-7"><?php e(display_time($scheduled_start_time)); ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_scheduled_end_time'))?></div>
-						<div class="col-xs-7"><?php e($scheduled_end_time)?></div>
+						<div class="col-xs-7"><?php e(display_time($scheduled_end_time)); ?></div>
+					</div>
+					<hr/>
+					<?php endif; ?>
+					<?php if ($step->actual_start_time): ?>
+					<div class="row">
+						<div class="col-xs-5"><?php e(lang('st_actual_start_time'))?></div>
+						<div class="col-xs-7"><?php e(display_time($step->actual_start_time)); ?></div>
+					</div>
+
+					<div class="row">
+						<div class="col-xs-5"><?php e(lang('st_actual_end_time'))?></div>
+						<?php if ($step->status == 'inprogress') : ?>
+						<div class="col-xs-7"><?php e(lang('st_actual_end_time_still_inprogress')); ?></div>
+						<?php else: ?>
+						<div class="col-xs-7"><?php e(display_time($step->actual_start_time)); ?></div>
+						<?php endif; ?>
 					</div>
 					<hr/>
 					<?php endif; ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_created'))?></div>
-						<div class="col-xs-7"><?php e($step->created_on)?></div>
+						<div class="col-xs-7"><?php e(display_time($step->created_on)); ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_updated'))?></div>
-						<div class="col-xs-7"><?php e($step->modified_on)?></div>
+						<div class="col-xs-7"><?php e(display_time($step->modified_on)); ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -230,6 +280,20 @@ $members = array_column($invited_members, 'user_id');
 <!-- Modal -->
 <div class="modal modal-monitor fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-80" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
+<div id="step-decider" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-80" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
+<div id="create-step" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
 	</div>

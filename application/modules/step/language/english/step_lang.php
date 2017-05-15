@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-// Genaral
+// General
 $lang['st_create_step'] = 'Create Step';
 $lang['st_edit_step'] = 'Edit Step';
 $lang['st_dashboard'] = 'Dashboard';
@@ -58,15 +58,15 @@ $lang['st_notes'] = 'Notes';
 $lang['st_closed_parking_lot'] = 'Closed parking lot';
 $lang['st_scheduled_duration'] = 'Scheduled duration';
 $lang['st_actual_duration'] = 'Actual duration';
-$lang['st_closed'] = 'Closed';
 $lang['st_close_parking_lot'] = 'Close Parking Lot';
-$lang['st_elapsed_time'] = 'Elapsed time';
 $lang['st_point_value'] = 'Point value';
 $lang['st_submit'] = 'Submit';
 $lang['st_there_was_a_problem_while_rating_attendees_and_tasks'] = 'There was a problem while rating attendees and tasks.';
 $lang['st_need_to_vote_all_tasks_and_attendees'] = 'All of the tasks and attendees need to be rated.';
 $lang['st_rating_success'] = 'Tasks and Attendees are rated successfully.';
-
+$lang['st_meeting_status'] = 'Meeting Status';
+$lang['st_started_on'] = 'Started on';
+$lang['st_confirmation_status'] = 'Confimation Status';
 // Action
 $lang['st_action'] = 'Action';
 $lang['st_create'] = 'Create';
@@ -86,6 +86,7 @@ $lang['st_finish'] = 'Finish';
 $lang['st_monitor'] = 'Monitor';
 $lang['st_set_up'] = 'Set up';
 $lang['st_join'] = 'Join';
+$lang['st_close_out_step'] = 'Close out Step';
 
 
 // Message
@@ -94,7 +95,8 @@ $lang['st_step_successfully_updated'] = 'Step successfully updated';
 $lang['st_schedule_time_saved'] = 'Schedule time saved';
 $lang['st_there_was_a_problem_while_creating_step'] = 'There was a problem while creating step';
 $lang['st_invalid_step_key'] = 'Invalid step key';
-$lang['st_invalid_schedule_time'] = 'Invalid schedule time';
+$lang['st_invalid_schedule_time'] = 'Invalid Schedule Time';
+$lang['st_invalid_assigned_time'] = 'Please fill Assigned time for all tasks';
 $lang['st_task_started'] = 'Task started';
 $lang['st_step_started'] = 'Step started';
 $lang['st_step_finished'] = 'Step finished';
@@ -113,6 +115,10 @@ $lang['st_waiting_for_start'] = 'Waiting for start';
 $lang['st_please_resolve_all_task_before_finish'] = 'Please resolve all tasks before finish';
 $lang['st_action_key_does_not_exist'] = 'Action key does not exist';
 $lang['st_step_key_does_not_exist'] = 'Step key does not exist';
+$lang['st_write_a_note_here'] = 'Write a note here...';
+$lang['st_all_task_confirmed_step_closed_out'] = 'All tasks confirmed. Step is now closed';
+$lang['st_unknown_error'] = 'Unknown error';
+$lang['st_please_select_all_confirmation_status'] = 'Please select all confirmation status';
 
 // Field
 $lang['st_detail'] = 'Detail';
@@ -133,20 +139,26 @@ $lang['st_add_team_member'] = '+ Add team member';
 $lang['st_point_used'] = 'Points used';
 $lang['st_description'] = 'Description';
 $lang['st_assignee'] = 'Assignee';
+$lang['st_select_an_option'] = '- Select an option -';
 
 // Step
 $lang['st_add_task'] = 'Add Task';
 $lang['st_edit'] = 'Edit';
 $lang['st_start_step'] = 'Start Step';
-$lang['st_open'] = 'Open';
-$lang['st_inprogress'] = 'In progress';
-$lang['st_ready'] = 'Ready for review';
 $lang['st_resolved'] = 'Resolved';
 $lang['st_mask_as_ready'] = 'Mark as \'Ready for Review\'';
 $lang['st_resolve'] = 'Resolve';
-$lang['st_finished'] = 'Finished';
-$lang['st_resolved'] = 'Resolved';
 $lang['st_resolve_step'] = 'Resolve Step';
 $lang['st_reopen'] = 'Re-open Step';
 $lang['st_update_status_fail'] = 'Unable to update step\'s status.';
 $lang['st_update_status_success'] = 'Updated step\'s status successful.';
+
+$lang['st_actual_start_time'] = 'Actual start time';
+$lang['st_actual_end_time'] = 'Actual end time';
+$lang['st_actual_end_time_still_inprogress'] = 'Still in-progress';
+
+$lang['st_open'] = 'Open';
+$lang['st_ready'] = 'Ready';
+$lang['st_inprogress'] = 'In progress';
+$lang['st_finished'] = 'Finished';
+$lang['st_resolved'] = 'Resolved';

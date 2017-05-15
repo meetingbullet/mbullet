@@ -157,12 +157,12 @@ $project_key = $project_key['0'];
 				<div class="an-component-body">
 					<div class="an-helper-block action-detail">
 						<div class="row">
-							<div class="col-xs-4"><?php e(lang('ac_created'))?></div>
-							<div class="col-xs-8"><?php e($action->created_on)?></div>
+							<div class="col-xs-4"><?php e(lang('ac_created')); ?></div>
+							<div class="col-xs-8"><?php e(display_time($action->created_on)); ?></div>
 						</div>
 						<div class="row">
-							<div class="col-xs-4"><?php e(lang('ac_updated'))?></div>
-							<div class="col-xs-8"><?php e($action->modified_on)?></div>
+							<div class="col-xs-4"><?php e(lang('ac_updated')); ?></div>
+							<div class="col-xs-8"><?php e(display_time($action->modified_on)); ?></div>
 						</div>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
