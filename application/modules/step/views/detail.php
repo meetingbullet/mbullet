@@ -1,6 +1,7 @@
 <?php
 
 $scheduled_start_time = null;
+$is_owner = $step->owner_id == $current_user->user_id;
 
 if ($step->scheduled_start_time) {
 	$scheduled_start_time = strtotime($step->scheduled_start_time);
@@ -68,23 +69,35 @@ $members = array_column($invited_members, 'user_id');
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<h2><?php e($step->name)?></h2>
+		<h2 id="step-name"><?php e($step->name)?></h2>
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
 
 <div class="btn-block">
 	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a href='#' id="edit-step" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
-	<?php if (in_array($current_user->user_id, $members) || $step->owner_id == $current_user->user_id) : ?>
-	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'open' ? ' step-open' : ''?><?php echo $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
-		<?php 
-			if ($step->status == 'open') {
-				echo '<i class="ion-ios-play"></i> '. lang('st_set_up');
-			} else {
-				echo '<i class="ion-ios-play"></i> ' . lang($step->owner_id == $current_user->user_id ? ($step->status == 'ready' ? 'st_start' : 'st_monitor') :  'st_join');
-			}
-		?>
-	</a>
+	<?php if (in_array($current_user->user_id, $members) || $is_owner) : ?>
+		<?php if ($step->status == 'open'): ?>
+			<?php if ($is_owner): ?>
+				<a href='#' id="open-step-monitor" class='an-btn an-btn-primary step-open'>
+					<i class="ion-ios-play"></i> <?php e(lang('st_set_up')); ?>
+				</a>
+			<?php endif; ?>
+		<?php elseif ($step->status == 'ready' || $step->status == 'inprogress'): ?>
+			<?php if ($is_owner): ?>
+			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary'>
+				<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
+			</a>
+			<?php elseif ($step->status == 'inprogress') : ?>
+			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary'>
+				<i class="ion-ios-play"></i> <?php e(lang('st_join')); ?>
+			</a>
+			<?php endif; ?>
+		<?php endif; ?>
+	<?php endif; ?>
+
+	<?php if ($step->manage_state == 'decide' && $is_owner): ?>
+	<a href='#' id="open-step-decider" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
 	<?php endif; ?>
 </div>
 
@@ -102,26 +115,31 @@ $members = array_column($invited_members, 'user_id');
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_goal'))?></div>
-						<div class="col-xs-8 step-goal"><?php echo word_limiter($step->goal, 100)?></div>
+						<div class="col-xs-8">
+							<div class="step-goal-container">
+								<div class="step-goal">
+									<?php echo $step->goal?></div>
+								</div>
+							</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
-						<div class="col-xs-8" id="status">
-							<span class="<?php e($label[$step->status])?>"><?php e(lang('st_' . $step->status))?></span>
+						<div class="col-xs-8">
+							<span class="<?php e($label[$step->status])?>" id="step-status" data-status="<?php e($step->status)?>" data-is-owner="<?php e($is_owner ? 1 : 0)?>"><?php e(lang('st_' . $step->status))?></span>
 						</div>
 
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_point_used')) ?></div>
-						<div class="col-xs-8" id="status"><?php e($point_used) ?></div>
+						<div class="col-xs-8"><?php e($point_used) ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_scheduled_duration')) ?></div>
-						<div class="col-xs-8" id="status"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
+						<div class="col-xs-8"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(ucfirst(lang('st_actual_duration')))?></div>
-						<div class="col-xs-8" id="status"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></div>
+						<div class="col-xs-8"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -134,7 +152,7 @@ $members = array_column($invited_members, 'user_id');
 			<div class="an-component-body">
 				<div class="an-helper-block">
 					<div class="an-scrollable-x">
-						<table class="table table-striped">
+						<table class="table table-striped table-detail-task">
 							<thead>
 								<tr>
 									<th><?php e(lang('st_key'))?></th>
@@ -149,7 +167,7 @@ $members = array_column($invited_members, 'user_id');
 							</thead>
 							<tbody>
 								<?php if($tasks): foreach ($tasks as $task) : ?>
-								<tr>
+								<tr data-confirm-status="<?php e($task->confirm_status) ?>">
 									<td class='basis-10'><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
 									<td class='basis-15'><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
 									<td class='basis-20'><?php echo word_limiter($task->description, 20)?></td>
@@ -165,7 +183,9 @@ $members = array_column($invited_members, 'user_id');
 									</td>
 									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
 									<td class='basis-10 task-status'>
+										<?php if ( isset($task_status_labels[$task->confirm_status]) ): ?>
 										<span class="<?php e($task_status_labels[$task->confirm_status] . ' label-' . $task->confirm_status)?>"><?php e(lang('st_' . $task->confirm_status))?></span>
+										<?php endif; ?>
 									</td>
 									<?php endif ?>
 								</tr>
@@ -174,7 +194,7 @@ $members = array_column($invited_members, 'user_id');
 						</table>
 					</div>
 
-					<?php if ($step->status == 'open'): ?>
+					<?php if ($step->status == 'open' && $is_owner): ?>
 					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-task-url="<?php echo site_url('task/create/' . $step_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-task"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
@@ -211,7 +231,7 @@ $members = array_column($invited_members, 'user_id');
 			</div>
 			<div class="an-component-body">
 				<div class="an-helper-block">
-					<div class="an-input-group step-note-container">
+					<div class="an-input-group step-notes">
 						<?php echo nl2br($step->notes) ?>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
@@ -298,6 +318,21 @@ $members = array_column($invited_members, 'user_id');
 <div id="resolve-task" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
+<div class="modal modal-monitor-evaluator fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-80" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
+<div class="modal waiting-modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<?php echo '<p class="text-center">' . lang('st_waiting_evaluator') . '</p>' ?>
 		</div>
 	</div>
 </div>

@@ -3,8 +3,6 @@ $is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
 if ($step->scheduled_start_time) {
-	$scheduled_start_time = strtotime($step->scheduled_start_time);
-
 	$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $step->scheduled_start_time);
 	$scheduled_end_time->modify('+' . $step->in . ' ' . $step->in_type);
 
@@ -32,17 +30,19 @@ $task_status_labels = [
 	<?php endif; ?>
 
 	<?php echo form_open(site_url('step/update_step_schedule'), ['class' => 'form-inline form-step-schedule']) ?>
-		<input type="hidden" name="scheduled_start_time" />
+		<input type="hidden" name="scheduled_start_time"/>
+
 		<div class="an-body-topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
-					<h2><?php e($step->name . ' - ' . lang('st_dashboard'))?></h2>
+					<h2><?php e($step->name)?></h2>
 
 					<?php if ($step->status != 'open'): ?>
 					<h5 class='text-muted'><?php e($scheduled_time)?></h5>
 					<?php endif; ?>
 				</div>
 			</div>
+			<?php if ($is_owner): ?>
 			<div class="pull-right">
 				<div class="an-bootstrap-custom-tab">
 					<div class="step-time-schedule">
@@ -54,11 +54,11 @@ $task_status_labels = [
 							<div class="step-action">
 								<button type="submit" 
 										name='start-step' 
-										class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>"
+										class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>">
 									<i class="ion-ios-play"></i> <?php e(lang('st_start'))?>
 								</button>
 								<button class="an-btn an-btn-success btn-finish<?php echo $step->status == 'inprogress' && $is_owner ? '' : ' hidden' ?>" disabled>
-									<i class="ion-ios-checkmark-outline"></i> <?php e(lang('st_finish'))?>
+									<i class="ion-checkmark"></i> <?php e(lang('st_finish'))?>
 								</button>
 							</div>
 							<?php else: ?>
@@ -82,6 +82,7 @@ $task_status_labels = [
 					</div>
 				</div>
 			</div>
+			<?php endif; ?>
 		</div> <!-- end AN-BODY-TOPBAR -->
 	<?php echo form_close() ?>
 

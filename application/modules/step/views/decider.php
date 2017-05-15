@@ -3,11 +3,27 @@ $is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
 if ($step->scheduled_start_time) {
-	$scheduled_start_time = strtotime($step->scheduled_start_time);
-	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
+	// Fix add StrToTime with Float number
+	if ( (int) $step->in !== $step->in ) {
+		switch ($step->in_type) {
+			case 'weeks':
+				$step->in *= 7;
+			case 'days':
+				$step->in *= 24;
+			case 'hours':
+				$step->in *= 60;
+			case 'minutes':
+				$step->in *= 60;
+		}
+	}
 
-	$scheduled_start_time = date('M d, H:i', $scheduled_start_time);
-	$scheduled_end_time = date('M d, H:i', $scheduled_end_time);
+	$scheduled_start_time = strtotime($step->scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $step->in . ' seconds', $scheduled_start_time);
+	$step->in = round( $step->in / 60, 2);
+	$step->in_type = 'minutes';
+
+	$scheduled_start_time = date('Y-m-d H:i:s', $scheduled_start_time);
+	$scheduled_end_time = date('Y-m-d H:i:s', $scheduled_end_time);
 }
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
@@ -46,7 +62,7 @@ $cost_of_time_to_badge = [
 		<div class="an-body-topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
-					<h2><?php e($step->name . ' - ' . lang('st_decider'))?></h2>
+					<h2><?php e($step->name)?></h2>
 				</div>
 			</div>
 			<div class="pull-right">
@@ -68,13 +84,13 @@ $cost_of_time_to_badge = [
 							<tbody>
 								<tr>
 									<td><?php e(lang('st_start_time')) ?></td>
-									<td><?php echo $scheduled_start_time ?></td>
-									<td><?php echo date('M d, H:i', strtotime($step->actual_start_time)) ?></td>
+									<td><?php echo display_time($scheduled_start_time) ?></td>
+									<td><?php echo display_time($step->actual_start_time) ?></td>
 								</tr>
 								<tr>
 									<td><?php e(lang('st_end_time')) ?></td>
-									<td><?php echo $scheduled_end_time ?></td>
-									<td><?php echo date('M d, H:i', strtotime($step->actual_end_time)) ?></td>
+									<td><?php echo display_time($scheduled_end_time) ?></td>
+									<td><?php echo display_time($step->actual_end_time) ?></td>
 								</tr>
 								<tr>
 									<td><?php e(lang('st_elapsed_time')) ?></td>
@@ -136,8 +152,8 @@ $cost_of_time_to_badge = [
 						<?php if($tasks): foreach ($tasks as $task) : ?>
 						<tr id='task-<?php e($task->task_id)?>' data-task-id='<?php e($task->task_id)?>' data-task-status='<?php e($task->status)?>'>
 							<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
-							<td><?php echo $task->started_on ?></td>
-							<td><?php echo $task->started_on ?></td>
+							<td><?php echo display_time($task->started_on) ?></td>
+							<td><?php echo round($task->duration, 2) ?></td>
 							<td>
 								<span class="<?php e($task_status_labels[$task->status])?>">
 									<?php e(lang('st_' . $task->status))?>
@@ -147,7 +163,7 @@ $cost_of_time_to_badge = [
 								<select name="tasks[<?php e($task->task_key) ?>]" class="confirmation-status an-form-control">
 									<option disabled selected value><?php e(lang('st_select_an_option')) ?></option>
 									<?php foreach ($confirmation_status as $status) {
-										echo "<option value='{$status}'>". lang('st_' . $status) ."</option>";
+										echo "<option value='{$status}' ". ($task->confirm_status == $status ? ' selected' : '') .">". lang('st_' . $status) ."</option>";
 									} ?>
 								</select>
 							</td>
@@ -171,7 +187,8 @@ $cost_of_time_to_badge = [
 
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('decider_js', [
-		'action_key' => $action_key
+		'action_key' => $action_key,
+		'step_key' => $step->step_key
 	], true) . '</script>';
 }
 ?>

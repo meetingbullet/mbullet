@@ -62,4 +62,21 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	$('li.update-btn a').click(function() {
+		var url = $(this).data('update-project-status-url');
+		$.get(url).done(function(data) {console.log(data);
+			if (data == 1) {
+				location.reload();
+			}
+		});
+	});
+
+	$('li.update-info-btn a').click(function() {
+		var url = $(this).data('update-project-url');
+		$.get(url).done(function(data) {
+			data = JSON.parse(data);console.log(data);
+			$('#bigModal .modal-content').html(data.modal_content)
+		});
+	})
 });
