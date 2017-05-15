@@ -96,7 +96,7 @@ $members = array_column($invited_members, 'user_id');
 		<?php endif; ?>
 	<?php endif; ?>
 
-	<?php if ($step->manage_state == 'decide'): ?>
+	<?php if ($step->manage_state == 'decide' && $is_owner): ?>
 	<a href='#' id="open-step-decider" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
 	<?php endif; ?>
 </div>
