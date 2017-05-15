@@ -256,8 +256,6 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 .user-name {
 	vertical-align: middle;
 }
-<<<<<<< HEAD
-=======
 
 /* Readmore plugin */
 .readmore {
@@ -275,4 +273,3 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	line-height: 150px;
 	background: linear-gradient(to bottom, rgba(255,255,255,0) 50%,rgba(255,255,255,1) 70%);
 }
->>>>>>> develop
