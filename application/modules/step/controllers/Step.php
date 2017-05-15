@@ -1114,8 +1114,6 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step->scheduled_end_time = $step->scheduled_start_time . ($step->in != 0 ? (' + ' . $step->in . ' ' . ($step->in == 1 ? rtrim($step->in_type, 's') : $step->in_type)) : '');
-
 		$step->members = $this->step_member_model
 							->select('u.user_id, avatar, email, first_name, last_name')
 							->join('users u', 'u.user_id = step_members.user_id')

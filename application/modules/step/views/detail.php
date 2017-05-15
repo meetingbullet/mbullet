@@ -1,6 +1,7 @@
 <?php
 
 $scheduled_start_time = null;
+$is_owner = $step->owner_id == $current_user->user_id;
 
 if ($step->scheduled_start_time) {
 	$scheduled_start_time = strtotime($step->scheduled_start_time);
@@ -75,19 +76,27 @@ $members = array_column($invited_members, 'user_id');
 <div class="btn-block">
 	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a href='#' id="edit-step" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
-	<?php if (in_array($current_user->user_id, $members) || $step->owner_id == $current_user->user_id) : ?>
-	<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo $step->status == 'open' ? ' step-open' : ''?><?php echo $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress' ? '' : ' hidden'?>'>
-		<?php 
-			if ($step->status == 'open') {
-				echo '<i class="ion-ios-play"></i> '. lang('st_set_up');
-			} else {
-				echo '<i class="ion-ios-play"></i> ' . lang($step->owner_id == $current_user->user_id ? ($step->status == 'ready' ? 'st_start' : 'st_monitor') :  'st_join');
-			}
-		?>
-	</a>
+	<?php if (in_array($current_user->user_id, $members) || $is_owner) : ?>
+		<?php if ($step->status == 'open'): ?>
+			<?php if ($is_owner): ?>
+				<a href='#' id="open-step-monitor" class='an-btn an-btn-primary step-open'>
+					<i class="ion-ios-play"></i> <?php e(lang('st_set_up')); ?>
+				</a>
+			<?php endif; ?>
+		<?php elseif ($step->status == 'ready' || $step->status == 'inprogress'): ?>
+			<?php if ($is_owner): ?>
+			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary'>
+				<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
+			</a>
+			<?php elseif ($step->status == 'inprogress') : ?>
+			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary'>
+				<i class="ion-ios-play"></i> <?php e(lang('st_join')); ?>
+			</a>
+			<?php endif; ?>
+		<?php endif; ?>
 	<?php endif; ?>
 
-	<?php if ($step->manage_state == 'decide'): ?>
+	<?php if ($step->manage_state == 'decide' && $is_owner): ?>
 	<a href='#' id="open-step-decider" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
 	<?php endif; ?>
 </div>
@@ -116,7 +125,7 @@ $members = array_column($invited_members, 'user_id');
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
 						<div class="col-xs-8">
-							<span class="<?php e($label[$step->status])?>" id="step-status" data-status="<?php e($step->status)?>" data-is-owner="<?php e($step->owner_id == $current_user->user_id ? 1 : 0)?>"><?php e(lang('st_' . $step->status))?></span>
+							<span class="<?php e($label[$step->status])?>" id="step-status" data-status="<?php e($step->status)?>" data-is-owner="<?php e($is_owner ? 1 : 0)?>"><?php e(lang('st_' . $step->status))?></span>
 						</div>
 
 					</div>
@@ -185,7 +194,7 @@ $members = array_column($invited_members, 'user_id');
 						</table>
 					</div>
 
-					<?php if ($step->status == 'open'): ?>
+					<?php if ($step->status == 'open' && $is_owner): ?>
 					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-task-url="<?php echo site_url('task/create/' . $step_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-task"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->

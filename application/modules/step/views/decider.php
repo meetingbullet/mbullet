@@ -3,8 +3,24 @@ $is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
 if ($step->scheduled_start_time) {
+	// Fix add StrToTime with Float number
+	if ( (int) $step->in !== $step->in ) {
+		switch ($step->in_type) {
+			case 'weeks':
+				$step->in *= 7;
+			case 'days':
+				$step->in *= 24;
+			case 'hours':
+				$step->in *= 60;
+			case 'minutes':
+				$step->in *= 60;
+		}
+	}
+
 	$scheduled_start_time = strtotime($step->scheduled_start_time);
-	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $step->in . ' seconds', $scheduled_start_time);
+	$step->in = round( $step->in / 60, 2);
+	$step->in_type = 'minutes';
 
 	$scheduled_start_time = date('Y-m-d H:i:s', $scheduled_start_time);
 	$scheduled_end_time = date('Y-m-d H:i:s', $scheduled_end_time);
