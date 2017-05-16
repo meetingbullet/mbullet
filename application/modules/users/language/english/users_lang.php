@@ -243,3 +243,11 @@ $lang['form_validation_confirm_required'] = 'Please agree with our Terms of Serv
 $lang['us_with_google'] = 'using Google';
 
 $lang['us_login_google_code_error'] = 'Can not validate with Google, please try again!';
+$lang['us_profile'] = 'Profile';
+$lang['us_password'] = 'Password';
+$lang['us_update_password'] = 'Update Password';
+$lang['us_current_password'] = 'Current Password';
+$lang['us_new_password'] = 'New Password';
+$lang['us_forgot_password'] = 'I forgot my password';
+$lang['us_wrong_current_password'] = 'The current password you\'ve typed is not correct.';
+$lang['us_change_email_subject'] = 'Change email successfully!';

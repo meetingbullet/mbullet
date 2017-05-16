@@ -90,16 +90,6 @@ class User_model extends BF_Model
 		),
 		'profile' => array (
 			array(
-				'field' => 'password',
-				'label' => 'lang:us_reg_password',
-				'rules' => 'trim|max_length[60]',
-			),
-			array(
-				'field' => 'conf_password',
-				'label' => 'lang:us_reg_conf_password',
-				'rules' => 'trim|max_length[60]|matches[password]',
-			),
-			array(
 				'field' => 'first_name',
 				'label' => 'lang:us_reg_first_name',
 				'rules' => 'trim|max_length[255]',
@@ -119,6 +109,23 @@ class User_model extends BF_Model
 				'label' => 'lang:us_reg_google_id_token',
 				'rules' => 'trim|max_length[2048]',
 			)
+		),
+		'change_password' => array(
+			array(
+				'field' => 'current_password',
+				'label' => 'lang:us_current_password',
+				'rules' => 'trim|required|max_length[60]',
+			),
+			array(
+				'field' => 'new_password',
+				'label' => 'lang:us_new_password',
+				'rules' => 'trim|required|max_length[60]',
+			),
+			array(
+				'field' => 'conf_password',
+				'label' => 'lang:us_reg_conf_password',
+				'rules' => 'trim|required|max_length[60]|matches[new_password]',
+			),
 		),
 		'register' => array(
 			array(
