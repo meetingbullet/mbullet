@@ -899,6 +899,7 @@ class Step extends Authenticated_Controller
 
 				$this->task_model->update($task->task_id, [
 					'status' => 'resolved',
+					'finished_on' => $current_time, 
 					'comment' => $this->input->post('comment'),
 					'modified_by' => $this->current_user->user_id
 				]);
@@ -922,6 +923,7 @@ class Step extends Authenticated_Controller
 
 				$this->task_model->update($task->task_id, [
 					'status' => 'parking_lot',
+					'finished_on' => $current_time, 
 					'comment' => $this->input->post('comment'),
 					'modified_by' => $this->current_user->user_id
 				]);
