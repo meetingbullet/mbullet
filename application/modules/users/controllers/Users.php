@@ -315,7 +315,7 @@ class Users extends Front_Controller
 							$email_data = array(
 								'to'	  => $data['email'],
 								'subject' => lang('us_change_email_subject'),
-								'message' => 'You \'ve recently changed your password. Click <a href="' . site_url('/login') . '">here</a> to login again.',
+								'message' => 'You \'ve recently changed your email. Click the link below to login again. Thanks for using our service! ' . site_url('/login'),
 							);
 							$this->emailer->send($email_data, true);
 							$this->logout();
