@@ -100,7 +100,7 @@ $task_status_labels = [
 			<div class="an-component-header">
 				<h6><?php e(lang('st_goal'))?></h6>
 			</div>
-			<div class="an-component-body an-helper-block" style="max-height: 300px; overflow-y: scroll">
+			<div class="an-component-body an-helper-block" style="max-height: 300px; overflow-y: auto">
 				<?php echo nl2br($step->goal) ?>
 			</div>
 		</div>
