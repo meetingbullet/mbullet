@@ -204,7 +204,7 @@
 					<div class="dropdown-menu">
 						<p class="an-info-count">Profile</p>
 						<ul class="an-profile-list">
-							<li><a href="#<?php //e(site_url() . 'users/profile')?>"><i class="icon-user"></i>My profile</a></li>
+							<li><a href="<?php e(site_url() . 'users/profile')?>"><i class="icon-user"></i>My profile</a></li>
 							<!--<li><a href="#"><i class="icon-envelop"></i>My inbox</a></li>
 							<li><a href="#"><i class="icon-calendar-check"></i>Calendar</a></li>
 							<li role="separator" class="divider"></li>
