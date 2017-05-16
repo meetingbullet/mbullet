@@ -49,7 +49,10 @@ $defaultTimezone = isset($user->timezone) ? $user->timezone : strtoupper(setting
 										<label><?php echo lang('us_reg_email') ?></label>
 										<div class="an-input-group">
 											<div class="an-input-group-addon"><i class="ion-ios-email-outline"></i></div>
-											<input type="text" name="email" class="an-form-control <?php echo iif( form_error('email') , 'danger') ;?>" value="<?php echo set_value('email', $user->email) ?>"/>
+											<input type="text" name="new_email" class="an-form-control <?php echo iif( form_error('email') , 'danger') ;?>" value="<?php echo set_value('email', $user->chosen_email) ?>"/>
+											<?php if ($user->chosen_email != $user->email) : ?>
+												<p class="an-small-doc-block"><?php echo sprintf(lang('us_waiting_for_confirmation_or_resend_mail'), '#'); ?></p>
+											<?php endif ?>
 										</div>
 
 										<label><?php echo lang('us_reg_name') ?></label>
