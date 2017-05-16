@@ -258,12 +258,28 @@ class Users extends Front_Controller
 		$this->load->config('address');
 		$this->load->helper('address');
 
+		$user_id = $this->current_user->user_id;
+		$user = $this->user_model->find($user_id);
+
+		if (! empty($user->new_email) && (strtotime('now') < strtotime($user->new_email_expired_on))) {
+			$user->chosen_email = $user->new_email;
+		} else {
+			$user->chosen_email = $user->email;
+			$this->user_model->update($user_id, [
+				'new_email' => null,
+				'new_email_expired_on' => null,
+				'new_email_hash' => null
+			]);
+		}
+
 		$old_password_matched = true;
 		if (isset($_POST['save']) || isset($_POST['save_password'])) {
-			$user_id = $this->current_user->user_id;
-			$user = $this->user_model->find($user_id);
 			$rules = $this->user_model->get_validation_rules();
 			$this->form_validation->set_rules(isset($_POST['save']) ? $rules['profile'] : $rules['change_password']);
+
+			if (trim($this->input->post('new_email')) == $user->email || trim($this->input->post('new_email')) == $user->new_email) {
+				unset($_POST['new_email']);
+			}
 
 			if ($this->form_validation->run() !== false) {
 				if (isset($_POST['save_password'])) {
@@ -291,11 +307,11 @@ class Users extends Front_Controller
 					}
 
 					// User cannot change his email
-					// unset($data['email']);
-					if ($data['email'] != $user->email) {
-						$change_email = true;
-						$data['google_id_token'] = null;
-						$data['google_refresh_token'] = null;
+					unset($data['email']);
+					if (! empty($data['new_email'])) {
+						$this->load->helper('string');
+						$data['new_email_hash'] = sha1(random_string('alnum', 40) . $data['new_email']);
+						$data['new_email_expired_on'] = date('Y-m-d H:i:s', strtotime('+1 week'));
 					}
 
 					if ($this->input->post('new_password')) {
@@ -309,16 +325,25 @@ class Users extends Front_Controller
 						Template::set_message(lang('us_profile_updated_error'), 'danger');
 					} else {
 						Template::set_message(lang('us_profile_updated_success'), 'success');
-						if (! empty($change_email)) {
+						if (! empty($data['new_email'])) {
 							// Now send the email
 							$this->load->library('emailer/emailer');
-							$email_data = array(
-								'to'	  => $data['email'],
-								'subject' => lang('us_change_email_subject'),
-								'message' => 'You \'ve recently changed your email. Click the link below to login again. Thanks for using our service! ' . site_url('/login'),
-							);
-							$this->emailer->send($email_data, true);
-							$this->logout();
+							$this->load->library('parser');
+							$email_template = $this->db->where('email_template_key', 'UPDATE_EMAIL')
+													->where('language_code', 'en_US')
+													->get('email_templates')->row();
+							if (! empty($email_template)) {
+								$email_data = array(
+									'to'	  => $data['new_email'],
+									'subject' => $email_template->email_title,
+									'message' => $this->parser->parse_string(html_entity_decode(nl2br($email_template->email_template_content)), [
+										'URL' => site_url('users/confirm_change_email/' . $data['new_email_hash']),
+										'LABEL' => site_url('users/confirm_change_email/' . $data['new_email_hash'])
+									], true),
+								);
+								$this->emailer->send($email_data);
+							}
+							$user->chosen_email = $data['new_email'];
 						}
 					}
 				} else {
@@ -329,16 +354,142 @@ class Users extends Front_Controller
 			}
 		}
 
-		// Get the current user information.
-		$user = $this->user_model->find($this->current_user->user_id);
-		Assets::add_js($this->load->view('profile_js', [
-			'email' => $this->current_user->email
-		], true), 'inline');
+		Assets::add_js($this->load->view('profile_js', null, true), 'inline');
+		Assets::add_js($this->load->view('resend_confirm_change_email_js', null, true), 'inline');
 		Template::set('old_password_matched', $old_password_matched);
 		Template::set('user', $user);
 		Template::set('languages', unserialize($this->settings_lib->item('site.languages')));
 		Template::set_view('profile');
 		Template::render('account');
+	}
+
+	public function confirm_change_email($code = '')
+	{
+		// Make sure the user is logged in.
+		$this->auth->restrict();
+		$this->set_current_user();
+
+		$user_id = $this->current_user->user_id;
+		$user = $this->user_model->find($user_id);
+		$code = trim($code);
+
+		if ((! empty($code)) && $user->new_email_hash == $code && (strtotime('now') < strtotime($user->new_email_expired_on))) {
+			$data = [
+				'email' => $user->new_email,
+				'new_email' => null,
+				'new_email_expired_on' => null,
+				'new_email_hash' => null
+			];
+
+			$updated = $this->user_model->update($user_id, $data);
+			if ($updated) {
+				Template::set_message(lang('us_change_email_success'), 'success');
+				if (! empty($user->google_refresh_token)) {
+					require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
+					$client_id = $this->config->item('client_id');
+					$client_secret = $this->config->item('client_secret');
+
+					$client = new Google_Client();
+					$client->setAccessType("offline");
+					$client->setClientId($client_id);
+					$client->setClientSecret($client_secret);
+					$client->refreshToken($user->google_refresh_token);
+					$token = $client->getAccessToken();
+					$client->revokeToken($token);
+				}
+				$this->logout();
+			} else {
+				$error = true;
+			}
+		} else {
+			$error = true;
+		}
+
+		Assets::add_js($this->load->view('resend_confirm_change_email_js', null, true), 'inline');
+		Template::set('message', ! empty($error) ? lang('us_change_email_fail') : '');
+		Template::render('account');
+	}
+
+	public function get_current_user_info() {
+		if ((! $this->auth->is_logged_in()) || (! $this->input->is_ajax_request())) {
+			echo json_encode([
+				'status' => 0,
+			]);
+			exit;
+		}
+
+		$this->set_current_user();
+		$user_id = $this->current_user->user_id;
+		$user = $this->user_model->find($user_id);
+
+		echo json_encode([
+			'status' => 1,
+			'data' => $user
+		]);
+		exit;
+	}
+
+	public function resend_confirm_change_email()
+	{
+		if ((! $this->auth->is_logged_in()) || (! $this->input->is_ajax_request())) {
+			echo json_encode([
+				'status' => 0,
+				'message' => lang('us_resend_confirm_fail')
+			]);
+			exit;
+		}
+
+		$this->set_current_user();
+		$user_id = $this->current_user->user_id;
+		$user = $this->user_model->find($user_id);
+
+		$this->load->helper('string');
+		$data['new_email_hash'] = sha1(random_string('alnum', 40) . $user->new_email);
+		$data['new_email_expired_on'] = date('Y-m-d H:i:s', strtotime('+1 week'));
+
+		$updated = $this->user_model->skip_validation(true)->update($user_id, $data);
+		if (! $updated) {
+			echo json_encode([
+				'status' => 0,
+				'message' => lang('us_resend_confirm_fail')
+			]);
+			exit;
+		}
+
+		$this->load->library('emailer/emailer');
+		$this->load->library('parser');
+		$email_template = $this->db->where('email_template_key', 'UPDATE_EMAIL')
+								->where('language_code', 'en_US')
+								->get('email_templates')->row();
+		if (empty($email_template)) {
+			echo json_encode([
+				'status' => 0,
+				'message' => lang('us_resend_confirm_fail')
+			]);
+			exit;
+		}
+		$email_data = array(
+			'to'	  => $user->new_email,
+			'subject' => $email_template->email_title,
+			'message' => $this->parser->parse_string(html_entity_decode(nl2br($email_template->email_template_content)), [
+				'URL' => site_url('users/confirm_change_email/' . $data['new_email_hash']),
+				'LABEL' => site_url('users/confirm_change_email/' . $data['new_email_hash'])
+			], true),
+		);
+		$sent = $this->emailer->send($email_data);
+		if (! $sent) {
+			echo json_encode([
+				'status' => 0,
+				'message' => lang('us_resend_confirm_fail')
+			]);
+			exit;
+		}
+
+		echo json_encode([
+				'status' => 1,
+				'message' => lang('us_resend_confirm_success')
+			]);
+		exit;
 	}
 
 	/**

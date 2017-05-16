@@ -90,6 +90,11 @@ class User_model extends BF_Model
 		),
 		'profile' => array (
 			array(
+				'field' => 'new_email',
+				'label' => 'lang:us_reg_email',
+				'rules' => 'trim|valid_email|max_length[255]|unique[users.email]|unique[users.new_email]',
+			),
+			array(
 				'field' => 'first_name',
 				'label' => 'lang:us_reg_first_name',
 				'rules' => 'trim|max_length[255]',
