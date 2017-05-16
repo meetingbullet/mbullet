@@ -94,7 +94,7 @@ $defaultTimezone = isset($user->timezone) ? $user->timezone : strtoupper(setting
 											<input type="password" name="new_password" class="an-form-control <?php echo iif( form_error('new_password') , 'danger') ;?>" placeholder="<?php echo lang('us_new_password') ?>"/>
 										</div>
 										<div class="an-input-group">
-											<div class="an-input-group-addon"><i class="ion-key"></i></div>
+											<div class="an-input-group-addon"><i class="ion-android-done-all"></i></div>
 											<input type="password" name="conf_password" class="an-form-control <?php echo iif( form_error('conf_password') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_conf_password') ?>"/>
 										</div>
 
