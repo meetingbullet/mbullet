@@ -1,19 +1,51 @@
 		<header class="an-header wow fadeInDown" style="visibility: visible; animation-name: fadeInDown;">
 			<div class="an-topbar-left-part">
-			<h3 class="an-logo-heading">
-				<a class="an-logo-link" href="<?php echo site_url(DEFAULT_LOGIN_LOCATION); ?>"><img src="<?php echo base_url('assets/images/logo-white.svg'); ?>" alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="87" height="31"></a>
-			</h3>
-			<!--<button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">
-				<i class="icon-list"></i>
-			</button>
-			<form class="an-form" action="#">
-				<div class="an-search-field topbar">
-				<input class="an-form-control" type="text" placeholder="Search...">
-				<button class="an-btn an-btn-icon" type="submit">
-					<i class="icon-search"></i>
-				</button>
+				<h3 class="an-logo-heading">
+					<a class="an-logo-link" href="<?php echo site_url(DEFAULT_LOGIN_LOCATION); ?>"><img src="<?php echo base_url('assets/images/logo-white.svg'); ?>" alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="87" height="31"></a>
+				</h3>
+
+				<div class="topbar-action">
+					<div class="btn-group">
+						<button type="button" class="an-btn an-btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<i class="ion-ios-paper-outline"></i>
+							<?php e(lang('projects')) ?> <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<?php if ($current_user->projects && count($current_user->projects)): 
+									foreach ($current_user->projects AS $project):
+							?>
+							
+							<li><a href="#"><?php e($project->name)?></a></li>
+							<?php endforeach; ?>
+							<li role="separator" class="divider"></li>
+							<?php endif; ?>
+
+							<li>
+								<a	href="#" 
+									class='mb-open-modal' 
+									data-modal-id="create-project-modal"
+									data-url="<?php echo site_url('project/create')?>" 
+								>
+									<i class="ion-ios-plus-outline"></i> <?php e(lang('create_project'))?>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<button class="an-btn an-btn-primary"><i class="ion-calendar"></i> <?php e(lang('my_calendar')) ?></button>
 				</div>
-			</form>-->
+
+				<!--<button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">
+					<i class="icon-list"></i>
+				</button>
+				<form class="an-form" action="#">
+					<div class="an-search-field topbar">
+					<input class="an-form-control" type="text" placeholder="Search...">
+					<button class="an-btn an-btn-icon" type="submit">
+						<i class="icon-search"></i>
+					</button>
+					</div>
+				</form>-->
 			</div> <!-- end .AN-TOPBAR-LEFT-PART -->
 
 			<div class="an-topbar-right-part">

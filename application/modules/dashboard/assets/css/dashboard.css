@@ -38,3 +38,7 @@
 .action-panel hr {
 	margin-top: 5px;
 }
+
+.an-breadcrumb {
+	display: none;
+}

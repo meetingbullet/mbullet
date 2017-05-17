@@ -276,10 +276,15 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 
 /* Fix button dropdown display incorrect position */
 .btn-group {
+	display: inline-block;
 	position: relative;
 }
 
 .an-helper-block .btn-group {
 	margin-bottom: 10px;
 	margin-right: 10px;
+}
+
+.topbar-action {
+	margin-left: 40px;
 }

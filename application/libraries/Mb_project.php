@@ -182,8 +182,11 @@ class Mb_project
 			case 'user':
 				$query = $query->where('tm.user_id', $object_id)->get();
 				if ($query->num_rows() > 0) return doubleval($query->row()->total);
+				break;
 			default:
 				return false;
 		}
+
+		return false;
 	}
 }
