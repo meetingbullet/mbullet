@@ -12,7 +12,6 @@ $project_status_labels = [
 	'inactive' => 'label label-warning label-bordered',
 	'archive' => 'label label-success label-bordered',
 ];
-
 ?>
 
 <div class="row">
@@ -72,7 +71,7 @@ $project_status_labels = [
 					</div>
 
 					<button class="an-btn an-btn-primary block-icon"><i class="ion-ios-play-outline"></i><?php e(lang('db_do_work')) ?></button><br>
-					<button class="an-btn an-btn-primary block-icon"><i class="ion-ios-speedometer-outline"></i><?php e(lang('db_review_work')) ?></button><br>
+					<button class="an-btn an-btn-default block-icon"><i class="ion-ios-speedometer-outline"></i><?php e(lang('db_review_work')) ?></button><br>
 				</div>
 			</div> <!-- end .welcome-panel -->
 		</div>
