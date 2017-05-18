@@ -21,6 +21,7 @@
 	<script src="<?php echo Template::theme_url("js-plugins/circle-progress.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/bootstrap-datetimepicker.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/readmore.min.js"); ?>" type="text/javascript"></script>
+	<script src="<?php echo Template::theme_url("js-plugins/jsrender.min.js"); ?>" type="text/javascript"></script>
 
 	<script src="<?php echo Template::theme_url("js/customize-chart.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js/scripts.js"); ?>" type="text/javascript"></script>

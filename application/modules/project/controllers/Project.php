@@ -43,10 +43,11 @@ class Project extends Authenticated_Controller
 		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
 
 		if (isset($_POST['save'])) {
-			if ($this->save_project()) {
+			if ($project = $this->save_project()) {
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
 				Template::set('message', lang('pj_project_successfully_created'));
+				Template::set('data', $project);
 
 				// Just to reduce AJAX request size
 				if ($this->input->is_ajax_request()) {
@@ -103,10 +104,11 @@ class Project extends Authenticated_Controller
 		Template::set('project', $project);
 
 		if (isset($_POST['save'])) {
-			if ($this->save_project('update', $project_id)) {
+			if ($project = $this->save_project('update', $project_id)) {
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
 				Template::set('message', lang('pj_project_successfully_created'));
+				Template::set('data', $project);
 
 				// Just to reduce AJAX request size
 				if ($this->input->is_ajax_request()) {
@@ -232,6 +234,8 @@ class Project extends Authenticated_Controller
 			}
 
 			$this->project_member_model->insert_batch($project_members);
+
+			return $this->ajax_project_data($project_id);
 		} else {
 			if (empty($project_id)) {
 				return false;
@@ -307,6 +311,7 @@ class Project extends Authenticated_Controller
 
 			$this->project_member_model->delete_where(['project_id' => $project_id]);
 			$this->project_member_model->insert_batch($project_members);
+			return $this->ajax_project_data($project_id);
 		}
 
 		return true;
@@ -753,5 +758,19 @@ class Project extends Authenticated_Controller
 
 			$this->db->update_batch('tasks', $tasks, 'task_id');
 		}
+	}
+
+	private function ajax_project_data($project_id)
+	{
+		$project = $this->project_model->select('projects.*, CONCAT(first_name, " ", last_name) AS full_name, first_name, last_name, avatar, email')
+									->join('users u', 'u.user_id = owner_id', 'LEFT')
+									->limit(1)
+									->find($project_id);
+
+		if ($project) {
+			$project->display_user = display_user($project->email, $project->first_name, $project->last_name, $project->avatar);
+		}
+
+		return $project;
 	}
 }

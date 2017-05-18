@@ -164,7 +164,7 @@ $project_status_labels = [
 				</div> <!-- end .an-single-component -->
 			</div>
 		<?php } ?>
-			<div class="col-xs-12">
+			<div id="project-list" class="col-xs-12">
 				<div class="an-single-component with-shadow">
 					<div class="an-component-header">
 						<h6>My Projects</h6>
@@ -267,6 +267,7 @@ $project_status_labels = [
 	</div>
 </div>
 
+
 <div class="modal waiting-modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-sm" role="document">
 		<div class="modal-content">
@@ -278,4 +279,17 @@ $project_status_labels = [
 <script>
 	var CREATE_PROJECT_URL = '<?php echo site_url('project/create')?>';
 	var INVITE_USER_URL = '<?php echo site_url('admin/team/invite')?>';
+</script>
+
+<script id="project-row" type="text">
+	<div class="list-user-single">
+		<div class="list-name basis-10">{{:project_id}}</div>
+		<div class="list-date basis-30"><a href="<?php echo site_url('project')?>/{{:cost_code}}">{{:name}}</a></div>
+		<div class="list-date basis-20">{{:cost_code}}</div>
+		<div class="list-text basis-30">{{:display_user}}</div>
+		<div class="list-state basis-10">
+			<span class="msg-tag label label-{{:status}} label-bordered">{{:status}}</span>
+		</div>
+		<div class="list-action basis-20">{{:created_on}}</div>
+	</div>
 </script>
