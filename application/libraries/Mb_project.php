@@ -183,4 +183,249 @@ class Mb_project
 				return false;
 		}
 	}
+	/**
+	 * Send email to project/action/step/task members
+	 *
+	 * @param int $object_id - project/action/step/task id
+	 * @param string $object_type - project/action/step/task
+	 * @param string $title - email title
+	 * @param string $content - email content maybe a normal string or a template
+	 * @param array $exclude - excluded member ids
+	 * @param boolean $use_template - use template for $content or not
+	 * @param array $data - template data
+	 * 				e.g:
+	 * 				[
+	 * 					'placeholder1' => 'value1' --> normal data
+	 * 					'placeholder2' => [
+	 * 						'field_name' => 'first_name' --> data from table 'users'' of member, in this case it's the field 'first_name'
+	 * 						'user_data' => true --> add this line to recognize this data is from table 'users'
+	 * 					]
+	 * 				]
+	 * @param boolean $override_queue - override email queue or not
+	 * @return boolean - true if sent successfully and vice versa
+	 */
+	public function send_mail_to_members($object_id, $object_type, $title, $content, $exclude = [], $use_template = false, $data = [], $override_queue = false)
+	{
+		if (empty($object_id) || empty($object_type) || empty($title) || empty($content)) {
+			return false;
+		}
+		$object_type = strtolower($object_type);
+		$types = ['project', 'action', 'step', 'task'];
+		if (! in_array($object_type, $types)) {
+			return false;
+		}
+		$this->ci->load->model($object_type . '/' . $object_type . '_model');
+		$this->ci->load->model($object_type . '/' . $object_type . '_member_model');
+		$object_owner = $this->ci->{$object_type . '_model'}
+						->select('u.*, CONCAT(u.first_name, u.last_name) as full_name')
+						->join('users u', 'u.user_id = ' . $object_type . 's.owner_id', 'inner')
+						->as_array()
+						->find($object_id);
+		$object_members = $this->ci->{$object_type . '_member_model'}
+								->select('u.*, CONCAT(u.first_name, u.last_name) as full_name')
+								->join('users u', 'u.user_id = ' . $object_type . '_members.user_id', 'inner')
+								->as_array()
+								->find_all_by($object_type . '_id', $object_id);
+
+		if (empty($object_owner)) {
+			return false;
+		}
+		$members = [$object_owner];
+
+		if (! empty($object_members)) {
+			$members = array_merge($object_members, $members);
+		}
+
+		$members = unique_multidim_array($members, 'user_id');
+		if (is_array($exclude) && ! empty($exclude)) {
+			$filtered_members = array_filter($members, function($v, $k) use ($exclude) {
+				if (! in_array($v['user_id'], $exclude)) {
+					return true;
+				}
+				return false;
+			}, ARRAY_FILTER_USE_BOTH);
+		} else {
+			$filtered_members = $members;
+		}
+
+		$emails = array_column($filtered_members, 'email');
+		$this->ci->load->library('emailer/emailer');
+		if (! $use_template) {
+			$email_data = [
+				'to' => $emails,
+				'subject' => $title,
+				'message' => $content,
+			];
+			// dump(1, $email_data); die;
+			if (empty($override_queue)) {
+				return (boolean) $this->ci->emailer->send($email_data);
+			}
+
+			$queue_data = [];
+			foreach ($emails as $email) {
+				$queue_data[] = [
+					'to_email' => $email,
+					'subject' => $email_data['subject'],
+					'message' => $email_data['message'],
+				];
+			}
+			return (boolean) $this->ci->db->insert_batch('email_queue', $queue_data);
+		}
+		$this->ci->load->library('parser');
+
+		if (! is_array($data) || empty($data)) {
+			return false;
+		}
+
+		$send_bulk_mail = true;
+		foreach ($data as $field) {
+			if (is_array($field)) {
+				if (! empty($field['user_data'])) {
+					$send_bulk_mail = false;
+					break;
+				} else {
+					return false;
+				}
+			}
+		}
+
+		if ($send_bulk_mail) {
+			$email_data = [
+				'to' => $emails,
+				'subject' => $title,
+				'message' => $this->ci->parser->parse_string($content, $data, true)
+			];
+			// dump(2, $email_data);die;
+			if (empty($override_queue)) {
+				return (boolean) $this->ci->emailer->send($email_data, $override_queue);
+			}
+
+			$queue_data = [];
+			foreach ($emails as $email) {
+				$queue_data[] = [
+					'to_email' => $email,
+					'subject' => $email_data['subject'],
+					'message' => $email_data['message'],
+				];
+			}
+			return (boolean) $this->ci->db->insert_batch('email_queue', $queue_data);
+		}
+
+		$count = 0;
+		foreach ($filtered_members as $member) {
+			$template_data = [];
+			foreach ($data as $placeholder => $field) {
+				if (is_array($field)) {
+					if ($field['user_data']) {
+						if (empty($member[$field['field_name']])) {
+							return false;
+						}
+						$template_data[$placeholder] = $member[$field['field_name']];
+					}
+				} else {
+					$template_data[$placeholder] = $field;
+				}
+			}
+
+			$email_data = [
+				'to' => $member['email'],
+				'subject' => $title,
+				'message' => $this->ci->parser->parse_string($content, $template_data, true)
+			];
+			// dump(3 . '.' . ($count + 1), $email_data);
+			$sent = $this->ci->emailer->send($email_data, $override_queue);
+			if ($sent) {
+				$count++;
+			}
+		}
+		return (boolean) $count;
+	}
+	/**
+	 * Send notification mail to project/action/step/task members after create a project/action/step/task or change project/action/step/task status
+	 *
+	 * @param int $object_id - project/action/step/task id
+	 * @param string $object_type - project/action/step/task
+	 * @param string $current_user_id - id of current user for excluding from email targets
+	 * @param string $action_type - to determine which type of email need to send
+	 * @return boolean - true if sent successfully and vice versa
+	 */
+	public function notify_members($object_id, $object_type, $current_user_id, $action_type = 'insert')
+	{
+		if (empty($object_id) || empty($object_type) || empty($action_type) || empty($current_user_id)) {
+			return false;
+		}
+
+		$action_type = strtolower($action_type);
+		$object_type = strtolower($object_type);
+
+		$action_types = ['insert', 'update_status'];
+		if (! in_array($action_type, $action_types)) {
+			return false;
+		}
+
+		$object_types = ['project', 'action', 'step', 'task'];
+		if (! in_array($object_type, $object_types)) {
+			return false;
+		}
+
+		$this->ci->load->model($object_type . '/' . $object_type . '_model', 'object_model');
+		$object_name = $this->ci->object_model->get_field($object_id, 'name');
+		$object_key = $this->ci->object_model->get_field($object_id, $object_type == 'project' ? 'cost_code' : $object_type . '_key');
+
+		$template_key = 'NEW_OBJECT';
+		if ($action_type == 'update_status') {
+			$template_key = 'UPDATE_OBJECT_STATUS';
+		}
+
+		$email_template = $this->ci->db->where('email_template_key', $template_key)
+								->where('language_code', 'en_US')
+								->get('email_templates')->row();
+		if (empty($email_template)) {
+			return false;
+		}
+
+		if ($action_type == 'insert') {
+			$this->ci->load->library('parser');
+			$email_template->email_title = $this->ci->parser->parse_string($email_template->email_title, [
+				'OBJECT_TYPE' => ucfirst($object_type)
+			], true);
+		}
+		return (boolean) $this->send_mail_to_members($object_id, $object_type, $email_template->email_title,
+			html_entity_decode(nl2br($email_template->email_template_content)),
+			[$current_user_id], true, [
+				'OBJECT_TYPE_UC' => strtoupper($object_type),
+				'OBJECT_TYPE' => ucfirst($object_type),
+				'OBJECT_NAME' => $object_name,
+				'USER_NAME' => [
+					'user_data' => true,
+					'field_name' => 'full_name'
+				],
+				'URL' => site_url($object_type . '/' . $object_key),
+				'LABEL' => $object_name
+			], true);
+	}
+}
+/**
+ * Similar to function array_unique() but apply for multidimensional array
+ *
+ * @param array $array - input array
+ * @param string $key - filter key
+ * @return array filtered array
+ */
+if (! function_exists('unique_multidim_array')) {
+	function unique_multidim_array($array, $key)
+	{
+		$temp_array = array();
+		$i = 0;
+		$key_array = array();
+
+		foreach($array as $val) {
+			if (!in_array($val[$key], $key_array)) {
+				$key_array[$i] = $val[$key];
+				$temp_array[$i] = $val;
+			}
+			$i++;
+		}
+		return $temp_array;
+	}
 }
