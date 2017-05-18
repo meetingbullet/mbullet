@@ -10,7 +10,7 @@
 
 application/logs/*.php
 application/archives/*.bak
-application/modules/Test/
+application/modules/test/
 
 public/assets/cache/*
 !public/assets/cache/index.html
