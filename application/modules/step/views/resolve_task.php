@@ -10,7 +10,7 @@
 
 	<div class="an-body-topbar">
 		<div class="an-helper-block">
-			<h4 class=''><?php e(sprintf(lang('st_time_alotted'), $task_id))?></h4>
+			<h4 class=''><?php e(sprintf(lang('st_time_alotted'), $task->name))?></h4>
 		</div>
 	</div>
 
@@ -20,7 +20,7 @@
 				<textarea class='an-form-control' name="comment" rows="6"></textarea>
 		</div> <!-- end .an-helper-block -->
 
-		<div class="<?php echo $this->input->is_ajax_request() ? 'modal-footer' : 'container-fluid pull-right' ?>">
+		<div class="<?php echo IS_AJAX ? 'modal-footer' : 'container-fluid pull-right' ?>">
 			<button type="submit" name="resolve" class="an-btn an-btn-primary btn-resolve"><?php e(lang('st_resolve'))?></button>
 			<button type="submit" name="parking_lot" class="an-btn an-btn-primary-transparent btn-parking-lot"><?php e(lang('st_parking_lot'))?></button>
 		</div>

@@ -98,6 +98,7 @@ class Task extends Authenticated_Controller
 							if (! empty($task_members)) {
 								$inserted = $this->task_member_model->insert_batch($task_members);
 								if ($inserted) {
+									$this->mb_project->notify_members($task_id, 'task', $this->current_user->user_id, 'insert');
 									Template::set('message', lang('tk_create_task_success'));
 									Template::set('message_type', 'success');
 								} else {

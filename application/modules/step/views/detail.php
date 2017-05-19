@@ -99,6 +99,9 @@ $members = array_column($invited_members, 'user_id');
 	<?php if ($step->manage_state == 'decide' && $is_owner): ?>
 	<a href='#' id="open-step-decider" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
 	<?php endif; ?>
+	<?php if ($step->manage_state == 'evaluate'): ?>
+	<a href='#' id="open-step-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
+	<?php endif; ?>
 </div>
 
 <div class="row">
@@ -194,7 +197,7 @@ $members = array_column($invited_members, 'user_id');
 						</table>
 					</div>
 
-					<?php if ($step->status == 'open' && $is_owner): ?>
+					<?php if ($step->status == 'open'): ?>
 					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-task-url="<?php echo site_url('task/create/' . $step_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-task"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->

@@ -242,6 +242,7 @@ class Project extends Authenticated_Controller
 			$project_data['cost_code'] = strtoupper($project_data['cost_code']);
 
 			$project_old_cost_code = $this->project_model->get_field($project_id, 'cost_code');
+			$project_old_status = $this->project_model->get_field($project_id, 'status');
 
 			$project_updated = $this->project_model->update($project_id, $project_data);
 			if ($project_updated === false) {
@@ -307,6 +308,14 @@ class Project extends Authenticated_Controller
 
 			$this->project_member_model->delete_where(['project_id' => $project_id]);
 			$this->project_member_model->insert_batch($project_members);
+		}
+
+		if ($type = 'insert') {
+			$this->mb_project->notify_members($id, 'project', $this->current_user->user_id, 'insert');
+		} else {
+			if ((! empty($project_data['status'])) && $project_data['status'] != $project_old_status) {
+				$this->mb_project->notify_members($id, 'project', $this->current_user->user_id, 'update_status');
+			}
 		}
 
 		return true;
@@ -672,6 +681,7 @@ class Project extends Authenticated_Controller
 				exit;
 			}
 		}
+		$this->mb_project->notify_members($project_id, 'project', $this->current_user->user_id, 'update_status');
 		echo 1;
 		exit;
 	}
