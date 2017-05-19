@@ -72,17 +72,29 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		// Get list resource/team member
 		$project_key = explode('-', $action_key);
 		$project_key = $project_key[0];
 
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 
+		// Create Step from Open Parking Lot tasks
+		if (isset($_POST['from_step'])) {
+			$open_tasks = $this->task_model->where('confirm_status', 'open_parking_lot')
+											->where('step_id', $this->input->post('from_step'))
+											->find_all();
+											
+			Template::set('open_tasks', $open_tasks);
+		} else {
+			Template::set('open_tasks', false);
+		}
+
 		Assets::add_js($this->load->view('create_js', [
 			'project_members' => $project_members
 		], true), 'inline');
 
-		if ($data = $this->input->post()) {
-			$data = $this->step_model->prep_data($data);
+		if (isset($_POST['save'])) {
+			$data = $this->step_model->prep_data($this->input->post());
 			$data['action_id'] = $action->action_id;
 			$data['created_by'] = $this->current_user->user_id;
 
@@ -104,6 +116,7 @@ class Step extends Authenticated_Controller
 						}
 
 						$this->step_member_model->insert_batch($member_data);
+						$this->mb_project->notify_members($id, 'step', $this->current_user->user_id, 'insert');
 					}
 				}
 
@@ -125,7 +138,6 @@ class Step extends Authenticated_Controller
 			Template::render();
 			return;
 		}
-
 
 		Template::set('project_members', $project_members);
 		Template::set('action_key', $action_key);
@@ -237,6 +249,9 @@ class Step extends Authenticated_Controller
 						}
 
 						$this->step_member_model->insert_batch($member_data);
+						if ((! empty($data['status'])) && $data['status'] != $step->status) {
+							$this->mb_project->notify_members($step->step_id, 'step', $this->current_user->user_id, 'update_status');
+						}
 					}
 				}
 
@@ -446,7 +461,9 @@ class Step extends Authenticated_Controller
 
 
 		Assets::add_js($this->load->view('decider_js', [
-			'action_key' => $action_key
+			'action_key' => $action_key,
+			'step_key' => $step->step_key,
+			'step_id' => $step_id
 		], true), 'inline');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
@@ -541,10 +558,13 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$task = $this->task_model->select('name')->limit(1)->find($task_id);
+
 		Template::set('id', 'resolve-task');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
 		Template::set('task_id', $task_id);
+		Template::set('task', $task);
 		Template::render();
 	}
 
@@ -702,6 +722,7 @@ class Step extends Authenticated_Controller
 			]);
 			
 			if ($query) {
+				$this->mb_project->notify_members($step->step_id, 'step', $this->current_user->user_id, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_step_finished'),
@@ -821,7 +842,7 @@ class Step extends Authenticated_Controller
 					'started_on' => $current_time,
 					'modified_by' => $this->current_user->user_id
 				]);
-
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_started'),
@@ -845,7 +866,7 @@ class Step extends Authenticated_Controller
 					'finished_on' => $current_time, 
 					'modified_by' => $this->current_user->user_id
 				]);
-
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_jumped')
@@ -867,7 +888,7 @@ class Step extends Authenticated_Controller
 					'status' => 'skipped', 
 					'modified_by' => $this->current_user->user_id
 				]);
-
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_skipped')
@@ -891,7 +912,7 @@ class Step extends Authenticated_Controller
 					'comment' => $this->input->post('comment'),
 					'modified_by' => $this->current_user->user_id
 				]);
-
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_resolved')
@@ -915,7 +936,7 @@ class Step extends Authenticated_Controller
 					'comment' => $this->input->post('comment'),
 					'modified_by' => $this->current_user->user_id
 				]);
-
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_placed')
@@ -988,7 +1009,7 @@ class Step extends Authenticated_Controller
 			]);
 			exit;
 		}
-
+		$this->mb_project->notify_members($step_id, 'step', $this->current_user->user_id, 'update_status');
 		echo json_encode([
 			'message_type' => 'success',
 			'message' => lang('st_update_status_success')
@@ -1104,6 +1125,39 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$evaluated_members = $this->step_member_rate_model
+								->select('user_id')
+								->where('step_id', $step->step_id)
+								->where('user_id', $this->current_user->user_id)
+								->group_by('user_id')
+								->as_array()
+								->find_all() > 0 ? true : false;
+		$evaluated_ids = [];
+		$evaluated = false;
+
+		if (count($evaluated_members) > 0) {
+			$evaluated_ids = array_column($evaluated_members, 'user_id');
+			if (in_array($this->current_user->user_id, $evaluated_ids)) {
+				$evaluated = true;
+			}
+		}
+
+		if ($evaluated) {
+			Template::set('message', lang('st_step_already_evaluated'));
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 1);
+			Template::render('ajax');
+			return;
+		}
+
+		if ($step->manage_state != 'evaluate') {
+			Template::set('message', lang('st_step_not_ready_for_evaluate'));
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 1);
+			Template::render('ajax');
+			return;
+		}
+
 		$step->members = $this->step_member_model
 							->select('u.user_id, avatar, email, first_name, last_name')
 							->join('users u', 'u.user_id = step_members.user_id')
@@ -1127,21 +1181,14 @@ class Step extends Authenticated_Controller
 		}
 
 		if ($this->input->post()) {
-			$rules = [
-				[
-					'field' => 'attendee_rate[]',
-					'label' => 'lang:st_attendees',
-					'rules' => 'required'
-				],
-				[
-					'field' => 'task_rate[]',
-					'label' => 'lang:st_tasks',
-					'rules' => 'required',
-				],
-			];
+			if (! is_array($this->input->post('attendee_rate'))
+			|| count($this->input->post('attendee_rate')) != count($step->members)
+			|| ! is_array($this->input->post('task_rate'))
+			|| count($this->input->post('task_rate')) != count($tasks)) {
+				$validation_error = true;
+			}
 
-			$this->form_validation->set_rules($rules);
-			if ($this->form_validation->run() !== false) {
+			if (empty($validation_error)) {
 				if (count($this->input->post('attendee_rate')) > 0) {
 					$attendee_rate_data = [];
 					foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
@@ -1179,10 +1226,8 @@ class Step extends Authenticated_Controller
 					Template::set('message', lang('st_rating_success'));
 					Template::set('message_type', 'success');
 					Template::set('close_modal', 0);
+					$this->done_step_if_qualified($step);
 				}
-
-			} else {
-				$validation_error = true;
 			}
 		} else {
 			$validation_error = true;
@@ -1235,6 +1280,7 @@ class Step extends Authenticated_Controller
 		exit;
 	}
 
+
 	private function ajax_step_data($step_id)
 	{
 		$data = $this->step_model->select('steps.*, CONCAT(first_name, " ", last_name) AS full_name, first_name, last_name, avatar, email')
@@ -1248,5 +1294,25 @@ class Step extends Authenticated_Controller
 		}
 
 		return $data;
+	}
+
+	private function done_step_if_qualified($step)
+	{
+		$member_ids[] = $step->owner_id;
+		if (! empty($step->members)) {
+			$members = (array) $step->members;
+			$member_ids = array_merge($member_ids, array_column($members, 'user_id'));
+		}
+
+		$member_ids = array_unique($member_ids);
+		$can_done = $this->step_member_rate_model
+						->select('user_id')
+						->where('step_id', $step->step_id)
+						->group_by('user_id')
+						->count_all() == count($member_ids) ? true : false;
+
+		if ($can_done) {
+			$this->step_model->skip_validation(true)->update($step->step_id, ['manage_state' => 'done']);
+		}
 	}
 }

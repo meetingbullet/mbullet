@@ -170,3 +170,44 @@ $(document).on("submit", '.form-ajax', (e) => {
 		}
 	});
 });
+
+// open step evaluator
+$('#open-step-evaluator').click((e) => {
+	e.preventDefault();
+	var is_owner = $('#open-step-evaluator').data('is-owner');
+	if (is_owner == 0) {
+		swal({
+			title: '<?php echo lang('st_waiting') ?>',
+			text: '<?php echo lang('st_waiting_evaluator') ?>',
+			allowEscapeKey: false,
+			imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
+			showConfirmButton: false
+		});
+
+		var interval = setInterval(function(){
+			$.get('<?php echo site_url('step/check_state/' . $step_key) ?>').done(function(data) {
+				if (data == 1) {
+					clearInterval(interval);
+					swal.close();
+
+					$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+						data = JSON.parse(data);
+						$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+						$('.modal-monitor-evaluator').modal({
+							backdrop: 'static'
+						});
+					});
+				}
+			});
+		}, 3000);
+	} else {
+		$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+			data = JSON.parse(data);
+			$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+			$('.modal-monitor-evaluator').modal({
+				backdrop: 'static'
+			});
+		});
+	}
+});
+

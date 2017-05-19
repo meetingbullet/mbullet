@@ -267,6 +267,12 @@ $project_status_labels = [
 	</div>
 </div>
 
+<div class="modal modal-monitor-evaluator fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-80" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
 
 <div class="modal waiting-modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-sm" role="document">
