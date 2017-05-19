@@ -127,6 +127,8 @@ $lang['st_please_create_a_new_step_to_finish_it'] = 'Please create a new step to
 $lang['st_waiting_evaluator'] = 'Be patient. The Step owner evaluation will finish soon.';
 $lang['st_waiting'] = 'Waiting...';
 $lang['st_evaluator'] = 'Evaluator';
+$lang['st_step_already_evaluated'] = 'You already evaluated this step.';
+$lang['st_step_not_ready_for_evaluate'] = 'This step hasn\'t ready for evaluating yet.';
 
 // Field
 $lang['st_detail'] = 'Detail';
