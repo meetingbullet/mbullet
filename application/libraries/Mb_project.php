@@ -179,9 +179,15 @@ class Mb_project
 				$query = $query->join('steps s', 's.step_id = t.step_id')->join('actions a', 'a.action_id = s.action_id')->where('a.project_id', $object_id)->get();
 				if ($query->num_rows() > 0) return doubleval($query->row()->total);
 				break;
+			case 'user':
+				$query = $query->where('tm.user_id', $object_id)->get();
+				if ($query->num_rows() > 0) return doubleval($query->row()->total);
+				break;
 			default:
 				return false;
 		}
+
+		return false;
 	}
 	/**
 	 * Send email to project/action/step/task members

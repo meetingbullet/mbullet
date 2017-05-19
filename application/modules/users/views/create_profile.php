@@ -3,7 +3,7 @@
 				<div class="col-md-6 col-md-offset-3">
 					<div class="an-login-container">
 					<div class="back-to-home">
-						<a class="an-logo-link" href="<?php e(base_url())?>"><img src="<?php echo img_path() . 'icon.svg' ?>" class='logo-login'/></a>
+						<a class="an-logo-link" href="<?php e(base_url())?>"><img src="<?php echo img_path() . 'logo-black.svg' ?>" class='logo-login'/></a>
 					</div>
 					<div class="an-single-component with-shadow">
 						<div class="an-component-header">

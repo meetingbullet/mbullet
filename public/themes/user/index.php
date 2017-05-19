@@ -5,7 +5,7 @@ echo Template::message();
 ?>
 		<div class="an-page-content">
 <?php
-echo theme_view('_sitenav');
+// echo theme_view('_sitenav');
 ?>
 
 			<div class="an-content-body">

@@ -324,3 +324,10 @@ $lang['form_validation_bf_users'] = 'Users';
 //------------------------------------------------------------------------------
 $lang['show_more'] = 'Show more';
 $lang['show_less'] = 'Show less';
+
+//------------------------------------------------------------------------------
+// Naviation
+//------------------------------------------------------------------------------
+$lang['projects'] = 'Projects';
+$lang['create_project'] = 'Create Project';
+$lang['my_calendar'] = 'My Calendar';

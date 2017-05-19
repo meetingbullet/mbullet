@@ -4,7 +4,7 @@
 						<div class="an-login-container">
 							<div class="an-single-component with-shadow">
 								<div class="an-component-header">
-									<a class="an-logo-link" href="<?php e(base_url())?>"><img src="<?php echo img_path() . 'icon.svg' ?>" class='logo-login'/></a>
+									<a class="an-logo-link" href="<?php e(base_url())?>"><img src="<?php echo img_path() . 'logo-black.svg' ?>" class='logo-login'/></a>
 									<div class="component-header-right">
 										<?php if ($this->settings_lib->item('auth.allow_register')) : ?>
 										<p class="sign-up-link">

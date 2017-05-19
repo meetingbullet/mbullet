@@ -9,7 +9,7 @@ if (! is_null($this->uri->segment(1))) {
 	switch ($this->uri->segment(1)) {
 		case 'dashboard':
 			$breadcrumb[0] = [
-				'name' => 'Home',
+				'name' => 'Dashboard',
 				'path' => null
 			];
 			break;

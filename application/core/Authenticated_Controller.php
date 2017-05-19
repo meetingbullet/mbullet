@@ -37,7 +37,7 @@ class Authenticated_Controller extends Base_Controller
 		parent::__construct();
 		$this->redirect_to_organization_url();
 		$this->goto_create_organization();
-
+		$this->get_navigation_project_list();
 
 		$this->form_validation->CI =& $this;
 		$this->form_validation->set_error_delimiters('', '');
@@ -102,5 +102,15 @@ class Authenticated_Controller extends Base_Controller
 					redirect((is_https() ? 'https://' : 'http://') . $sub . '.' . $main_domain . '/' . DEFAULT_LOGIN_LOCATION);
 			}
 		}
+	}
+
+	private function get_navigation_project_list()
+	{
+		$this->current_user->projects = $this->db->select('name')
+													->join('project_members pm', 'pm.project_id = projects.project_id', 'LEFT')
+													->where('owner_id', $this->current_user->user_id)
+													->or_where('user_id', $this->current_user->user_id)
+													->get('projects')
+													->result();
 	}
 }

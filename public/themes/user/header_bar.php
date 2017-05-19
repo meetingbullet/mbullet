@@ -1,19 +1,51 @@
 		<header class="an-header wow fadeInDown" style="visibility: visible; animation-name: fadeInDown;">
 			<div class="an-topbar-left-part">
-			<h3 class="an-logo-heading">
-				<a class="an-logo-link" href="#"><img src="<?php echo base_url('assets/images/icon.svg'); ?>" alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="87" height="31"></a>
-			</h3>
-			<button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">
-				<i class="icon-list"></i>
-			</button>
-			<form class="an-form" action="#">
-				<div class="an-search-field topbar">
-				<input class="an-form-control" type="text" placeholder="Search...">
-				<button class="an-btn an-btn-icon" type="submit">
-					<i class="icon-search"></i>
-				</button>
+				<h3 class="an-logo-heading">
+					<a class="an-logo-link" href="<?php echo site_url(DEFAULT_LOGIN_LOCATION); ?>"><img src="<?php echo base_url('assets/images/logo-white.svg'); ?>" alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="87" height="31"></a>
+				</h3>
+
+				<div class="topbar-action">
+					<div class="btn-group">
+						<button type="button" class="an-btn an-btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<i class="ion-ios-paper-outline"></i>
+							<?php e(lang('projects')) ?> <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<?php if ($current_user->projects && count($current_user->projects)): 
+									foreach ($current_user->projects AS $project):
+							?>
+							
+							<li><a href="#"><?php e($project->name)?></a></li>
+							<?php endforeach; ?>
+							<li role="separator" class="divider"></li>
+							<?php endif; ?>
+
+							<li>
+								<a	href="#" 
+									class='mb-open-modal' 
+									data-modal-id="create-project-modal"
+									data-url="<?php echo site_url('project/create')?>" 
+								>
+									<i class="ion-ios-plus-outline"></i> <?php e(lang('create_project'))?>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<button class="an-btn an-btn-primary"><i class="ion-calendar"></i> <?php e(lang('my_calendar')) ?></button>
 				</div>
-			</form>
+
+				<!--<button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">
+					<i class="icon-list"></i>
+				</button>
+				<form class="an-form" action="#">
+					<div class="an-search-field topbar">
+					<input class="an-form-control" type="text" placeholder="Search...">
+					<button class="an-btn an-btn-icon" type="submit">
+						<i class="icon-search"></i>
+					</button>
+					</div>
+				</form>-->
 			</div> <!-- end .AN-TOPBAR-LEFT-PART -->
 
 			<div class="an-topbar-right-part">
@@ -22,7 +54,7 @@
 				<button type="button" class="an-btn an-btn-icon dropdown-toggle js-has-new-notification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<i class="ion-ios-bell-outline"></i>
 				</button>
-				<div class="dropdown-menu">
+				<!--<div class="dropdown-menu">
 					<p class="an-info-count">Notifications <span>3</span></p>
 					<div class="an-info-content notifications-info notifications-content ps-container ps-theme-default" data-ps-id="0f0d7128-aed9-6089-d33a-0f028f90e788">
 					<div class="an-info-single unread">
@@ -82,11 +114,11 @@
 						</div>
 						</a>
 					</div>
-					<div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;"><div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps-scrollbar-y-rail" style="top: 0px; right: 0px;"><div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div> <!-- end .AN-INFO-CONTENT -->
+					<div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;"><div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps-scrollbar-y-rail" style="top: 0px; right: 0px;"><div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div> 
 					<div class="an-info-show-all-btn">
 					<a class="an-btn an-btn-transparent fluid rounded uppercase small-font" href="#">Show all</a>
 					</div>
-				</div>
+				</div>-->
 				</div>
 			</div> <!-- end .AN-NOTIFICATION -->
 
@@ -95,7 +127,7 @@
 				<button type="button" class="an-btn an-btn-icon dropdown-toggle js-has-new-messages" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<i class="ion-ios-email-outline"></i>
 				</button>
-				<div class="dropdown-menu">
+				<!--<div class="dropdown-menu">
 					<p class="an-info-count">Messages <span>3</span></p>
 					<div class="an-info-content notifications-info ps-container ps-theme-default" data-ps-id="f8e89032-777a-5cdb-3b04-d217ab26808d">
 					<div class="an-info-single unread">
@@ -163,33 +195,55 @@
 						</div>
 						</a>
 					</div>
-					<div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;"><div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps-scrollbar-y-rail" style="top: 0px; right: 0px;"><div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div> <!-- end .AN-INFO-CONTENT -->
+					<div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;"><div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps-scrollbar-y-rail" style="top: 0px; right: 0px;"><div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div>
 
 					<div class="an-info-show-all-btn">
 					<a class="an-btn an-btn-transparent fluid rounded uppercase small-font" href="#">Show all</a>
 					</div>
-				</div>
+				</div>-->
 				</div>
 			</div> <!-- end .AN-MESSAGE -->
 
-			<div class="an-profile-settings">
-				<div class="btn-group an-notifications-dropown  profile">
-				<button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="an-profile-img" style="background-image: url('<?php echo $current_user->avatar ? img_path() . 'users/' . $current_user->avatar : img_path() . 'default_avatar.png'; ?>');"></span>
-					<span class="an-user-name"><?php echo $current_user->first_name . ' ' . $current_user->last_name ?></span>
-					<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
-				</button>
-				<div class="dropdown-menu">
-					<p class="an-info-count">Profile Settings</p>
-					<ul class="an-profile-list">
-					<li><a href="<?php e(site_url() . 'users/profile')?>"><i class="icon-user"></i>My profile</a></li>
-					<!--<li><a href="#"><i class="icon-envelop"></i>My inbox</a></li>
-					<li><a href="#"><i class="icon-calendar-check"></i>Calendar</a></li>
-					<li role="separator" class="divider"></li>
-					<li><a href="#"><i class="icon-lock"></i>Lock screen</a></li>-->
-					<li><a href="<?php e(site_url() . 'logout')?>"><i class="icon-download-left"></i><?php e(lang('us_logout'))?></a></li>
-					</ul>
+			<div class="an-settings">
+				<div class="btn-group an-notifications-dropown settings">
+					<button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="ion-ios-gear-outline"></i>
+					</button>
+					<div class="dropdown-menu">
+						<p class="an-info-count">Settings</p>
+						<ul class="an-settings-list">
+							<li><a href="<?php echo site_url('admin/settings'); ?>"><i class="ion-ios-settings"></i>Preferences</a></li>
+							<li><a href="<?php echo site_url('admin/team'); ?>"><i class="ion-ios-people-outline"></i>Team</a></li>
+							<li><a href="<?php echo site_url('admin/invites'); ?>"><i class="ion-ios-personadd-outline"></i>Invitations</a></li>
+							<li><a href="<?php echo site_url('admin/billing'); ?>"><i class="ion-social-usd-outline"></i>Billing</a></li>
+							<li><a href="<?php echo site_url('admin/auth'); ?>"><i class="ion-ios-locked-outline"></i>Authentication</a></li>
+						</ul>
+					</div>
 				</div>
+			</div>
+
+			<div class="an-profile-settings">
+				<div class="btn-group an-notifications-dropown profile">
+					<button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="an-profile-img" style="background-image: url('<?php
+						if (empty($current_user->avatar)) echo gravatar_url($current_user->email, 40);
+						elseif (!filter_var($current_user->avatar, FILTER_VALIDATE_URL) === false)	echo $current_user->avatar;
+						else echo $current_user->avatar ? img_path() . 'users/' . $current_user->avatar : img_path() . 'default_avatar.png'; 
+						?>');"></span>
+						<span class="an-user-name"><?php echo $current_user->first_name . ' ' . $current_user->last_name ?></span>
+						<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
+					</button>
+					<div class="dropdown-menu">
+						<p class="an-info-count">Profile</p>
+						<ul class="an-profile-list">
+							<li><a href="<?php e(site_url() . 'users/profile')?>"><i class="icon-user"></i>My profile</a></li>
+							<!--<li><a href="#"><i class="icon-envelop"></i>My inbox</a></li>
+							<li><a href="#"><i class="icon-calendar-check"></i>Calendar</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="#"><i class="icon-lock"></i>Lock screen</a></li>-->
+							<li><a href="<?php e(site_url() . 'logout')?>"><i class="icon-download-left"></i><?php e(lang('us_logout'))?></a></li>
+						</ul>
+					</div>
 				</div>
 			</div> <!-- end .AN-PROFILE-SETTINGS -->
 			</div> <!-- end .AN-TOPBAR-RIGHT-PART -->
