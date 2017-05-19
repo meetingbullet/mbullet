@@ -42,7 +42,6 @@ $task_status_labels = [
 					<?php endif; ?>
 				</div>
 			</div>
-			<?php if ($is_owner): ?>
 			<div class="pull-right">
 				<div class="an-bootstrap-custom-tab">
 					<div class="step-time-schedule">
@@ -50,6 +49,7 @@ $task_status_labels = [
 
 							<h3 id="scheduled-timer" class="step-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
 							
+							<?php if ($is_owner): ?>
 							<?php if ($step->status != 'open'): ?>
 							<div class="step-action">
 								<button type="submit" 
@@ -79,10 +79,10 @@ $task_status_labels = [
 								</span>
 							</div>
 							<?php endif; ?>
+							<?php endif; ?>
 					</div>
 				</div>
 			</div>
-			<?php endif; ?>
 		</div> <!-- end AN-BODY-TOPBAR -->
 	<?php echo form_close() ?>
 

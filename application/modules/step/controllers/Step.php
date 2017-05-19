@@ -557,10 +557,13 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$task = $this->task_model->select('name')->limit(1)->find($task_id);
+
 		Template::set('id', 'resolve-task');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
 		Template::set('task_id', $task_id);
+		Template::set('task', $task);
 		Template::render();
 	}
 
