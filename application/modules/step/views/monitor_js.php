@@ -598,7 +598,7 @@ function update_monitor()
 					title: '<?php echo lang('st_waiting') ?>',
 					text: '<?php echo lang('st_waiting_evaluator') ?>',
 					allowEscapeKey: false,
-					imageUrl: '<?php echo Template::theme_url('images/balls_loading.gif') ?>',
+					imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
 					showConfirmButton: false
 				});
 
