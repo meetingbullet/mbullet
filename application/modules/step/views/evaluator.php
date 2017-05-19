@@ -115,17 +115,17 @@ $task_status_labels = [
 			<?php if (is_array($step->members) && count($step->members) > 0) : ?>
 				<?php foreach ($step->members as $member) : ?>
 				<div class="attendee">
-					<div class="info"><?php echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar) ?></div>
+					<div class="info"><?php echo display_user($member['email'], $member['first_name'], $member['last_name'], $member['avatar']) ?></div>
 					<div class="rating">
-						<input type="radio" id="star5" name="attendee_rate[<?php echo $member->user_id ?>]" <?php echo set_radio('attendee_rate[' . $member->user_id . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
+						<input type="radio" id="star5" name="attendee_rate[<?php echo $member['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $member['user_id'] . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
 						<!--input type="radio" id="star4half" name="attendee_rate[<?php echo $member->user_id ?>]" value="4.5" /><label class="half" for="star4half" title="4.5 stars"></label-->
-						<input type="radio" id="star4" name="attendee_rate[<?php echo $member->user_id ?>]" <?php echo set_radio('attendee_rate[' . $member->user_id . ']', 4) ?> value="4" /><label class = "full" for="star4" title="4 stars"></label>
+						<input type="radio" id="star4" name="attendee_rate[<?php echo $member['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $member['user_id'] . ']', 4) ?> value="4" /><label class = "full" for="star4" title="4 stars"></label>
 						<!--input type="radio" id="star3half" name="attendee_rate[<?php echo $member->user_id ?>]" value="3.5" /><label class="half" for="star3half" title="3.5 stars"></label-->
-						<input type="radio" id="star3" name="attendee_rate[<?php echo $member->user_id ?>]" <?php echo set_radio('attendee_rate[' . $member->user_id . ']', 3) ?> value="3" /><label class = "full" for="star3" title="3 stars"></label>
+						<input type="radio" id="star3" name="attendee_rate[<?php echo $member['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $member['user_id'] . ']', 3) ?> value="3" /><label class = "full" for="star3" title="3 stars"></label>
 						<!--input type="radio" id="star2half" name="attendee_rate[<?php echo $member->user_id ?>]" value="2.5" /><label class="half" for="star2half" title="2.5 stars"></label-->
-						<input type="radio" id="star2" name="attendee_rate[<?php echo $member->user_id ?>]" <?php echo set_radio('attendee_rate[' . $member->user_id . ']', 2) ?> value="2" /><label class = "full" for="star2" title="2 stars"></label>
+						<input type="radio" id="star2" name="attendee_rate[<?php echo $member['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $member['user_id'] . ']', 2) ?> value="2" /><label class = "full" for="star2" title="2 stars"></label>
 						<!--input type="radio" id="star1half" name="attendee_rate[<?php echo $member->user_id ?>]" value="1.5" /><label class="half" for="star1half" title="1.5 stars"></label-->
-						<input type="radio" id="star1" name="attendee_rate[<?php echo $member->user_id ?>]" <?php echo set_radio('attendee_rate[' . $member->user_id . ']', 1) ?> value="1" /><label class = "full" for="star1" title="1 star"></label>
+						<input type="radio" id="star1" name="attendee_rate[<?php echo $member['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $member['user_id'] . ']', 1) ?> value="1" /><label class = "full" for="star1" title="1 star"></label>
 						<!--input type="radio" id="starhalf" name="attendee_rate[<?php echo $member->user_id ?>]" value="0.5" /><label class="half" for="starhalf" title="0.5 stars"></label-->
 					</div>
 				</div>
