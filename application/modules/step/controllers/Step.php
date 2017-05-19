@@ -327,7 +327,13 @@ class Step extends Authenticated_Controller
 									
 		$point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
 
+		$evaluated = $this->is_evaluated($step_id);
+		if ($evaluated === true) {
+			Template::set_message(lang('st_step_already_evaluated'), 'danger');
+		}
+
 		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key], true), 'inline');
+		Template::set('evaluated', $evaluated);
 		Template::set('invited_members', $invited_members);
 		Template::set('point_used', $point_used);
 		Template::set('step', $step);
@@ -1124,37 +1130,12 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$evaluated_members = $this->step_member_rate_model
-								->select('user_id')
-								->where('step_id', $step->step_id)
-								->where('user_id', $this->current_user->user_id)
-								->group_by('user_id')
-								->as_array()
-								->find_all() > 0 ? true : false;
-		$evaluated_ids = [];
-		$evaluated = false;
+		$evaluated = $this->is_evaluated($step_id);
 
-		if (count($evaluated_members) > 0) {
-			$evaluated_ids = array_column($evaluated_members, 'user_id');
-			if (in_array($this->current_user->user_id, $evaluated_ids)) {
-				$evaluated = true;
-			}
-		}
-
-		if ($evaluated) {
-			Template::set('message', lang('st_step_already_evaluated'));
+		if ($evaluated === true || $step->manage_state != 'evaluate') {
+			Template::set('message', $evaluated === true ? lang('st_step_already_evaluated') : lang('st_step_not_ready_for_evaluate'));
 			Template::set('message_type', 'danger');
 			Template::set('close_modal', 1);
-			Template::render('ajax');
-			return;
-		}
-
-		if ($step->manage_state != 'evaluate') {
-			Template::set('message', lang('st_step_not_ready_for_evaluate'));
-			Template::set('message_type', 'danger');
-			Template::set('close_modal', 1);
-			Template::render('ajax');
-			return;
 		}
 
 		$step->members = $this->step_member_model
@@ -1162,6 +1143,7 @@ class Step extends Authenticated_Controller
 							->join('users u', 'u.user_id = step_members.user_id')
 							->where('u.user_id !=', $this->current_user->user_id)
 							->where('step_id', $step_id)
+							->as_array()
 							->find_all();
 
 		$tasks = $this->task_model->select('tasks.*, 
@@ -1179,57 +1161,59 @@ class Step extends Authenticated_Controller
 			}
 		}
 
-		if ($this->input->post()) {
-			if (! is_array($this->input->post('attendee_rate'))
-			|| count($this->input->post('attendee_rate')) != count($step->members)
-			|| ! is_array($this->input->post('task_rate'))
-			|| count($this->input->post('task_rate')) != count($tasks)) {
+		if ($evaluated === false || $step->manage_state == 'evaluate') {
+			if ($this->input->post()) {
+				if (! is_array($this->input->post('attendee_rate'))
+				|| count($this->input->post('attendee_rate')) != count($step->members)
+				|| ! is_array($this->input->post('task_rate'))
+				|| count($this->input->post('task_rate')) != count($tasks)) {
+					$validation_error = true;
+				}
+
+				if (empty($validation_error)) {
+					if (count($this->input->post('attendee_rate')) > 0) {
+						$attendee_rate_data = [];
+						foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
+							$attendee_rate_data[] = [
+								'step_id' => $step_id,
+								'user_id' => $this->current_user->user_id,
+								'attendee_id' => $attendee_id,
+								'rate' => $rate
+							];
+						}
+
+						$attendees_rated = $this->step_member_rate_model->insert_batch($attendee_rate_data);
+						if (empty($attendees_rated)) {
+							$insert_error = true;
+						}
+					}
+
+					if (count($this->input->post('task_rate'))) {
+						$task_rate_data = [];
+						foreach ($this->input->post('task_rate') as $task_id => $rate) {
+							$task_rate_data[] = [
+								'task_id' => $task_id,
+								'user_id' => $this->current_user->user_id,
+								'rate' => $rate
+							];
+						}
+
+						$tasks_rated = $this->task_rate_model->insert_batch($task_rate_data);
+						if (empty($tasks_rated)) {
+							$insert_error = true;
+						}
+					}
+
+					if (empty($insert_error)) {
+						Template::set('message', lang('st_rating_success'));
+						Template::set('message_type', 'success');
+						Template::set('close_modal', 0);
+						$this->done_step_if_qualified($step);
+					}
+				}
+			} else {
 				$validation_error = true;
 			}
-
-			if (empty($validation_error)) {
-				if (count($this->input->post('attendee_rate')) > 0) {
-					$attendee_rate_data = [];
-					foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
-						$attendee_rate_data[] = [
-							'step_id' => $step_id,
-							'user_id' => $this->current_user->user_id,
-							'attendee_id' => $attendee_id,
-							'rate' => $rate
-						];
-					}
-
-					$attendees_rated = $this->step_member_rate_model->insert_batch($attendee_rate_data);
-					if (empty($attendees_rated)) {
-						$insert_error = true;
-					}
-				}
-
-				if (count($this->input->post('task_rate'))) {
-					$task_rate_data = [];
-					foreach ($this->input->post('task_rate') as $task_id => $rate) {
-						$task_rate_data[] = [
-							'task_id' => $task_id,
-							'user_id' => $this->current_user->user_id,
-							'rate' => $rate
-						];
-					}
-
-					$tasks_rated = $this->task_rate_model->insert_batch($task_rate_data);
-					if (empty($tasks_rated)) {
-						$insert_error = true;
-					}
-				}
-
-				if (empty($insert_error)) {
-					Template::set('message', lang('st_rating_success'));
-					Template::set('message_type', 'success');
-					Template::set('close_modal', 0);
-					$this->done_step_if_qualified($step);
-				}
-			}
-		} else {
-			$validation_error = true;
 		}
 
 		if (! empty($validation_error)) {
@@ -1291,11 +1275,33 @@ class Step extends Authenticated_Controller
 		$can_done = $this->step_member_rate_model
 						->select('user_id')
 						->where('step_id', $step->step_id)
+						->where_in('user_id', $member_ids)
 						->group_by('user_id')
 						->count_all() == count($member_ids) ? true : false;
 
 		if ($can_done) {
 			$this->step_model->skip_validation(true)->update($step->step_id, ['manage_state' => 'done']);
 		}
+	}
+
+	private function is_evaluated($step_id) {
+		$evaluated_members = $this->step_member_rate_model
+								->select('user_id')
+								->where('step_id', $step_id)
+								->where('user_id', $this->current_user->user_id)
+								->group_by('user_id')
+								->as_array()
+								->find_all();
+		$evaluated_ids = [];
+		$evaluated = false;
+
+		if (count($evaluated_members) > 0) {
+			$evaluated_ids = array_column($evaluated_members, 'user_id');
+			if (in_array($this->current_user->user_id, $evaluated_ids)) {
+				$evaluated = true;
+			}
+		}
+
+		return $evaluated_ids;
 	}
 }

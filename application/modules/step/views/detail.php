@@ -99,7 +99,7 @@ $members = array_column($invited_members, 'user_id');
 	<?php if ($step->manage_state == 'decide' && $is_owner): ?>
 	<a href='#' id="open-step-decider" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
 	<?php endif; ?>
-	<?php if ($step->manage_state == 'evaluate'): ?>
+	<?php if ($step->manage_state == 'evaluate' || $evaluated === false): ?>
 	<a href='#' id="open-step-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
 	<?php endif; ?>
 </div>
