@@ -62,10 +62,10 @@ $task_status_labels = [
 		</div>
 	</div> <!-- end AN-BODY-TOPBAR -->
 
-	<div class="col-md-4">
+	<div class="col-md-5">
 		<div class="an-single-component">
 			<div class="an-component-body an-helper-block">
-				<table class="table">
+				<table class="table table-striped table-step-time">
 					<thead>
 						<tr>
 							<th></th>
@@ -86,8 +86,8 @@ $task_status_labels = [
 						</tr>
 						<tr>
 							<td><strong><?php echo lang('st_elapsed_time') ?></strong></td>
-							<td class="text-center"><?php e($step->in . ' ' . $step->in_type) ?></td>
-							<td class="text-center"><?php e(round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes')) ?></td>
+							<td class="text-center"><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
+							<td class="text-center"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></td>
 						</tr>
 					</tbody>
 				</table>
@@ -106,7 +106,7 @@ $task_status_labels = [
 		</div>
 	</div>
 
-	<div class="col-md-4">
+	<div class="col-md-3">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_attendees'))?></h6>

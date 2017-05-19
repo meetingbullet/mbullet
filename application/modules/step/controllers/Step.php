@@ -72,29 +72,28 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		// Get list resource/team member
 		$project_key = explode('-', $action_key);
 		$project_key = $project_key[0];
-
-		// get projecct id
-		// $project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
-		// if ($project_id === false) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
-
-		// if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		// && $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		// && $this->auth->has_permission('Project.Edit.All') === false) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
-
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+
+		// Create Step from Open Parking Lot tasks
+		if (isset($_POST['from_step'])) {
+			$open_tasks = $this->task_model->where('confirm_status', 'open_parking_lot')
+											->where('step_id', $this->input->post('from_step'))
+											->find_all();
+											
+			Template::set('open_tasks', $open_tasks);
+		} else {
+			Template::set('open_tasks', false);
+		}
 
 		Assets::add_js($this->load->view('create_js', [
 			'project_members' => $project_members
 		], true), 'inline');
 
-		if ($data = $this->input->post()) {
-			$data = $this->step_model->prep_data($data);
+		if (isset($_POST['save'])) {
+			$data = $this->step_model->prep_data($this->input->post());
 			$data['action_id'] = $action->action_id;
 			$data['created_by'] = $this->current_user->user_id;
 
@@ -138,7 +137,6 @@ class Step extends Authenticated_Controller
 			Template::render();
 			return;
 		}
-
 
 		Template::set('project_members', $project_members);
 		Template::set('action_key', $action_key);
@@ -462,7 +460,9 @@ class Step extends Authenticated_Controller
 
 
 		Assets::add_js($this->load->view('decider_js', [
-			'action_key' => $action_key
+			'action_key' => $action_key,
+			'step_key' => $step->step_key,
+			'step_id' => $step_id
 		], true), 'inline');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);

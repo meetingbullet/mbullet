@@ -121,6 +121,9 @@ $lang['st_all_task_confirmed_step_closed_out'] = 'All tasks confirmed. Step is n
 $lang['st_unknown_error'] = 'Unknown error';
 $lang['st_please_select_all_confirmation_status'] = 'Please select all confirmation status';
 $lang['st_waiting_evaluator'] = 'Waiting for Step owner evaluation.';
+$lang['st_task_x_was_place_in_open_parking_plot'] = 'Task <strong>%s - %s</strong> was placed in open parking lot. Please create a new step to finish it.';
+$lang['st_there_tasks_were_placed_in_open_parking_lot'] = 'These tasks were placed in open parking lot:';
+$lang['st_please_create_a_new_step_to_finish_it'] = 'Please create a new step to finish it.';
 
 // Field
 $lang['st_detail'] = 'Detail';
