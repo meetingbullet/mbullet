@@ -1121,6 +1121,39 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$evaluated_members = $this->step_member_rate_model
+								->select('user_id')
+								->where('step_id', $step->step_id)
+								->where('user_id', $this->current_user->user_id)
+								->group_by('user_id')
+								->as_array()
+								->find_all() > 0 ? true : false;
+		$evaluated_ids = [];
+		$evaluated = false;
+
+		if (count($evaluated_members) > 0) {
+			$evaluated_ids = array_column($evaluated_members, 'user_id');
+			if (in_array($this->current_user->user_id, $evaluated_ids)) {
+				$evaluated = true;
+			}
+		}
+
+		if ($evaluated) {
+			Template::set('message', lang('st_step_already_evaluated'));
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 1);
+			Template::render('ajax');
+			return;
+		}
+
+		if ($step->manage_state != 'evaluate') {
+			Template::set('message', lang('st_step_not_ready_for_evaluate'));
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 1);
+			Template::render('ajax');
+			return;
+		}
+
 		$step->members = $this->step_member_model
 							->select('u.user_id, avatar, email, first_name, last_name')
 							->join('users u', 'u.user_id = step_members.user_id')
@@ -1189,6 +1222,7 @@ class Step extends Authenticated_Controller
 					Template::set('message', lang('st_rating_success'));
 					Template::set('message_type', 'success');
 					Template::set('close_modal', 0);
+					$this->done_step_if_qualified($step);
 				}
 			}
 		} else {
@@ -1240,5 +1274,25 @@ class Step extends Authenticated_Controller
 
 		echo 1;
 		exit;
+	}
+
+	private function done_step_if_qualified($step)
+	{
+		$member_ids[] = $step->owner_id;
+		if (! empty($step->members)) {
+			$members = (array) $step->members;
+			$member_ids = array_merge($member_ids, array_column($members, 'user_id'));
+		}
+
+		$member_ids = array_unique($member_ids);
+		$can_done = $this->step_member_rate_model
+						->select('user_id')
+						->where('step_id', $step->step_id)
+						->group_by('user_id')
+						->count_all() == count($member_ids) ? true : false;
+
+		if ($can_done) {
+			$this->step_model->skip_validation(true)->update($step->step_id, ['manage_state' => 'done']);
+		}
 	}
 }
