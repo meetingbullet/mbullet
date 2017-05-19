@@ -17,3 +17,11 @@ $lang['tk_cancel'] = 'Cancel';
 $lang['tk_add_task_member_fail'] = 'Unable to add task members.';
 $lang['tk_task_key_does_not_exist'] = 'Task key does not exist';
 $lang['tk_step_key_does_not_exist'] = 'Step key does not exist';
+
+// Status
+$lang['tk_open'] = 'Open';
+$lang['tk_inprogress'] = 'In-progress';
+$lang['tk_resolved'] = 'Resolved';
+$lang['tk_skipped'] = 'Skipped';
+$lang['tk_jumped'] = 'Jumped';
+$lang['tk_parking_lot'] = 'Parking Lot';

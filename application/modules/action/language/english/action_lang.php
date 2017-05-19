@@ -71,3 +71,9 @@ $lang['ac_resolve'] = 'Resolve';
 $lang['ac_resolved'] = 'Resolved';
 $lang['ac_action_name'] = 'Name';
 $lang['ac_back'] = 'Back';
+
+// Status
+$lang['ac_open'] = 'Open';
+$lang['ac_inprogress'] = 'In-progress';
+$lang['ac_ready'] = 'Ready';
+$lang['ac_resolved'] = 'Resolved';

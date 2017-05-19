@@ -75,6 +75,7 @@ class Step extends Authenticated_Controller
 		// Get list resource/team member
 		$project_key = explode('-', $action_key);
 		$project_key = $project_key[0];
+
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 
 		// Create Step from Open Parking Lot tasks
@@ -122,7 +123,7 @@ class Step extends Authenticated_Controller
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
 				Template::set('message', lang('st_step_successfully_created'));
-
+				Template::set('data', $this->ajax_step_data($id));
 				// Just to reduce AJAX request size
 				if (IS_AJAX) {
 					Template::set('content', '');
@@ -1277,6 +1278,22 @@ class Step extends Authenticated_Controller
 
 		echo 1;
 		exit;
+	}
+
+
+	private function ajax_step_data($step_id)
+	{
+		$data = $this->step_model->select('steps.*, CONCAT(first_name, " ", last_name) AS full_name, first_name, last_name, avatar, email')
+									->join('users u', 'u.user_id = owner_id', 'LEFT')
+									->limit(1)
+									->find($step_id);
+
+		if ($data) {
+			$data->display_user = display_user($data->email, $data->first_name, $data->last_name, $data->avatar);
+			$data->lang_status = lang('st_' . $data->status);
+		}
+
+		return $data;
 	}
 
 	private function done_step_if_qualified($step)

@@ -152,7 +152,7 @@ $members = array_column($invited_members, 'user_id');
 			<div class="an-component-header">
 				<h6><?php e(lang('st_tasks'))?></h6>
 				</div>
-			<div class="an-component-body">
+			<div id="task-list" class="an-component-body">
 				<div class="an-helper-block">
 					<div class="an-scrollable-x">
 						<table class="table table-striped table-detail-task">
@@ -170,7 +170,7 @@ $members = array_column($invited_members, 'user_id');
 							</thead>
 							<tbody>
 								<?php if($tasks): foreach ($tasks as $task) : ?>
-								<tr data-confirm-status="<?php e($task->confirm_status) ?>">
+								<tr data-task-id="<?php e($task->task_id) ?>" data-confirm-status="<?php e($task->confirm_status) ?>">
 									<td class='basis-10'><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
 									<td class='basis-15'><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
 									<td class='basis-20'><?php echo word_limiter($task->description, 20)?></td>
@@ -182,7 +182,7 @@ $members = array_column($invited_members, 'user_id');
 										} ?>
 									</td>
 									<td class='basis-10 task-status'>
-										<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
+										<span class="label label-bordered label-<?php e($task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 									</td>
 									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
 									<td class='basis-10 task-status'>
@@ -339,3 +339,16 @@ $members = array_column($invited_members, 'user_id');
 		</div>
 	</div>
 </div>
+<script type="text" id="task-row">
+	<tr data-task-id="{{:task_id}}" data-confirm-status="">
+		<td class="basis-10">{{:task_id}}</td>
+		<td class="basis-15">{{:name}}</td>
+		<td class="basis-20">{{:description}}</td>
+		<td class="basis-20">
+			{{:assignees}}
+		</td>
+		<td class="basis-10 task-status">
+			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
+		</td>
+	</tr>
+</script>

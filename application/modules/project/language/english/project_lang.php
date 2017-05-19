@@ -21,6 +21,9 @@ $lang['pj_back'] = 'Back';
 $lang['pj_point_defined'] = 'Point defined';
 $lang['pj_point_used'] = 'Point Used';
 $lang['pj_total_project_point_used'] = 'Total project points used';
+$lang['pj_open'] = 'Open';
+$lang['pj_inactive'] = 'Inactive';
+$lang['pj_archive'] = 'Archive';
 
 // Messages
 $lang['pj_project_successfully_created'] = 'Project successfully created';

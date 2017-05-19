@@ -18,7 +18,6 @@ $('#add-step').click((e) => {
 
 	$.get('<?php e(site_url('step/create/' . $action_key)) ?>', (data) => {
 		data = JSON.parse(data);
-		console.log(data.modal_content);
 		$('.modal .modal-content').html(data.modal_content);
 		$('.modal').modal({backdrop: "static"});
 	});
@@ -59,8 +58,8 @@ $(document).on("submit", '.form-ajax', (e) => {
 				});
 
 				if (data.message_type == 'success') {
-					// @TODO Refresh Step list
-					location.reload();
+					// Step created
+					$('#step-list tbody').append($.templates('#step-row').render(data.data));
 				}
 			}
 		}

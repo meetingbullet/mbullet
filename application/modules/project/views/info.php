@@ -26,7 +26,7 @@ $task_status_labels = [
 		</div>
 	</div>
 	<div class="an-component-body padding20">
-		<div class="an-user-lists user-stats">
+		<div id="action-list" class="an-user-lists user-stats">
 			<div class="list-title">
 				<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
 				<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
@@ -35,12 +35,11 @@ $task_status_labels = [
 				<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
 			</div>
 
-			<div class="an-lists-body an-customScrollbar ps-container ps-theme-default">
-
+			<div class="an-lists-body">
 			<?php if (is_array($lists['actions']) && count($lists['actions']) > 0) : ?>
 				<?php foreach ($lists['actions'] as $item) : ?>
 
-				<div class="list-user-single">
+				<div data-action-id="<?php e($item->action_id) ?>" class="list-user-single">
 					<div class="list-date number basis-30">
 						<a href="<?php e("/action/{$item->action_key}") ?>"><?php e($item->action_key) ?></a>
 					</div>
@@ -54,7 +53,7 @@ $task_status_labels = [
 						<?php e($item->point_used) ?>
 					</div>
 					<div class="list-action basis-20">
-						<span class="msg-tag <?php echo $label[$item->status] ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
+						<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
 					</div>
 				</div> <!-- end .USER-LIST-SINGLE -->
 
@@ -94,12 +93,12 @@ $task_status_labels = [
 				<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
 			</div>
 
-			<div class="an-lists-body an-customScrollbar ps-container ps-theme-default">
+			<div class="an-lists-body">
 
 			<?php if (is_array($lists['steps']) && count($lists['steps']) > 0) : ?>
 				<?php foreach ($lists['steps'] as $item) : ?>
 
-				<div class="list-user-single">
+				<div data-step-id="<?php e($item->step_id) ?>" class="list-user-single">
 					<div class="list-date number basis-30">
 						<a href="<?php e("/step/{$item->step_key}") ?>"><?php e($item->step_key) ?></a>
 					</div>
@@ -110,7 +109,7 @@ $task_status_labels = [
 						<?php e($item->point_used) ?>
 					</div>
 					<div class="list-action basis-20">
-						<span class="msg-tag <?php echo $label[$item->status] ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
+						<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
 					</div>
 				</div> <!-- end .USER-LIST-SINGLE -->
 
@@ -149,12 +148,12 @@ $task_status_labels = [
 				<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
 			</div>
 
-			<div class="an-lists-body an-customScrollbar ps-container ps-theme-default">
+			<div class="an-lists-body">
 
 			<?php if (is_array($lists['tasks']) && count($lists['tasks']) > 0) : ?>
 				<?php foreach ($lists['tasks'] as $item) : ?>
 
-				<div class="list-user-single">
+				<div data-task-id="<?php e($item->task_id) ?>" class="list-user-single">
 					<div class="list-date number basis-30">
 						<a href="<?php e("/task/{$item->task_key}") ?>"><?php e($item->task_key) ?></a>
 					</div>
@@ -162,7 +161,7 @@ $task_status_labels = [
 						<a href="<?php e("/task/{$item->task_key}") ?>"><?php e($item->name) ?></a>
 					</div>
 					<div class="list-action basis-20">
-						<span class="msg-tag <?php echo isset($task_status_labels[$item->status]) ? $task_status_labels[$item->status] : 'label label-default' ?>"><?php e(lang('pj_' . $item->status)) ?></span>
+						<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(lang('pj_' . $item->status)) ?></span>
 					</div>
 				</div> <!-- end .USER-LIST-SINGLE -->
 
@@ -188,3 +187,19 @@ $task_status_labels = [
 		<?php endif ?>
 	</div> <!-- end .AN-COMPONENT-BODY -->
 </div>
+
+<script id="action-row" type="text">
+	<div data-action-id="{{:action_id}}" class="list-user-single">
+		<div class="list-date number basis-30">
+			<a href="<?php echo site_url('action') ?>/{{:action_key}}">{{:action_key}}</a>
+		</div>
+		<div class="list-name basis-50">
+			<a href="<?php echo site_url('action') ?>/{{:action_key}}">{{:name}}</a>
+		</div>
+		<div class="list-name basis-30">{{:point_value}}</div>
+		<div class="list-name basis-30">{{:point_used}}</div>
+		<div class="list-action basis-20">
+			<span class="msg-tag label label-{{:status}} label-bordered">{{:lang_status}}</span>
+		</div>
+	</div> <!-- end .USER-LIST-SINGLE -->
+</script>

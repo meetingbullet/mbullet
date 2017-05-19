@@ -10,7 +10,7 @@ $task_types = [
 	<h4 class="modal-title" id="myModaloneLabel"><?php e(lang('tk_create_task')) ?></h4>
 </div> <!-- end MODAL-HEADER -->
 
-<?php echo form_open($this->uri->uri_string(), ['class' => 'form-ajax']) ?>
+<?php echo form_open($this->uri->uri_string(), ['class' => 'form-ajax', 'id' => 'create-task']) ?>
 
 <div class="container-fluid modal-body">
 	<?php echo mb_form_input('text', 'name', lang('tk_name'), true, set_value('name')) ?>
