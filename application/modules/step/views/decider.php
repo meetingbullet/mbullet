@@ -84,19 +84,19 @@ $cost_of_time_to_badge = [
 							</thead>
 							<tbody>
 								<tr>
-									<td><?php e(lang('st_start_time')) ?></td>
-									<td><?php echo display_time($scheduled_start_time) ?></td>
-									<td><?php echo display_time($step->actual_start_time) ?></td>
+									<td><strong><?php e(lang('st_start_time')) ?></strong></td>
+									<td class="text-center"><?php echo display_time($scheduled_start_time) ?></td>
+									<td class="text-center"><?php echo display_time($step->actual_start_time) ?></td>
 								</tr>
 								<tr>
-									<td><?php e(lang('st_end_time')) ?></td>
-									<td><?php echo display_time($scheduled_end_time) ?></td>
-									<td><?php echo display_time($step->actual_end_time) ?></td>
+									<td><strong><?php e(lang('st_end_time')) ?></strong></td>
+									<td class="text-center"><?php echo display_time($scheduled_end_time) ?></td>
+									<td class="text-center"><?php echo display_time($step->actual_end_time) ?></td>
 								</tr>
 								<tr>
-									<td><?php e(lang('st_elapsed_time')) ?></td>
-									<td><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
-									<td><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></td>
+									<td><strong><?php e(lang('st_elapsed_time')) ?></strong></td>
+									<td class="text-center"><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
+									<td class="text-center"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></td>
 								</tr>
 							</tbody>
 						</table>
@@ -189,7 +189,8 @@ $cost_of_time_to_badge = [
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('decider_js', [
 		'action_key' => $action_key,
-		'step_key' => $step->step_key
+		'step_key' => $step->step_key,
+		'step_id' => $step->step_id
 	], true) . '</script>';
 }
 ?>
