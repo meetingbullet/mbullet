@@ -330,7 +330,7 @@ class Step extends Authenticated_Controller
 
 		$evaluated = $this->is_evaluated($step_id);
 		if ($evaluated === true) {
-			Template::set_message(lang('st_step_already_evaluated'), 'danger');
+			Template::set_message(lang('st_step_already_evaluated'), 'info');
 		}
 
 		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key], true), 'inline');
