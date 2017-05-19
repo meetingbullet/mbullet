@@ -525,75 +525,75 @@
  * Sweetalerts initialization
  */
 
-function BasicAlerts(){
-  swal("Here's a message!")
-}
+// function BasicAlerts(){
+//   swal("Here's a message!")
+// }
 
-function AlertsWithTextUnder(){
-  swal("Here's a message!", "It's pretty, isn't it?")
-}
+// function AlertsWithTextUnder(){
+//   swal("Here's a message!", "It's pretty, isn't it?")
+// }
 
-function AlertsSuccess(){
-  swal("Good job!", "You clicked the button!", "success")
-}
+// function AlertsSuccess(){
+//   swal("Good job!", "You clicked the button!", "success")
+// }
 
-function AlertsWithConfirm(){
-  swal({
-    title: "Are you sure?",
-    text: "You will not be able to recover this imaginary file!",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#DD6B55",
-    confirmButtonText: "Yes, delete it!",
-    closeOnConfirm: false
-  },
-  function(){
-    swal("Deleted!", "Your imaginary file has been deleted.", "success");
-  });
-}
+// function AlertsWithConfirm(){
+//   swal({
+//     title: "Are you sure?",
+//     text: "You will not be able to recover this imaginary file!",
+//     type: "warning",
+//     showCancelButton: true,
+//     confirmButtonColor: "#DD6B55",
+//     confirmButtonText: "Yes, delete it!",
+//     closeOnConfirm: false
+//   },
+//   function(){
+//     swal("Deleted!", "Your imaginary file has been deleted.", "success");
+//   });
+// }
 
-function AlertsWithCancel(){
-  swal({
-    title: "Are you sure?",
-    text: "You will not be able to recover this imaginary file!",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#DD6B55",
-    confirmButtonText: "Yes, delete it!",
-    cancelButtonText: "No, cancel plx!",
-    closeOnConfirm: false,
-    closeOnCancel: false
-  },
-  function(isConfirm){
-    if (isConfirm) {
-      swal("Deleted!", "Your imaginary file has been deleted.", "success");
-    } else {
-      swal("Cancelled", "Your imaginary file is safe :)", "error");
-    }
-  });
-}
+// function AlertsWithCancel(){
+//   swal({
+//     title: "Are you sure?",
+//     text: "You will not be able to recover this imaginary file!",
+//     type: "warning",
+//     showCancelButton: true,
+//     confirmButtonColor: "#DD6B55",
+//     confirmButtonText: "Yes, delete it!",
+//     cancelButtonText: "No, cancel plx!",
+//     closeOnConfirm: false,
+//     closeOnCancel: false
+//   },
+//   function(isConfirm){
+//     if (isConfirm) {
+//       swal("Deleted!", "Your imaginary file has been deleted.", "success");
+//     } else {
+//       swal("Cancelled", "Your imaginary file is safe :)", "error");
+//     }
+//   });
+// }
 
-function AlertsWithPrompt(){
-  swal({
-    title: "An input!",
-    text: "Write something interesting:",
-    type: "input",
-    showCancelButton: true,
-    closeOnConfirm: false,
-    animation: "slide-from-top",
-    inputPlaceholder: "Write something"
-  },
-  function(inputValue){
-    if (inputValue === false) return false;
+// function AlertsWithPrompt(){
+//   swal({
+//     title: "An input!",
+//     text: "Write something interesting:",
+//     type: "input",
+//     showCancelButton: true,
+//     closeOnConfirm: false,
+//     animation: "slide-from-top",
+//     inputPlaceholder: "Write something"
+//   },
+//   function(inputValue){
+//     if (inputValue === false) return false;
 
-    if (inputValue === "") {
-      swal.showInputError("You need to write something!");
-      return false
-    }
+//     if (inputValue === "") {
+//       swal.showInputError("You need to write something!");
+//       return false
+//     }
 
-    swal("Nice!", "You wrote: " + inputValue, "success");
-  });
-}
+//     swal("Nice!", "You wrote: " + inputValue, "success");
+//   });
+// }
 
 
 

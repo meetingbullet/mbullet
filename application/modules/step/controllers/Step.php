@@ -1147,21 +1147,14 @@ class Step extends Authenticated_Controller
 		}
 
 		if ($this->input->post()) {
-			$rules = [
-				[
-					'field' => 'attendee_rate[]',
-					'label' => 'lang:st_attendees',
-					'rules' => 'required'
-				],
-				[
-					'field' => 'task_rate[]',
-					'label' => 'lang:st_tasks',
-					'rules' => 'required',
-				],
-			];
+			if (! is_array($this->input->post('attendee_rate'))
+			|| count($this->input->post('attendee_rate')) != count($step->members)
+			|| ! is_array($this->input->post('task_rate'))
+			|| count($this->input->post('task_rate')) != count($tasks)) {
+				$validation_error = true;
+			}
 
-			$this->form_validation->set_rules($rules);
-			if ($this->form_validation->run() !== false) {
+			if (empty($validation_error)) {
 				if (count($this->input->post('attendee_rate')) > 0) {
 					$attendee_rate_data = [];
 					foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
@@ -1200,9 +1193,6 @@ class Step extends Authenticated_Controller
 					Template::set('message_type', 'success');
 					Template::set('close_modal', 0);
 				}
-
-			} else {
-				$validation_error = true;
 			}
 		} else {
 			$validation_error = true;

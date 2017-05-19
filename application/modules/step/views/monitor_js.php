@@ -594,14 +594,19 @@ function update_monitor()
 					$('#step-decider').modal({backdrop: "static"});
 				});
 			} else {
-				$('.wating-modal').modal({
-					backdrop: 'static'
+				swal({
+					title: '<?php echo lang('st_waiting') ?>',
+					text: '<?php echo lang('st_waiting_evaluator') ?>',
+					allowEscapeKey: false,
+					imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
+					showConfirmButton: false
 				});
+
 				var interval = setInterval(function(){
 					$.get('<?php echo site_url('step/check_state/' . $step_key) ?>').done(function(data) {
 						if (data == 1) {
 							clearInterval(interval);
-							$('.wating-modal').modal('hide');
+							swal.close();
 
 							$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
 								data = JSON.parse(data);

@@ -57,7 +57,7 @@ $task_status_labels = [
 	<div class="an-body-topbar">
 		<div class="an-page-title">
 			<div class="an-bootstrap-custom-tab">
-				<h2><?php e($step->name . ' - ' . lang('st_evaluation'))?></h2>
+				<h2><?php e($step->name)?></h2>
 			</div>
 		</div>
 	</div> <!-- end AN-BODY-TOPBAR -->
