@@ -97,7 +97,7 @@ $project_key = $project_key['0'];
 				<div class="an-component-header">
 					<h6><?php e(lang('ac_steps'))?></h6>
 					</div>
-				<div class="an-component-body">
+				<div id="step-list" class="an-component-body">
 					<div class="an-helper-block">
 						<div class="an-scrollable-x">
 							<table class="table table-striped table-step">
@@ -112,12 +112,12 @@ $project_key = $project_key['0'];
 								</thead>
 								<tbody>
 									<?php if (is_array($steps)) : foreach ($steps as $step): ?>
-									<tr>
+									<tr data-step-id="<?php e($step->step_id)?> " >
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->step_key); ?></td>
 										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?></td>
 										<td><?php e($step->point_used); ?></td>
 										<td><?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?></td>
-										<td><span class="<?php echo $step_label[$step->status]; ?>"><?php e($step->status)?></span></td>
+										<td><span class="label label-bordered label-<?php echo $step->status ?>"><?php e(lang('st_' . $step->status))?></span></td>
 									</tr>
 									<?php endforeach; endif;?>
 								</tbody>
@@ -157,12 +157,12 @@ $project_key = $project_key['0'];
 				<div class="an-component-body">
 					<div class="an-helper-block action-detail">
 						<div class="row">
-							<div class="col-xs-4"><?php e(lang('ac_created')); ?></div>
-							<div class="col-xs-8"><?php e(display_time($action->created_on)); ?></div>
+							<div class="col-xs-5"><?php e(lang('ac_created')); ?></div>
+							<div class="col-xs-7"><?php e(display_time($action->created_on)); ?></div>
 						</div>
 						<div class="row">
-							<div class="col-xs-4"><?php e(lang('ac_updated')); ?></div>
-							<div class="col-xs-8"><?php e(display_time($action->modified_on)); ?></div>
+							<div class="col-xs-5"><?php e(lang('ac_updated')); ?></div>
+							<div class="col-xs-7"><?php e(display_time($action->modified_on)); ?></div>
 						</div>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
@@ -177,3 +177,13 @@ $project_key = $project_key['0'];
 		</div>
 	</div>
 </div>
+
+<script type="text" id="step-row">
+	<tr data-step-id="{{:step_id}}" >
+		<td><a href="<?php echo site_url('step/') ?>{{:step_key}}">{{:step_key}}</a></td>
+		<td><a href="<?php echo site_url('step/') ?>{{:step_key}}">{{:name}}</a></td>
+		<td>0</td>
+		<td>{{:display_user}}</td>
+		<td><span class="label label-bordered label-{{:status}}">{{:lang_status}}</span></td>
+	</tr>
+</script>

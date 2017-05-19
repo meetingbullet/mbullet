@@ -57,7 +57,7 @@ $(document).ready(function() {
 					if (data.message_type == 'success') {
 						// New project created, insert to project list
 						$('#project-list .an-lists-body').append($.templates('#project-row').render(data.data));
-						console.log($.templates('#project-row').render(data.data));
+						$('#project-list .an-lists-body > div:last-child').effect("highlight", {}, 3000);
 					}
 				}
 			}

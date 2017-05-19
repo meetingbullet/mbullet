@@ -104,14 +104,14 @@ $project_status_labels = [
 							<div class="an-lists-body">
 								<?php foreach($my_steps as $step): ?>
 								<div class="list-user-single">
-									<div class="list-date basis-40">
+									<div class="list-name basis-40">
 										<?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?>
 									</div>
 									<div class="list-text basis-20">
 										<?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?>
 									</div>
 									<div class="list-state basis-10">
-										<span class="msg-tag <?php echo $step_status_labels[$step->status] ?>">
+										<span class="msg-tag label label-bordered label-<?php echo $step->status ?>">
 											<?php e($step->status)?>
 										</span>
 									</div>
@@ -187,10 +187,10 @@ $project_status_labels = [
 							<div class="an-lists-body">
 								<?php foreach($projects as $project): ?>
 								<div class="list-user-single">
-									<div class="list-name basis-10">
+									<div class="list-date basis-10">
 										<?php e($project->project_id)?>
 									</div>
-									<div class="list-date basis-30">
+									<div class="list-name basis-30">
 										<?php echo anchor(site_url() . 'project/' . $project->cost_code, $project->name); ?>
 									</div>
 									<div class="list-date basis-20">
@@ -200,7 +200,7 @@ $project_status_labels = [
 										<?php echo display_user($project->email, $project->first_name, $project->last_name, $project->avatar); ?>
 									</div>
 									<div class="list-state basis-10">
-										<span class="msg-tag <?php echo $project_status_labels[$project->status] ?>">
+										<span class="msg-tag label label-bordered label-<?php echo $project->status ?>">
 											<?php e($project->status)?>
 										</span>
 									</div>
@@ -283,12 +283,12 @@ $project_status_labels = [
 
 <script id="project-row" type="text">
 	<div class="list-user-single">
-		<div class="list-name basis-10">{{:project_id}}</div>
-		<div class="list-date basis-30"><a href="<?php echo site_url('project')?>/{{:cost_code}}">{{:name}}</a></div>
+		<div class="list-date basis-10">{{:project_id}}</div>
+		<div class="list-name basis-30"><a href="<?php echo site_url('project')?>/{{:cost_code}}">{{:name}}</a></div>
 		<div class="list-date basis-20">{{:cost_code}}</div>
 		<div class="list-text basis-30">{{:display_user}}</div>
 		<div class="list-state basis-10">
-			<span class="msg-tag label label-{{:status}} label-bordered">{{:status}}</span>
+			<span class="msg-tag label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</div>
 		<div class="list-action basis-20">{{:created_on}}</div>
 	</div>

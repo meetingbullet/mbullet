@@ -769,6 +769,7 @@ class Project extends Authenticated_Controller
 
 		if ($project) {
 			$project->display_user = display_user($project->email, $project->first_name, $project->last_name, $project->avatar);
+			$project->lang_status = lang('pj_' . $project->status);
 		}
 
 		return $project;

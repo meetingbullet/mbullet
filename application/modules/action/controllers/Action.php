@@ -7,6 +7,7 @@ class Action extends Authenticated_Controller
 		parent::__construct();
 		$this->load->library('mb_project');
 		$this->lang->load('action');
+		$this->lang->load('step/step');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
 		$this->load->model('action_model');
@@ -166,18 +167,6 @@ class Action extends Authenticated_Controller
 			$this->auth->restrict();
 		}
 
-		// get projecct id
-		// $project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
-		// if ($project_id === false) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
-
-		// if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		// && $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		// && $this->auth->has_permission('Project.Edit.All') === false) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
-
 		if(! empty($action_key)) {
 			$action = $this->action_model->get_action_by_key($action_key, $this->current_user->current_organization_id, 'actions.*');
 			if ($action !== false) {
@@ -248,7 +237,7 @@ class Action extends Authenticated_Controller
 				]);
 
 				$query = str_replace('INSERT', 'INSERT IGNORE', $query);
-				$this->db->query($query);
+				$query = $this->db->query($query);
 
 				if ($this->input->post('point_value') != '') {
 					$data['point_value'] = $this->input->post('point_value');
@@ -266,10 +255,9 @@ class Action extends Authenticated_Controller
 					if (empty($action_key)) {
 						$action_id = $this->action_model->insert($data);
 						if (!$action_id) {
-							logit('line 99: unable to insert data to table mb_actions');
+							logit('Unable to insert data to table mb_actions');
 							throw new Exception(lang('unable_create_action'));
 						}
-
 
 						if ($team = $this->input->post('team')) {
 							if ($team = explode(',', $team)) {
@@ -299,7 +287,8 @@ class Action extends Authenticated_Controller
 							}
 						}
 					} else {
-						$updated = $this->action_model->update($action->action_id, $data);
+						$action_id = $action->action_id;
+						$updated = $this->action_model->update($action_id, $data);
 						if (!$updated) {
 							logit('line 99: unable to update data to table mb_actions');
 							throw new Exception(lang('unable_update_action'));
@@ -310,12 +299,12 @@ class Action extends Authenticated_Controller
 								$member_data = [];
 								foreach ($team as $member) {
 									$member_data[] = [
-										'action_id' => $action->action_id,
+										'action_id' => $action_id,
 										'user_id' => $member
 									];
 								}
 
-								$this->action_member_model->delete_where(['action_id' => $action->action_id]);
+								$this->action_member_model->delete_where(['action_id' => $action_id]);
 								$inserted = $this->action_member_model->insert_batch($member_data);
 								if (! $inserted) {
 									logit('line 210: unable to add action members');
@@ -337,20 +326,22 @@ class Action extends Authenticated_Controller
 					$error_message .= "<li>" . $message . "</li>";
 				}
 				$error_message .= "</ul>";
-				if (! $this->input->is_ajax_request()) {
-					Template::set_message($error_message, 'danger');
-				} else {
+
+				if (IS_AJAX) {
 					Template::set('close_modal', 0);
 					Template::set('message_type', 'danger');
 					Template::set('message', $error_message);
+				} else {
+					Template::set_message($error_message, 'danger');
 				}
 			} else {
-				if (! $this->input->is_ajax_request()) {
-						Template::set_message(empty($action_key) ? lang('create_success') : lang('update_success'), 'success');
-				} else {
+				if (IS_AJAX) {
 					Template::set('message_type', 'success');
 					Template::set('message', empty($action_key) ? lang('create_success') : lang('update_success'));
 					Template::set('content', '');
+					Template::set('data', $this->ajax_action_data($action_id));
+				} else {
+					Template::set_message(empty($action_key) ? lang('create_success') : lang('update_success'), 'success');
 				}
 			}
 		}
@@ -429,5 +420,17 @@ class Action extends Authenticated_Controller
 
 		// Prevent duplicate row by MySQL Insert Ignore
 		echo (int) $this->action_member_model->delete_where(['user_id' => $user_id, 'action_id' => $action_id]);
+	}
+
+	private function ajax_action_data($action_id)
+	{
+		$data = $this->action_model->limit(1)->find($action_id);
+
+		if ($data) {
+			$data->point_used = 0;
+			$data->lang_status = lang('ac_' . $data->status);
+		}
+
+		return $data;
 	}
 }

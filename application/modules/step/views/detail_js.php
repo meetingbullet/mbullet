@@ -159,8 +159,12 @@ $(document).on("submit", '.form-ajax', (e) => {
 				});
 
 				if (data.message_type == 'success') {
-					// @TODO Refresh Step list
-					location.reload();
+					console.log("$(e.target).prop('id')", $(e.target).prop('id'));
+					// Task created
+					if ($(e.target).prop('id') == 'create-task') {
+						$('#task-list tbody').append($.templates('#task-row').render(data.data));
+						$('#task-list tbody tr:last-child').effect("highlight", {}, 3000);
+					}
 				}
 			}
 		}

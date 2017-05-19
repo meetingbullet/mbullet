@@ -249,7 +249,20 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 }
 
 .user-avatar {
-	display: inline-block;
+	border-radius: 50%;
+	width: 24px;
+	height: 24px;
+}
+
+.avatar-list:first-child {
+	margin-left: 0;
+}
+
+.avatar-list {
+	width: 24px;
+	height: 24px;
+	margin-left: 10px;
+	margin-right: 0;
 	border-radius: 50%;
 }
 
@@ -287,4 +300,49 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 
 .topbar-action {
 	margin-left: 40px;
+}
+
+/* Fix highligh Effect on */
+.an-user-lists .list-user-single {
+	transition: none;
+}
+
+/* Status label color 
+	Project: 'open','inactive','archive'
+	Action: 'open','inprogress','ready','resolved'
+	Step: 'open','ready','inprogress','finished','resolved'
+	Task: 'open','inprogress','resolved','skipped','jumped','parking_lot'
+*/
+
+.label-open {
+	background: #025d83;
+}
+
+.label-ready {
+	background: #2388b3;
+}
+
+.label-inactive {
+	background: #346c84;
+}
+
+.label-inprogress {
+	background: #eb547c;
+}
+
+.label-resolved {
+	background: #70c1b3;
+}
+
+.label-archive {
+	background: #999;
+}
+
+.label-jumped, .label-skipped {
+	background: #f3ffbd;
+	color: #333;
+}
+
+.label-parking_lot {
+	background: #b2dbbf;
 }

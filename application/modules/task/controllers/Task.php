@@ -8,11 +8,12 @@ class Task extends Authenticated_Controller
 		$this->load->library('mb_project');
 		$this->lang->load('task');
 		$this->load->helper('mb_form');
-		$this->load->helper('mb_general');
 		$this->load->model('step/step_model');
 		$this->load->model('users/user_model');
 		$this->load->model('task_model');
 		$this->load->model('task_member_model');
+		$this->load->model('project/project_model');
+		$this->load->model('project/project_member_model');
 	}
 
 	public function create($step_key)
@@ -20,7 +21,6 @@ class Task extends Authenticated_Controller
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
-
 
 		$step_id = $this->mb_project->get_object_id('step', $step_key);
 
@@ -36,27 +36,6 @@ class Task extends Authenticated_Controller
 
 		$project_key = $keys[0];
 
-		$this->load->model('project/project_model');
-		$this->load->model('project/project_member_model');
-
-		// get projecct id
-		// $project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
-		// if ($project_id === false) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
-
-		// if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		// && $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		// && $this->auth->has_permission('Project.Edit.All') === false) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
-
-		$this->load->model('step/step_model');
-		$this->load->helper('mb_form');
-		$this->load->helper('mb_general');
-
-		// $step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
-
 		if (! $this->mb_project->has_permission('step', $step_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
@@ -70,6 +49,8 @@ class Task extends Authenticated_Controller
 			Template::set('message', lang('tk_not_have_permission'));
 			Template::set('message_type', 'danger');
 		} else {
+			Template::set('close_modal', 0);
+
 			if ($this->input->post()) {
 				$rules = $this->task_model->get_validation_rules();
 				$this->form_validation->set_rules($rules['create']);
@@ -100,14 +81,18 @@ class Task extends Authenticated_Controller
 								if ($inserted) {
 									Template::set('message', lang('tk_create_task_success'));
 									Template::set('message_type', 'success');
+									Template::set('data', $this->ajax_task_data($task_id));
+									Template::set('close_modal', 1);
+
 								} else {
 									Template::set('message', lang('tk_add_task_member_fail'));
 									Template::set('message_type', 'danger');
-									Template::set('close_modal', 0);
 								}
 							} else {
 								Template::set('message', lang('tk_create_task_success'));
 								Template::set('message_type', 'success');
+								Template::set('data', $this->ajax_task_data($task_id));
+								Template::set('close_modal', 1);
 							}
 						} else {
 							$error = true;
@@ -122,15 +107,32 @@ class Task extends Authenticated_Controller
 				if (! empty($error)) {
 					Template::set('message', lang('tk_create_task_fail'));
 					Template::set('message_type', 'danger');
-					Template::set('close_modal', 0);
 				}
 			}
 		}
 		// Assets::add_js($this->load->view('create_js', [
 		// 	'organization_members' => $organization_members
 		// ], true), 'inline');
-		Template::set('close_modal', 0);
 		Template::set('organization_members', $organization_members);
 		Template::render();
+	}
+
+	private function ajax_task_data($task_id)
+	{
+		$data = $this->task_model->limit(1)->find($task_id);
+
+		if ($data) {
+			$data->lang_status = lang('tk_' . $data->status);
+			$data->assignees = [];
+			$assignees = $this->task_member_model->select('avatar, email, CONCAT(first_name, " ", last_name) AS full_name')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task_id)->find_all();
+
+			if (is_array($assignees)) {
+				foreach ($assignees AS $user) {
+					$data->assignees[] = '<img class="avatar avatar-list" title="'. $user->full_name .'" src="'. avatar_url($user->avatar, $user->email) .'">';
+				}
+			}
+		}
+
+		return $data;
 	}
 }

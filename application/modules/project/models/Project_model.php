@@ -348,7 +348,7 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_tasks($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, t.task_key, t.name, t.status', $as_array = false)
+	public function get_tasks($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, t.task_id, t.task_key, t.name, t.status', $as_array = false)
 	{
 		$this->db->select($select)->from('tasks t');
 		if (! $all) {
