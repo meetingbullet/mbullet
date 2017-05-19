@@ -1302,6 +1302,6 @@ class Step extends Authenticated_Controller
 			}
 		}
 
-		return $evaluated_ids;
+		return $evaluated;
 	}
 }
