@@ -1312,7 +1312,7 @@ class Step extends Authenticated_Controller
 		$evaluated_ids = [];
 		$evaluated = false;
 
-		if (count($evaluated_members) > 0) {
+		if (is_array($evaluated_members) && count($evaluated_members) > 0) {
 			$evaluated_ids = array_column($evaluated_members, 'user_id');
 			if (in_array($this->current_user->user_id, $evaluated_ids)) {
 				$evaluated = true;
