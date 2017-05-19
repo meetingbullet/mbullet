@@ -129,7 +129,7 @@ class Task extends Authenticated_Controller
 
 			if (is_array($assignees)) {
 				foreach ($assignees AS $user) {
-					$data->assignees[] = '<img class="avatar avatar-list" title="'. $user->full_name .'" src="'. avatar_url($user->avatar, $user->email) .'">';
+					$data->assignees[] = ['html' => '<img class="user-avatar" title="'. $user->full_name .'" src="'. avatar_url($user->avatar, $user->email) .'">'];
 				}
 			}
 		}

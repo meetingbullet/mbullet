@@ -345,7 +345,9 @@ $members = array_column($invited_members, 'user_id');
 		<td class="basis-15">{{:name}}</td>
 		<td class="basis-20">{{:description}}</td>
 		<td class="basis-20">
-			{{:assignees}}
+			{{for assignees}}
+				{{:html}}
+			{{/for}}
 		</td>
 		<td class="basis-10 task-status">
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>

@@ -330,7 +330,7 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	background: #eb547c;
 }
 
-.label-resolved {
+.label-resolved, .label-finished {
 	background: #70c1b3;
 }
 
