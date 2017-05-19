@@ -122,6 +122,7 @@ $lang['st_unknown_error'] = 'Unknown error';
 $lang['st_please_select_all_confirmation_status'] = 'Please select all confirmation status';
 $lang['st_waiting_evaluator'] = 'Be patient. The Step owner evaluation will finish soon.';
 $lang['st_waiting'] = 'Waiting...';
+$lang['st_evaluator'] = 'Evaluator';
 
 // Field
 $lang['st_detail'] = 'Detail';
