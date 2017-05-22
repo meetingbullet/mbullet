@@ -675,20 +675,31 @@ class Project extends Authenticated_Controller
 	public function update_project_status($project_key)
 	{
 		if (empty($project_key) || empty($this->input->get('status'))) {
-			echo 0;
-			exit;
+			echo json_encode([
+				'message' => lang('pj_invalid_action'),
+				'message_type' => 'danger'
+			]);
+			return;
 		}
-		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id, '*', false);
-		if ($project_id !== false) {
-			$updated = $this->project_model->update($project_id, ['status' => $this->input->get('status')]);
-			if (! $updated) {
-				echo 0;
-				exit;
+
+		if ($project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id, '*', false)) {
+			if (! $this->project_model->update($project_id, ['status' => $this->input->get('status')])) {
+				echo json_encode([
+					'message' => lang('pj_unable_to_update_status'),
+					'message_type' => 'danger'
+				]);
+				return;
 			}
 		}
+
 		$this->mb_project->notify_members($project_id, 'project', $this->current_user->user_id, 'update_status');
-		echo 1;
-		exit;
+
+		echo json_encode([
+			'message' => lang('pj_project_status_updated'),
+			'message_type' => 'success',
+			'status' => strtolower($this->input->get('status')),
+			'lang_status' => lang('pj_' . strtolower($this->input->get('status')))
+		]);
 	}
 
 	private function get_actions($project_id)

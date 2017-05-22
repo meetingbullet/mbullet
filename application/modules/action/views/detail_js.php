@@ -59,7 +59,14 @@ $(document).on("submit", '.form-ajax', (e) => {
 
 				if (data.message_type == 'success') {
 					// Step created
-					$('#step-list tbody').append($.templates('#step-row').render(data.data));
+					if (data.data.step_key) {
+						$('#step-list tbody').append($.templates('#step-row').render(data.data));
+					}
+
+					// Action edited
+					if (data.data.action_key) {
+						
+					}
 				}
 			}
 		}

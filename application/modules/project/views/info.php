@@ -59,7 +59,7 @@ $task_status_labels = [
 
 				<?php endforeach ?>
 			<?php else : ?>
-				<div class="list-user-single">
+				<div id="no-action" class="list-user-single">
 					<div class="list-text basis-30">
 					</div>
 					<div class="list-date email approve basis-40">

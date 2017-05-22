@@ -46,6 +46,7 @@ $(document).ready(function() {
 
 					if (data.message_type == 'success') {
 						// New action created, insert to table
+						$('#no-action').remove();
 						$('#action-list .an-lists-body').append($.templates('#action-row').render(data.data));
 						$('#action-list .an-lists-body > div:last-child').effect("highlight", {}, 3000);
 					}
@@ -55,10 +56,31 @@ $(document).ready(function() {
 	});
 
 	$('li.update-btn a').click(function() {
+		if ($(this).hasClass('disabled')) {
+			return;
+		}
+
+		var _this = this;
 		var url = $(this).data('update-project-status-url');
-		$.get(url).done(function(data) {console.log(data);
-			if (data == 1) {
-				location.reload();
+		$.get(url).done(function(data) {
+			data = JSON.parse(data);
+
+			if (data.message_type) {
+				$.notify({
+					message: data.message
+				}, {
+					type: data.message_type,
+					z_index: 1051
+				});
+
+				// Status updated
+				if (data.message_type == 'success') {
+					$('#project-status').attr('class', 'msg-tag label label-bordered label-' + data.status);
+					$('#project-status').text(data.lang_status);
+
+					$('li.update-btn a').removeClass('disabled');
+					$(_this).addClass('disabled');
+				}
 			}
 		});
 	});

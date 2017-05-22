@@ -156,7 +156,7 @@ class User_model extends BF_Model
 
 	public function get_organization_members($organization_id)
 	{
-		return $this->select('uto.user_id, email, first_name, last_name, avatar')
+		return $this->select('uto.user_id, email, first_name, last_name, avatar, cost_of_time')
 					->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $organization_id)
 					->find_all();
 	}
