@@ -302,6 +302,10 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	margin-left: 40px;
 }
 
+.topbar-action button {
+	font-size: 17px;
+}
+
 /* Fix highligh Effect on */
 .an-user-lists .list-user-single {
 	transition: none;
