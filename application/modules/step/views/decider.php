@@ -96,7 +96,7 @@ $cost_of_time_to_badge = [
 								<tr>
 									<td><strong><?php e(lang('st_elapsed_time')) ?></strong></td>
 									<td class="text-center"><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
-									<td class="text-center"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></td>
+									<td class="text-center"><?php echo timespan(strtotime($step->actual_start_time), strtotime($step->actual_end_time)) ?></td>
 								</tr>
 							</tbody>
 						</table>
@@ -154,7 +154,7 @@ $cost_of_time_to_badge = [
 						<tr id='task-<?php e($task->task_id)?>' data-task-id='<?php e($task->task_id)?>' data-task-status='<?php e($task->status)?>'>
 							<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
 							<td><?php echo display_time($task->started_on) ?></td>
-							<td><?php echo round($task->duration, 2) ?></td>
+							<td><?php echo timespan(strtotime($task->started_on), strtotime($task->finished_on)) ?></td>
 							<td>
 								<span class="<?php e($task_status_labels[$task->status])?>">
 									<?php e(lang('st_' . $task->status))?>
