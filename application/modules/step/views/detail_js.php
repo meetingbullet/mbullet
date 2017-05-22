@@ -1,9 +1,11 @@
 // Read more Notes & Goal
-$('.step-goal, .step-notes').readmore({
+var rm_option = {
 	speed: 300,
 	moreLink: '<a class=\'readmore rm-more\' href="#"><?php e(lang('show_more'))?></a>',
 	lessLink: '<a class=\'readmore rm-less\' href="#"><?php e(lang('show_less'))?></a>'
-});
+};
+
+$('.goal, .step-notes').readmore(rm_option);
 
 // Edit step
 $('#edit-step').click((e) => {
@@ -131,6 +133,59 @@ $(document).on("submit", '.form-ajax', (e) => {
 		data: data,
 		success: (data) => {
 			data = JSON.parse(data);
+
+			if (data.message_type) {
+				$.notify({
+					message: data.message
+				}, {
+					type: data.message_type,
+					z_index: 1051
+				});
+
+				if (data.message_type == 'success') {
+
+					// Task created
+					if ($(e.target).prop('id') == 'create-task') {
+						$('#task-list tbody').append($.templates('#task-row').render(data.data));
+						$('#task-list tbody tr:last-child').effect("highlight", {}, 3000);
+					}
+
+					// Step updated
+					if ($(e.target).prop('id') == 'form-update-step') {
+						// Gather form data
+						var step_name = $('#form-update-step input[name="name"]').val();
+						var lang_status = $('#form-update-step select[name="status"] option:selected').text();
+						var status = $('#form-update-step select[name="status"] option:selected').val();
+						var goal = $('#form-update-step textarea[name="goal"]').val();
+						var owner_id = $('#form-update-step input[name="owner_id"]').val();
+						var team = $('#form-update-step input[name="team"]').val().split(',');
+						var owner_html = $('.step-detail .owner').html();
+						var resource_html = '';
+
+						project_members.forEach((item) => {
+							if (item.id == owner_id) {
+								owner_html = '<img class="user-avatar" title="'+ item.name +'" src="'+ item.avatar +'" style="width: 24px; height: 24px"> <span class="user-name">'+ item.name +'</span>';
+							}
+
+							if (team.indexOf(item.id) >= 0) {
+								resource_html += '<li>\
+													<img class="user-avatar" title="'+ item.name + '" src="'+ item.avatar + '" style="width: 24px; height: 24px">\
+													<span class="user-name">'+ item.name + '</span>\
+													<span class="badge badge-'+ item.cost_of_time + ' badge-bordered pull-right">M</span>\
+												</li>';
+							}
+						});
+
+						// Update view
+						$('#step-name').text(step_name);
+						$('.step-detail .status').html('<span class="label label-'+ status +' label-bordered" id="step-status" data-status="'+ status +'" data-is-owner="'+ $('#step-status').data('is-owner') +'">'+ lang_status +'</span>');
+						$('.step-detail .owner').html(owner_html);
+						$('.step-detail .goal').html(goal);
+						$('.goal').readmore(rm_option);
+						$('#step-resource').html(resource_html);
+					} 
+				}
+			}
 			
 			if (data.close_modal == 0) {
 				if ($('.modal.in').length) {
@@ -148,24 +203,6 @@ $(document).on("submit", '.form-ajax', (e) => {
 			} else {
 				$('.modal.in .modal-content').html('');
 				$('.modal.in').modal('hide');
-			}
-
-			if (data.message_type) {
-				$.notify({
-					message: data.message
-				}, {
-					type: data.message_type,
-					z_index: 1051
-				});
-
-				if (data.message_type == 'success') {
-					console.log("$(e.target).prop('id')", $(e.target).prop('id'));
-					// Task created
-					if ($(e.target).prop('id') == 'create-task') {
-						$('#task-list tbody').append($.templates('#task-row').render(data.data));
-						$('#task-list tbody tr:last-child').effect("highlight", {}, 3000);
-					}
-				}
 			}
 		}
 	});
