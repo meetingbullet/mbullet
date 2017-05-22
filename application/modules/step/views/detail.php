@@ -138,11 +138,11 @@ $members = array_column($invited_members, 'user_id');
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_scheduled_duration')) ?></div>
-						<div class="col-xs-8"><?php e($step->in . ' ' . lang('st_' . $step->in_type)) ?></div>
+						<div class="col-xs-8"><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time)) ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(ucfirst(lang('st_actual_duration')))?></div>
-						<div class="col-xs-8"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></div>
+						<div class="col-xs-8"><?php echo timespan(strtotime($step->actual_start_time), strtotime($step->actual_end_time)) ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -162,9 +162,9 @@ $members = array_column($invited_members, 'user_id');
 									<th><?php e(lang('st_name'))?></th>
 									<th><?php e(lang('st_description'))?></th>
 									<th><?php e(lang('st_assignee'))?></th>
-									<th><?php e(lang('st_status'))?></th>
+									<th class="text-center"><?php e(lang('st_status'))?></th>
 									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
-									<th><?php e(lang('st_confirmation_status'))?></th>
+									<th class="text-center"><?php e(lang('st_confirmation_status'))?></th>
 									<?php endif ?>
 								</tr>
 							</thead>
@@ -181,11 +181,11 @@ $members = array_column($invited_members, 'user_id');
 											}
 										} ?>
 									</td>
-									<td class='basis-10 task-status'>
+									<td class='basis-10 task-status text-center'>
 										<span class="label label-bordered label-<?php e($task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 									</td>
 									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
-									<td class='basis-10 task-status'>
+									<td class='basis-10 task-status text-center'>
 										<?php if ( isset($task_status_labels[$task->confirm_status]) ): ?>
 										<span class="<?php e($task_status_labels[$task->confirm_status] . ' label-' . $task->confirm_status)?>"><?php e(lang('st_' . $task->confirm_status))?></span>
 										<?php endif; ?>

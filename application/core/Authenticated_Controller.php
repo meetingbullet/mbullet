@@ -106,11 +106,24 @@ class Authenticated_Controller extends Base_Controller
 
 	private function get_navigation_project_list()
 	{
-		$this->current_user->projects = $this->db->select('name')
-													->join('project_members pm', 'pm.project_id = projects.project_id', 'LEFT')
+		$this->current_user->projects = $this->db->select('name, cost_code')
+													->join('project_members pm', 'pm.project_id = projects.project_id AND user_id = "'. $this->current_user->user_id .'"', 'LEFT')
 													->where('owner_id', $this->current_user->user_id)
 													->or_where('user_id', $this->current_user->user_id)
 													->get('projects')
 													->result();
+
+		// Get current project name
+		$this->current_user->current_project_name = lang('projects');
+
+		if ($cost_code = explode('-', $this->uri->segment(2))) {
+			if (count($cost_code)) {
+				$cost_code = $cost_code[0];
+				$project = $this->db->select('name')->where('cost_code', $cost_code)->limit(1)->get('projects')->row();
+				if ($project) {
+					$this->current_user->current_project_name = $project->name;
+				}
+			}
+		}
 	}
 }

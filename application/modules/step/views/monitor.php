@@ -125,7 +125,7 @@ $task_status_labels = [
 						</td>
 						<td class='text-center skip-votes '><?php e($task->skip_votes)?></td>
 						<td class='task-status' <?php echo "data-time-assigned='{$task->time_assigned}' " . ($task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}'" : '') ?>>
-							<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
+							<span class="label label-bordered <?php e(' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
 						</td>
 
 						<?php if ($is_owner): ?>
