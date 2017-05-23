@@ -8,8 +8,8 @@
 				<ul class="nav nav-tabs text-left" role="tablist">
 				<?php foreach (['all', 'disabled', 'by_role'] as $type) : ?>
 					<li role="presentation" class="<?php if ($type == $this->input->get('type') || (is_null($this->input->get('type')) && $type == 'all')) echo 'active' ?>">
-						<a href="<?php echo site_url('admin/team?') . http_build_query(['type' => $type]) ?>">
-							<?php echo lang('ad_tm_tab_' . $type) . ($type == 'by_role' ? '&nbsp;<i class="ion-arrow-down-b" id="toggle_dropdown"></i>' : '') ?>
+						<a href="<?php echo $type == 'by_role' ? '#' : site_url('admin/team?') . http_build_query(['type' => $type]) ?>" <?php echo $type == 'by_role' ? 'id="toggle_dropdown"' : '' ?>>
+							<?php echo lang('ad_tm_tab_' . $type) . ($type == 'by_role' ? '&nbsp;<i class="ion-arrow-down-b"></i>' : '') ?>
 						</a>
 						<?php if ($type == 'by_role') : ?>
 						<div class="dropdown-menu right-align">
@@ -36,9 +36,9 @@
 								<?php echo lang('ad_tm_full_name') ?>
 							</h6>
 							<h6 class="basis-30"><?php echo lang('ad_tm_email') ?></h6>
+							<h6 class="basis-10"><?php echo lang('ad_tm_role') ?></h6>
 							<h6 class="basis-20"><?php echo lang('ad_tm_last_login') ?></h6>
 							<h6 class="basis-10"><?php echo lang('ad_tm_status') ?></h6>
-							<h6 class="basis-10"></h6>
 						</div>
 
 						<div class="an-lists-body an-customScrollbar ps-container ps-theme-default ps-active-y">
@@ -62,13 +62,14 @@
 								<div class="list-date email approve basis-30">
 									<p><?php e($user->email) ?></p>
 								</div>
+								<div class="list-text basis-10">
+									<p><?php e($user->role_name) ?></p>
+								</div>
 								<div class="list-date basis-20">
 									<p><?php e(display_time($user->last_login)) ?></p>
 								</div>
-								<div class="list-state basis-10">
+								<div class="list-state basis-10 text-right">
 									<span class="msg-tag <?php echo $user->enabled == 1 ? 'read' : 'spam' ?>"><?php echo $user->enabled == 1 ? 'enabled' : 'disabled' ?></span>
-								</div>
-								<div class="list-action basis-10">
 								</div>
 							</div> <!-- end .USER-LIST-SINGLE -->
 						<?php endforeach ?>

@@ -9,3 +9,4 @@ $lang['ad_tm_email'] = 'Email';
 $lang['ad_tm_last_login'] = 'Last Login';
 $lang['ad_tm_status'] = 'Status';
 $lang['ad_tm_no_users'] = 'There are no users found.';
+$lang['ad_tm_role'] = 'Role';
