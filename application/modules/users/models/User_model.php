@@ -154,6 +154,21 @@ class User_model extends BF_Model
 	}
 
 
+	public function get_organization_users($organization_id, $select = 'uto.user_id, email, first_name, last_name, avatar', $with_role = false, $filter = ['enabled' => 1], $limit = null, $offset = null)
+	{
+		$this->select($select)->join('user_to_organizations uto', 'users.user_id = uto.user_id AND organization_id = ' . $organization_id);
+		if ($with_role === true) {
+			$this->join('roles r', 'r.role_id = uto.role_id', 'left');
+		}
+		if (! empty($filter)) {
+			$this->where($filter);
+		}
+		if (isset($limit) && isset($offset) && $limit > 0) {
+			$this->limit($limit, $offset);
+		}
+		return $this->find_all();
+	}
+
 	public function get_organization_members($organization_id, $project_id = null)
 	{
 		$cost_of_time_name_query_str = ', ';

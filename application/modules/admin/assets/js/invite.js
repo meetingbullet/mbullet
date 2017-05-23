@@ -47,3 +47,14 @@ $(document).ready(function() {
         });
     });
 });
+
+$('#toggle_dropdown').click((e) => {
+	e.preventDefault();
+	$('#toggle_dropdown').closest('li').toggleClass('open');
+});
+
+$(document).on("click", function(e) {
+	if ($(e.target).is("#toggle_dropdown") === false) {
+		$("#toggle_dropdown").closest('li').removeClass("open");
+	}
+});

@@ -56,4 +56,13 @@ class Role_model extends BF_Model
 	{
 		parent::__construct();
 	}
+
+	public function get_organization_roles($organization_id, $select = '*')
+	{
+		return $this->select($select)
+					->where('organization_id', $organization_id)
+					->or_where('(organization_id IS NULL AND is_public = 1)')
+					->order_by('role_id')
+					->find_all();
+	}
 }

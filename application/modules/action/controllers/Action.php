@@ -77,7 +77,7 @@ class Action extends Authenticated_Controller
 
 
 			$this->action_model->update($action->action_id, ['status' => $next_status]);
-			$this->mb_project->notify_members($action->action_id, 'action', $this->current_user->user_id, 'update_status');
+			$this->mb_project->notify_members($action->action_id, 'action', $this->current_user, 'update_status');
 
 			$action = $this->action_model->select('actions.*, u.email, u.first_name, u.last_name, u.avatar')
 									->join('users u', 'u.user_id = actions.owner_id')
@@ -281,7 +281,7 @@ class Action extends Authenticated_Controller
 								}
 
 								$inserted = $this->action_member_model->insert_batch($member_data);
-								$this->mb_project->notify_members($action_id, 'action', $this->current_user->user_id, 'insert');
+								$this->mb_project->notify_members($action_id, 'action', $this->current_user, 'insert');
 								if (! $inserted) {
 									logit('line 210: unable to add action members');
 									throw new Exception(lang('unable_add_action_members'));
@@ -310,7 +310,7 @@ class Action extends Authenticated_Controller
 								$inserted = $this->action_member_model->insert_batch($member_data);
 
 								if ((! empty($data['status'])) && $action->status != $data['status']) {
-									$this->mb_project->notify_members($action->action_id, 'action', $this->current_user->user_id, 'update_status');
+									$this->mb_project->notify_members($action->action_id, 'action', $this->current_user, 'update_status');
 								}
 								if (! $inserted) {
 									logit('line 210: unable to add action members');

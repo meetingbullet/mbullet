@@ -116,7 +116,7 @@ class Step extends Authenticated_Controller
 						}
 
 						$this->step_member_model->insert_batch($member_data);
-						$this->mb_project->notify_members($id, 'step', $this->current_user->user_id, 'insert');
+						$this->mb_project->notify_members($id, 'step', $this->current_user, 'insert');
 					}
 				}
 
@@ -250,7 +250,7 @@ class Step extends Authenticated_Controller
 
 						$this->step_member_model->insert_batch($member_data);
 						if ((! empty($data['status'])) && $data['status'] != $step->status) {
-							$this->mb_project->notify_members($step->step_id, 'step', $this->current_user->user_id, 'update_status');
+							$this->mb_project->notify_members($step->step_id, 'step', $this->current_user, 'update_status');
 						}
 					}
 				}
@@ -728,7 +728,7 @@ class Step extends Authenticated_Controller
 			]);
 			
 			if ($query) {
-				$this->mb_project->notify_members($step->step_id, 'step', $this->current_user->user_id, 'update_status');
+				$this->mb_project->notify_members($step->step_id, 'step', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_step_finished'),
@@ -848,7 +848,7 @@ class Step extends Authenticated_Controller
 					'started_on' => $current_time,
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_started'),
@@ -872,7 +872,7 @@ class Step extends Authenticated_Controller
 					'finished_on' => $current_time, 
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_jumped')
@@ -894,7 +894,7 @@ class Step extends Authenticated_Controller
 					'status' => 'skipped', 
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_skipped')
@@ -918,7 +918,7 @@ class Step extends Authenticated_Controller
 					'comment' => $this->input->post('comment'),
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_resolved')
@@ -942,7 +942,7 @@ class Step extends Authenticated_Controller
 					'comment' => $this->input->post('comment'),
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user->user_id, 'update_status');
+				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_task_placed')
@@ -1015,7 +1015,7 @@ class Step extends Authenticated_Controller
 			]);
 			exit;
 		}
-		$this->mb_project->notify_members($step_id, 'step', $this->current_user->user_id, 'update_status');
+		$this->mb_project->notify_members($step_id, 'step', $this->current_user, 'update_status');
 		echo json_encode([
 			'message_type' => 'success',
 			'message' => lang('st_update_status_success')
