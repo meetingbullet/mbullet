@@ -223,12 +223,12 @@ class Mb_project
 		$this->ci->load->model($object_type . '/' . $object_type . '_model');
 		$this->ci->load->model($object_type . '/' . $object_type . '_member_model');
 		$object_owner = $this->ci->{$object_type . '_model'}
-						->select('u.*, CONCAT(u.first_name, u.last_name) as full_name')
+						->select('u.*, CONCAT(u.first_name, " ", u.last_name) as full_name')
 						->join('users u', 'u.user_id = ' . $object_type . 's.owner_id', 'inner')
 						->as_array()
 						->find($object_id);
 		$object_members = $this->ci->{$object_type . '_member_model'}
-								->select('u.*, CONCAT(u.first_name, u.last_name) as full_name')
+								->select('u.*, CONCAT(u.first_name, " ", u.last_name) as full_name')
 								->join('users u', 'u.user_id = ' . $object_type . '_members.user_id', 'inner')
 								->as_array()
 								->find_all_by($object_type . '_id', $object_id);
@@ -412,7 +412,7 @@ class Mb_project
 
 			$this->ci->load->model($object_type . '/' . $object_type . '_member_model', 'object_member_model');
 			$object_members = $this->ci->object_member_model
-									->select('CONCAT(first_name, last_name) as full_name, email')
+									->select('CONCAT(first_name, " ", last_name) as full_name, email')
 									->join('users u', 'u.user_id = ' . $object_type . '_members.user_id', 'left')
 									->find_all_by($object_type . '_id', $object_id);
 
@@ -444,7 +444,7 @@ class Mb_project
 			$data['STATUS'] = '"' . $object->status . '"';
 		}
 		return (boolean) $this->send_mail_to_members($object_id, $object_type, $email_template->email_title,
-			html_entity_decode(nl2br($email_template->email_template_content)),
+			html_entity_decode($email_template->email_template_content),
 			[$current_user_id], true, $data, true);
 	}
 }
