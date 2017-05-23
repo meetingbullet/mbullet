@@ -62,7 +62,7 @@ class Step extends Authenticated_Controller
 			$this->auth->restrict();
 		}
 
-		$action = $this->action_model->select('action_id')
+		$action = $this->action_model->select('action_id, p.project_id')
 									->join('projects p', 'actions.project_id = p.project_id')
 									->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
 									->limit(1)
@@ -76,7 +76,7 @@ class Step extends Authenticated_Controller
 		$project_key = explode('-', $action_key);
 		$project_key = $project_key[0];
 
-		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $action->project_id);
 
 		// Create Step from Open Parking Lot tasks
 		if (isset($_POST['from_step'])) {
@@ -200,7 +200,7 @@ class Step extends Authenticated_Controller
 		$project_key = explode('-', $step_key);
 		$project_key = $project_key[0];
 
-		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $step->project_id);
 
 		Template::set('project_members', $project_members);
 		Assets::add_js($this->load->view('create_js', [

@@ -80,7 +80,13 @@
 						$user->avatar = avatar_url($user->avatar, $user->email);
 					}
 				?>
-				{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>', cost_of_time: <?php echo $user->cost_of_time?>},
+				{
+					id: '<?php e($user->user_id)?>', 
+					name: '<?php e($user->first_name . ' ' . $user->last_name)?>', 
+					avatar: '<?php echo $user->avatar?>', 
+					cost_of_time: <?php e($user->cost_of_time)?>,
+					cost_of_time_name: '<?php e($user->cost_of_time_name)?>'
+				},
 				<?php endforeach; ?>
 			];
 

@@ -42,7 +42,7 @@ $project_key = $project_key['0'];
 
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<h2><?php e($action->name)?></h2>
+		<h2 id="action-name"><?php e($action->name)?></h2>
 
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
@@ -67,19 +67,19 @@ $project_key = $project_key['0'];
 					<div class="an-helper-block action-detail">
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_owner'))?></div>
-							<div class="col-xs-8"><?php echo display_user($action->email, $action->first_name, $action->last_name, $action->avatar); ?></div>
+							<div class="col-xs-8 owner"><?php echo display_user($action->email, $action->first_name, $action->last_name, $action->avatar); ?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_success_condition'))?></div>
-							<div class="col-xs-8"><?php e(lang('ac_' . $action->success_condition))?></div>
+							<div class="col-xs-8 success"><?php e(lang('ac_' . $action->success_condition))?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_type'))?></div>
-							<div class="col-xs-8"><?php e(lang('ac_' . $action->action_type))?></div>
+							<div class="col-xs-8 type"><?php e(lang('ac_' . $action->action_type))?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_point_value'))?></div>
-							<div class="col-xs-8"><?php e($action->point_value)?></div>
+							<div class="col-xs-8 point-value"><?php e($action->point_value)?></div>
 						</div>
 						<div class="row">
 							<div class="col-xs-4"><?php e(lang('ac_point_used'))?></div>
@@ -137,12 +137,12 @@ $project_key = $project_key['0'];
 				</div>
 				<div class="an-component-body">
 					<div class="an-helper-block">
-						<ul class="list-unstyled list-member">
+						<ul id="action-resource" class="list-unstyled list-member">
 							<?php if (is_array($invited_members)) { foreach ($invited_members as $user) { ?>
 							<li>
 								<?php echo display_user($user->email, $user->first_name, $user->last_name, $user->avatar); ?>
 
-								<span class="badge badge-<?php e($cost_of_time_to_badge[$user->cost_of_time])?> badge-bordered pull-right"><?php e($user->cost_of_time_name)?></span>
+								<span class="badge badge-<?php e($user->cost_of_time)?> badge-bordered pull-right"><?php e($user->cost_of_time_name)?></span>
 							</li>
 							<?php } } ?>
 						</ul>

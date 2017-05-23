@@ -154,11 +154,35 @@ class User_model extends BF_Model
 	}
 
 
-	public function get_organization_members($organization_id)
+	public function get_organization_members($organization_id, $project_id = null)
 	{
-		return $this->select('uto.user_id, email, first_name, last_name, avatar, cost_of_time')
-					->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $organization_id)
-					->find_all();
+		$cost_of_time_name_query_str = ', ';
+
+		$this->select('uto.user_id, email, first_name, last_name, avatar, cost_of_time')
+				->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $organization_id);
+
+		if (is_numeric($project_id)) {
+			$this->select('IF(
+								uto.cost_of_time = 1, 
+								p.cost_of_time_1,
+								IF(
+									uto.cost_of_time = 2, 
+									p.cost_of_time_2,
+									IF(
+										uto.cost_of_time = 3, 
+										p.cost_of_time_3,
+										IF(
+											uto.cost_of_time = 4, 
+											p.cost_of_time_4,
+											p.cost_of_time_5
+										)
+									)
+								)
+							) AS cost_of_time_name')
+				->join('projects p', 'project_id = ' . $project_id);
+		}
+
+		return $this->find_all();
 	}
 
 	//--------------------------------------------------------------------------
