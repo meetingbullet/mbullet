@@ -9,7 +9,7 @@ $project_label = [
 	<div class="an-page-title">
 		<h2><?php e($project_name)?></h2>
 	</div>
-	<button id="back-btn" class="an-btn an-btn-primary-transparent dropdown-toggle setting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="ion-ios-more-outline"></i></button>
+	<button id="btn-project-settings" class="an-btn an-btn-primary-transparent dropdown-toggle setting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="ion-ios-more-outline"></i></button>
 	<div class="dropdown-menu dropdown-menu-right">
 		<ul class="an-basic-list">
 			<li class="update-btn">

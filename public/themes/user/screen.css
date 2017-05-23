@@ -281,6 +281,7 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 
 .rm-more {
 	position: absolute;
+	text-align: center;
 	bottom: 0;
 	height: 90px;
 	line-height: 150px;
