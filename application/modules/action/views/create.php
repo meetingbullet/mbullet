@@ -27,7 +27,7 @@ $action_types = [
 </div> <!-- end AN-BODY-TOPBAR -->
 <?php endif; ?>
 
-<?php echo form_open($this->uri->uri_string(), ['class' => IS_AJAX ? 'form-ajax' : '']) ?>
+<?php echo form_open($this->uri->uri_string(), ['class' => IS_AJAX ? 'form-ajax' : '', 'id' => 'form-save-action']) ?>
 
 <div class='container-fluid<?php echo IS_AJAX ? ' modal-body' : ''?>'>
 	<?php echo mb_form_input('text', 'name', lang('ac_name'), true, set_value('name', ! empty($action->name) ? $action->name : null)) ?>

@@ -171,7 +171,7 @@ $(document).on("submit", '.form-ajax', (e) => {
 								resource_html += '<li>\
 													<img class="user-avatar" title="'+ item.name + '" src="'+ item.avatar + '" style="width: 24px; height: 24px">\
 													<span class="user-name">'+ item.name + '</span>\
-													<span class="badge badge-'+ item.cost_of_time + ' badge-bordered pull-right">M</span>\
+													<span class="badge badge-'+ item.cost_of_time + ' badge-bordered pull-right">'+ item.cost_of_time_name +'</span>\
 												</li>';
 							}
 						});
