@@ -184,7 +184,7 @@ class Action extends Authenticated_Controller
 				Template::set('action', $action);
 			}
 		}
-		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $project_id);
 
 		Assets::add_js($this->load->view('create_js', [
 			'project_members' => $project_members

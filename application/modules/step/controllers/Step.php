@@ -62,7 +62,7 @@ class Step extends Authenticated_Controller
 			$this->auth->restrict();
 		}
 
-		$action = $this->action_model->select('action_id')
+		$action = $this->action_model->select('action_id, p.project_id')
 									->join('projects p', 'actions.project_id = p.project_id')
 									->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
 									->limit(1)
@@ -76,7 +76,7 @@ class Step extends Authenticated_Controller
 		$project_key = explode('-', $action_key);
 		$project_key = $project_key[0];
 
-		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $action->project_id);
 
 		// Create Step from Open Parking Lot tasks
 		if (isset($_POST['from_step'])) {
@@ -200,7 +200,7 @@ class Step extends Authenticated_Controller
 		$project_key = explode('-', $step_key);
 		$project_key = $project_key[0];
 
-		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $step->project_id);
 
 		Template::set('project_members', $project_members);
 		Assets::add_js($this->load->view('create_js', [
@@ -308,7 +308,7 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, (actual_end_time - actual_start_time) / 60 AS actual_elapsed_time, u.email, u.first_name, u.last_name, u.avatar');
+		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, u.email, u.first_name, u.last_name, u.avatar');
 
 		if (! $step) {
 			redirect(DEFAULT_LOGIN_LOCATION);
@@ -437,7 +437,7 @@ class Step extends Authenticated_Controller
 			To access Step Monitor, user must be owner or team member of Step
 		*/
 
-		$step = $this->step_model->select('*, (actual_end_time - actual_start_time) / 60 AS actual_elapsed_time')->find_by('step_key', $step_key);
+		$step = $this->step_model->find_by('step_key', $step_key);
 
 		if (! $step) {
 			Template::set_message(lang('st_invalid_step_key'), 'danger');

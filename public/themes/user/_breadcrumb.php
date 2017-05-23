@@ -13,7 +13,7 @@ if (! is_null($this->uri->segment(1))) {
 				'path' => null
 			];
 			break;
-		case 'projects':
+		case 'project':
 			$breadcrumb[] = [
 				'name' => $this->uri->segment(2),
 				'path' => null

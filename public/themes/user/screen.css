@@ -281,10 +281,16 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 
 .rm-more {
 	position: absolute;
+	text-align: center;
 	bottom: 0;
 	height: 90px;
 	line-height: 150px;
 	background: linear-gradient(to bottom, rgba(255,255,255,0) 50%,rgba(255,255,255,1) 70%);
+}
+
+/* Fix readmore overflow */
+.an-helper-block {
+	overflow: hidden;
 }
 
 /* Fix button dropdown display incorrect position */
@@ -300,6 +306,10 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 
 .topbar-action {
 	margin-left: 40px;
+}
+
+.topbar-action button {
+	font-size: 17px;
 }
 
 /* Fix highligh Effect on */
@@ -345,4 +355,21 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 
 .label-parking_lot {
 	background: #b2dbbf;
+}
+
+/* Cost of time to Badge */
+.badge-1 {
+	background: #88cac4;
+}
+.badge-2 {
+	background: #b2dbbf;
+}
+.badge-3 {
+	background: #70c1b3;
+}
+.badge-4 {
+	background: #025d83;
+}
+.badge-5 {
+	background: #eb547c;
 }

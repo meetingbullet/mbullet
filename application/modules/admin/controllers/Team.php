@@ -67,11 +67,11 @@ class Team extends Authenticated_Controller
 		];
 
 		if ($this->input->get('type') == 'all' || empty($this->input->get('type'))) {
-			$pagination_config['total_rows'] = $this->user_model->get_organization_members($this->current_user->current_organization_id, 'COUNT(*) as count')[0]->count;
+			$pagination_config['total_rows'] = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'COUNT(*) as count')[0]->count;
 		}
 
 		if ($this->input->get('type') == 'disabled') {
-			$pagination_config['total_rows'] = $this->user_model->get_organization_members($this->current_user->current_organization_id, 'COUNT(*) as count', false, ['enabled' => 0])[0]->count;
+			$pagination_config['total_rows'] = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'COUNT(*) as count', false, ['enabled' => 0])[0]->count;
 		}
 
 		if ($this->input->get('type') == 'by_role') {
@@ -79,7 +79,7 @@ class Team extends Authenticated_Controller
 			if (empty($role_id)) {
 				$role_id = $roles[0]->role_id;
 			}
-			$pagination_config['total_rows'] = $this->user_model->get_organization_members($this->current_user->current_organization_id, 'COUNT(*) as count', false, ['uto.role_id' => $role_id])[0]->count;
+			$pagination_config['total_rows'] = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'COUNT(*) as count', false, ['uto.role_id' => $role_id])[0]->count;
 		}
 
 		$this->pagination->initialize($pagination_config);
@@ -92,15 +92,15 @@ class Team extends Authenticated_Controller
 		$offset = ($current_page - 1) * $limit;
 
 		if ($this->input->get('type') == 'all' || empty($this->input->get('type'))) {
-			$users = $this->user_model->get_organization_members($this->current_user->current_organization_id, 'uto.user_id, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, [], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, [], $limit, $offset);
 		}
 
 		if ($this->input->get('type') == 'disabled') {
-			$users = $this->user_model->get_organization_members($this->current_user->current_organization_id, 'uto.user_id, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['enabled' => 0], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['enabled' => 0], $limit, $offset);
 		}
 
 		if ($this->input->get('type') == 'by_role') {
-			$users = $this->user_model->get_organization_members($this->current_user->current_organization_id, 'uto.user_id, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['uto.role_id' => $role_id], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['uto.role_id' => $role_id], $limit, $offset);
 		}
 
 		$users_list['result'] = sprintf(lang('ad_tm_pager_result'), ($offset + 1), ($offset + count($users)), $pagination_config['total_rows']);

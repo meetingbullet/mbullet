@@ -7,15 +7,16 @@
 				<div class="topbar-action">
 					<div class="btn-group">
 						<button type="button" class="an-btn an-btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<i class="ion-ios-paper-outline"></i>
-							<?php e(lang('projects')) ?> <span class="caret"></span>
+							<?php e($current_user->current_project_name) ?> <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu">
 							<?php if ($current_user->projects && count($current_user->projects)): 
 									foreach ($current_user->projects AS $project):
 							?>
 							
-							<li><a href="#"><?php e($project->name)?></a></li>
+							<li<?php echo $project->name == $current_user->current_project_name ? ' class="active"' : '' ?>>
+								<a href="<?php echo site_url('project/' . $project->cost_code) ?>"><?php e($project->name)?></a>
+							</li>
 							<?php endforeach; ?>
 							<li role="separator" class="divider"></li>
 							<?php endif; ?>

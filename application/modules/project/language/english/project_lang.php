@@ -24,12 +24,15 @@ $lang['pj_total_project_point_used'] = 'Total project points used';
 $lang['pj_open'] = 'Open';
 $lang['pj_inactive'] = 'Inactive';
 $lang['pj_archive'] = 'Archive';
+$lang['pj_x_settings'] = '%s - Settings';
 
 // Messages
 $lang['pj_project_successfully_created'] = 'Project successfully created';
 $lang['pj_there_was_a_problem_while_creating_project'] = 'There was a problem while creating project';
 $lang['pj_duplicated_cost_code'] = 'Duplicated cost code';
 $lang['pj_not_have_config_permission'] = 'You do not have permission to change project settings';
+$lang['pj_project_status_updated'] = 'Project status updated';
+$lang['pj_invalid_action'] = 'Invalid action';
 
 // Fields
 $lang['pj_project_name'] 			= 'Project name';

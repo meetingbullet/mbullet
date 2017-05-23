@@ -1,6 +1,6 @@
-	<div class="<?php echo $this->input->is_ajax_request() ? '' : 'an-content-body'?>">
+	<div class="<?php echo IS_AJAX ? '' : 'an-content-body'?>">
 
-		<?php if ($this->input->is_ajax_request()): ?>
+		<?php if (IS_AJAX): ?>
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 			<h4 class="modal-title"><?php e(lang('st_edit_step'))?></h4>
@@ -13,9 +13,9 @@
 		</div> <!-- end AN-BODY-TOPBAR -->
 		<?php endif; ?>
 
-		<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '']) ?>
+		<?php echo form_open($this->uri->uri_string(), ['class' => IS_AJAX ? 'form-ajax' : '', 'id' => 'form-update-step']) ?>
 
-		<div class='container-fluid<?php echo $this->input->is_ajax_request() ? ' modal-body' : ''?>'>
+		<div class='container-fluid<?php echo IS_AJAX ? ' modal-body' : ''?>'>
 				<?php echo mb_form_input('text', 'name', lang('st_name'), true, $step->name) ?>
 
 				<div class="row">
@@ -64,16 +64,32 @@
 				</div>
 		</div>
 
-		<div class="<?php echo $this->input->is_ajax_request() ? 'modal-footer' : 'container-fluid pull-right' ?>">
-			<button type="submit" name="save" class="an-btn an-btn-primary"><?php e(lang('st_update'))?></button>
-			<a href="#" class="an-btn an-btn-danger-transparent" <?php echo $this->input->is_ajax_request() ? 'data-dismiss="modal"' : '' ?>><?php e(lang('st_cancel'))?></a>
+		<div class="<?php echo IS_AJAX ? 'modal-footer' : 'container-fluid pull-right' ?>">
+			<button type="submit" name="save" id="update-step" class="an-btn an-btn-primary"><?php e(lang('st_update'))?></button>
+			<a href="#" class="an-btn an-btn-danger-transparent" <?php echo IS_AJAX ? 'data-dismiss="modal"' : '' ?>><?php e(lang('st_cancel'))?></a>
 		</div>
 
 		<?php echo form_close(); ?>
 	</div>
 
-	<?php if ($this->input->is_ajax_request()): ?>
+	<?php if (IS_AJAX): ?>
 		<script>
+			var project_members = [
+				<?php foreach($project_members as $user): 
+					if (strstr($user->avatar, 'http') === false) {
+						$user->avatar = avatar_url($user->avatar, $user->email);
+					}
+				?>
+				{
+					id: '<?php e($user->user_id)?>', 
+					name: '<?php e($user->first_name . ' ' . $user->last_name)?>', 
+					avatar: '<?php echo $user->avatar?>', 
+					cost_of_time: <?php e($user->cost_of_time)?>,
+					cost_of_time_name: '<?php e($user->cost_of_time_name)?>'
+				},
+				<?php endforeach; ?>
+			];
+
 			Selectize.define('select-member', function(options) {
 				var self = this;
 
@@ -95,15 +111,7 @@
 				valueField: 'id',
 				labelField: 'name',
 				searchField: ['name'],
-				options: [
-					<?php foreach($project_members as $user): 
-						if (strstr($user->avatar, 'http') === false) {
-							$user->avatar = avatar_url($user->avatar, $user->email);
-						}
-					?>
-					{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
-					<?php endforeach; ?>
-				],
+				options: project_members,
 				render: {
 					item: function(item, escape) {
 						return '<div>' +
@@ -128,15 +136,7 @@
 				valueField: 'id',
 				labelField: 'name',
 				searchField: ['name'],
-				options: [
-					<?php foreach($project_members as $user): 
-						if (strstr($user->avatar, 'http') === false) {
-							$user->avatar = avatar_url($user->avatar, $user->email);
-						}
-					?>
-					{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
-					<?php endforeach; ?>
-				],
+				options: project_members,
 				render: {
 					item: function(item, escape) {
 						return '<div>' +

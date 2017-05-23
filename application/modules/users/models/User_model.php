@@ -154,14 +154,7 @@ class User_model extends BF_Model
 	}
 
 
-	// public function get_organization_members($organization_id)
-	// {
-	// 	return $this->select('uto.user_id, email, first_name, last_name, avatar')
-	// 		->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $organization_id)
-	// 		->find_all();
-	// }
-
-	public function get_organization_members($organization_id, $select = 'uto.user_id, email, first_name, last_name, avatar', $with_role = false, $filter = ['enabled' => 1], $limit = null, $offset = null)
+	public function get_organization_users($organization_id, $select = 'uto.user_id, email, first_name, last_name, avatar', $with_role = false, $filter = ['enabled' => 1], $limit = null, $offset = null)
 	{
 		$this->select($select)->join('user_to_organizations uto', 'users.user_id = uto.user_id AND organization_id = ' . $organization_id);
 		if ($with_role === true) {
@@ -173,6 +166,37 @@ class User_model extends BF_Model
 		if (isset($limit) && isset($offset) && $limit > 0) {
 			$this->limit($limit, $offset);
 		}
+		return $this->find_all();
+	}
+
+	public function get_organization_members($organization_id, $project_id = null)
+	{
+		$cost_of_time_name_query_str = ', ';
+
+		$this->select('uto.user_id, email, first_name, last_name, avatar, cost_of_time')
+				->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $organization_id);
+
+		if (is_numeric($project_id)) {
+			$this->select('IF(
+								uto.cost_of_time = 1, 
+								p.cost_of_time_1,
+								IF(
+									uto.cost_of_time = 2, 
+									p.cost_of_time_2,
+									IF(
+										uto.cost_of_time = 3, 
+										p.cost_of_time_3,
+										IF(
+											uto.cost_of_time = 4, 
+											p.cost_of_time_4,
+											p.cost_of_time_5
+										)
+									)
+								)
+							) AS cost_of_time_name')
+				->join('projects p', 'project_id = ' . $project_id);
+		}
+
 		return $this->find_all();
 	}
 

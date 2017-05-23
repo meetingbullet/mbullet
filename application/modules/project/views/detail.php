@@ -9,33 +9,29 @@ $project_label = [
 	<div class="an-page-title">
 		<h2><?php e($project_name)?></h2>
 	</div>
-	<button id="back-btn" class="an-btn an-btn-primary-transparent dropdown-toggle setting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="ion-ios-more-outline"></i></button>
+	<button id="btn-project-settings" class="an-btn an-btn-primary-transparent dropdown-toggle setting" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="ion-ios-more-outline"></i></button>
 	<div class="dropdown-menu dropdown-menu-right">
 		<ul class="an-basic-list">
 			<li class="update-btn">
-			<?php if ($detail['project']->status == 'open') : ?>
-				<a style="color: #ccc"><?php e(lang('pj_more_btn_open_pj')) ?></a>
-			<?php else : ?>
-				<a href="#" data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=open') ?>" ><?php e(lang('pj_more_btn_open_pj')) ?></a>
-			<?php endif ?>
+				<a href="#" class='<?php echo $detail['project']->status == 'open' ? 'disabled' : '' ?>' data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=open') ?>" ><?php e(lang('pj_more_btn_open_pj')) ?></a>
 			</li>
 			<li class="update-btn">
-				<?php if ($detail['project']->status == 'inactive') : ?>
-					<a style="color: #ccc"><?php e(lang('pj_more_btn_inactive_pj')) ?></a>
-				<?php else : ?>
-					<a href="#" data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=inactive') ?>"><?php e(lang('pj_more_btn_inactive_pj')) ?></a>
-				<?php endif ?>
+				<a href="#" 
+					class='<?php echo $detail['project']->status == 'inactive' ? 'disabled' : '' ?>' 
+					data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=inactive') ?>">
+						<?php e(lang('pj_more_btn_inactive_pj')) ?>
+				</a>
 			</li>
 			<li class="update-btn">
-				<?php if ($detail['project']->status == 'archive') : ?>
-					<a style="color: #ccc"><?php e(lang('pj_more_btn_archive_pj')) ?></a>
-				<?php else : ?>
-					<a href="#" data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=archive') ?>"><?php e(lang('pj_more_btn_archive_pj')) ?></a>
-				<?php endif ?>
+				<a href="#" 
+					class='<?php echo $detail['project']->status == 'archive' ? 'disabled' : '' ?>' 
+					data-update-project-status-url="<?php echo site_url('project/update_project_status/' . $project_key . '?status=archive') ?>">
+					<?php e(lang('pj_more_btn_archive_pj')) ?>
+				</a>
 			</li>
 			<li role="separator" class="divider"></li>
 			<li class="update-info-btn"><a href="#" data-toggle="modal" data-target="#bigModal" data-update-project-url="<?php echo site_url('project/update/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_update')) ?></a></li>
-			<li><a href="<?php echo site_url('project/settings/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
+			<li><a href="<?php echo site_url('project/'. $project_key .'/settings') ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
 		</ul>
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
@@ -53,7 +49,11 @@ $project_label = [
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_owner') . ':'; ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo display_user($detail['project']->email, $detail['project']->first_name, $detail['project']->last_name, $detail['project']->avatar); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_detail_tab_info_table_label_status') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><span class="msg-tag <?php echo $project_label[$detail['project']->status]; ?>"><?php e($detail['project']->status); ?></span></div>
+				<div class="col-md-6 pj-detail-item">
+					<span id="project-status" class="msg-tag label label-bordered label-<?php echo $detail['project']->status; ?>">
+						<?php e(lang('pj_' . $detail['project']->status)); ?>
+					</span>
+				</div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_project_point_used') . ':'; ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['project']->total_project_point_used); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_created_on') . ':'; ?></div>

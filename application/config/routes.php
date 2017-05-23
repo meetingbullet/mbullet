@@ -78,4 +78,8 @@ Route::prefix(SITE_AREA, function(){
     Route::context('settings');
 });
 
+// Meeting Bullet
+Route::any('project/(:any)/settings', 'project/settings/$1');
+Route::block('project/settings/(:any)');
+
 $route = Route::map($route);

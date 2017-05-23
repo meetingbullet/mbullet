@@ -59,7 +59,44 @@ $(document).on("submit", '.form-ajax', (e) => {
 
 				if (data.message_type == 'success') {
 					// Step created
-					$('#step-list tbody').append($.templates('#step-row').render(data.data));
+					if (data.data.step_key) {
+						$('#step-list tbody').append($.templates('#step-row').render(data.data));
+					}
+
+					// Action edited
+					if ($(e.target).attr('id') == 'form-save-action') {
+						// Gather form data
+						var name = $('#form-save-action input[name="name"]').val();
+						var lang_success = $('#form-save-action select[name="success_condition"] option:selected').text();
+						var lang_type = $('#form-save-action select[name="action_type"] option:selected').text();
+						var owner_id = $('#form-save-action input[name="owner_id"]').val();
+						var owner_html = $('.action-detail .owner').html();
+						var point_value = $('#form-save-action input[name="point_value"]').val();
+						var team = $('#form-save-action input[name="team"]').val().split(',');
+						var resource_html = '';
+
+						project_members.forEach((item) => {
+							if (item.id == owner_id) {
+								owner_html = '<img class="user-avatar" title="'+ item.name +'" src="'+ item.avatar +'" style="width: 24px; height: 24px"> <span class="user-name">'+ item.name +'</span>';
+							}
+
+							if (team.indexOf(item.id) >= 0) {
+								resource_html += '<li>\
+													<img class="user-avatar" title="'+ item.name + '" src="'+ item.avatar + '" style="width: 24px; height: 24px">\
+													<span class="user-name">'+ item.name + '</span>\
+													<span class="badge badge-'+ item.cost_of_time + ' badge-bordered pull-right">'+ item.cost_of_time_name +'</span>\
+												</li>';
+							}
+						});
+
+						// Update view
+						$('#action-name').text(name);
+						$('.action-detail .success').text(lang_success);
+						$('.action-detail .type').text(lang_type);
+						$('.action-detail .point-value').text(point_value);
+						$('.action-detail .owner').html(owner_html);
+						$('#action-resource').html(resource_html);
+					}
 				}
 			}
 		}
