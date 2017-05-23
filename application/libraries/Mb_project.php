@@ -401,7 +401,7 @@ class Mb_project
 				'field_name' => 'full_name'
 			],
 			'URL' => site_url($object_type . '/' . $object_key),
-			'LABEL' => $object_name
+			'LABEL' => site_url($object_type . '/' . $object_key)
 		];
 
 		if ($action_type == 'insert') {
