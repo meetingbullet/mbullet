@@ -316,10 +316,10 @@ class Project extends Authenticated_Controller
 		}
 
 		if ($type = 'insert') {
-			$this->mb_project->notify_members($id, 'project', $this->current_user->user_id, 'insert');
+			$this->mb_project->notify_members($id, 'project', $this->current_user, 'insert');
 		} else {
 			if ((! empty($project_data['status'])) && $project_data['status'] != $project_old_status) {
-				$this->mb_project->notify_members($id, 'project', $this->current_user->user_id, 'update_status');
+				$this->mb_project->notify_members($id, 'project', $this->current_user, 'update_status');
 			}
 		}
 
@@ -686,7 +686,7 @@ class Project extends Authenticated_Controller
 				exit;
 			}
 		}
-		$this->mb_project->notify_members($project_id, 'project', $this->current_user->user_id, 'update_status');
+		$this->mb_project->notify_members($project_id, 'project', $this->current_user, 'update_status');
 		echo 1;
 		exit;
 	}

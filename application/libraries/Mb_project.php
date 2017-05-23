@@ -355,11 +355,12 @@ class Mb_project
 	 * @param string $action_type - to determine which type of email need to send
 	 * @return boolean - true if sent successfully and vice versa
 	 */
-	public function notify_members($object_id, $object_type, $current_user_id, $action_type = 'insert')
+	public function notify_members($object_id, $object_type, $current_user, $action_type = 'insert')
 	{
-		if (empty($object_id) || empty($object_type) || empty($action_type) || empty($current_user_id)) {
+		if (empty($object_id) || empty($object_type) || empty($action_type) || empty($current_user)) {
 			return false;
 		}
+		$current_user_id = $current_user->user_id;
 
 		$action_type = strtolower($action_type);
 		$object_type = strtolower($object_type);
@@ -375,8 +376,9 @@ class Mb_project
 		}
 
 		$this->ci->load->model($object_type . '/' . $object_type . '_model', 'object_model');
-		$object_name = $this->ci->object_model->get_field($object_id, 'name');
-		$object_key = $this->ci->object_model->get_field($object_id, $object_type == 'project' ? 'cost_code' : $object_type . '_key');
+		$object = $this->ci->object_model->find($object_id);
+		$object_name = $object->name;
+		$object_key = $object->{$object_type == 'project' ? 'cost_code' : $object_type . '_key'};
 
 		$template_key = 'NEW_OBJECT';
 		if ($action_type == 'update_status') {
@@ -390,25 +392,60 @@ class Mb_project
 			return false;
 		}
 
+		$data = [
+			'OBJECT_TYPE_UC' => strtoupper($object_type),
+			'OBJECT_TYPE' => ucfirst($object_type),
+			'OBJECT_NAME' => $object_name,
+			'USER_NAME' => [
+				'user_data' => true,
+				'field_name' => 'full_name'
+			],
+			'URL' => site_url($object_type . '/' . $object_key),
+			'LABEL' => $object_name
+		];
+
 		if ($action_type == 'insert') {
 			$this->ci->load->library('parser');
 			$email_template->email_title = $this->ci->parser->parse_string($email_template->email_title, [
 				'OBJECT_TYPE' => ucfirst($object_type)
 			], true);
+
+			$this->ci->load->model($object_type . '/' . $object_type . '_member_model', 'object_member_model');
+			$object_members = $this->ci->object_member_model
+									->select('CONCAT(first_name, last_name) as full_name, email')
+									->join('users u', 'u.user_id = ' . $object_type . '_members.user_id', 'left')
+									->find_all_by($object_type . '_id', $object_id);
+
+			$members = '';
+			if (! empty($object_members)) {
+				foreach ($object_members as $key => $member) {
+					$members .= $member->full_name . '(' . $member->email . ')';
+					if ($key < (count($object_members) - 1)) {
+						$members .= ', ';
+					}
+				}
+			}
+
+			$this->ci->load->model('users/user_model');
+			$object_owner = $this->ci->user_model->select('CONCAT(first_name, last_name) as full_name, email')->find($object->owner_id);
+			$owner = $object_owner->full_name . '(' . $object_owner->email . ')';
+
+			$this->ci->load->model('organization/organization_model');
+			$object_organization = $this->ci->organization_model->select('name')->organization_model->find($current_user->current_organization_id);
+			$organization = $object_organization->name;
+
+			$data ['OBJECT_OWNER'] = $owner;
+			$data['OBJECT_MEMBERS'] = $members;
+			$data['OBJECT_KEY'] = $object_key;
+			$data['OBJECT_ORG'] = $organization;
+		}
+
+		if ($action_type == 'update_status') {
+			$data['STATUS'] = '"' . $object->status . '"';
 		}
 		return (boolean) $this->send_mail_to_members($object_id, $object_type, $email_template->email_title,
 			html_entity_decode(nl2br($email_template->email_template_content)),
-			[$current_user_id], true, [
-				'OBJECT_TYPE_UC' => strtoupper($object_type),
-				'OBJECT_TYPE' => ucfirst($object_type),
-				'OBJECT_NAME' => $object_name,
-				'USER_NAME' => [
-					'user_data' => true,
-					'field_name' => 'full_name'
-				],
-				'URL' => site_url($object_type . '/' . $object_key),
-				'LABEL' => $object_name
-			], true);
+			[$current_user_id], true, $data, true);
 	}
 }
 /**
