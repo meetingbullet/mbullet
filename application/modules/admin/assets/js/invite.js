@@ -53,8 +53,8 @@ $('#toggle_dropdown').click((e) => {
 	$('#toggle_dropdown').closest('li').toggleClass('open');
 });
 
-$(document).on("click", function(e) {
-	if ($(e.target).is("#toggle_dropdown") === false) {
-		$("#toggle_dropdown").closest('li').removeClass("open");
+$(document).on('click', function(e) {
+	if ($(e.target).is('#toggle_dropdown') === false) {
+		$('#toggle_dropdown').closest('li').removeClass('open');
 	}
 });
