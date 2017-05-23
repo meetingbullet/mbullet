@@ -106,8 +106,10 @@
 	display: table;
 }
 
-#back-btn {
-	float: right;
+#btn-project-settings {
+	font-size: 30px;
+	line-height: 0;
+	padding: 0 15px;
 }
 
 .inline-inputs {

@@ -141,7 +141,7 @@ $members = array_column($invited_members, 'user_id');
 		<?php if (! empty($step->notes)) : ?>
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
-				<h6><?php e(lang('st_notes'))?></h6>
+				<h6><?php e(lang('st_notes_summary'))?></h6>
 			</div>
 			<div class="an-component-body">
 				<div class="an-helper-block">

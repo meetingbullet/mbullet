@@ -1,6 +1,6 @@
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<h2><?php echo lang('pj_settings') . ": {$project->name}" ?></h2>
+		<h2><?php echo sprintf(lang('pj_x_settings'), $project->name) ?></h2>
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
 <?php echo form_open('') ?>

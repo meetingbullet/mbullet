@@ -56,6 +56,7 @@ $lang['st_start_time'] = 'Start time';
 $lang['st_end_time'] = 'End time';
 $lang['st_elapsed_time'] = 'Elapsed time';
 $lang['st_notes'] = 'Notes';
+$lang['st_notes_summary'] = 'Notes / Summary';
 $lang['st_closed_parking_lot'] = 'Closed parking lot';
 $lang['st_scheduled_duration'] = 'Scheduled duration';
 $lang['st_actual_duration'] = 'Actual duration';
