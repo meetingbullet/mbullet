@@ -1,7 +1,12 @@
 // Open step monitor
 $('.btn-open-step-monitor').click((e) => {
 	e.preventDefault();
-	var key = $(e.target).data('step-key');
+	var key = $(e.target).data('step-key') ? $(e.target).data('step-key') : $(e.target).parent().data('step-key');
+
+	if (key == undefined) {
+		console.error('Unable to get STEP KEY on target', $(e.target));
+		return;
+	}
 
 	// Adjust diff between server and client on counters
 	$(document).data('ajax-start-time', moment().unix());
