@@ -22,6 +22,7 @@ $(document).ready(function() {
         data += '&' + $(e.target).find('[type="submit"]').attr('name') + '=';
         console.log(data);
 
+		var form = $(e.target);
         $.ajax({
             type: "POST",
             url: $(e.target).attr('action'),
@@ -43,6 +44,13 @@ $(document).ready(function() {
                         z_index: 1051
                     });
                 }
+
+				if ($(form).hasClass('edit-user-form') && data.message_type == 'success') {
+					$.get(window.location.href).done(function(data) {
+						data = JSON.parse(data);
+						$('.tab-pane').html(data.modal_content);
+					});
+				}
             }
         });
     });
@@ -59,7 +67,7 @@ $(document).on('click', function(e) {
 	}
 });
 
-$('#edit-user').click(function() {
+$(document).on('click', '.an-user-lists.tables .edit-user', function() {
 	var url = $(this).data('edit-user-url');
 	$.get(url).done(function(data) {
 		data = JSON.parse(data);

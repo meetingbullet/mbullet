@@ -211,6 +211,7 @@ class Team extends Authenticated_Controller
 				$data['role_id'] = $this->input->post('role_id');
 				$data['title'] = empty($this->input->post('title')) ? null : $this->input->post('title');
 				$data['cost_of_time'] = $this->input->post('cost_of_time');
+				$data['enabled'] = $this->input->post('enabled');
 				if (empty($this->input->post('enabled'))) {
 					$data['enabled'] = 0;
 				}

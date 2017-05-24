@@ -3,7 +3,7 @@
 	<h4 class="modal-title"><?php echo lang('ad_tm_edit_user') . ': ' . $user->full_name ?></h4>
 </div> <!-- end MODAL-HEADER -->
 
-<?php echo form_open($this->uri->uri_string(), ['class' => 'form-ajax']) ?>
+<?php echo form_open($this->uri->uri_string(), ['class' => 'form-ajax edit-user-form']) ?>
 
 <div class='container-fluid modal-body'>
 	<?php echo mb_form_input('text', 'title', lang('ad_tm_title'), false, set_value('title', isset($user->title) ? $user->title : ''), $class = 'an-form-control', '', lang('ad_tm_title')) ?>
