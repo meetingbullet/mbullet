@@ -594,6 +594,7 @@ function update_monitor()
 					$('#step-decider').modal({backdrop: "static"});
 				});
 			} else {
+				// Wait for owner finish decider
 				swal({
 					title: '<?php echo lang('st_waiting') ?>',
 					text: '<?php echo lang('st_waiting_evaluator') ?>',
@@ -602,10 +603,10 @@ function update_monitor()
 					showConfirmButton: false
 				});
 
-				var interval = setInterval(function(){
+				var check_state_interval = setInterval(function(){
 					$.get('<?php echo site_url('step/check_state/' . $step_key) ?>').done(function(data) {
 						if (data == 1) {
-							clearInterval(interval);
+							clearInterval(check_state_interval);
 							swal.close();
 
 							$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
@@ -621,7 +622,25 @@ function update_monitor()
 			}
 		}
 
-		$.each(data.data, (index, item) => {
+		// Real-time step joiner
+		$('#step-joiner span').addClass('inactive');
+		$.each(data.online_members, (index, item) => {
+			if ($('#step-joiner span[data-user-id="'+ item.user_id +'"]').length) {
+				$('#step-joiner span[data-user-id="'+ item.user_id +'"]').removeClass('inactive');
+			} else {
+				var new_joiner_html = '<span class="avatar" data-user-id="'+ item.user_id +'" style="background-image: url(\''+ item.avatar +'\'); display: none;"></span>';
+				$(new_joiner_html).appendTo('#step-joiner').slideDown(300);
+			}
+		});
+
+		// Remove joiner whose has left
+		$('#step-joiner span.inactive').animate({width: 0, marginRight: 0}, 300, function() {
+			$(this).remove();
+		});
+
+
+		// Real-time task data
+		$.each(data.tasks, (index, item) => {
 			old_vote = parseInt($('#task-' + item.task_id + ' .skip-votes').text());
 			old_status = $('#task-' + item.task_id).data('task-status');
 
