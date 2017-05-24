@@ -22,11 +22,12 @@
 	<script src="<?php echo Template::theme_url("js-plugins/bootstrap-datetimepicker.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/readmore.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/jsrender.min.js"); ?>" type="text/javascript"></script>
-
 	<script src="<?php echo Template::theme_url("js/customize-chart.js"); ?>" type="text/javascript"></script>
-	<script src="<?php echo Template::theme_url("js/scripts.js"); ?>" type="text/javascript"></script>
     <script src="<?php echo Template::theme_url("js-plugins/bootstrap-notify.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/sweetalert.min.js"); ?>" type="text/javascript"></script>
+	<script src="<?php echo Template::theme_url("js-plugins/bootstrap-switch.min.js"); ?>" type="text/javascript"></script>
+	<script src="<?php echo Template::theme_url("js-plugins/lc_switch.min.js"); ?>" type="text/javascript"></script>
+	<script src="<?php echo Template::theme_url("js/scripts.js"); ?>" type="text/javascript"></script>
     <script src="<?php echo Template::theme_url("js/main.js"); ?>" type="text/javascript"></script>
 </body>
 </html>

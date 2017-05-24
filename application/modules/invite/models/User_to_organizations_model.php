@@ -3,7 +3,7 @@
 class User_to_organizations_model extends BF_Model
 {
 	protected $table_name	= 'user_to_organizations';
-	protected $key			= 'user__id';
+	protected $key			= 'user_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;

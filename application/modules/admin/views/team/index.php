@@ -1,3 +1,8 @@
+<div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
+	<div class="an-page-title">
+		<h2><?php echo lang('ad_tm_org_users') . ': ' . $organization->name ?></h2>
+	</div>
+</div> <!-- end AN-BODY-TOPBAR -->
 <button class="an-btn an-btn-success" id="invite" style="margin: 30px 0">Invite User</button>
 
 <div class="an-single-component with-shadow">
@@ -51,13 +56,13 @@
 						<?php endif ?>
 
 						<?php foreach ($users_list['data'] as $user) : ?>
-							<div class="list-user-single">
+							<div class="list-user-single" style="cursor: pointer;" id="edit-user" data-id="<?php e($user->user_id) ?>" data-edit-user-url="<?php echo site_url('admin/team/edit_user/' . $user->user_id) ?>">
 								<div class="list-name basis-30">
 									<!--span class="an-custom-checkbox">
 										<input id="check-40" type="checkbox">
 										<label for="check-40"></label>
 									</span-->
-									<a href="#"><?php e($user->first_name . ' ' . $user->last_name) ?></a>
+									<a><?php e($user->first_name . ' ' . $user->last_name) ?></a>
 								</div>
 								<div class="list-date email approve basis-30">
 									<p><?php e($user->email) ?></p>
@@ -88,6 +93,13 @@
 
 <div class="modal fade" id="inviteModal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
 	</div>
