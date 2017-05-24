@@ -614,7 +614,6 @@ class Step extends Authenticated_Controller
 		echo json_encode([
 			'message_type' => 'success',
 			'tasks' => $tasks,
-			'l' => $this->db->last_query(),
 			'step' => $this->step_model->select('status')->limit(1)->find($step_id),
 			'online_members' => $online_members ? $online_members : [],
 			'current_time' => $current_time,
