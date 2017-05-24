@@ -597,11 +597,27 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
+		$current_time = gmdate('Y-m-d H:i:s');
+
+		// Real-time joiner
+		$interval = 3;
+		$this->step_member_model->where('user_id', $this->current_user->user_id)->update($step_id, ['last_online' => $current_time]);
+		$online_members = $this->step_member_model->select('u.user_id, CONCAT(first_name, " ", last_name) AS full_name, avatar, email')
+													->join('users u', 'u.user_id = step_members.user_id')
+													->where('TIMEDIFF(DATE_ADD(last_online, INTERVAL '. $interval  .' SECOND), "'. $current_time .'") >= 0 ', null, false)
+													->where('step_id', $step_id)
+													->order_by('u.user_id')
+													->find_all();
+
+
+
 		echo json_encode([
 			'message_type' => 'success',
-			'data' => $tasks,
+			'tasks' => $tasks,
+			'l' => $this->db->last_query(),
 			'step' => $this->step_model->select('status')->limit(1)->find($step_id),
-			'current_time' => gmdate('Y-m-d H:i:s')
+			'online_members' => $online_members ? $online_members : [],
+			'current_time' => $current_time,
 		]);
 	}
 

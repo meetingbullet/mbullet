@@ -30,8 +30,35 @@
 	margin-bottom: 0;
 }
 
-.step-monitor .an-body-topbar {
+.step-monitor .topbar {
 	align-items: flex-start;
+	position: relative;
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.topbar h2 {
+	margin-top: 0;
+}
+
+#step-joiner {
+	position: relative;
+	min-height: 30px;
+	margin: 0 15px 10px 15px;
+}
+
+#step-joiner .avatar {
+	margin-left: 0;
+}
+
+#step-joiner .ui-effects-placeholder {
+	display: none !important;
+}
+
+#step-joiner .avatar {
+	width: 30px;
+	height: 30px;
 }
 
 .step-time-schedule .an-btn-danger-transparent:hover,
