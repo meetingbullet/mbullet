@@ -35,7 +35,7 @@ class Dashboard extends Authenticated_Controller
 
 		$member_steps = $this->step_member_model->select('s.*, u.first_name, u.last_name, u.email, u.avatar')
 									->join('steps s', 's.step_id = step_members.step_id AND s.owner_id != ' . $this->current_user->user_id)
-									->join('users u', 'u.user_id = step_members.user_id')
+									->join('users u', 'u.user_id = s.owner_id')
 									->where('(status = "ready" OR status = "inprogress")', null, false)
 									->where('step_members.user_id', $this->current_user->user_id)
 									->find_all();

@@ -32,7 +32,7 @@ $task_status_labels = [
 	<?php echo form_open(site_url('step/update_step_schedule'), ['class' => 'form-inline form-step-schedule']) ?>
 		<input type="hidden" name="scheduled_start_time"/>
 
-		<div class="an-body-topbar">
+		<div class="topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
 					<h2><?php e($step->name)?></h2>
@@ -86,6 +86,9 @@ $task_status_labels = [
 		</div> <!-- end AN-BODY-TOPBAR -->
 	<?php echo form_close() ?>
 
+	<div id="step-joiner">
+		
+	</div>
 
 	<div class="an-single-component with-shadow">
 		<div class="an-component-header">
