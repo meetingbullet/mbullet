@@ -1,3 +1,4 @@
+<?php if (! $this->input->is_ajax_request()) : ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
 		<h2><?php echo lang('ad_tm_org_users') . ': ' . $organization->name ?></h2>
@@ -13,7 +14,7 @@
 				<ul class="nav nav-tabs text-left" role="tablist">
 				<?php foreach (['all', 'disabled', 'by_role'] as $type) : ?>
 					<li role="presentation" class="<?php if ($type == $this->input->get('type') || (is_null($this->input->get('type')) && $type == 'all')) echo 'active' ?>">
-						<a href="<?php echo $type == 'by_role' ? '#' : site_url('admin/team?') . http_build_query(['type' => $type]) ?>" <?php echo $type == 'by_role' ? 'id="toggle_dropdown"' : '' ?>>
+						<a href="<?php echo $type == 'by_role' ? '#' : site_url('admin/team?') . http_build_query(['type' => $type]) ?>" <?php echo $type == 'by_role' ? 'id="toggle_dropdown" style="cursor: pointer;"' : '' ?>>
 							<?php echo lang('ad_tm_tab_' . $type) . ($type == 'by_role' ? '&nbsp;<i class="ion-arrow-down-b"></i>' : '') ?>
 						</a>
 						<?php if ($type == 'by_role') : ?>
@@ -56,7 +57,7 @@
 						<?php endif ?>
 
 						<?php foreach ($users_list['data'] as $user) : ?>
-							<div class="list-user-single" style="cursor: pointer;" id="edit-user" data-id="<?php e($user->user_id) ?>" data-edit-user-url="<?php echo site_url('admin/team/edit_user/' . $user->user_id) ?>">
+							<div class="list-user-single edit-user" style="cursor: pointer;" data-id="<?php e($user->user_id) ?>" data-edit-user-url="<?php echo site_url('admin/team/edit_user/' . $user->user_id) ?>">
 								<div class="list-name basis-30">
 									<!--span class="an-custom-checkbox">
 										<input id="check-40" type="checkbox">
@@ -108,3 +109,59 @@
 <script>
 	var INVITE_USER_URL = '<?php echo site_url('admin/team/invite')?>';
 </script>
+<?php else : ?>
+<div class="an-user-lists tables messages">
+	<div class="list-title">
+		<h6 class="basis-30">
+			<!--span class="an-custom-checkbox">
+				<input id="check-11" type="checkbox">
+				<label for="check-11"></label>
+			</span-->
+			<?php echo lang('ad_tm_full_name') ?>
+		</h6>
+		<h6 class="basis-30"><?php echo lang('ad_tm_email') ?></h6>
+		<h6 class="basis-10"><?php echo lang('ad_tm_role') ?></h6>
+		<h6 class="basis-20"><?php echo lang('ad_tm_last_login') ?></h6>
+		<h6 class="basis-10"><?php echo lang('ad_tm_status') ?></h6>
+	</div>
+
+	<div class="an-lists-body an-customScrollbar ps-container ps-theme-default ps-active-y">
+	<?php if (empty($users_list['data'])) : ?>
+		<div class="list-user-single">
+			<div class="list-date" style="width: 100%">
+				<p class="text-center"><?php echo lang('ad_tm_no_users') ?></p>
+			</div>
+		</div>
+	<?php endif ?>
+
+	<?php foreach ($users_list['data'] as $user) : ?>
+		<div class="list-user-single edit-user" style="cursor: pointer;" data-id="<?php e($user->user_id) ?>" data-edit-user-url="<?php echo site_url('admin/team/edit_user/' . $user->user_id) ?>">
+			<div class="list-name basis-30">
+				<!--span class="an-custom-checkbox">
+					<input id="check-40" type="checkbox">
+					<label for="check-40"></label>
+				</span-->
+				<a><?php e($user->first_name . ' ' . $user->last_name) ?></a>
+			</div>
+			<div class="list-date email approve basis-30">
+				<p><?php e($user->email) ?></p>
+			</div>
+			<div class="list-text basis-10">
+				<p><?php e($user->role_name) ?></p>
+			</div>
+			<div class="list-date basis-20">
+				<p><?php e(display_time($user->last_login)) ?></p>
+			</div>
+			<div class="list-state basis-10 text-right">
+				<span class="msg-tag <?php echo $user->enabled == 1 ? 'read' : 'spam' ?>"><?php echo $user->enabled == 1 ? 'enabled' : 'disabled' ?></span>
+			</div>
+		</div> <!-- end .USER-LIST-SINGLE -->
+	<?php endforeach ?>
+	</div>
+</div>
+
+<div class="an-pagination-container">
+	<p class="result-info"><?php if (! empty($users_list['result'])) echo $users_list['result'] ?></p>
+	<?php if (! empty($users_list['pagination'])) echo $users_list['pagination'] ?>
+</div>
+<?php endif; ?>
