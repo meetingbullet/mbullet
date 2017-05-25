@@ -68,7 +68,7 @@ class Authenticated_Controller extends Base_Controller
 						Template::set_message(sprintf(lang('user_is_disabled_from_organization'), ucfirst(! empty($organization) ? $organization->name : $this->current_organization_url)), 'danger');
 					}
 				} else {
-					Template::set_message(sprintf(lang('use_is_out_of_organization'), ucfirst(! empty($organization) ? $organization->name : $this->current_organization_url)), 'danger');
+					Template::set_message(lang('use_is_out_of_organization'), 'danger');
 				}
 			}
 		} else {
