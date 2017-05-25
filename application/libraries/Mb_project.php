@@ -427,7 +427,7 @@ class Mb_project
 			}
 
 			$this->ci->load->model('users/user_model');
-			$object_owner = $this->ci->user_model->select('CONCAT(first_name, last_name) as full_name, email')->find($object->owner_id);
+			$object_owner = $this->ci->user_model->select('CONCAT(first_name, " ", last_name) as full_name, email')->find($object->owner_id);
 			$owner = $object_owner->full_name . '(' . $object_owner->email . ')';
 
 			$this->ci->load->model('organization/organization_model');
