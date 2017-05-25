@@ -35,6 +35,7 @@ class Authenticated_Controller extends Base_Controller
 		$this->autoload['libraries'][] = 'users/auth';
 
 		parent::__construct();
+		$this->check_user_enabled();
 		$this->redirect_to_organization_url();
 		$this->goto_create_organization();
 		$this->get_navigation_project_list();
@@ -44,6 +45,49 @@ class Authenticated_Controller extends Base_Controller
 
 		// Basic setup
 		Template::set_theme('user', 'junk');
+	}
+
+	private function check_user_enabled()
+	{
+		if (is_null($this->current_user->current_organization_id)) {
+			if (! is_null($this->current_organization_url)) {
+				// user logged in but not choose organization or user can not access organization or user is not part of organization
+				$uo = $this->db->select('uo.enabled')
+							->from('user_to_organizations uo')
+							->join('organizations o', 'o.organization_id = uo.organization_id', 'inner')
+							->where('uo.user_id', $this->current_user->user_id)
+							->where('o.url', $this->current_organization_url)
+							->get()->row();
+
+				$organization = $this->db->select('name')
+										->where('url', $this->current_organization_url)
+										->get('organizations')->row();
+
+				if (! empty($uo)) {
+					if ($uo->enabled == 0) {
+						Template::set_message(sprintf(lang('user_is_disabled_from_organization'), ucfirst(! empty($organization) ? $organization->name : $this->current_organization_url)), 'danger');
+					}
+				} else {
+					Template::set_message(sprintf(lang('use_is_out_of_organization'), ucfirst(! empty($organization) ? $organization->name : $this->current_organization_url)), 'danger');
+				}
+			}
+		} else {
+			// user's still logging in
+			$uo = $this->db->select('enabled')
+							->from('user_to_organizations')
+							->where('user_id', $this->current_user->user_id)
+							->where('organization_id', $this->current_user->current_organization_id)
+							->get()->row();
+
+			$organization = $this->db->select('name')
+									->where('organization_id', $this->current_user->current_organization_id)
+									->get('organizations')->row();
+
+			if ($uo->enabled == 0) {
+				Template::set_message(sprintf(lang('user_is_disabled_from_organization'), ucfirst(! empty($organization) ? $organization->name : $this->current_organization_url)), 'danger');
+				$this->current_user->current_organization_id = null;
+			}
+		}
 	}
 
 	private function goto_create_organization()
@@ -97,9 +141,9 @@ class Authenticated_Controller extends Base_Controller
 				$sub = $orgs->row()->url;
 				// redirect to organization domain if current domain is incorrect
 				if (isset($this->requested_page) && !empty($this->requested_page))
-					redirect((is_https() ? 'https://' : 'http://') . $sub . '.' . $main_domain . '/' . $this->uri->uri_string());
+					Template::redirect((is_https() ? 'https://' : 'http://') . $sub . '.' . $main_domain . '/' . $this->uri->uri_string());
 				else
-					redirect((is_https() ? 'https://' : 'http://') . $sub . '.' . $main_domain . '/' . DEFAULT_LOGIN_LOCATION);
+					Template::redirect((is_https() ? 'https://' : 'http://') . $sub . '.' . $main_domain . '/' . DEFAULT_LOGIN_LOCATION);
 			}
 		}
 	}
