@@ -69,14 +69,14 @@ $members = array_column($invited_members, 'user_id');
 	<a href='#' id="edit-step" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
 	<?php if (in_array($current_user->user_id, $members) || $is_owner) : ?>
 		<?php if ($step->status == 'open'): ?>
-			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary step-open<?php echo ($is_owner ? '' : ' hidden')?>'>
+			<a href='#' class='open-step-monitor an-btn an-btn-primary step-open<?php echo ($is_owner ? '' : ' hidden')?>'>
 				<i class="ion-ios-play"></i> <?php e(lang('st_set_up')); ?>
 			</a>
 		<?php elseif ($step->status == 'ready' || $step->status == 'inprogress'): ?>
-			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo ($is_owner ? '' : ' hidden')?>'>
+			<a href='#' class='open-step-monitor an-btn an-btn-primary<?php echo ($is_owner ? '' : ' hidden')?>'>
 				<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
 			</a>
-			<a href='#' id="open-step-monitor" class='an-btn an-btn-primary<?php echo (!$is_owner && $step->status == 'inprogress'? '' : ' hidden')?>'>
+			<a href='#' class='open-step-monitor an-btn an-btn-primary<?php echo (!$is_owner && $step->status == 'inprogress'? '' : ' hidden')?>'>
 				<i class="ion-ios-play"></i> <?php e(lang('st_join')); ?>
 			</a>
 		<?php endif; ?>
