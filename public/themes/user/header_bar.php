@@ -14,7 +14,7 @@
 									foreach ($current_user->projects AS $project):
 							?>
 							
-							<li<?php echo $project->name == $current_user->current_project_name ? ' class="active"' : '' ?>>
+							<li<?php echo $project->project_id == $current_user->current_project_id ? ' class="active"' : '' ?>>
 								<a href="<?php echo site_url('project/' . $project->cost_code) ?>"><?php e($project->name)?></a>
 							</li>
 							<?php endforeach; ?>
