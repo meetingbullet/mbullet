@@ -74,7 +74,9 @@ class Organization_model extends BF_Model
 		$query = $this->db->select('o.organization_id, o.name, o.url, o.icon, o.signup_mode')
 							->from('organizations o')
 							->join('user_to_organizations uo', 'o.organization_id = uo.organization_id')
-							->where('uo.user_id', $user_id)->get();
+							->where('uo.user_id', $user_id)
+							->where('uo.enabled', 1)
+							->get();
 		if ($query->num_rows() > 0) {
 			return $query->result();
 		} else {
