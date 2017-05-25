@@ -20,7 +20,7 @@ $('#edit-step').click((e) => {
 });
 
 // Open step monitor
-$('#open-step-monitor').click((e) => {
+$('.open-step-monitor').click((e) => {
 	e.preventDefault();
 
 	// Adjust diff between server and client on counters
