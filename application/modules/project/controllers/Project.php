@@ -607,7 +607,7 @@ class Project extends Authenticated_Controller
 
 		$project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id);
 		if ($project_id !== false) {
-			$members = $this->db->select('u.user_id, CONCAT(u.first_name, u.last_name) as full_name')
+			$members = $this->db->select('u.user_id, CONCAT(u.first_name, " ", u.last_name) as full_name')
 								->from('users u')
 								->join('project_members pm', 'u.user_id = pm.user_id', 'inner')
 								->like('CONCAT(u.first_name, u.last_name)', $this->input->get('member_name'))
