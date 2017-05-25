@@ -453,7 +453,7 @@ class Auth
 		}
 
 		// Inform the user of the lack of permission and redirect.
-		Template::set_message(lang('us_no_permission'), 'attention');
+		Template::set_message(lang('us_no_permission'), 'danger');
 		Template::redirect($uri);
 	}
 
