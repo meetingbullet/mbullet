@@ -332,5 +332,5 @@ $lang['projects'] = 'Projects';
 $lang['create_project'] = 'Create Project';
 $lang['my_calendar'] = 'My Calendar';
 
-$lang['user_is_disabled_from_organization'] = 'Unfortunately, You are no longer a member of this organization(%s).';
-$lang['use_is_out_of_organization'] = 'Sorry, The requested organization does not exist or You have not been a member of this organization(%s) yet.';
+$lang['user_is_disabled_from_organization'] = 'Unfortunately, You are no longer a member of %s organization.';
+$lang['use_is_out_of_organization'] = 'Sorry, your requested URL does not exist or you have not been a member of that organization yet.';
