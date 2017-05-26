@@ -222,10 +222,10 @@
 	margin-bottom: 0;
 }
 
-.goal, .step-notes {
+.goal, .step-notes, .notes-container {
 	overflow: hidden;
 }
 
-.step-goal-container {
+.step-goal-container, .step-notes-container {
 	position: relative;
 }

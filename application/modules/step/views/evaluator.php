@@ -87,7 +87,7 @@ $task_status_labels = [
 						<tr>
 							<td><strong><?php echo lang('st_elapsed_time') ?></strong></td>
 							<td class="text-center"><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
-							<td class="text-center"><?php echo round($step->actual_elapsed_time, 2) . ' ' . lang('st_minutes') ?></td>
+							<td class="text-center"><?php echo timespan(strtotime($step->actual_start_time), strtotime($step->actual_end_time)) ?></td>
 						</tr>
 					</tbody>
 				</table>
@@ -157,16 +157,7 @@ $task_status_labels = [
 						<tr>
 							<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
 							<td class="text-center"><?php e(empty($task->started_on) ? '' : $task->started_on) ?></td>
-							<td class="text-center">
-							<?php
-							if (! empty($task->started_on) && ! empty($task->finished_on)) {
-								$duration = strtotime($task->finished_on) - strtotime($task->started_on);
-								if ($duration >= 0) {
-									echo round($duration / 60, 2) . ' ' . lang(($duration == 1 ? 'st_minute' : 'st_minutes'));
-								}
-							}
-							?>
-							</td>
+							<td class="text-center"><?php echo timespan(strtotime($task->started_on), strtotime($task->finished_on)) ?></td>
 							<td class="text-center task-status">
 								<?php if (! empty($task->status)) : ?>
 								<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
@@ -201,8 +192,10 @@ $task_status_labels = [
 
 	<div class="col-md-12">
 		<label><?php echo lang('st_notes') ?></label>
-		<div>
-		<?php echo nl2br($step->notes) ?>
+		<div class="step-notes-container">
+			<div class='step-notes'>
+			<?php echo nl2br($step->notes) ?>
+			</div>
 		</div>
 	</div>
 

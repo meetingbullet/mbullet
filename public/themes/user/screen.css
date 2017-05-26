@@ -272,7 +272,7 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 
 /* Readmore plugin */
 .readmore {
-	display: table-cell;
+	display: block;
 	vertical-align: bottom;
 	color: gray;
 	text-transform: uppercase;
