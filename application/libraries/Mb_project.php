@@ -404,12 +404,12 @@ class Mb_project
 			'LABEL' => site_url($object_type . '/' . $object_key)
 		];
 
-		if ($action_type == 'insert') {
-			$this->ci->load->library('parser');
-			$email_template->email_title = $this->ci->parser->parse_string($email_template->email_title, [
-				'OBJECT_TYPE' => ucfirst($object_type)
-			], true);
+		$this->ci->load->library('parser');
+		$email_template->email_title = $this->ci->parser->parse_string($email_template->email_title, [
+			'OBJECT_TYPE' => ucfirst($object_type)
+		], true);
 
+		if ($action_type == 'insert') {
 			$this->ci->load->model($object_type . '/' . $object_type . '_member_model', 'object_member_model');
 			$object_members = $this->ci->object_member_model
 									->select('CONCAT(first_name, " ", last_name) as full_name, email')
