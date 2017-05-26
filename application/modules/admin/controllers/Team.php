@@ -219,6 +219,9 @@ class Team extends Authenticated_Controller
 				$updated = $this->user_to_organizations_model->where('organization_id', $this->current_user->current_organization_id)->skip_validation(true)->update($user_id, $data);
 
 				if ($updated) {
+					if ($data['enabled'] != $user->enabled) {
+						$this->notify_user_status($user->email, $user->full_name, $data['enabled']);
+					}
 					Template::set('close_modal', 1);
 					Template::set('message_type', 'success');
 					Template::set('message', lang('ad_tm_update_success'));
@@ -241,5 +244,49 @@ class Team extends Authenticated_Controller
 		} else {
 			Template::render();
 		}
+	}
+
+	private function notify_user_status($email, $fullname, $status)
+	{
+		if (is_null($status)) {
+			return false;
+		}
+
+		if ( $status == 0) {
+			$template_key = 'ACCOUNT_DISABLED';
+		} elseif ($status == 1) {
+			$template_key = 'ACCOUNT_ENABLED';
+		} else {
+			return false;
+		}
+
+		$owner = $this->user_model->select('CONCAT(first_name, " ", last_name) as full_name')
+								->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
+								->join('roles r', 'uto.role_id = r.role_id AND r.is_public = 1', 'left')
+								->find_by('uto.organization_id', $this->current_user->current_organization_id);
+		if (empty($owner)) {
+			return false;
+		}
+
+		$email_template = $this->db->where('email_template_key', $template_key)
+								->where('language_code', 'en_US')
+								->get('email_templates')->row();
+		if (empty($email_template)) {
+			return false;
+		}
+
+		$this->load->library('emailer/emailer');
+		$this->load->library('parser');
+
+		$email_data = [
+			'to' => $email,
+			'subject' => $email_template->email_title,
+			'message' => $this->parser->parse_string(html_entity_decode($email_template->email_template_content), [
+							'OWNER_NAME' => $owner->full_name,
+							'USER_NAME' => $fullname
+						], true)
+		];
+
+		return $this->emailer->send($email_data, true);
 	}
 }
