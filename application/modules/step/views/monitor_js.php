@@ -45,12 +45,12 @@ $('.modal-monitor').on('hidden.bs.modal', function () {
 })
 
 // Disable all Start task if there is a "In Progress" Task
-if ($('.label-inprogress').length) {
+if ($('.step-monitor .label-inprogress').length) {
 	$('.btn-start-task').prop('disabled', true);
 	$('.btn-finish').prop('disabled', true);
 }
 
-if ($('.label-inprogress').length == 0 && $('.label-open').length == 0) {
+if ($('.step-monitor .label-inprogress').length == 0 && $('.step-monitor .label-open').length == 0) {
 	$('.btn-finish').prop('disabled', false);
 }
 
