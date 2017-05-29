@@ -135,10 +135,6 @@
 	margin: 5px;
 }
 
-.modal-content {
-	overflow: hidden;
-}
-
 .attendee > .rating {
 	float: right;
 }

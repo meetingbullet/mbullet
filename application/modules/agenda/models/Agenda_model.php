@@ -48,6 +48,11 @@ class Agenda_model extends BF_Model
 				'field' => 'name',
 				'label' => 'lang:tk_name',
 				'rules' => 'trim|required|max_length[255]',
+			),
+			array(
+				'field' => 'assignee',
+				'label' => 'lang:tk_assignee',
+				'rules' => 'trim|required',
 			)
 		)
 	);
