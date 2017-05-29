@@ -23,22 +23,6 @@ if ($step->scheduled_start_time) {
 	$scheduled_start_time = date('Y-m-d H:i:s', $scheduled_start_time);
 	$scheduled_end_time = date('Y-m-d H:i:s', $scheduled_end_time);
 }
-
-$task_confirm_status_labels = [
-	'closed' => 'label label-default label-bordered',
-	'skipped' => 'label label-warning label-bordered',
-	'resolved' => 'label label-success label-bordered',
-	'open_parking_lot' => 'label label-info label-bordered',
-	'closed_parking_lot' => 'label label-success label-bordered'
-];
-$task_status_labels = [
-	'open' => 'label label-default label-bordered',
-	'inprogress' => 'label label-warning label-bordered',
-	'resolved' => 'label label-success label-bordered',
-	'jumped' => 'label label-info label-bordered',
-	'skipped' => 'label label-success label-bordered',
-	'parking_lot' => 'label label-info label-bordered',
-];
 ?>
 <?php echo form_open('', ['class' => 'form-inline form-ajax form-step-schedule']) ?>
 <div style="display:none" class="rating">
@@ -138,10 +122,10 @@ $task_status_labels = [
 	<div class="col-md-12">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
-				<h6><?php e(lang('st_tasks'))?></h6>
+				<h6><?php e(lang('st_agendas'))?></h6>
 			</div>
 			<div class="an-component-body an-helper-block">
-				<table class="table table-striped table-task">
+				<table class="table table-striped table-agenda">
 					<thead>
 						<tr>
 							<th><?php e(lang('st_name'))?></th>
@@ -153,33 +137,33 @@ $task_status_labels = [
 						</tr>
 					</thead>
 					<tbody>
-						<?php if(is_array($tasks)): foreach ($tasks as $task) : ?>
+						<?php if(is_array($agendas)): foreach ($agendas as $agenda) : ?>
 						<tr>
-							<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
-							<td class="text-center"><?php e(empty($task->started_on) ? '' : $task->started_on) ?></td>
-							<td class="text-center"><?php echo timespan(strtotime($task->started_on), strtotime($task->finished_on)) ?></td>
-							<td class="text-center task-status">
-								<?php if (! empty($task->status)) : ?>
-								<span class="<?php e($task_status_labels[$task->status] . ' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
+							<td><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
+							<td class="text-center"><?php e(empty($agenda->started_on) ? '' : display_time($agenda->started_on)) ?></td>
+							<td class="text-center"><?php echo timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) ?></td>
+							<td class="text-center agenda-status">
+								<?php if (! empty($agenda->status)) : ?>
+								<span class="label label-bordered label-<?php e($agenda->status)?>"><?php e(lang('st_' . $agenda->status))?></span>
 								<?php endif ?>
 							</td>
-							<td class="text-center task-status">
-								<?php if (! empty($task->confirm_status)) : ?>
-								<span class="<?php e($task_confirm_status_labels[$task->confirm_status] . ' label-' . $task->confirm_status)?>"><?php e(lang('st_' . $task->confirm_status))?></span>
+							<td class="text-center agenda-status">
+								<?php if (! empty($agenda->confirm_status)) : ?>
+								<span class="label label-bordered label-<?php e($agenda->confirm_status)?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 								<?php endif ?>
 							</td>
 							<td>
 								<div class="rating">
-									<input type="radio" id="star5" name="task_rate[<?php echo $task->task_id ?>]" <?php echo set_radio('task_rate[' . $task->task_id . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
-									<!--input type="radio" id="star4half" name="task_rate[<?php echo $task->task_id ?>]" value="4.5" /><label class="half" for="star4half" title="4.5 stars"></label-->
-									<input type="radio" id="star4" name="task_rate[<?php echo $task->task_id ?>]" <?php echo set_radio('task_rate[' . $task->task_id . ']', 4) ?> value="4" /><label class = "full" for="star4" title="4 stars"></label>
-									<!--input type="radio" id="star3half" name="task_rate[<?php echo $task->task_id ?>]" value="3.5" /><label class="half" for="star3half" title="3.5 stars"></label-->
-									<input type="radio" id="star3" name="task_rate[<?php echo $task->task_id ?>]" <?php echo set_radio('task_rate[' . $task->task_id . ']', 3) ?> value="3" /><label class = "full" for="star3" title="3 stars"></label>
-									<!--input type="radio" id="star2half" name="task_rate[<?php echo $task->task_id ?>]" value="2.5" /><label class="half" for="star2half" title="2.5 stars"></label-->
-									<input type="radio" id="star2" name="task_rate[<?php echo $task->task_id ?>]" <?php echo set_radio('task_rate[' . $task->task_id . ']', 2) ?> value="2" /><label class = "full" for="star2" title="2 stars"></label>
-									<!--input type="radio" id="star1half" name="task_rate[<?php echo $task->task_id ?>]" value="1.5" /><label class="half" for="star1half" title="1.5 stars"></label-->
-									<input type="radio" id="star1" name="task_rate[<?php echo $task->task_id ?>]" <?php echo set_radio('task_rate[' . $task->task_id . ']', 1) ?> value="1" /><label class = "full" for="star1" title="1 star"></label>
-									<!--input type="radio" id="starhalf" name="task_rate[<?php echo $task->task_id ?>]" value="0.5" /><label class="half" for="starhalf" title="0.5 stars"></label-->
+									<input type="radio" id="star5" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" <?php echo set_radio('agenda_rate[' . $agenda->agenda_id . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
+									<!--input type="radio" id="star4half" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" value="4.5" /><label class="half" for="star4half" title="4.5 stars"></label-->
+									<input type="radio" id="star4" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" <?php echo set_radio('agenda_rate[' . $agenda->agenda_id . ']', 4) ?> value="4" /><label class = "full" for="star4" title="4 stars"></label>
+									<!--input type="radio" id="star3half" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" value="3.5" /><label class="half" for="star3half" title="3.5 stars"></label-->
+									<input type="radio" id="star3" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" <?php echo set_radio('agenda_rate[' . $agenda->agenda_id . ']', 3) ?> value="3" /><label class = "full" for="star3" title="3 stars"></label>
+									<!--input type="radio" id="star2half" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" value="2.5" /><label class="half" for="star2half" title="2.5 stars"></label-->
+									<input type="radio" id="star2" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" <?php echo set_radio('agenda_rate[' . $agenda->agenda_id . ']', 2) ?> value="2" /><label class = "full" for="star2" title="2 stars"></label>
+									<!--input type="radio" id="star1half" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" value="1.5" /><label class="half" for="star1half" title="1.5 stars"></label-->
+									<input type="radio" id="star1" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" <?php echo set_radio('agenda_rate[' . $agenda->agenda_id . ']', 1) ?> value="1" /><label class = "full" for="star1" title="1 star"></label>
+									<!--input type="radio" id="starhalf" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" value="0.5" /><label class="half" for="starhalf" title="0.5 stars"></label-->
 								</div>
 							</td>
 						</tr>

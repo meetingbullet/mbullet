@@ -280,17 +280,17 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function count_tasks($project_id, $all = true, $user_id = null)
+	public function count_agendas($project_id, $all = true, $user_id = null)
 	{
-		$this->db->select('COUNT(*) AS total')->from('tasks t');
+		$this->db->select('COUNT(*) AS total')->from('agendas t');
 		if (! $all) {
-			$this->db->join('task_members tm', 'tm.task_id = t.task_id', 'LEFT')
+			$this->db->join('agenda_members tm', 'tm.agenda_id = t.agenda_id', 'LEFT')
 					->where('(tm.user_id = \'' . $user_id . '\' OR t.owner_id = \'' . $user_id . '\')');
 		}
 		$query = $this->db->join('steps s', 't.step_id = s.step_id', 'LEFT')
 						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
-						->group_by('t.task_id')
+						->group_by('t.agenda_id')
 						->get();
 		if ($query->num_rows() > 0) {
 			return $query->row()->total;
@@ -348,17 +348,17 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_tasks($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, t.task_id, t.task_key, t.name, t.status', $as_array = false)
+	public function get_agendas($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, t.agenda_id, t.agenda_key, t.name, t.status', $as_array = false)
 	{
-		$this->db->select($select)->from('tasks t');
+		$this->db->select($select)->from('agendas t');
 		if (! $all) {
-			$this->db->join('task_members tm', 'tm.task_id = t.task_id', 'LEFT')
+			$this->db->join('agenda_members tm', 'tm.agenda_id = t.agenda_id', 'LEFT')
 					->where('(tm.user_id = \'' . $user_id . '\' OR t.owner_id = \'' . $user_id . '\')');
 		}
 		$this->db->join('steps s', 's.step_id = t.step_id', 'LEFT')
 						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
-						->group_by('t.task_id')
+						->group_by('t.agenda_id')
 						->order_by('t.created_on', 'DESC');
 		if (! (empty($limit) && empty($offset))) {
 			$this->db->limit($limit, $offset);

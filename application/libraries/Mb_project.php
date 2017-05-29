@@ -10,7 +10,7 @@ class Mb_project
 	}
 
 	/**
-	 * Get next key for Project, Action, Step, Task
+	 * Get next key for Project, Action, Step, Agenda
 	 *
 	 * @param string $parent_key
 	 * @param string $table Table name (not include prefix)
@@ -33,9 +33,9 @@ class Mb_project
 			}
 
 			if (count($keys) == 3) {
-				$table = 'tasks';
+				$table = 'agendas';
 			}
-		} elseif ($table != 'actions' && $table != 'steps' && $table != 'tasks') {
+		} elseif ($table != 'actions' && $table != 'steps' && $table != 'agendas') {
 			return false;
 		}
 
@@ -54,7 +54,7 @@ class Mb_project
 	/**
 	 * Get object ID from object key (Organization checked)
 	 *
-	 * @param string $object_type One of following values: project, action, step, task
+	 * @param string $object_type One of following values: project, action, step, agenda
 	 * @param string $object_key
 	 * @param int $organization_id If this value is NULL, it will get current organization ID
 	 * @return int if found, otherwise return false
@@ -80,9 +80,9 @@ class Mb_project
 				if ($query->num_rows() > 0) return $query->row()->step_id;
 				else return false;
 				break;
-			case 'task':
-				$query = $this->ci->db->select('t.task_id')->from('tasks t')->join('steps s', 's.step_id = t.step_id')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.task_key', $object_key)->where('p.organization_id', $organization_id)->get();
-				if ($query->num_rows() > 0) return $query->row()->task_id;
+			case 'agenda':
+				$query = $this->ci->db->select('t.agenda_id')->from('agendas t')->join('steps s', 's.step_id = t.step_id')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.agenda_key', $object_key)->where('p.organization_id', $organization_id)->get();
+				if ($query->num_rows() > 0) return $query->row()->agenda_id;
 				else return false;
 				break;
 			default:
@@ -93,7 +93,7 @@ class Mb_project
 	/**
 	 * Check user has permission or not
 	 *
-	 * @param string $object_type One of following values: project, action, step, task
+	 * @param string $object_type One of following values: project, action, step, agenda
 	 * @param int $object_id
 	 * @param string $permission_name
 	 * @return boolean
@@ -118,8 +118,8 @@ class Mb_project
 					if ($query->num_rows() > 0) $project_id = $query->row()->project_id;
 					else return false;
 					break;
-				case 'task':
-					$query = $this->ci->db->select('a.project_id')->from('actions a')->join('steps s', 'a.action_id = s.action_id')->join('tasks t', 't.step_id = s.step_id')->where('t.task_id', $object_id)->get();
+				case 'agenda':
+					$query = $this->ci->db->select('a.project_id')->from('actions a')->join('steps s', 'a.action_id = s.action_id')->join('agendas t', 't.step_id = s.step_id')->where('t.agenda_id', $object_id)->get();
 					if ($query->num_rows() > 0) $project_id = $query->row()->project_id;
 					else return false;
 					break;
@@ -145,7 +145,7 @@ class Mb_project
 	/**
 	 * Calculate total point used of an object
 	 *
-	 * @param string $object_type One of following values: project, action, step, task
+	 * @param string $object_type One of following values: project, action, step, agenda
 	 * @param int $object_id
 	 * @param int $organization_id If this value is NULL, it will get current organization ID
 	 * @return double
@@ -156,15 +156,15 @@ class Mb_project
 		elseif (is_null($organization_id)) $organization_id = $this->ci->auth->user()->current_organization_id;
 
 		$query = $this->ci->db->select('IFNULL(SUM((t.finished_on - t.started_on) / 60 * uo.cost_of_time), 0) AS total')
-			->from('tasks t')
-			->join('task_members tm', 'tm.task_id = t.task_id')
+			->from('agendas t')
+			->join('agenda_members tm', 'tm.agenda_id = t.agenda_id')
 			->join('user_to_organizations uo', 'uo.user_id = tm.user_id')
 			->where('uo.organization_id', $organization_id)
 			->having('NOT(total IS NULL)');
 
 		switch ($object_type) {
-			case 'task':
-				$query = $query->where('t.task_id', $object_id)->get();
+			case 'agenda':
+				$query = $query->where('t.agenda_id', $object_id)->get();
 				if ($query->num_rows() > 0) return doubleval($query->row()->total);
 				break;
 			case 'step':
@@ -190,10 +190,10 @@ class Mb_project
 		return false;
 	}
 	/**
-	 * Send email to project/action/step/task members
+	 * Send email to project/action/step/agenda members
 	 *
-	 * @param int $object_id - project/action/step/task id
-	 * @param string $object_type - project/action/step/task
+	 * @param int $object_id - project/action/step/agenda id
+	 * @param string $object_type - project/action/step/agenda
 	 * @param string $title - email title
 	 * @param string $content - email content maybe a normal string or a template
 	 * @param array $exclude - excluded member ids
@@ -216,7 +216,7 @@ class Mb_project
 			return false;
 		}
 		$object_type = strtolower($object_type);
-		$types = ['project', 'action', 'step', 'task'];
+		$types = ['project', 'action', 'step', 'agenda'];
 		if (! in_array($object_type, $types)) {
 			return false;
 		}
@@ -347,10 +347,10 @@ class Mb_project
 		return (boolean) $count;
 	}
 	/**
-	 * Send notification mail to project/action/step/task members after create a project/action/step/task or change project/action/step/task status
+	 * Send notification mail to project/action/step/agenda members after create a project/action/step/agenda or change project/action/step/agenda status
 	 *
-	 * @param int $object_id - project/action/step/task id
-	 * @param string $object_type - project/action/step/task
+	 * @param int $object_id - project/action/step/agenda id
+	 * @param string $object_type - project/action/step/agenda
 	 * @param string $current_user_id - id of current user for excluding from email targets
 	 * @param string $action_type - to determine which type of email need to send
 	 * @return boolean - true if sent successfully and vice versa
@@ -370,7 +370,7 @@ class Mb_project
 			return false;
 		}
 
-		$object_types = ['project', 'action', 'step', 'task'];
+		$object_types = ['project', 'action', 'step', 'agenda'];
 		if (! in_array($object_type, $object_types)) {
 			return false;
 		}

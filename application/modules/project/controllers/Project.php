@@ -407,13 +407,13 @@ class Project extends Authenticated_Controller
 		// generate links
 		$steps_links = $this->pagination->create_links();
 
-		// pagination for tasks
-		$config_tasks = $pagination_config;
-		$config_tasks['query_string_segment'] = 'tasks_page';
-		$config_tasks['total_rows'] = $this->project_model->count_tasks($project_id);
-		$this->pagination->initialize($config_tasks);
+		// pagination for agendas
+		$config_agendas = $pagination_config;
+		$config_agendas['query_string_segment'] = 'agendas_page';
+		$config_agendas['total_rows'] = $this->project_model->count_agendas($project_id);
+		$this->pagination->initialize($config_agendas);
 		// generate links
-		$tasks_links = $this->pagination->create_links();
+		$agendas_links = $this->pagination->create_links();
 
 		/***************** GET DATA *****************/
 		// get actions current page
@@ -449,24 +449,24 @@ class Project extends Authenticated_Controller
 			}
 		}
 
-		// get tasks current page
-		$tasks_current_page = 1;
-		if (! empty($this->input->get('tasks_page'))) {
-			$tasks_current_page = $this->input->get('tasks_page');
+		// get agendas current page
+		$agendas_current_page = 1;
+		if (! empty($this->input->get('agendas_page'))) {
+			$agendas_current_page = $this->input->get('agendas_page');
 		}
-		// get tasks list
-		$tasks = $this->project_model->get_tasks($project_id, $pagination_config['per_page'], ($tasks_current_page - 1) * $pagination_config['per_page']);
+		// get agendas list
+		$agendas = $this->project_model->get_agendas($project_id, $pagination_config['per_page'], ($agendas_current_page - 1) * $pagination_config['per_page']);
 
 		Template::set('info_tab_data', [
 			'paginations' => [
 				'actions' => $actions_links,
 				'steps' => $steps_links,
-				'tasks' => $tasks_links,
+				'agendas' => $agendas_links,
 			],
 			'lists' => [
 				'actions' => $actions,
 				'steps' => $steps,
-				'tasks' => $tasks,
+				'agendas' => $agendas,
 			]
 		]);
 
@@ -749,7 +749,7 @@ class Project extends Authenticated_Controller
 	{
 		$actions = $this->project_model->get_actions($project_id, null, null, true, null, 'a.action_key, a.action_id', true);
 		$steps = $this->project_model->get_steps($project_id, null, null, true, null, 's.step_key, s.step_id', true);
-		$tasks = $this->project_model->get_tasks($project_id, null, null, true, null, 't.task_key, t.task_id', true);
+		$agendas = $this->project_model->get_agendas($project_id, null, null, true, null, 't.agenda_key, t.agenda_id', true);
 
 		if (! empty($actions)) {
 			foreach ($actions as &$action) {
@@ -771,14 +771,14 @@ class Project extends Authenticated_Controller
 			$this->db->update_batch('steps', $steps, 'step_id');
 		}
 
-		if (! empty($tasks)) {
-			foreach ($tasks as &$task) {
-				$keys = explode('-', $task['task_key']);
+		if (! empty($agendas)) {
+			foreach ($agendas as &$agenda) {
+				$keys = explode('-', $agenda['agenda_key']);
 				$keys[0] = $new_cost_code;
-				$task['task_key'] = implode('-', $keys);
+				$agenda['agenda_key'] = implode('-', $keys);
 			}
 
-			$this->db->update_batch('tasks', $tasks, 'task_id');
+			$this->db->update_batch('agendas', $agendas, 'agenda_id');
 		}
 	}
 

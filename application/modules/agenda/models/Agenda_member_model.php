@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Task_member_model extends BF_Model
+class Agenda_member_model extends BF_Model
 {
-	protected $table_name	= 'task_members';
-	protected $key			= 'task_id';
+	protected $table_name	= 'agenda_members';
+	protected $key			= 'agenda_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;

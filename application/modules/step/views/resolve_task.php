@@ -1,20 +1,20 @@
 <?php
 
 ?>
-<div id="resolve-task">
+<div id="resolve-agenda">
 	<?php if (IS_AJAX): ?>
 	<div class="modal-header">
-		<h4 class="modal-title"><?php e(lang('st_resolve_task'))?></h4>
+		<h4 class="modal-title"><?php e(lang('st_resolve_agenda'))?></h4>
 	</div> <!-- end MODAL-HEADER -->
 	<?php endif; ?>
 
 	<div class="an-body-topbar">
 		<div class="an-helper-block">
-			<h4 class=''><?php e(sprintf(lang('st_time_alotted'), $task->name))?></h4>
+			<h4 class=''><?php e(sprintf(lang('st_time_alotted'), $agenda->name))?></h4>
 		</div>
 	</div>
 
-	<?php echo form_open(site_url('step/resolve_task/'), ['class' => 'form-inline form-resolve-task', 'data-task-id' => $task_id]) ?>
+	<?php echo form_open(site_url('step/resolve_agenda/'), ['class' => 'form-inline form-resolve-agenda', 'data-agenda-id' => $agenda_id]) ?>
 		<div class="an-helper-block">
 				<label for="comment"><?php e(lang('st_comment_topics'))?></label>
 				<textarea class='an-form-control' name="comment" rows="6"></textarea>

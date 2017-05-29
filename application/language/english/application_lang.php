@@ -289,7 +289,7 @@ $lang['bf_menu_template']       = 'Template';
 $lang['bf_menu_translate']      = 'Translate';
 $lang['bf_menu_users']          = 'Users';
 $lang['bf_menu_action']         = 'Action';
-$lang['bf_menu_task']           = 'Task';
+$lang['bf_menu_agenda']         = 'Agenda';
 
 //------------------------------------------------------------------------------
 // Anything that doesn't follow the 'bf_*' convention:

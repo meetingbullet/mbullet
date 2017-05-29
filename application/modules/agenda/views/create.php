@@ -1,22 +1,16 @@
 <?php
-$task_types = [
-	'agenda' => lang('tk_agenda'),
-	'system_task' => lang('tk_system_task'),
-	'jira_ticket' => lang('tk_jira_ticket'),
-];
 ?>
 <div class="modal-header">
 	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-	<h4 class="modal-title" id="myModaloneLabel"><?php e(lang('tk_create_task')) ?></h4>
+	<h4 class="modal-title" id="myModaloneLabel"><?php e(lang('tk_create_agenda')) ?></h4>
 </div> <!-- end MODAL-HEADER -->
 
-<?php echo form_open($this->uri->uri_string(), ['class' => 'form-ajax', 'id' => 'create-task']) ?>
+<?php echo form_open($this->uri->uri_string(), ['class' => 'form-ajax', 'id' => 'create-agenda']) ?>
 
 <div class="container-fluid modal-body">
 	<?php echo mb_form_input('text', 'name', lang('tk_name'), true, set_value('name')) ?>
-	<?php echo mb_form_dropdown('type', $task_types, set_value('type'), lang('tk_type'), 'class="an-form-control ' . iif( form_error('type') , ' danger') .'"', '', true) ?>
 	<?php echo mb_form_input('text', 'description', lang('tk_description'), false, set_value('description')) ?>
-	<?php echo mb_form_input('text', 'assignee', lang('tk_assignee'), false, set_value('assignee'), 'team select-member an-tags-input', '', lang('tk_add_team_member')) ?>
+	<?php echo mb_form_input('text', 'assignee', lang('tk_assignee'), true, set_value('assignee'), 'team select-member an-tags-input', '', lang('tk_add_team_member')) ?>
 </div>
 
 <div class="modal-footer">

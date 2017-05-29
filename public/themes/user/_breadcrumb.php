@@ -50,7 +50,7 @@ if (! is_null($this->uri->segment(1))) {
 				'path' => null
 			];
 			break;
-		case 'task':
+		case 'agenda':
 			$step = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
 			$action = substr($step, 0, strrpos($step, '-'));
 			$project = substr($action, 0, strrpos($action, '-'));

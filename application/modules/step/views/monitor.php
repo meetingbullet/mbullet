@@ -12,7 +12,7 @@ if ($step->scheduled_start_time) {
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
 
-$task_status_labels = [
+$agenda_status_labels = [
 	'open' => 'label label-default label-bordered',
 	'inprogress' => 'label label-warning label-bordered',
 	'resolved' => 'label label-success label-bordered',
@@ -92,10 +92,10 @@ $task_status_labels = [
 
 	<div class="an-single-component with-shadow">
 		<div class="an-component-header">
-			<h6><?php e(lang('st_tasks'))?></h6>
+			<h6><?php e(lang('st_agendas'))?></h6>
 			</div>
 		<div class="an-component-body an-helper-block">
-			<table class="table table-striped table-task">
+			<table class="table table-striped table-agenda">
 				<thead>
 					<tr>
 						<th><?php e(lang('st_name'))?></th>
@@ -108,41 +108,41 @@ $task_status_labels = [
 					</tr>
 				</thead>
 				<tbody>
-					<?php if($tasks): foreach ($tasks as $task) : ?>
-					<tr id='task-<?php e($task->task_id)?>' data-task-id='<?php e($task->task_id)?>' data-task-status='<?php e($task->status)?>'>
-						<td class=""><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
-						<td class=""><?php echo word_limiter($task->description, 24)?></td>
+					<?php if($agendas): foreach ($agendas as $agenda) : ?>
+					<tr id='agenda-<?php e($agenda->agenda_id)?>' data-agenda-id='<?php e($agenda->agenda_id)?>' data-agenda-status='<?php e($agenda->status)?>'>
+						<td class=""><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
+						<td class=""><?php echo word_limiter($agenda->description, 24)?></td>
 						<td class="">
-							<?php if ($task->members) {
-								foreach ($task->members as $member) {
+							<?php if ($agenda->members) {
+								foreach ($agenda->members as $member) {
 									echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
 								}
 							} ?>
 						</td>
 						<td class='text-center '>
 							<span class="time-assigned">
-								<?php e($task->time_assigned)?>
+								<?php e($agenda->time_assigned)?>
 							</span>
 
-							<input type="number" name="time_assigned" data-task-id='<?php e($task->task_id)?>' class='an-form-control form-td<?php echo ($task->time_assigned == NULL && $is_owner ? '' : ' hidden' ) ?>' step="0.01" value="<?php e($task->time_assigned)?>"/>
+							<input type="number" name="time_assigned" data-agenda-id='<?php e($agenda->agenda_id)?>' class='an-form-control form-td<?php echo ($agenda->time_assigned == NULL && $is_owner ? '' : ' hidden' ) ?>' step="0.01" value="<?php e($agenda->time_assigned)?>"/>
 						</td>
-						<td class='text-center skip-votes '><?php e($task->skip_votes)?></td>
-						<td class='task-status' <?php echo "data-time-assigned='{$task->time_assigned}' " . ($task->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$task->started_on}'" : '') ?>>
-							<span class="label label-bordered <?php e(' label-' . $task->status)?>"><?php e(lang('st_' . $task->status))?></span>
+						<td class='text-center skip-votes '><?php e($agenda->skip_votes)?></td>
+						<td class='agenda-status' <?php echo "data-time-assigned='{$agenda->time_assigned}' " . ($agenda->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$agenda->started_on}'" : '') ?>>
+							<span class="label label-bordered <?php e(' label-' . $agenda->status)?>"><?php e(lang('st_' . $agenda->status))?></span>
 						</td>
 
 						<?php if ($is_owner): ?>
-						<td class='task-action '>
-							<button class="an-btn an-btn-small an-btn-primary btn-start-task<?php e($step->status == 'inprogress' && $task->status == 'open' ? '' : ' hidden')?>"<?php e($task->time_assigned ? '' : ' disabled')?>>
+						<td class='agenda-action '>
+							<button class="an-btn an-btn-small an-btn-primary btn-start-agenda<?php e($step->status == 'inprogress' && $agenda->status == 'open' ? '' : ' hidden')?>"<?php e($agenda->time_assigned ? '' : ' disabled')?>>
 								<?php e(lang('st_start'))?>
 							</button>
-							<button class="an-btn an-btn-small an-btn-primary btn-skip<?php e($step->status == 'inprogress' && $task->status == 'open' ? '' : ' hidden')?>"><?php e(lang('st_skip'))?></button>
-							<button class="an-btn an-btn-small an-btn-primary btn-jump<?php e($task->status == 'inprogress' ? '' : ' hidden')?>"><?php e(lang('st_jump'))?></button>
+							<button class="an-btn an-btn-small an-btn-primary btn-skip<?php e($step->status == 'inprogress' && $agenda->status == 'open' ? '' : ' hidden')?>"><?php e(lang('st_skip'))?></button>
+							<button class="an-btn an-btn-small an-btn-primary btn-jump<?php e($agenda->status == 'inprogress' ? '' : ' hidden')?>"><?php e(lang('st_jump'))?></button>
 						</td>
 						<?php else: ?>
 						<td class=''>
-							<?php if ($task->voted_skip == 0):?>
-							<button class="an-btn an-btn-small an-btn-primary btn-vote-skip <?php echo $task->status == 'resolved' || $task->status == 'skipped' || $task->status == 'jumped' || $task->status == 'parking_lot' ? ' hidden' : ''?>"><?php e(lang('st_vote_skip'))?></button>
+							<?php if ($agenda->voted_skip == 0):?>
+							<button class="an-btn an-btn-small an-btn-primary btn-vote-skip <?php echo $agenda->status == 'resolved' || $agenda->status == 'skipped' || $agenda->status == 'jumped' || $agenda->status == 'parking_lot' ? ' hidden' : ''?>"><?php e(lang('st_vote_skip'))?></button>
 							<?php else: ?>
 							<button class="an-btn an-btn-small an-btn-primary-transparent" disabled><?php e(lang('st_voted_skip'))?></button>
 							<?php endif; ?>
@@ -165,7 +165,7 @@ $task_status_labels = [
 
 <?php if ( ! IS_AJAX): ?>
 <!-- Modal -->
-<div id="resolve-task" class="modal fade" tabindex="-1" role="dialog">
+<div id="resolve-agenda" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
