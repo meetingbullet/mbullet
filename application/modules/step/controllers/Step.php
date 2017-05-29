@@ -333,7 +333,7 @@ class Step extends Authenticated_Controller
 			Template::set_message(lang('st_step_already_evaluated'), 'info');
 		}
 
-		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key], true), 'inline');
+		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key, 'current_user' => $this->current_user], true), 'inline');
 		Template::set('evaluated', $evaluated);
 		Template::set('invited_members', $invited_members);
 		Template::set('point_used', $point_used);
