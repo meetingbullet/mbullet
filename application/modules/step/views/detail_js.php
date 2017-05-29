@@ -183,6 +183,13 @@ $(document).on("submit", '.form-ajax', (e) => {
 						$('.step-detail .goal').html(goal);
 						$('.goal').readmore(rm_option);
 						$('#step-resource').html(resource_html);
+
+						// Hide\Show Button for Owner
+						if (owner_id == <?php e($current_user->user_id) ?>) {
+							$('.open-step-monitor').removeClass('hidden');
+						} else {
+							$('.open-step-monitor').addClass('hidden');
+						}
 					} 
 				}
 			}
