@@ -75,7 +75,7 @@
 	margin-bottom: 0 !important;
 }
 
-.table-task td {
+.table-agenda td {
 	vertical-align: middle;
 }
 
@@ -110,11 +110,11 @@
 	margin-right: 20px;
 }
 
-.table-task tr {
+.table-agenda tr {
 	min-height: 52px;
 }
 
-.task-status, .task-action {
+.agenda-status, .agenda-action {
 	white-space: nowrap;
 }
 

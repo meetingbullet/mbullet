@@ -7,7 +7,7 @@ $label = [
 	'resolved' => 'label label-success label-bordered'
 ];
 
-$task_status_labels = [
+$agenda_status_labels = [
 	'open' => 'label label-default label-bordered',
 	'inprogress' => 'label label-warning label-bordered',
 	'resolved' => 'label label-success label-bordered',
@@ -138,7 +138,7 @@ $task_status_labels = [
 
 <div class="an-single-component with-shadow">
 	<div class="an-component-header">
-		<h6><?php e(lang('pj_detail_tab_info_table_all_tasks')) ?></h6>
+		<h6><?php e(lang('pj_detail_tab_info_table_all_agendas')) ?></h6>
 	</div>
 	<div class="an-component-body padding20">
 		<div class="an-user-lists user-stats">
@@ -150,15 +150,15 @@ $task_status_labels = [
 
 			<div class="an-lists-body">
 
-			<?php if (is_array($lists['tasks']) && count($lists['tasks']) > 0) : ?>
-				<?php foreach ($lists['tasks'] as $item) : ?>
+			<?php if (is_array($lists['agendas']) && count($lists['agendas']) > 0) : ?>
+				<?php foreach ($lists['agendas'] as $item) : ?>
 
-				<div data-task-id="<?php e($item->task_id) ?>" class="list-user-single">
+				<div data-agenda-id="<?php e($item->agenda_id) ?>" class="list-user-single">
 					<div class="list-date number basis-30">
-						<a href="<?php e("/task/{$item->task_key}") ?>"><?php e($item->task_key) ?></a>
+						<a href="<?php e("/agenda/{$item->agenda_key}") ?>"><?php e($item->agenda_key) ?></a>
 					</div>
 					<div class="list-name basis-50">
-						<a href="<?php e("/task/{$item->task_key}") ?>"><?php e($item->name) ?></a>
+						<a href="<?php e("/agenda/{$item->agenda_key}") ?>"><?php e($item->name) ?></a>
 					</div>
 					<div class="list-action basis-20">
 						<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(lang('pj_' . $item->status)) ?></span>
@@ -171,7 +171,7 @@ $task_status_labels = [
 					<div class="list-text basis-30">
 					</div>
 					<div class="list-date email approve basis-40">
-						<?php e(lang('pj_no_task')) ?>
+						<?php e(lang('pj_no_agenda')) ?>
 					</div>
 					<div class="list-text basis-30">
 					</div>
@@ -180,9 +180,9 @@ $task_status_labels = [
 			</div> <!-- end .AN-LISTS-BODY -->
 		</div>
 
-		<?php if (! empty($paginations['tasks'])) : ?>
+		<?php if (! empty($paginations['agendas'])) : ?>
 		<div class="an-pagination-container right">
-			<?php echo $paginations['tasks'] ?>
+			<?php echo $paginations['agendas'] ?>
 		</div>
 		<?php endif ?>
 	</div> <!-- end .AN-COMPONENT-BODY -->

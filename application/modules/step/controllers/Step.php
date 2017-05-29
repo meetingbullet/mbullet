@@ -12,9 +12,9 @@ class Step extends Authenticated_Controller
 		$this->load->library('mb_project');
 		
 		$this->load->model('users/user_model');
-		$this->load->model('task/task_model');
-		$this->load->model('task/task_member_model');
-		$this->load->model('task/task_rate_model');
+		$this->load->model('agenda/agenda_model');
+		$this->load->model('agenda/agenda_member_model');
+		$this->load->model('agenda/agenda_rate_model');
 
 		$this->load->model('step_model');
 		$this->load->model('step_member_model');
@@ -78,15 +78,15 @@ class Step extends Authenticated_Controller
 
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $action->project_id);
 
-		// Create Step from Open Parking Lot tasks
+		// Create Step from Open Parking Lot agendas
 		if (isset($_POST['from_step'])) {
-			$open_tasks = $this->task_model->where('confirm_status', 'open_parking_lot')
+			$open_agendas = $this->agenda_model->where('confirm_status', 'open_parking_lot')
 											->where('step_id', $this->input->post('from_step'))
 											->find_all();
 											
-			Template::set('open_tasks', $open_tasks);
+			Template::set('open_agendas', $open_agendas);
 		} else {
-			Template::set('open_tasks', false);
+			Template::set('open_agendas', false);
 		}
 
 		Assets::add_js($this->load->view('create_js', [
@@ -314,13 +314,13 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$tasks = $this->task_model->select('tasks.*, u.email, u.first_name, u.last_name, u.avatar')
-								->join('users u', 'u.user_id = tasks.owner_id', 'left')
+		$agendas = $this->agenda_model->select('agendas.*, u.email, u.first_name, u.last_name, u.avatar')
+								->join('users u', 'u.user_id = agendas.owner_id', 'left')
 								->where('step_id', $step_id)->find_all();
 
-		if ($tasks) {
-			foreach ($tasks as &$task) {
-				$task->members = $this->task_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
+		if ($agendas) {
+			foreach ($agendas as &$agenda) {
+				$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
 			}
 		}
 
@@ -338,7 +338,7 @@ class Step extends Authenticated_Controller
 		Template::set('invited_members', $invited_members);
 		Template::set('point_used', $point_used);
 		Template::set('step', $step);
-		Template::set('tasks', $tasks);
+		Template::set('agendas', $agendas);
 		Template::set('project_key', $project_key);
 		Template::set('action_key', $action_key);
 		Template::set('step_key', $step_key);
@@ -380,23 +380,23 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$tasks = $this->task_model->select('tasks.*, 
-											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
-											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
-									->join('users u', 'u.user_id = tasks.owner_id', 'left')
+		$agendas = $this->agenda_model->select('agendas.*, 
+											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
+											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
+									->join('users u', 'u.user_id = agendas.owner_id', 'left')
 									->where('step_id', $step->step_id)->find_all();
 		
-		// We can't start without Tasks
-		if ($tasks === false) {
+		// We can't start without agendas
+		if ($agendas === false) {
 			Template::set('message_type', 'warning');
-			Template::set('message', lang('st_cannot_start_step_without_any_task'));
+			Template::set('message', lang('st_cannot_start_step_without_any_agenda'));
 			Template::set('content', '');
 			Template::render();
 			return;
 		}
 
-		foreach ($tasks as &$task) {
-			$task->members = $this->task_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
+		foreach ($agendas as &$agenda) {
+			$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
 		}
 
 
@@ -405,7 +405,7 @@ class Step extends Authenticated_Controller
 		], true), 'inline');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
-		Template::set('tasks', $tasks);
+		Template::set('agendas', $agendas);
 		Template::set('step', $step);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::render();
@@ -446,23 +446,23 @@ class Step extends Authenticated_Controller
 
 		$action_key = $keys[0] . '-' . $keys[1];
 		$step->members = $this->step_member_model->get_step_member($step_id);
-		$tasks = $this->task_model->select('tasks.*, (finished_on - started_on) / 60 AS duration, 
-											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
-											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
-									->join('users u', 'u.user_id = tasks.owner_id', 'left')
+		$agendas = $this->agenda_model->select('agendas.*, (finished_on - started_on) / 60 AS duration, 
+											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
+											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
+									->join('users u', 'u.user_id = agendas.owner_id', 'left')
 									->where('step_id', $step->step_id)->find_all();
 		
-		// We can't start without Tasks
-		if ($tasks === false) {
+		// We can't start without agendas
+		if ($agendas === false) {
 			Template::set('message_type', 'warning');
-			Template::set('message', lang('st_cannot_start_step_without_any_task'));
+			Template::set('message', lang('st_cannot_start_step_without_any_agenda'));
 			Template::set('content', '');
 			Template::render();
 			return;
 		}
 
-		foreach ($tasks as &$task) {
-			$task->members = $this->task_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = task_members.user_id')->where('task_id', $task->task_id)->find_all();
+		foreach ($agendas as &$agenda) {
+			$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
 		}
 
 
@@ -473,7 +473,7 @@ class Step extends Authenticated_Controller
 		], true), 'inline');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
-		Template::set('tasks', $tasks);
+		Template::set('agendas', $agendas);
 		Template::set('step', $step);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::render();
@@ -516,7 +516,7 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
-		if (! is_array($this->input->post('tasks')) && count($this->input->post('tasks')) == 0) {
+		if (! is_array($this->input->post('agendas')) && count($this->input->post('agendas')) == 0) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('st_invalid_action')
@@ -526,17 +526,17 @@ class Step extends Authenticated_Controller
 
 		// Prepare data
 
-		$task_data = [];
+		$agenda_data = [];
 
-		foreach ($this->input->post('tasks') as $task_key => $confirmation_status) {
-			$task_data[] = [
-				'task_key' => $task_key,
+		foreach ($this->input->post('agendas') as $agenda_key => $confirmation_status) {
+			$agenda_data[] = [
+				'agenda_key' => $agenda_key,
 				'confirm_status' => $confirmation_status,
 				'modified_by' => $this->current_user->user_id
 			];
 		}
 
-		if ($this->task_model->update_batch($task_data, 'task_key') ) {
+		if ($this->agenda_model->update_batch($agenda_data, 'agenda_key') ) {
 
 			if ($this->input->post('note')) {
 				$this->step_model->skip_validation(TRUE)->update($step_id, [
@@ -547,7 +547,7 @@ class Step extends Authenticated_Controller
 
 			echo json_encode([
 				'message_type' => 'success',
-				'message' => lang('st_all_task_confirmed_step_closed_out')
+				'message' => lang('st_all_agenda_confirmed_step_closed_out')
 			]);
 			return;
 		}
@@ -558,19 +558,19 @@ class Step extends Authenticated_Controller
 		]);
 	}
 
-	public function resolve_task($task_id = null)
+	public function resolve_agenda($agenda_id = null)
 	{
-		if (empty($task_id)) {
+		if (empty($agenda_id)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$task = $this->task_model->select('name')->limit(1)->find($task_id);
+		$agenda = $this->agenda_model->select('name')->limit(1)->find($agenda_id);
 
-		Template::set('id', 'resolve-task');
+		Template::set('id', 'resolve-agenda');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
-		Template::set('task_id', $task_id);
-		Template::set('task', $task);
+		Template::set('agenda_id', $agenda_id);
+		Template::set('agenda', $agenda);
 		Template::render();
 	}
 
@@ -584,12 +584,12 @@ class Step extends Authenticated_Controller
 			return ;
 		}
 
-		$tasks = $this->task_model->select('tasks.task_id, tasks.status, tasks.started_on, tasks.time_assigned, 
-											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
-									->join('users u', 'u.user_id = tasks.owner_id', 'left')
+		$agendas = $this->agenda_model->select('agendas.agenda_id, agendas.status, agendas.started_on, agendas.time_assigned, 
+											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
+									->join('users u', 'u.user_id = agendas.owner_id', 'left')
 									->where('step_id', $step_id)->find_all();
 
-		if ($tasks === false) {
+		if ($agendas === false) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('st_invalid_step_key')
@@ -613,18 +613,18 @@ class Step extends Authenticated_Controller
 
 		echo json_encode([
 			'message_type' => 'success',
-			'tasks' => $tasks,
+			'agendas' => $agendas,
 			'step' => $this->step_model->select('status')->limit(1)->find($step_id),
 			'online_members' => $online_members ? $online_members : [],
 			'current_time' => $current_time,
 		]);
 	}
 
-	public function vote_skip($task_id)
+	public function vote_skip($agenda_id)
 	{
 		// Prevent duplicate row by MySQL Insert Ignore
-		$query = $this->db->insert_string('task_votes', [
-			'task_id' => $task_id,
+		$query = $this->db->insert_string('agenda_votes', [
+			'agenda_id' => $agenda_id,
 			'user_id' => $this->current_user->user_id
 		]);
 
@@ -686,15 +686,15 @@ class Step extends Authenticated_Controller
 
 			if ($query) {
 				if ( is_array($this->input->post('time_assigned')) ) {
-					$task_data = [];
-					foreach ($this->input->post('time_assigned') as $task_id => $time_assigned) {
-						$task_data[] = [
-							'task_id' => $task_id,
+					$agenda_data = [];
+					foreach ($this->input->post('time_assigned') as $agenda_id => $time_assigned) {
+						$agenda_data[] = [
+							'agenda_id' => $agenda_id,
 							'time_assigned' => $time_assigned
 						];
 					}
 
-					$this->task_model->skip_validation(1)->update_batch($task_data, 'task_id');
+					$this->agenda_model->skip_validation(1)->update_batch($agenda_data, 'agenda_id');
 				}
 
 				echo json_encode([
@@ -724,12 +724,12 @@ class Step extends Authenticated_Controller
 				return;
 			}
 
-			$tasks = $this->task_model->select('task_key')->where('step_id', $step->step_id)->where('(status = "inprogress" OR status ="open")', null, false)->find_all();
+			$agendas = $this->agenda_model->select('agenda_key')->where('step_id', $step->step_id)->where('(status = "inprogress" OR status ="open")', null, false)->find_all();
 
-			if ($tasks) {
+			if ($agendas) {
 				echo json_encode([
 					'message_type' => 'danger',
-					'message' => lang('st_please_resolve_all_task_before_finish')
+					'message' => lang('st_please_resolve_all_agenda_before_finish')
 				]);
 
 				return;
@@ -778,15 +778,15 @@ class Step extends Authenticated_Controller
 
 		if ($query) {
 			if ( is_array($this->input->post('time_assigned')) ) {
-				$task_data = [];
-				foreach ($this->input->post('time_assigned') as $task_id => $time_assigned) {
-					$task_data[] = [
-						'task_id' => $task_id,
+				$agenda_data = [];
+				foreach ($this->input->post('time_assigned') as $agenda_id => $time_assigned) {
+					$agenda_data[] = [
+						'agenda_id' => $agenda_id,
 						'time_assigned' => $time_assigned
 					];
 				}
 
-				$this->task_model->skip_validation(1)->update_batch($task_data, 'task_id');
+				$this->agenda_model->skip_validation(1)->update_batch($agenda_data, 'agenda_id');
 			}
 			echo json_encode([
 				'message_type' => 'success',
@@ -802,10 +802,10 @@ class Step extends Authenticated_Controller
 		]);
 	}
 
-	public function update_task_status()
+	public function update_agenda_status()
 	{
-		$task = $this->task_model->select('tasks.*, u.timezone, s.step_id')
-								->join('steps s', 's.step_id = tasks.step_id')
+		$agenda = $this->agenda_model->select('agendas.*, u.timezone, s.step_id')
+								->join('steps s', 's.step_id = agendas.step_id')
 								->join('actions a', 'a.action_id = s.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
@@ -813,9 +813,9 @@ class Step extends Authenticated_Controller
 								->where('s.owner_id', $this->current_user->user_id)
 								->where('s.status', 'inprogress')
 								->limit(1)
-								->find($this->input->post('task_id'));
+								->find($this->input->post('agenda_id'));
 
-		if ($task === false) {
+		if ($agenda === false) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('st_invalid_action')
@@ -828,146 +828,146 @@ class Step extends Authenticated_Controller
 
 		switch ($this->input->post('status')) {
 			case 'inprogress':
-				if ($task->status != 'open') {
+				if ($agenda->status != 'open') {
 					echo json_encode([
 						'message_type' => 'danger',
-						'message' => lang('st_invalid_task_status')
+						'message' => lang('st_invalid_agenda_status')
 					]);
 
 					return;
 				}
 
-				// We can only start 1 task at a time
-				$task_in_progress = $this->task_model->select('tasks.*, u.timezone')
-								->join('steps s', 's.step_id = tasks.step_id')
+				// We can only start 1 agenda at a time
+				$agenda_in_progress = $this->agenda_model->select('agendas.*, u.timezone')
+								->join('steps s', 's.step_id = agendas.step_id')
 								->join('actions a', 'a.action_id = s.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
 								->join('users u', 'u.user_id = ' . $this->current_user->user_id)
 								->where('s.owner_id', $this->current_user->user_id)
-								->where('tasks.status', 'inprogress')
+								->where('agendas.status', 'inprogress')
 								->limit(1)
-								->find_by('tasks.step_id', $task->step_id);
+								->find_by('agendas.step_id', $agenda->step_id);
 
-				if ($task_in_progress) {
+				if ($agenda_in_progress) {
 					echo json_encode([
 						'message_type' => 'danger',
-						'message' => lang('st_please_finish_other_task')
+						'message' => lang('st_please_finish_other_agenda')
 					]);
 					return;
 				}
 				
-				$this->task_model->update($task->task_id, [
+				$this->agenda_model->update($agenda->agenda_id, [
 					'status' => 'inprogress', 
 					'time_assigned' => $this->input->post('time_assigned'), 
 					'started_on' => $current_time,
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
+				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => lang('st_task_started'),
+					'message' => lang('st_agenda_started'),
 					'started_on' => $current_time
 				]);
 
 				break;
 
 			case 'jumped':
-				if ($task->status != 'inprogress') {
+				if ($agenda->status != 'inprogress') {
 					echo json_encode([
 						'message_type' => 'danger',
-						'message' => lang('st_invalid_task_status')
+						'message' => lang('st_invalid_agenda_status')
 					]);
 
 					return;
 				}
 
-				$this->task_model->update($task->task_id, [
+				$this->agenda_model->update($agenda->agenda_id, [
 					'status' => 'jumped', 
 					'finished_on' => $current_time, 
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
+				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => lang('st_task_jumped')
+					'message' => lang('st_agenda_jumped')
 				]);
 
 				break;
 			case 'skipped':
 
-				if ($task->status != 'open') {
+				if ($agenda->status != 'open') {
 					echo json_encode([
 						'message_type' => 'danger',
-						'message' => lang('st_invalid_task_status')
+						'message' => lang('st_invalid_agenda_status')
 					]);
 
 					return;
 				}
 
-				$this->task_model->update($task->task_id, [
+				$this->agenda_model->update($agenda->agenda_id, [
 					'status' => 'skipped', 
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
+				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => lang('st_task_skipped')
+					'message' => lang('st_agenda_skipped')
 				]);
 
 				break;
 
 			case 'resolved':
-				if ($task->status != 'inprogress') {
+				if ($agenda->status != 'inprogress') {
 						echo json_encode([
 							'message_type' => 'danger',
-							'message' => lang('st_invalid_task_status')
+							'message' => lang('st_invalid_agenda_status')
 						]);
 
 						return;
 				}
 
-				$this->task_model->update($task->task_id, [
+				$this->agenda_model->update($agenda->agenda_id, [
 					'status' => 'resolved',
 					'finished_on' => $current_time, 
 					'comment' => $this->input->post('comment'),
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
+				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => lang('st_task_resolved')
+					'message' => lang('st_agenda_resolved')
 				]);
 
 				break;
 
 			case 'parking_lot':
-				if ($task->status != 'inprogress') {
+				if ($agenda->status != 'inprogress') {
 						echo json_encode([
 							'message_type' => 'danger',
-							'message' => lang('st_invalid_task_status')
+							'message' => lang('st_invalid_agenda_status')
 						]);
 
 						return;
 				}
 
-				$this->task_model->update($task->task_id, [
+				$this->agenda_model->update($agenda->agenda_id, [
 					'status' => 'parking_lot',
 					'finished_on' => $current_time, 
 					'comment' => $this->input->post('comment'),
 					'modified_by' => $this->current_user->user_id
 				]);
-				$this->mb_project->notify_members($task->task_id, 'task', $this->current_user, 'update_status');
+				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => lang('st_task_placed')
+					'message' => lang('st_agenda_placed')
 				]);
 
 				break;
 
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_invalid_task_status')
+				'message' => lang('st_invalid_agenda_status')
 			]);
 			return;
 		}
@@ -1162,17 +1162,17 @@ class Step extends Authenticated_Controller
 							->as_array()
 							->find_all();
 
-		$tasks = $this->task_model->select('tasks.*, 
-											IF((SELECT tv.user_id FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
-											(SELECT COUNT(*) FROM mb_task_votes tv WHERE mb_tasks.task_id = tv.task_id) AS skip_votes', false)
-									->join('users u', 'u.user_id = tasks.owner_id', 'left')
+		$agendas = $this->agenda_model->select('agendas.*, 
+											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
+											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
+									->join('users u', 'u.user_id = agendas.owner_id', 'left')
 									->where('step_id', $step->step_id)->find_all();
-		if (is_array($tasks) && count($tasks) > 0) {
-			foreach ($tasks as &$task) {
-				$task->members = $this->task_member_model
+		if (is_array($agendas) && count($agendas) > 0) {
+			foreach ($agendas as &$agenda) {
+				$agenda->members = $this->agenda_member_model
 									->select('avatar, email, first_name, last_name')
-									->join('users u', 'u.user_id = task_members.user_id')
-									->where('task_id', $task->task_id)
+									->join('users u', 'u.user_id = agenda_members.user_id')
+									->where('agenda_id', $agenda->agenda_id)
 									->find_all();
 			}
 		}
@@ -1181,8 +1181,8 @@ class Step extends Authenticated_Controller
 			if ($this->input->post()) {
 				if (! is_array($this->input->post('attendee_rate'))
 				|| count($this->input->post('attendee_rate')) != count($step->members)
-				|| ! is_array($this->input->post('task_rate'))
-				|| count($this->input->post('task_rate')) != count($tasks)) {
+				|| ! is_array($this->input->post('agenda_rate'))
+				|| count($this->input->post('agenda_rate')) != count($agendas)) {
 					$validation_error = true;
 				}
 
@@ -1204,18 +1204,18 @@ class Step extends Authenticated_Controller
 						}
 					}
 
-					if (count($this->input->post('task_rate'))) {
-						$task_rate_data = [];
-						foreach ($this->input->post('task_rate') as $task_id => $rate) {
-							$task_rate_data[] = [
-								'task_id' => $task_id,
+					if (count($this->input->post('agenda_rate'))) {
+						$agenda_rate_data = [];
+						foreach ($this->input->post('agenda_rate') as $agenda_id => $rate) {
+							$agenda_rate_data[] = [
+								'agenda_id' => $agenda_id,
 								'user_id' => $this->current_user->user_id,
 								'rate' => $rate
 							];
 						}
 
-						$tasks_rated = $this->task_rate_model->insert_batch($task_rate_data);
-						if (empty($tasks_rated)) {
+						$agendas_rated = $this->agenda_rate_model->insert_batch($agenda_rate_data);
+						if (empty($agendas_rated)) {
 							$insert_error = true;
 						}
 					}
@@ -1233,13 +1233,13 @@ class Step extends Authenticated_Controller
 		}
 
 		if (! empty($validation_error)) {
-			Template::set('message', lang('st_need_to_vote_all_tasks_and_attendees'));
+			Template::set('message', lang('st_need_to_vote_all_agendas_and_attendees'));
 			Template::set('message_type', 'danger');
 			Template::set('close_modal', 0);
 		}
 
 		if (! empty($insert_error)) {
-			Template::set('message', lang('st_there_was_a_problem_while_rating_attendees_and_tasks'));
+			Template::set('message', lang('st_there_was_a_problem_while_rating_attendees_and_agendas'));
 			Template::set('message_type', 'danger');
 			Template::set('close_modal', 0);
 		}
@@ -1247,7 +1247,7 @@ class Step extends Authenticated_Controller
 		$point_used = number_format($this->mb_project->total_point_used('step', $step_id), 2);
 		Template::set('point_used', $point_used);
 		Template::set('step', $step);
-		Template::set('tasks', $tasks);
+		Template::set('agendas', $agendas);
 		Template::render('ajax');
 	}
 

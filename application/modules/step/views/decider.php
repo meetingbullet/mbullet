@@ -28,7 +28,7 @@ if ($step->scheduled_start_time) {
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
 
-$task_status_labels = [
+$agenda_status_labels = [
 	'open' => 'label label-default label-bordered',
 	'inprogress' => 'label label-warning label-bordered',
 	'resolved' => 'label label-success label-bordered',
@@ -136,7 +136,7 @@ $cost_of_time_to_badge = [
 
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
-				<h6><?php e(lang('st_tasks'))?></h6>
+				<h6><?php e(lang('st_agendas'))?></h6>
 			</div>
 			<div class="an-component-body an-helper-block">
 				<table class="table table-striped table-step-time">
@@ -150,21 +150,21 @@ $cost_of_time_to_badge = [
 						</tr>
 					</thead>
 					<tbody>
-						<?php if($tasks): foreach ($tasks as $task) : ?>
-						<tr id='task-<?php e($task->task_id)?>' data-task-id='<?php e($task->task_id)?>' data-task-status='<?php e($task->status)?>'>
-							<td><?php echo anchor(site_url('task/' . $task->task_key), $task->name, ['target' => '_blank'])?></td>
-							<td><?php echo display_time($task->started_on) ?></td>
-							<td><?php echo timespan(strtotime($task->started_on), strtotime($task->finished_on)) ?></td>
+						<?php if($agendas): foreach ($agendas as $agenda) : ?>
+						<tr id='agenda-<?php e($agenda->agenda_id)?>' data-agenda-id='<?php e($agenda->agenda_id)?>' data-agenda-status='<?php e($agenda->status)?>'>
+							<td><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
+							<td><?php echo display_time($agenda->started_on) ?></td>
+							<td><?php echo timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) ?></td>
 							<td>
-								<span class="<?php e($task_status_labels[$task->status])?>">
-									<?php e(lang('st_' . $task->status))?>
+								<span class="<?php e($agenda_status_labels[$agenda->status])?>">
+									<?php e(lang('st_' . $agenda->status))?>
 								</span>
 							</td>
 							<td>
-								<select name="tasks[<?php e($task->task_key) ?>]" class="confirmation-status an-form-control">
+								<select name="agendas[<?php e($agenda->agenda_key) ?>]" class="confirmation-status an-form-control">
 									<option disabled selected value><?php e(lang('st_select_an_option')) ?></option>
 									<?php foreach ($confirmation_status as $status) {
-										echo "<option value='{$status}' ". ($task->confirm_status == $status ? ' selected' : '') .">". lang('st_' . $status) ."</option>";
+										echo "<option value='{$status}' ". ($agenda->confirm_status == $status ? ' selected' : '') .">". lang('st_' . $status) ."</option>";
 									} ?>
 								</select>
 							</td>
@@ -197,7 +197,7 @@ $cost_of_time_to_badge = [
 
 <?php if ( ! IS_AJAX): ?>
 <!-- Modal -->
-<div id="resolve-task" class="modal fade" tabindex="-1" role="dialog">
+<div id="resolve-agenda" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>

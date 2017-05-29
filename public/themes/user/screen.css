@@ -321,7 +321,7 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	Project: 'open','inactive','archive'
 	Action: 'open','inprogress','ready','resolved'
 	Step: 'open','ready','inprogress','finished','resolved'
-	Task: 'open','inprogress','resolved','skipped','jumped','parking_lot'
+	Agenda: 'open','inprogress','resolved','skipped','jumped','parking_lot'
 */
 
 .label-open {

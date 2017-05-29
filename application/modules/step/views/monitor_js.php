@@ -1,5 +1,5 @@
 <?php
-$task_status_labels = [
+$agenda_status_labels = [
 	'open' => 'label label-default label-bordered',
 	'inprogress' => 'label label-warning label-bordered',
 	'resolved' => 'label label-success label-bordered',
@@ -19,17 +19,17 @@ var status_lang = {
 };
 
 var status_label = {
-	'open' : '<?php echo $task_status_labels['open'] ?>',
-	'inprogress' : '<?php echo $task_status_labels['inprogress'] ?>',
-	'resolved' : '<?php echo $task_status_labels['resolved'] ?>',
-	'jumped' : '<?php echo $task_status_labels['jumped'] ?>',
-	'skipped' : "<?php echo $task_status_labels['skipped'] ?>",
-	'parking_lot' : "<?php echo $task_status_labels['parking_lot'] ?>",
+	'open' : '<?php echo $agenda_status_labels['open'] ?>',
+	'inprogress' : '<?php echo $agenda_status_labels['inprogress'] ?>',
+	'resolved' : '<?php echo $agenda_status_labels['resolved'] ?>',
+	'jumped' : '<?php echo $agenda_status_labels['jumped'] ?>',
+	'skipped' : "<?php echo $agenda_status_labels['skipped'] ?>",
+	'parking_lot' : "<?php echo $agenda_status_labels['parking_lot'] ?>",
 };
 
 
 var update_step_timer_interval,
-	update_task_timer_intervals = [];
+	update_agenda_timer_intervals = [];
 
 // Update skip votes periodly
 var update_monitor_interval = setInterval(update_monitor, 3000);
@@ -39,14 +39,14 @@ $('.modal-monitor').on('hidden.bs.modal', function () {
 	clearInterval(update_step_timer_interval);
 	clearInterval(update_monitor_interval);
 
-	$.each(update_task_timer_intervals, (i, item) => {
+	$.each(update_agenda_timer_intervals, (i, item) => {
 		clearInterval(item);
 	});
 })
 
-// Disable all Start task if there is a "In Progress" Task
+// Disable all Start agenda if there is a "In Progress" agenda
 if ($('.step-monitor .label-inprogress').length) {
-	$('.btn-start-task').prop('disabled', true);
+	$('.btn-start-agenda').prop('disabled', true);
 	$('.btn-finish').prop('disabled', true);
 }
 
@@ -71,9 +71,9 @@ $(document).off('.monitor');
 
 $(document).on('click.monitor', '.btn-vote-skip', (e) => {
 	e.preventDefault();
-	var task_id = $(e.target).parent().parent().data('task-id');
+	var agenda_id = $(e.target).parent().parent().data('agenda-id');
 
-	$.get('<?php e(site_url('step/vote_skip/'))?>' + task_id, (result) => {
+	$.get('<?php e(site_url('step/vote_skip/'))?>' + agenda_id, (result) => {
 		if (result == '1') {
 			update_monitor();
 
@@ -94,9 +94,9 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 	var time_assigned_data = "";
 	var is_set_time = true;
 
-	$('.table-task tr input[name="time_assigned"]').each((i, item) => {
+	$('.table-agenda tr input[name="time_assigned"]').each((i, item) => {
 		if ($(item).val() != '' && $(item).val() > 0) {
-			time_assigned_data += "&time_assigned["+ $(item).data('task-id') +"]=" + $(item).val();
+			time_assigned_data += "&time_assigned["+ $(item).data('agenda-id') +"]=" + $(item).val();
 			$(item).removeClass('danger');
 		} else {
 			$(item).addClass('danger');
@@ -153,9 +153,9 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 	var time_assigned_data = "";
 	var is_set_time = true;
 
-	$('.table-task tr input[name="time_assigned"]').each((i, item) => {
+	$('.table-agenda tr input[name="time_assigned"]').each((i, item) => {
 		if ($(item).val() != '' && $(item).val() > 0) {
-			time_assigned_data += "&time_assigned["+ $(item).data('task-id') +"]=" + $(item).val();
+			time_assigned_data += "&time_assigned["+ $(item).data('agenda-id') +"]=" + $(item).val();
 			$(item).removeClass('danger');
 		} else {
 			$(item).addClass('danger');
@@ -181,9 +181,9 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 			$('.btn-finish').toggleClass('hidden');
 			$('.btn-start-step').toggleClass('hidden');
 
-			$('tr[data-task-status="open"] .btn-skip').removeClass('hidden');
-			$('tr[data-task-status="open"] .btn-start-task').removeClass('hidden');
-			$('tr[data-task-status="open"] .btn-start-task').prop('disabled', false);
+			$('tr[data-agenda-status="open"] .btn-skip').removeClass('hidden');
+			$('tr[data-agenda-status="open"] .btn-start-agenda').removeClass('hidden');
+			$('tr[data-agenda-status="open"] .btn-start-agenda').prop('disabled', false);
 
 			$('.btn-update-step-schedule').addClass('hidden');
 			$('.input-group-btn-right').removeClass('input-group-btn-right');
@@ -191,9 +191,9 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 			$('#scheduled-timer').data('now', data.actual_start_time);
 			update_step_timer();
 
-			$('.table-task tr input[name="time_assigned"]').each((i, item) => {
+			$('.table-agenda tr input[name="time_assigned"]').each((i, item) => {
 				if ($(item).val() != '' && $(item).val() > 0) {
-					time_assigned_data += "&time_assigned["+ $(item).data('task-id') +"]=" + $(item).val();
+					time_assigned_data += "&time_assigned["+ $(item).data('agenda-id') +"]=" + $(item).val();
 					$(item).removeClass('danger');
 					$(item).addClass('hidden');
 					$(item).parent().children('span').text($(item).val());
@@ -251,16 +251,16 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 $(document).on('keyup.monitor', '.form-td', (e) => {
 	if ($(e.target).val() <= 0) {
 		$(e.target).addClass('danger');
-		$(e.target).parent().parent().find('.btn-start-task').prop('disabled', true);
+		$(e.target).parent().parent().find('.btn-start-agenda').prop('disabled', true);
 	} else {
 		if ($('.label-inprogress').length === 0) {
-			$(e.target).parent().parent().find('.btn-start-task').prop('disabled', false);
+			$(e.target).parent().parent().find('.btn-start-agenda').prop('disabled', false);
 			$(e.target).removeClass('danger');
 		}
 	}
 });
 
-$(document).on('click.monitor', '.btn-start-task', (e) => {
+$(document).on('click.monitor', '.btn-start-agenda', (e) => {
 	var row = $(e.target).parent().parent();
 	var time_assigned = $(row).find('input[name="time_assigned"]').val()
 						? $(row).find('input[name="time_assigned"]').val()
@@ -268,8 +268,8 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 
 	$(document).data('ajax-start-time', moment().unix());
 
-	$.post('<?php echo site_url('step/update_task_status') ?>', {
-		task_id: $(e.target).parent().parent().data('task-id'), 
+	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+		agenda_id: $(e.target).parent().parent().data('agenda-id'), 
 		status: 'inprogress', 
 		time_assigned: time_assigned
 	}, (result) => {
@@ -287,12 +287,12 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 			$(row).find('.btn-skip').addClass('hidden');
 			$(row).find('.btn-jump').removeClass('hidden');
 
-			$(row).find('.task-status').data('started-on', data.started_on);
-			$(row).find('.task-status').data('now', data.started_on);
+			$(row).find('.agenda-status').data('started-on', data.started_on);
+			$(row).find('.agenda-status').data('now', data.started_on);
 
-			update_task_timer($(row).find('.task-status'));
+			update_agenda_timer($(row).find('.agenda-status'));
 
-			$('.btn-start-task').prop('disabled', true);
+			$('.btn-start-agenda').prop('disabled', true);
 
 			$(row).find('input[name="time_assigned"]').addClass('hidden');
 			$(row).find('.time-assigned').text($(row).find('input[name="time_assigned"]').val());
@@ -301,14 +301,14 @@ $(document).on('click.monitor', '.btn-start-task', (e) => {
 });
 
 $(document).on('click.monitor', '.btn-skip', (e) => {
-	var task_id = $(e.target).parent().parent().data('task-id');
+	var agenda_id = $(e.target).parent().parent().data('agenda-id');
 	var row = $(e.target).parent().parent();
 	var time_assigned = $(row).find('input[name="time_assigned"]').val()
 						? $(row).find('input[name="time_assigned"]').val()
 						: $(row).find('.time-assigned').text();
 
-	$.post('<?php echo site_url('step/update_task_status') ?>', {
-		task_id, 
+	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+		agenda_id, 
 		status: 'skipped'
 	}, (result) => {
 		data = JSON.parse(result);
@@ -322,8 +322,8 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
-			$(row).find('.btn-start-task').addClass('hidden');
-			$(row).find('.task-status').html('<span class="<?php e($task_status_labels['skipped'])?>"><?php e(lang('st_skipped'))?></span>');
+			$(row).find('.btn-start-agenda').addClass('hidden');
+			$(row).find('.agenda-status').html('<span class="<?php e($agenda_status_labels['skipped'])?>"><?php e(lang('st_skipped'))?></span>');
 
 			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
@@ -333,14 +333,14 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 });
 
 $(document).on('click.monitor', '.btn-jump', (e) => {
-	var task_id = $(e.target).parent().parent().data('task-id');
+	var agenda_id = $(e.target).parent().parent().data('agenda-id');
 	var row = $(e.target).parent().parent();
 	var time_assigned = $(row).find('input[name="time_assigned"]').val()
 						? $(row).find('input[name="time_assigned"]').val()
 						: $(row).find('.time-assigned').text();
 
-	$.post('<?php echo site_url('step/update_task_status') ?>', {
-		task_id, 
+	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+		agenda_id, 
 		status: 'jumped'
 	}, (result) => {
 		data = JSON.parse(result);
@@ -354,10 +354,10 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
-			clearInterval(update_task_timer_intervals[task_id]);
-			$(row).find('.task-status').html('<span class="<?php e($task_status_labels['jumped'])?>"><?php e(lang('st_jumped'))?></span>');
+			clearInterval(update_agenda_timer_intervals[agenda_id]);
+			$(row).find('.agenda-status').html('<span class="<?php e($agenda_status_labels['jumped'])?>"><?php e(lang('st_jumped'))?></span>');
 
-			$('.btn-start-task').each((i, item) => {
+			$('.btn-start-agenda').each((i, item) => {
 				if ( $(item).parent().parent().find('input[name="time_assigned"]').val() ) {
 					$(item).prop('disabled', false);
 				}
@@ -372,10 +372,10 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 
 $(document).on('click.monitor', '.btn-resolve', (e) => {
 	e.preventDefault();
-	var task_id = $('.form-resolve-task').data('task-id');
+	var agenda_id = $('.form-resolve-agenda').data('agenda-id');
 
-	$.post('<?php echo site_url('step/update_task_status') ?>', {
-		task_id, 
+	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+		agenda_id, 
 		status: 'resolved',
 		comment: $('textarea[name="comment"]').val()
 	}, (result) => {
@@ -389,10 +389,10 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			$('#resolve-task').modal('hide');
-			$('.btn-start-task').prop('disabled', false);
-			$('#task-' + task_id).find('.btn-jump').addClass('hidden');
-			$('#task-' + task_id).find('.task-status').html('<span class="<?php e($task_status_labels['resolved'])?>"><?php e(lang('st_resolved'))?></span>');
+			$('#resolve-agenda').modal('hide');
+			$('.btn-start-agenda').prop('disabled', false);
+			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
+			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="<?php e($agenda_status_labels['resolved'])?>"><?php e(lang('st_resolved'))?></span>');
 
 			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
@@ -403,10 +403,10 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 
 $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 	e.preventDefault();
-	var task_id = $('.form-resolve-task').data('task-id');
+	var agenda_id = $('.form-resolve-agenda').data('agenda-id');
 
-	$.post('<?php echo site_url('step/update_task_status') ?>', {
-		task_id, 
+	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+		agenda_id, 
 		status: 'parking_lot',
 		comment: $('textarea[name="comment"]').val()
 	}, (result) => {
@@ -420,10 +420,10 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			$('#resolve-task').modal('hide');
-			$('.btn-start-task').prop('disabled', false);
-			$('#task-' + task_id).find('.btn-jump').addClass('hidden');
-			$('#task-' + task_id).find('.task-status').html('<span class="<?php e($task_status_labels['parking_lot'])?>"><?php e(lang('st_parking_lot'))?></span>');
+			$('#resolve-agenda').modal('hide');
+			$('.btn-start-agenda').prop('disabled', false);
+			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
+			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="<?php e($agenda_status_labels['parking_lot'])?>"><?php e(lang('st_parking_lot'))?></span>');
 
 			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
@@ -433,15 +433,15 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 });
 
 $(document).on('click.monitor', '.time-assigned', (e) => {
-	if ($(e.target).parent().parent().find('.task-status span').text() == 'Open') {
+	if ($(e.target).parent().parent().find('.agenda-status span').text() == 'Open') {
 		$(e.target).parent().find('input').removeClass('hidden');
 		$(e.target).hide();
 	}
 });
 
-$('.table-task .task-status').each((index, item) => {
+$('.table-agenda .agenda-status').each((index, item) => {
 	if ( $(item).data('started-on') ) {
-		update_task_timer(item);
+		update_agenda_timer(item);
 	}
 });
 
@@ -484,9 +484,9 @@ function update_step_timer(clock)
 	}, interval);
 }
 
-function update_task_timer(clock)
+function update_agenda_timer(clock)
 {
-	var task_id = $(clock).parent().data('task-id'),
+	var agenda_id = $(clock).parent().data('agenda-id'),
 		time_assigned = $(clock).data('time-assigned'),
 		ajax_start_time = $(document).data('ajax-start-time'),
 		request_time = ajax_start_time ? ((moment().unix() - ajax_start_time) / 2) : 0;
@@ -504,7 +504,7 @@ function update_task_timer(clock)
 
 	var $time = $('<span class="time" ></span>').appendTo($(clock));
 
-		update_task_timer_intervals[task_id] = setInterval(function(){
+		update_agenda_timer_intervals[agenda_id] = setInterval(function(){
 
 			duration = moment.duration(duration.asMilliseconds() + interval, 'milliseconds');
 			var d = moment.duration(duration).days(),
@@ -512,12 +512,12 @@ function update_task_timer(clock)
 				m = moment.duration(duration).minutes(),
 				s = moment.duration(duration).seconds();
 
-			// Time alotted for Task
+			// Time alotted for agenda
 			if (duration.asMinutes() >= time_assigned && $('.step-monitor').data('is-owner') == '1') {
-				if (update_task_timer_intervals[task_id]) {
-					clearInterval(update_task_timer_intervals[task_id]);
+				if (update_agenda_timer_intervals[agenda_id]) {
+					clearInterval(update_agenda_timer_intervals[agenda_id]);
 
-					$.getJSON('<?php echo site_url('step/resolve_task/') ?>' + task_id, (data) => {
+					$.getJSON('<?php echo site_url('step/resolve_agenda/') ?>' + agenda_id, (data) => {
 						if (data.message != '') {
 							$.notify({
 								message: data.message
@@ -527,8 +527,8 @@ function update_task_timer(clock)
 							});
 						}
 
-						$('#resolve-task .modal-content').html(data.modal_content);
-						$('#resolve-task').modal({backdrop: 'static'});
+						$('#resolve-agenda .modal-content').html(data.modal_content);
+						$('#resolve-agenda').modal({backdrop: 'static'});
 					});
 				}
 			}
@@ -639,40 +639,40 @@ function update_monitor()
 		});
 
 
-		// Real-time task data
-		$.each(data.tasks, (index, item) => {
-			old_vote = parseInt($('#task-' + item.task_id + ' .skip-votes').text());
-			old_status = $('#task-' + item.task_id).data('task-status');
+		// Real-time agenda data
+		$.each(data.agendas, (index, item) => {
+			old_vote = parseInt($('#agenda-' + item.agenda_id + ' .skip-votes').text());
+			old_status = $('#agenda-' + item.agenda_id).data('agenda-status');
 
 			if (item.skip_votes != old_vote) {
-				$('#task-' + item.task_id + ' .skip-votes').text(item.skip_votes);
-				$('#task-' + item.task_id + ' .skip-votes').effect("highlight", {}, 3000);
+				$('#agenda-' + item.agenda_id + ' .skip-votes').text(item.skip_votes);
+				$('#agenda-' + item.agenda_id + ' .skip-votes').effect("highlight", {}, 3000);
 			}
 
 			if (item.status != old_status && $('.step-monitor').data('is-owner') == 0) {
-				$('#task-' + item.task_id).data('task-status', item.status);
-				$('#task-' + item.task_id + ' .task-status').effect("highlight", {}, 3000);
-				$('#task-' + item.task_id + ' .label').removeClass('label-' + old_status);
-				$('#task-' + item.task_id + ' .label').addClass('label-' + item.status);
+				$('#agenda-' + item.agenda_id).data('agenda-status', item.status);
+				$('#agenda-' + item.agenda_id + ' .agenda-status').effect("highlight", {}, 3000);
+				$('#agenda-' + item.agenda_id + ' .label').removeClass('label-' + old_status);
+				$('#agenda-' + item.agenda_id + ' .label').addClass('label-' + item.status);
 
 				if (item.status == 'inprogress') {
-					$('#task-' + item.task_id + ' .label').data('started-on', item.started_on);
-					$('#task-' + item.task_id + ' .label').data('now', item.current_time);
+					$('#agenda-' + item.agenda_id + ' .label').data('started-on', item.started_on);
+					$('#agenda-' + item.agenda_id + ' .label').data('now', item.current_time);
 
-					update_task_timer($('#task-' + item.task_id + ' .task-status'));
+					update_agenda_timer($('#agenda-' + item.agenda_id + ' .agenda-status'));
 				} else {
-					if (update_task_timer_intervals[item.task_id]) {
-						clearInterval(update_task_timer_intervals[item.task_id]);
-						$('#task-' + item.task_id + ' .task-status > span').text('');
+					if (update_agenda_timer_intervals[item.agenda_id]) {
+						clearInterval(update_agenda_timer_intervals[item.agenda_id]);
+						$('#agenda-' + item.agenda_id + ' .agenda-status > span').text('');
 					}
 
 					if (item.status == 'jumped' || item.status == 'resolved' || item.status == 'skipped' || item.status == 'parking_lot') {
-						$('#task-' + item.task_id + ' .btn-vote-skip').addClass('hidden');
+						$('#agenda-' + item.agenda_id + ' .btn-vote-skip').addClass('hidden');
 					}
 				}
 
-				$('#task-' + item.task_id + ' .label').attr('class', status_label[item.status]);
-				$('#task-' + item.task_id + ' .label').text(status_lang[item.status]);
+				$('#agenda-' + item.agenda_id + ' .label').attr('class', status_label[item.status]);
+				$('#agenda-' + item.agenda_id + ' .label').text(status_lang[item.status]);
 			}
 		});
 	});

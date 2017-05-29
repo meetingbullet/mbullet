@@ -19,7 +19,7 @@ $label = [
 	'resolved' => 'label label-success label-bordered'
 ];
 
-$task_status_labels = [
+$agenda_status_labels = [
 	'open' => 'label label-default label-bordered',
 	'inprogress' => 'label label-warning label-bordered',
 	'resolved' => 'label label-success label-bordered',
@@ -155,12 +155,12 @@ $members = array_column($invited_members, 'user_id');
 
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
-				<h6><?php e(lang('st_tasks'))?></h6>
+				<h6><?php e(lang('st_agendas'))?></h6>
 				</div>
-			<div id="task-list" class="an-component-body">
+			<div id="agenda-list" class="an-component-body">
 				<div class="an-helper-block">
 					<div class="an-scrollable-x">
-						<table class="table table-striped table-detail-task">
+						<table class="table table-striped table-detail-agenda">
 							<thead>
 								<tr>
 									<th><?php e(lang('st_key'))?></th>
@@ -174,25 +174,25 @@ $members = array_column($invited_members, 'user_id');
 								</tr>
 							</thead>
 							<tbody>
-								<?php if($tasks): foreach ($tasks as $task) : ?>
-								<tr data-task-id="<?php e($task->task_id) ?>" data-confirm-status="<?php e($task->confirm_status) ?>">
-									<td class='basis-10'><?php e($task->task_key) //anchor(site_url('task/' . $task->task_key), $task->task_key)?></td>
-									<td class='basis-15'><?php e($task->name) //anchor(site_url('task/' . $task->task_key), $task->name)?></td>
-									<td class='basis-20'><?php echo word_limiter($task->description, 20)?></td>
+								<?php if($agendas): foreach ($agendas as $agenda) : ?>
+								<tr data-agenda-id="<?php e($agenda->agenda_id) ?>" data-confirm-status="<?php e($agenda->confirm_status) ?>">
+									<td class='basis-10'><?php e($agenda->agenda_key) //anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->agenda_key)?></td>
+									<td class='basis-15'><?php e($agenda->name) //anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name)?></td>
+									<td class='basis-20'><?php echo word_limiter($agenda->description, 20)?></td>
 									<td class='basis-20'>
-										<?php if ($task->members) {
-											foreach ($task->members as $member) {
+										<?php if ($agenda->members) {
+											foreach ($agenda->members as $member) {
 												echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
 											}
 										} ?>
 									</td>
-									<td class='basis-10 task-status text-center'>
-										<span class="label label-bordered label-<?php e($task->status)?>"><?php e(lang('st_' . $task->status))?></span>
+									<td class='basis-10 agenda-status text-center'>
+										<span class="label label-bordered label-<?php e($agenda->status)?>"><?php e(lang('st_' . $agenda->status))?></span>
 									</td>
 									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
-									<td class='basis-10 task-status text-center'>
-										<?php if ( isset($task_status_labels[$task->confirm_status]) ): ?>
-										<span class="<?php e($task_status_labels[$task->confirm_status] . ' label-' . $task->confirm_status)?>"><?php e(lang('st_' . $task->confirm_status))?></span>
+									<td class='basis-10 agenda-status text-center'>
+										<?php if ( isset($agenda_status_labels[$agenda->confirm_status]) ): ?>
+										<span class="<?php e($agenda_status_labels[$agenda->confirm_status] . ' label-' . $agenda->confirm_status)?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 										<?php endif; ?>
 									</td>
 									<?php endif ?>
@@ -203,7 +203,7 @@ $members = array_column($invited_members, 'user_id');
 					</div>
 
 					<?php if ($step->status == 'open'): ?>
-					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-task-url="<?php echo site_url('task/create/' . $step_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-task"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_task')?></button>
+					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-agenda-url="<?php echo site_url('agenda/create/' . $step_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-agenda"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_agenda')?></button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -308,7 +308,7 @@ $members = array_column($invited_members, 'user_id');
 	</div>
 </div>
 
-<div id="resolve-task" class="modal fade" tabindex="-1" role="dialog">
+<div id="resolve-agenda" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
@@ -329,9 +329,9 @@ $members = array_column($invited_members, 'user_id');
 		</div>
 	</div>
 </div>
-<script type="text" id="task-row">
-	<tr data-task-id="{{:task_id}}" data-confirm-status="">
-		<td class="basis-10">{{:task_id}}</td>
+<script type="text" id="agenda-row">
+	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="">
+		<td class="basis-10">{{:agenda_key}}</td>
 		<td class="basis-15">{{:name}}</td>
 		<td class="basis-20">{{:description}}</td>
 		<td class="basis-20">
@@ -339,7 +339,7 @@ $members = array_column($invited_members, 'user_id');
 				{{:html}}
 			{{/for}}
 		</td>
-		<td class="basis-10 task-status">
+		<td class="basis-10 agenda-status text-center">
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
 	</tr>

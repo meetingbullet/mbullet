@@ -39,12 +39,10 @@ $(document).on('submit.decider', '.form-step-decider', (e) => {
 			$('#step-decider').modal('hide');
 
 			/* 
-				If one of the tasks is marked as Closed Parking Lot the step owner is redirected to 
-				the Step creation screen and prompted to create a new step to resolve the Closed Parking Lot task.
+				If one of the agendas is marked as Closed Parking Lot the step owner is redirected to 
+				the Step creation screen and prompted to create a new step to resolve the Closed Parking Lot agenda.
 			*/
 			if ($('.confirmation-status option[value="open_parking_lot"]:selected').length > 0) {
-				var open_parking_lot_tasks = [];
-
 				$.post('<?php e(site_url('step/create/' . $action_key)) ?>', {from_step: '<?php e($step_id) ?>'}, (data) => {
 					data = JSON.parse(data);
 					$('#create-step .modal-content').html(data.modal_content);

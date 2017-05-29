@@ -81,10 +81,10 @@ $lang['pj_detail_tab_action'] = 'Action';
 $lang['pj_detail_tab_report'] = 'Report';
 $lang['pj_detail_tab_info_table_my_actions'] = 'My Actions';
 $lang['pj_detail_tab_info_table_my_steps'] = 'My Steps';
-$lang['pj_detail_tab_info_table_my_tasks'] = 'My Tasks';
+$lang['pj_detail_tab_info_table_my_agendas'] = 'My Agendas';
 $lang['pj_detail_tab_info_table_all_actions'] = 'Actions';
 $lang['pj_detail_tab_info_table_all_steps'] = 'Steps';
-$lang['pj_detail_tab_info_table_all_tasks'] = 'Tasks';
+$lang['pj_detail_tab_info_table_all_agendas'] = 'Agendas';
 $lang['pj_detail_tab_info_table_label_key'] = 'Key';
 $lang['pj_detail_tab_info_table_label_name'] = 'Name';
 $lang['pj_detail_tab_info_table_label_status'] = 'Status';
@@ -92,7 +92,7 @@ $lang['pj_info_pager_first'] = 'First';
 $lang['pj_info_pager_last'] = 'Last';
 $lang['pj_no_action'] = 'There are no actions at the moment.';
 $lang['pj_no_step'] = 'There are no steps at the moment.';
-$lang['pj_no_task'] = 'There are no tasks at the moment.';
+$lang['pj_no_agenda'] = 'There are no agendas at the moment.';
 
 // project settings
 $lang['pj_settings'] = 'Project settings';
@@ -132,7 +132,7 @@ $lang['pj_there_was_a_problem_while_updating_project_settings'] = 'There was a p
 $lang['pj_cost_of_time_legend'] = 'Cost/Unit of Time: measured in T-Shirts, can be calibrated by entering in fractions/percents which sum to 1/100 when all values from "XS" to "XL" are added, or by entering any rational number.';
 $lang['pj_value_of_time_legend'] = 'Value/Unit of Time: measured in Stars, can be calibrated by entering either a quality rating (5=Excellent, 4=Good, 3=Average, 2=Below Average 1=Poor) or a letter grade (5=A, 4=B, 3=C, 2=D, 1=F).';
 
-// Tasks
+// Agendas
 $lang['pj_inprogress'] = 'In Progress';
 $lang['pj_skipped'] = 'Skipped';
 $lang['pj_jumped'] = 'Jumped';

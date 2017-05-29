@@ -16,21 +16,21 @@
 		<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '']) ?>
 
 		<div class='container-fluid<?php echo $this->input->is_ajax_request() ? ' modal-body' : ''?>'>
-				<?php if (is_array($open_tasks)): ?>
-					<?php if (count($open_tasks) == 1): ?>
+				<?php if (is_array($open_agendas)): ?>
+					<?php if (count($open_agendas) == 1): ?>
 					<p class="an-small-doc-block">
 						<?php echo sprintf(
-							lang('st_task_x_was_place_in_open_parking_plot'), 
-							$open_tasks[0]->name, 
-							word_limiter($open_tasks[0]->description, 10)
+							lang('st_agenda_x_was_place_in_open_parking_plot'), 
+							$open_agendas[0]->name, 
+							word_limiter($open_agendas[0]->description, 10)
 						) ?>
 					</p>
 					<?php else: ?>
 					<div class="an-small-doc-block">
-						<p><?php e(lang('st_there_tasks_were_placed_in_open_parking_lot'));?></p>
+						<p><?php e(lang('st_there_agendas_were_placed_in_open_parking_lot'));?></p>
 						<ul>
-							<?php foreach ($open_tasks as $task): ?>
-							<li><?php echo $task->name . ' - ' . word_limiter($task->description, 10)?></li>
+							<?php foreach ($open_agendas as $agenda): ?>
+							<li><?php echo $agenda->name . ' - ' . word_limiter($agenda->description, 10)?></li>
 							<?php endforeach;?>
 						</ul>
 						<?php e(lang('st_please_create_a_new_step_to_finish_it')); ?>

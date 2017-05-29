@@ -87,9 +87,9 @@ $('#start-step').click((e) => {
 	});
 });
 
-// Open step decider if there is a task without confirmed status
+// Open step decider if there is a agenda without confirmed status
 if ($('#step-status').data('is-owner') == '1' && ($('#step-status').data('status') == 'resolved' || $('#step-status').data('status') == 'finished')) {
-	$('.table-detail-task tr').each((i, item) => {
+	$('.table-detail-agenda tr').each((i, item) => {
 		if ($(item).data('confirm-status') == '') {
 			$('#step-decider .modal-content').html('');
 
@@ -144,10 +144,10 @@ $(document).on("submit", '.form-ajax', (e) => {
 
 				if (data.message_type == 'success') {
 
-					// Task created
-					if ($(e.target).prop('id') == 'create-task') {
-						$('#task-list tbody').append($.templates('#task-row').render(data.data));
-						$('#task-list tbody tr:last-child').effect("highlight", {}, 3000);
+					// agenda created
+					if ($(e.target).prop('id') == 'create-agenda') {
+						$('#agenda-list tbody').append($.templates('#agenda-row').render(data.data));
+						$('#agenda-list tbody tr:last-child').effect("highlight", {}, 3000);
 					}
 
 					// Step updated

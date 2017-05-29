@@ -7,8 +7,8 @@ $(document).ready(function() {
 		});
 	})
 
-	$('#add-task').click(function() {
-		var url = $(this).data('add-task-url');
+	$('#add-agenda').click(function() {
+		var url = $(this).data('add-agenda-url');
 		$.get(url).done(function(data) {
 			data = JSON.parse(data);
 			$('#bigModal .modal-content').html(data.modal_content);

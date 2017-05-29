@@ -1,15 +1,20 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Task_rate_model extends BF_Model
+class Agenda_model extends BF_Model
 {
-	protected $table_name	= 'task_rates';
-	protected $key			= 'task_id';
+	protected $table_name	= 'agendas';
+	protected $key			= 'agenda_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;
-	protected $set_created	= false;
-	protected $set_modified = false;
+	protected $set_created	= true;
+	protected $set_modified = true;
 	protected $soft_deletes	= false;
+
+	protected $created_field	 = 'created_on';
+	protected $modified_field	 = 'modified_on';
+	protected $created_by_field	 = 'created_by';
+	protected $modified_by_field	 = 'modified_by';
 
 	// Customize the operations of the model without recreating the insert,
 	// update, etc. methods by adding the method names to act as callbacks here.
@@ -37,7 +42,15 @@ class Task_rate_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	public $validation_rules		= array();
+	public $validation_rules		= array(
+		'create' => array(
+			array(
+				'field' => 'name',
+				'label' => 'lang:tk_name',
+				'rules' => 'trim|required|max_length[255]',
+			)
+		)
+	);
 	protected $insert_validation_rules  = array();
 	protected $skip_validation	= true;
 
