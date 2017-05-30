@@ -317,7 +317,7 @@ $members = array_column($invited_members, 'user_id');
 
 <div class="modal modal-monitor-evaluator fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-80" role="document">
-		<div class="modal-content">
+		<div class="modal-content" style="overflow: hidden;">
 		</div>
 	</div>
 </div>
