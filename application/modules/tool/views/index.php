@@ -58,11 +58,13 @@
 			<tr>
 				<th>Total:</th>
 				<td colspan="2">
+				<?php if (! empty($total)) : ?>
 					<ul>
 					<?php foreach ($total as $item) : ?>
 						<li style="<?php echo $user->email == $item['email'] ? 'font-style: italic; font-weight: bold;' : ''; ?>"><?php echo "{$item['email']} - {$item['time']} hour(s)" ?></li>
 					<?php endforeach ?>
 					</ul>
+				<?php endif ?>
 				</td>
 			</tr>
 		</tfoot>
