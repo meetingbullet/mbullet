@@ -12,6 +12,11 @@ class Step extends Authenticated_Controller
 		$this->load->library('mb_project');
 		
 		$this->load->model('users/user_model');
+
+		$this->lang->load('homework/homework');
+		$this->load->model('homework/homework_model');
+		$this->load->model('homework/homework_member_model');
+		
 		$this->load->model('agenda/agenda_model');
 		$this->load->model('agenda/agenda_member_model');
 		$this->load->model('agenda/agenda_rate_model');
@@ -320,7 +325,21 @@ class Step extends Authenticated_Controller
 
 		if ($agendas) {
 			foreach ($agendas as &$agenda) {
-				$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
+				$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')
+				->join('users u', 'u.user_id = agenda_members.user_id')
+				->where('agenda_id', $agenda->agenda_id)
+				->find_all();
+			}
+		}
+
+		$homeworks = $this->homework_model->where('step_id', $step_id)->find_all();
+
+		if ($homeworks) {
+			foreach ($homeworks as &$homework) {
+				$homework->members = $this->homework_member_model->select('avatar, email, last_name, first_name, CONCAT(first_name, " ", last_name) AS full_name')
+				->join('users u', 'u.user_id = homework_members.user_id')
+				->where('homework_id', $agenda->agenda_id)
+				->find_all();
 			}
 		}
 
@@ -339,6 +358,7 @@ class Step extends Authenticated_Controller
 		Template::set('point_used', $point_used);
 		Template::set('step', $step);
 		Template::set('agendas', $agendas);
+		Template::set('homeworks', $homeworks);
 		Template::set('project_key', $project_key);
 		Template::set('action_key', $action_key);
 		Template::set('step_key', $step_key);
@@ -385,7 +405,7 @@ class Step extends Authenticated_Controller
 											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
 									->join('users u', 'u.user_id = agendas.owner_id', 'left')
 									->where('step_id', $step->step_id)->find_all();
-		
+
 		// We can't start without agendas
 		if ($agendas === false) {
 			Template::set('message_type', 'warning');
@@ -399,6 +419,16 @@ class Step extends Authenticated_Controller
 			$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
 		}
 
+		$homeworks = $this->homework_model->where('step_id', $step_id)->find_all();
+
+		if ($homeworks) {
+			foreach ($homeworks as &$homework) {
+				$homework->members = $this->homework_member_model->select('avatar, email, last_name, first_name')
+				->join('users u', 'u.user_id = homework_members.user_id')
+				->where('homework_id', $agenda->agenda_id)
+				->find_all();
+			}
+		}
 
 		Assets::add_js($this->load->view('monitor_js', [
 			'step_key' => $step_key
@@ -406,6 +436,7 @@ class Step extends Authenticated_Controller
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
 		Template::set('agendas', $agendas);
+		Template::set('homeworks', $homeworks);
 		Template::set('step', $step);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::render();
@@ -1278,7 +1309,6 @@ class Step extends Authenticated_Controller
 		echo 1;
 		exit;
 	}
-
 
 	private function ajax_step_data($step_id)
 	{

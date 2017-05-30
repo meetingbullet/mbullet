@@ -97,7 +97,7 @@ $members = array_column($invited_members, 'user_id');
 				<h6><?php e(lang('st_detail'))?> </h6>
 			</div>
 			<div class="an-component-body">
-				<div class="an-helper-block step-detail">
+				<div class="an-helper-block step-detail readmore-container">
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_owner'))?></div>
 						<div class="col-xs-8 owner"><?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?></div>
@@ -144,7 +144,7 @@ $members = array_column($invited_members, 'user_id');
 				<h6><?php e(lang('st_notes_summary'))?></h6>
 			</div>
 			<div class="an-component-body">
-				<div class="an-helper-block">
+				<div class="an-helper-block readmore-container">
 					<div class="an-input-group step-notes">
 						<?php echo nl2br($step->notes) ?>
 					</div>
@@ -153,6 +153,7 @@ $members = array_column($invited_members, 'user_id');
 		</div> <!-- end .AN-SINGLE-COMPONENT  -->
 		<?php endif; ?>
 
+		<!-- Agendas -->
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_agendas'))?></h6>
@@ -191,9 +192,7 @@ $members = array_column($invited_members, 'user_id');
 									</td>
 									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
 									<td class='basis-10 agenda-status text-center'>
-										<?php if ( isset($agenda_status_labels[$agenda->confirm_status]) ): ?>
-										<span class="<?php e($agenda_status_labels[$agenda->confirm_status] . ' label-' . $agenda->confirm_status)?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
-										<?php endif; ?>
+										<span class="label label-bordered label-<?php e($agenda->confirm_status) ?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 									</td>
 									<?php endif ?>
 								</tr>
@@ -207,9 +206,57 @@ $members = array_column($invited_members, 'user_id');
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
-		</div>
+		</div> <!-- end AGENDAS -->
+
+		<!-- Homeworks -->
+		<div class="an-single-component with-shadow">
+			<div class="an-component-header">
+				<h6><?php e(lang('hw_homework'))?></h6>
+				</div>
+			<div id="homework-list" class="an-component-body">
+				<div class="an-helper-block">
+					<div class="an-scrollable-x">
+						<table class="table table-striped table-detail-homework">
+							<thead>
+								<tr>
+									<th><?php e(lang('hw_name'))?></th>
+									<th><?php e(lang('hw_description'))?></th>
+									<th><?php e(lang('hw_member'))?></th>
+									<th><?php e(lang('hw_time_spent'))?></th>
+									<th class="text-center"><?php e(lang('hw_status'))?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php if($homeworks): foreach ($homeworks as $homework) : ?>
+								<tr data-homework-id="<?php e($homework->homework_id) ?>">
+									<td class='basis-15'><?php e($homework->name) ?></td>
+									<td class='basis-20'><?php echo word_limiter($homework->description, 20)?></td>
+									<td class='basis-20'>
+										<?php if ($homework->members) {
+											foreach ($homework->members as $member) {
+												echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
+											}
+										} ?>
+									</td>
+									<td class='basis-20'><?php echo $homework->time_spent ?></td>
+									<td class='basis-10 homework-status text-center'>
+										<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('st_' . $homework->status))?></span>
+									</td>
+								</tr>
+								<?php endforeach; endif; ?>
+							</tbody>
+						</table>
+					</div>
+
+					<?php if ($step->status == 'open'): ?>
+					<button class="an-btn an-btn-primary mb-open-modal" data-modal-id="create-homework-modal" data-url="<?php echo site_url('homework/create/' . $step->step_key) ?>" ><?php echo '<i class="ion-android-add"></i> ' . lang('hw_add_homework')?></button>
+					<?php endif; ?>
+				</div> <!-- end .AN-HELPER-BLOCK -->
+			</div> <!-- end .AN-COMPONENT-BODY -->
+		</div> <!-- end Homeworks -->
 	</div>
 
+	<!-- Columns right -->
 	<div class="col-md-3">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
@@ -329,6 +376,7 @@ $members = array_column($invited_members, 'user_id');
 		</div>
 	</div>
 </div>
+
 <script type="text" id="agenda-row">
 	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="">
 		<td class="basis-10">{{:agenda_key}}</td>
@@ -340,6 +388,22 @@ $members = array_column($invited_members, 'user_id');
 			{{/for}}
 		</td>
 		<td class="basis-10 agenda-status text-center">
+			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
+		</td>
+	</tr>
+</script>
+
+<script type="text" id="homework-row">
+	<tr data-homework-id="{{:homework_id}}">
+		<td class='basis-15'>{{:name}}</td>
+		<td class='basis-20'>{{:description}}</td>
+		<td class='basis-20'>
+			{{for members}}
+				{{:html}}
+			{{/for}}
+		</td>
+		<td class='basis-20'>{{:time_spent}}</td>
+		<td class='basis-10 homework-status text-center'>
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
 	</tr>

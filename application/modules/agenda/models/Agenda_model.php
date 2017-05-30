@@ -6,7 +6,7 @@ class Agenda_model extends BF_Model
 	protected $key			= 'agenda_id';
 	protected $date_format	= 'datetime';
 
-	protected $log_user	= false;
+	protected $log_user	= true;
 	protected $set_created	= true;
 	protected $set_modified = true;
 	protected $soft_deletes	= false;

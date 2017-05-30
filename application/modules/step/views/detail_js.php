@@ -150,6 +150,12 @@ $(document).on("submit", '.form-ajax', (e) => {
 						$('#agenda-list tbody tr:last-child').effect("highlight", {}, 3000);
 					}
 
+					// Homework created
+					if ($(e.target).prop('id') == 'create-homework') {
+						$('#homework-list tbody').append($.templates('#homework-row').render(data.data));
+						$('#homework-list tbody tr:last-child').effect("highlight", {}, 3000);
+					}
+
 					// Step updated
 					if ($(e.target).prop('id') == 'form-update-step') {
 						// Gather form data

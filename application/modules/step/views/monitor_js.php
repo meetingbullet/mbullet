@@ -1,14 +1,3 @@
-<?php
-$agenda_status_labels = [
-	'open' => 'label label-default label-bordered',
-	'inprogress' => 'label label-warning label-bordered',
-	'resolved' => 'label label-success label-bordered',
-	'jumped' => 'label label-info label-bordered',
-	'skipped' => 'label label-success label-bordered',
-	'parking_lot' => 'label label-info label-bordered',
-];
-?>
-
 var status_lang = {
 	'open' : '<?php echo lang('st_open') ?>',
 	'inprogress' : '<?php echo lang('st_inprogress') ?>',
@@ -17,16 +6,6 @@ var status_lang = {
 	'skipped' : "<?php echo lang('st_skipped') ?>",
 	'parking_lot' : "<?php echo lang('st_parking_lot') ?>",
 };
-
-var status_label = {
-	'open' : '<?php echo $agenda_status_labels['open'] ?>',
-	'inprogress' : '<?php echo $agenda_status_labels['inprogress'] ?>',
-	'resolved' : '<?php echo $agenda_status_labels['resolved'] ?>',
-	'jumped' : '<?php echo $agenda_status_labels['jumped'] ?>',
-	'skipped' : "<?php echo $agenda_status_labels['skipped'] ?>",
-	'parking_lot' : "<?php echo $agenda_status_labels['parking_lot'] ?>",
-};
-
 
 var update_step_timer_interval,
 	update_agenda_timer_intervals = [];
@@ -323,9 +302,9 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
 			$(row).find('.btn-start-agenda').addClass('hidden');
-			$(row).find('.agenda-status').html('<span class="<?php e($agenda_status_labels['skipped'])?>"><?php e(lang('st_skipped'))?></span>');
+			$(row).find('.agenda-status').html('<span class="label label-bordered label-skipped"><?php e(lang('st_skipped'))?></span>');
 
-			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
+			if ($('.step-monitor .label-open, .step-monitor .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -355,7 +334,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
 			clearInterval(update_agenda_timer_intervals[agenda_id]);
-			$(row).find('.agenda-status').html('<span class="<?php e($agenda_status_labels['jumped'])?>"><?php e(lang('st_jumped'))?></span>');
+			$(row).find('.agenda-status').html('<span class="label label-bordered label-jumped"><?php e(lang('st_jumped'))?></span>');
 
 			$('.btn-start-agenda').each((i, item) => {
 				if ( $(item).parent().parent().find('input[name="time_assigned"]').val() ) {
@@ -392,7 +371,7 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 			$('#resolve-agenda').modal('hide');
 			$('.btn-start-agenda').prop('disabled', false);
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
-			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="<?php e($agenda_status_labels['resolved'])?>"><?php e(lang('st_resolved'))?></span>');
+			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-resolved"><?php e(lang('st_resolved'))?></span>');
 
 			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
@@ -423,12 +402,93 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 			$('#resolve-agenda').modal('hide');
 			$('.btn-start-agenda').prop('disabled', false);
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
-			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="<?php e($agenda_status_labels['parking_lot'])?>"><?php e(lang('st_parking_lot'))?></span>');
+			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-parking_lot"><?php e(lang('st_parking_lot'))?></span>');
 
 			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
+	});
+});
+
+// Editable homework when status is OPEN
+if ($('.step-monitor[data-status="open"]').length > 0
+	|| $('.step-monitor[data-status="ready"]').length > 0
+	|| $('.step-monitor[data-status="inprogress"]').length > 0
+	) {
+	homework_editable();
+}
+
+// Make this function reuse-able to apply after dynamic creating new Homework
+function homework_editable() {
+	$('.table-homework .description').editable({
+		// Disable display method for word_limiter functionality in success response
+		display: function(value, response) {
+			return false;
+		},
+
+		success: function(data) {
+			data = JSON.parse(data);
+
+			if (data.message_type == 'danger') {
+				$.notify({
+					message: data.message
+				}, {
+					type: data.message_type,
+					z_index: 1051
+				});
+
+				return;
+			}
+
+			$(this).data('value', data.value);
+			$(this).html(data.value);
+		}
+	});
+
+	$('.table-homework .time-spent').editable({
+		success: function(data, newValue) {
+			return {newValue: parseFloat(newValue)};
+		}
+	});
+}
+
+$(document).on('click.monitor', '.btn-update-homework-status', (e) => {
+	$.post("<?php echo site_url('homework/ajax_edit') ?>", {
+		pk: $(e.target).data('pk'),
+		name: 'status',
+		value: $(e.target).data('value'),
+	}, (data) => {
+		data = JSON.parse(data);
+
+		$.notify({
+			message: data.message
+		}, {
+			type: data.message_type,
+			z_index: 1051
+		});
+
+		if (data.message_type == 'success') {
+			var btn_status = $(e.target).parents('.btn-group').children('.btn-status');
+			var btn_status_caret = $(e.target).parents('.btn-group').children('.btn.dropdown-toggle');
+
+			$(btn_status).text( $(e.target).text() );
+			$(btn_status).prop('class', 'btn btn-status label-' + $(e.target).data('value'));
+			$(btn_status_caret).prop('class', 'btn dropdown-toggle label-' + $(e.target).data('value'));
+
+			$(e.target).parents('ul').find('.btn-update-homework-status').removeClass('hidden');
+			$(e.target).addClass('hidden');
+		}
+	}).fail((data) => {
+		data = JSON.parse(data.responseText);
+
+		$.notify({
+			message: data.message
+		}, {
+			type: data.message_type,
+			z_index: 1051
+		});
+		console.log(data);
 	});
 });
 
@@ -671,7 +731,7 @@ function update_monitor()
 					}
 				}
 
-				$('#agenda-' + item.agenda_id + ' .label').attr('class', status_label[item.status]);
+				$('#agenda-' + item.agenda_id + ' .label').attr('class', 'label label-bordered label-' + item.status);
 				$('#agenda-' + item.agenda_id + ' .label').text(status_lang[item.status]);
 			}
 		});

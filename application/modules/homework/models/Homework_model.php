@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Step_model extends BF_Model
+class Homework_model extends BF_Model
 {
-	protected $table_name	= 'steps';
-	protected $key			= 'step_id';
+	protected $table_name	= 'homework';
+	protected $key			= 'homework_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= true;
@@ -42,20 +42,25 @@ class Step_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	protected $validation_rules		= array(
+	public $validation_rules		= array(
 		array(
 			'field' => 'name',
-			'label' => 'lang:st_step_name',
+			'label' => 'lang:hw_name',
 			'rules' => 'trim|required|max_length[255]',
 		),
 		array(
-			'field' => 'owner_id',
-			'label' => 'lang:st_project_id',
-			'rules' => 'trim|numeric',
+			'field' => 'time_spent',
+			'label' => 'lang:hw_time_spent',
+			'rules' => 'trim|numeric|required',
+		),
+		array(
+			'field' => 'member',
+			'label' => 'lang:hw_member',
+			'rules' => 'trim|required',
 		)
 	);
 	protected $insert_validation_rules  = array();
-	protected $skip_validation	= false;
+	protected $skip_validation	= true;
 
 	/**
 	 * Constructor
@@ -66,35 +71,4 @@ class Step_model extends BF_Model
 	{
 		parent::__construct();
 	}
-
-	public function get_step_by_key($step_key, $organization_id, $select = '*', $with_owner = true)
-	{
-		$this->select($select);
-		if ($with_owner) {
-			$this->join('users u', 'u.user_id = steps.owner_id', 'left');
-		}
-
-		$step = $this->join('actions a', 'a.action_id = steps.action_id', 'inner')
-					->join('projects p', 'p.project_id = a.project_id', 'inner')
-					->where('p.organization_id', $organization_id)
-					->find_by('steps.step_key', $step_key);
-
-        if (! empty($step)) {
-            return $step;
-        }
-
-        return false;
-	}
-	
-    public function get_step_id($step_key, $organization_id)
-    {
-		$step = $this->get_step_by_key($step_key, $organization_id, 'steps.step_id');
-
-        if (! empty($step)) {
-            return $step->step_id;
-        }
-
-        return false;
-    }
-
 }

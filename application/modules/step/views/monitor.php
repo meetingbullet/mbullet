@@ -1,4 +1,5 @@
 <?php
+$is_homework_editable = $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress';
 $is_owner = $step->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
@@ -12,16 +13,8 @@ if ($step->scheduled_start_time) {
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
 
-$agenda_status_labels = [
-	'open' => 'label label-default label-bordered',
-	'inprogress' => 'label label-warning label-bordered',
-	'resolved' => 'label label-success label-bordered',
-	'jumped' => 'label label-info label-bordered',
-	'skipped' => 'label label-success label-bordered',
-	'parking_lot' => 'label label-info label-bordered',
-];
 ?>
-<div data-step-id="<?php e($step->step_id)?>" class="step-monitor" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
+<div data-step-id="<?php e($step->step_id)?>" class="step-monitor" data-status="<?php e($step->status) ?>" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
@@ -86,10 +79,9 @@ $agenda_status_labels = [
 		</div> <!-- end AN-BODY-TOPBAR -->
 	<?php echo form_close() ?>
 
-	<div id="step-joiner">
-		
-	</div>
+	<div id="step-joiner"></div>
 
+	<!-- Agenda -->
 	<div class="an-single-component with-shadow">
 		<div class="an-component-header">
 			<h6><?php e(lang('st_agendas'))?></h6>
@@ -110,9 +102,9 @@ $agenda_status_labels = [
 				<tbody>
 					<?php if($agendas): foreach ($agendas as $agenda) : ?>
 					<tr id='agenda-<?php e($agenda->agenda_id)?>' data-agenda-id='<?php e($agenda->agenda_id)?>' data-agenda-status='<?php e($agenda->status)?>'>
-						<td class=""><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
-						<td class=""><?php echo word_limiter($agenda->description, 24)?></td>
-						<td class="">
+						<td><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
+						<td><?php echo word_limiter($agenda->description, 24)?></td>
+						<td>
 							<?php if ($agenda->members) {
 								foreach ($agenda->members as $member) {
 									echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
@@ -153,12 +145,86 @@ $agenda_status_labels = [
 				</tbody>
 			</table>
 		</div> <!-- end .AN-COMPONENT-BODY -->
-	</div>
+	</div> <!-- end Agenda -->
+
+	<!-- homeowrk -->
+	<div class="an-single-component with-shadow">
+		<div class="an-component-header">
+			<h6><?php e(lang('hw_homework'))?></h6>
+			</div>
+		<div class="an-component-body an-helper-block">
+			<table class="table table-striped table-homework">
+				<thead>
+					<tr>
+						<th><?php e(lang('hw_name'))?></th>
+						<th><?php e(lang('hw_description'))?></th>
+						<th><?php e(lang('hw_member'))?></th>
+						<th><?php e(lang('hw_time_spent'))?></th>
+						<th><?php e(lang('hw_status'))?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if($homeworks): foreach ($homeworks as $homework) : ?>
+					<tr id='homework-<?php e($homework->homework_id)?>' data-homework-id='<?php e($homework->homework_id)?>' class='homework'>
+						<td class='name'><?php echo anchor(site_url('homework/' . $homework->homework_id), $homework->name, ['target' => '_blank'])?></td>
+						<td>
+							<a href='#' class='description'
+								data-type="textarea" 
+								data-name="description"
+								data-pk="<?php e($homework->homework_id) ?>" 
+								data-url="<?php echo site_url('homework/ajax_edit') ?>"
+								data-value="<?php e($homework->description) ?>"
+								data-emptytext="<?php e(lang('hw_no_description')) ?>"
+								data-emptyclass="text-muted"
+							><?php echo word_limiter($homework->description, 18)?></a>
+						</td>
+						<td>
+							<?php if ($homework->members) {
+								foreach ($homework->members as $member) {
+									echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
+								}
+							} ?>
+						</td>
+						<td>
+							<a href='#' class='time-spent'
+								data-type="text" 
+								data-tpl="<input type='number' step='0.01'>"
+								data-name="time_spent"
+								data-pk="<?php e($homework->homework_id) ?>" 
+								data-url="<?php echo site_url('homework/ajax_edit') ?>"
+								data-emptytext="<i class='ion-edit'></i>"
+								data-emptyclass="text-muted"
+							><?php e($homework->time_spent) ?></a>
+						<td class='status'>
+							<!-- Update homework status button -->
+							<div class="btn-group">
+								<button type="button" class="btn btn-status label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></button>
+
+								<?php if ($is_homework_editable): ?>
+								<button type="button" class="btn dropdown-toggle label-<?php e($homework->status)?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li><a href="#" class='btn-update-homework-status <?php e($homework->status == 'open' ? 'hidden' : '')?>' data-pk="<?php e($homework->homework_id) ?>" data-value="open"><?php e(lang('hw_open'))?></a></li>
+									<li><a href="#" class='btn-update-homework-status <?php e($homework->status == 'done' ? 'hidden' : '')?>' data-pk="<?php e($homework->homework_id) ?>" data-value="done"><?php e(lang('hw_done'))?></a></li>
+									<li><a href="#" class='btn-update-homework-status <?php e($homework->status == 'undone' ? 'hidden' : '')?>' data-pk="<?php e($homework->homework_id) ?>" data-value="undone"><?php e(lang('hw_undone'))?></a></li>
+								</ul>
+								<?php endif; ?>
+							</div>
+						</td>
+					</tr>
+					<?php endforeach; endif; ?>
+				</tbody>
+			</table>
+		</div> <!-- end .AN-COMPONENT-BODY -->
+	</div> <!-- end Homework -->
+	
 </div>
 
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('monitor_js', [
-		'step_key' => $step_key
+		'step_key' => $step_key,
+		'current_user' => $current_user
 	], true) . '</script>';
 }
 ?>

@@ -6,12 +6,18 @@ class Agenda extends Authenticated_Controller
 	{
 		parent::__construct();
 		$this->load->library('mb_project');
+
 		$this->lang->load('agenda');
+
 		$this->load->helper('mb_form');
-		$this->load->model('step/step_model');
-		$this->load->model('users/user_model');
+		$this->load->helper('text');
+
 		$this->load->model('agenda_model');
 		$this->load->model('agenda_member_model');
+
+		$this->load->model('step/step_model');
+		$this->load->model('users/user_model');
+		
 		$this->load->model('project/project_model');
 		$this->load->model('project/project_member_model');
 	}
@@ -123,6 +129,7 @@ class Agenda extends Authenticated_Controller
 		$data = $this->agenda_model->limit(1)->find($agenda_id);
 
 		if ($data) {
+			$data->description = word_limiter($data->description, 20);
 			$data->lang_status = lang('tk_' . $data->status);
 			$data->assignees = [];
 			$assignees = $this->agenda_member_model->select('avatar, email, CONCAT(first_name, " ", last_name) AS full_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda_id)->find_all();
