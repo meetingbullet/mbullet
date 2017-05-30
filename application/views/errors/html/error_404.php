@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	<body>
 		<div class="main-wrapper">
 			<div class="an-loader-container">
-				<img src="/themes/default/image/loader.png" alt="">
+				<img src="/themes/default/images/loader.png" alt="">
 			</div>
 			<div class="an-page-content">
 				<div class="an-flex-center-center">
