@@ -16,9 +16,10 @@ $(document).ready(function() {
 $(document).on('click.mb', '.mb-open-modal', (e) => {
 	e.preventDefault();
 	var modal_id = '#' + $(e.target).data('modal-id');
+	var dialog_class = $(e.target).data('modal-dialog-class') ? $(e.target).data('modal-dialog-class') : 'modal-lg';
 	var template = '\
 	<div class="modal fade" id="'+ $(e.target).data('modal-id') +'" tabindex="-1" role="dialog">\
-		<div class="modal-dialog modal-lg" role="document">\
+		<div class="modal-dialog '+ dialog_class +'" role="document">\
 			<div class="modal-content">\
 			</div>\
 		</div>\
@@ -32,8 +33,14 @@ $(document).on('click.mb', '.mb-open-modal', (e) => {
 		$(modal_id).modal({backdrop: "static"});
 	});
 
-	$(document).on('hide.bs.modal', modal_id, function () {
+	// Clean after modal is closed
+	$(document).on('hidden.bs.modal', modal_id, function () {
 		$(modal_id).remove();
+
+		// Fix modal-open class remove when there are open modals
+		if ($('.modal.in').length > 0) {
+			$('body').addClass('modal-open');
+		}
 	});
 });
 /*

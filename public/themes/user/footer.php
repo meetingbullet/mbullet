@@ -27,6 +27,7 @@
 	<script src="<?php echo Template::theme_url("js-plugins/sweetalert.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/bootstrap-switch.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/lc_switch.min.js"); ?>" type="text/javascript"></script>
+	<script src="<?php echo Template::theme_url("js/bootstrap-editable.min"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js/scripts.js"); ?>" type="text/javascript"></script>
     <script src="<?php echo Template::theme_url("js/main.js"); ?>" type="text/javascript"></script>
 </body>
