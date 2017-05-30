@@ -38,6 +38,10 @@
 	width: 100%;
 }
 
+.step-monitor .homework .status .btn-group {
+	margin: 0;
+}
+
 .topbar h2 {
 	margin-top: 0;
 }

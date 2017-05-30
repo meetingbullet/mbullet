@@ -151,9 +151,15 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 	<div class="an-single-component with-shadow">
 		<div class="an-component-header">
 			<h6><?php e(lang('hw_homework'))?></h6>
+
+			<div class="pull-right">
+				<button class="an-btn an-btn-primary mb-open-modal <?php e($step->status != 'open' ? 'hidden' : '') ?>" data-modal-id="create-homework-modal" data-url="<?php echo site_url('homework/create/' . $step->step_key) ?>" >
+					<?php echo '<i class="ion-android-add"></i> ' . lang('hw_add_homework')?>
+				</button>
+			</div>
 			</div>
 		<div class="an-component-body an-helper-block">
-			<table class="table table-striped table-homework">
+			<table class="table table-striped table-monitor-homework">
 				<thead>
 					<tr>
 						<th><?php e(lang('hw_name'))?></th>

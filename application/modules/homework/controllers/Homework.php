@@ -179,7 +179,7 @@ class Homework extends Authenticated_Controller
 	private function ajax_homework_data($homework_id)
 	{
 		if ($data = $this->homework_model->limit(1)->find($homework_id) ) {
-			$data->description = word_limiter($data->description, 20);
+			$data->short_description = word_limiter($data->description, 18);
 			$data->lang_status = lang('hw_' . $data->status);
 			$data->members = [];
 

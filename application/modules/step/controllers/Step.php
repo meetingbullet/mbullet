@@ -338,7 +338,7 @@ class Step extends Authenticated_Controller
 			foreach ($homeworks as &$homework) {
 				$homework->members = $this->homework_member_model->select('avatar, email, last_name, first_name, CONCAT(first_name, " ", last_name) AS full_name')
 				->join('users u', 'u.user_id = homework_members.user_id')
-				->where('homework_id', $agenda->agenda_id)
+				->where('homework_id', $homework->homework_id)
 				->find_all();
 			}
 		}
@@ -425,7 +425,7 @@ class Step extends Authenticated_Controller
 			foreach ($homeworks as &$homework) {
 				$homework->members = $this->homework_member_model->select('avatar, email, last_name, first_name')
 				->join('users u', 'u.user_id = homework_members.user_id')
-				->where('homework_id', $agenda->agenda_id)
+				->where('homework_id', $homework->homework_id)
 				->find_all();
 			}
 		}

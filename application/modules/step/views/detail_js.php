@@ -19,60 +19,6 @@ $('#edit-step').click((e) => {
 
 });
 
-// Open step monitor
-$('.open-step-monitor').click((e) => {
-	e.preventDefault();
-
-	// Adjust diff between server and client on counters
-	$(document).data('ajax-start-time', moment().unix());
-	
-	$('.modal-monitor .modal-content').html('');
-
-	$.get('<?php e(site_url('step/monitor/' . $step_key)) ?>', (data) => {
-		data = JSON.parse(data);
-
-		if (data.modal_content == '') {
-			$.notify({
-				message: data.message
-			}, {
-				type: data.message_type,
-				z_index: 1051
-			});
-			return;
-		}
-
-		$('.modal-monitor .modal-content').html(data.modal_content);
-		$('.modal-monitor').modal({backdrop: "static"});
-	});
-
-	if ($(this).hasClass('step-open')) {
-		$(this).removeClass('step-open');
-		$(this).find('span').text('<?php echo lang('st_monitor')?>')
-	}
-});
-
-// Open step decider
-$('#open-step-decider').click((e) => {
-	e.preventDefault();
-
-	$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
-		data = JSON.parse(data);
-
-		if (data.modal_content == '') {
-			$.notify({
-				message: data.message
-			}, {
-				type: data.message_type,
-				z_index: 1051
-			});
-			return;
-		}
-
-		$('#step-decider .modal-content').html(data.modal_content);
-		$('#step-decider').modal({backdrop: "static"});
-	});
-});
-
 $('#start-step').click((e) => {
 	e.preventDefault();
 	var _this = this;
@@ -154,6 +100,12 @@ $(document).on("submit", '.form-ajax', (e) => {
 					if ($(e.target).prop('id') == 'create-homework') {
 						$('#homework-list tbody').append($.templates('#homework-row').render(data.data));
 						$('#homework-list tbody tr:last-child').effect("highlight", {}, 3000);
+
+						if ($('.table-monitor-homework').length > 0) {
+							console.log(data.data, $.templates('#monitor-homework-row').render(data.data));
+							$('.table-monitor-homework tbody').append($('#monitor-homework-row').render(data.data));
+							$('.table-monitor-homework tbody tr:last-child').effect("highlight", {}, 3000);
+						}
 					}
 
 					// Step updated
@@ -214,8 +166,8 @@ $(document).on("submit", '.form-ajax', (e) => {
 					}
 				}
 			} else {
-				$('.modal.in .modal-content').html('');
-				$('.modal.in').modal('hide');
+				$('.modal.in:last .modal-content').html('');
+				$('.modal.in:last').modal('hide');
 			}
 		}
 	});

@@ -14,7 +14,7 @@ var update_step_timer_interval,
 var update_monitor_interval = setInterval(update_monitor, 3000);
 
 // Clear all updater 
-$('.modal-monitor').on('hidden.bs.modal', function () {
+$('#step-monitor-modal').on('hide.bs.modal', function () {
 	clearInterval(update_step_timer_interval);
 	clearInterval(update_monitor_interval);
 
@@ -421,7 +421,7 @@ if ($('.step-monitor[data-status="open"]').length > 0
 
 // Make this function reuse-able to apply after dynamic creating new Homework
 function homework_editable() {
-	$('.table-homework .description').editable({
+	$('.table-monitor-homework .description').editable({
 		// Disable display method for word_limiter functionality in success response
 		display: function(value, response) {
 			return false;
@@ -446,7 +446,7 @@ function homework_editable() {
 		}
 	});
 
-	$('.table-homework .time-spent').editable({
+	$('.table-monitor-homework .time-spent').editable({
 		success: function(data, newValue) {
 			return {newValue: parseFloat(newValue)};
 		}
