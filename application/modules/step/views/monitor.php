@@ -170,10 +170,14 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 					</tr>
 				</thead>
 				<tbody>
-					<?php if($homeworks): foreach ($homeworks as $homework) : ?>
-					<tr id='homework-<?php e($homework->homework_id)?>' data-homework-id='<?php e($homework->homework_id)?>' class='homework'>
+					<?php if($homeworks): foreach ($homeworks as $homework) : 
+						$can_edit = $current_user->user_id == $homework->created_by || in_array($current_user->user_id, array_column($homework->members, 'user_id'));
+					?>
+					<tr id='homework-<?php e($homework->homework_id)?>' 
+						data-homework-id='<?php e($homework->homework_id)?>'
+						class='homework <?php e($can_edit ? 'can-edit' : '') ?>'>
 						<td class='name'><?php echo anchor(site_url('homework/' . $homework->homework_id), $homework->name, ['target' => '_blank'])?></td>
-						<td>
+						<td class='description-container'>
 							<a href='#' class='description'
 								data-type="textarea" 
 								data-name="description"
@@ -191,7 +195,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 								}
 							} ?>
 						</td>
-						<td>
+						<td class='time-spent-container'>
 							<a href='#' class='time-spent'
 								data-type="text" 
 								data-tpl="<input type='number' step='0.01'>"
@@ -201,12 +205,12 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 								data-emptytext="<i class='ion-edit'></i>"
 								data-emptyclass="text-muted"
 							><?php e($homework->time_spent) ?></a>
-						<td class='status'>
+						<td class='status-container'>
 							<!-- Update homework status button -->
 							<div class="btn-group">
-								<button type="button" class="btn btn-status label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></button>
+								<button type="button" class="btn btn-status label-<?php e($homework->status)?>" data-status="<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></button>
 
-								<?php if ($is_homework_editable): ?>
+								<?php if ($is_homework_editable && $can_edit): ?>
 								<button type="button" class="btn dropdown-toggle label-<?php e($homework->status)?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									<span class="caret"></span>
 								</button>

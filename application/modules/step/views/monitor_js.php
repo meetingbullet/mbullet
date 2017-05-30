@@ -7,6 +7,12 @@ var status_lang = {
 	'parking_lot' : "<?php echo lang('st_parking_lot') ?>",
 };
 
+var homework_status_lang = {
+	'open' : '<?php echo lang('hw_open') ?>',
+	'done' : '<?php echo lang('hw_done') ?>',
+	'undone' : '<?php echo lang('hw_undone') ?>',
+};
+
 var update_step_timer_interval,
 	update_agenda_timer_intervals = [];
 
@@ -421,7 +427,7 @@ if ($('.step-monitor[data-status="open"]').length > 0
 
 // Make this function reuse-able to apply after dynamic creating new Homework
 function homework_editable() {
-	$('.table-monitor-homework .description').editable({
+	$('tr.homework.can-edit .description').editable({
 		// Disable display method for word_limiter functionality in success response
 		display: function(value, response) {
 			return false;
@@ -446,14 +452,14 @@ function homework_editable() {
 		}
 	});
 
-	$('.table-monitor-homework .time-spent').editable({
+	$('tr.homework.can-edit .time-spent').editable({
 		success: function(data, newValue) {
 			return {newValue: parseFloat(newValue)};
 		}
 	});
 }
 
-$(document).on('click.monitor', '.btn-update-homework-status', (e) => {
+$(document).on('click.monitor', 'tr.homework.can-edit .btn-update-homework-status', (e) => {
 	$.post("<?php echo site_url('homework/ajax_edit') ?>", {
 		pk: $(e.target).data('pk'),
 		name: 'status',
@@ -474,6 +480,7 @@ $(document).on('click.monitor', '.btn-update-homework-status', (e) => {
 
 			$(btn_status).text( $(e.target).text() );
 			$(btn_status).prop('class', 'btn btn-status label-' + $(e.target).data('value'));
+			$(btn_status).data('status', $(e.target).data('value'));
 			$(btn_status_caret).prop('class', 'btn dropdown-toggle label-' + $(e.target).data('value'));
 
 			$(e.target).parents('ul').find('.btn-update-homework-status').removeClass('hidden');
@@ -733,6 +740,35 @@ function update_monitor()
 
 				$('#agenda-' + item.agenda_id + ' .label').attr('class', 'label label-bordered label-' + item.status);
 				$('#agenda-' + item.agenda_id + ' .label').text(status_lang[item.status]);
+			}
+		});
+
+		// Real-time Homework data
+		$.each(data.homeworks, (index, item) => {
+			old_description = $('#homework-' + item.homework_id + ' .description').data('value');
+			old_status = $('#homework-' + item.homework_id + ' .btn-status').data('status');
+			old_time_spent = parseFloat( $('#homework-' + item.homework_id + ' .time-spent').text() );
+
+			if (item.description != old_description) {
+				$('#homework-' + item.homework_id + ' .description').editable('setValue', item.description);
+				$('#homework-' + item.homework_id + ' .description').removeClass('text-muted');
+				$('#homework-' + item.homework_id + ' .description').html(item.short_description);
+				$('#homework-' + item.homework_id + ' .description').data('value', item.description);
+				$('#homework-' + item.homework_id + ' .description-container').effect("highlight", {}, 3000);
+			}
+
+			if (item.status != old_status) {
+				$('#homework-' + item.homework_id + ' .btn-status').text(homework_status_lang[item.status]);
+				$('#homework-' + item.homework_id + ' .btn-status').data('status', item.status);
+				$('#homework-' + item.homework_id + ' .btn-status').prop('class', 'btn btn-status label-' + item.status);
+				$('#homework-' + item.homework_id + ' .btn-status + .btn').prop('class', 'btn dropdown-toggle label-' + item.status);
+				$('#homework-' + item.homework_id + ' .status-container').effect("highlight", {}, 3000);
+			}
+
+			if (item.time_spent != old_time_spent) {
+				$('#homework-' + item.homework_id + ' .time-spent').editable('setValue', item.time_spent);
+				$('#homework-' + item.homework_id + ' .time-spent').text(item.time_spent);
+				$('#homework-' + item.homework_id + ' .time-spent-container').effect("highlight", {}, 3000);
 			}
 		});
 	});

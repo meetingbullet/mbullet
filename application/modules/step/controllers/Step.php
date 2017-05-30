@@ -336,10 +336,12 @@ class Step extends Authenticated_Controller
 
 		if ($homeworks) {
 			foreach ($homeworks as &$homework) {
-				$homework->members = $this->homework_member_model->select('avatar, email, last_name, first_name, CONCAT(first_name, " ", last_name) AS full_name')
+				$homework->members = $this->homework_member_model->select('u.user_id, avatar, email, last_name, first_name, CONCAT(first_name, " ", last_name) AS full_name')
 				->join('users u', 'u.user_id = homework_members.user_id')
 				->where('homework_id', $homework->homework_id)
 				->find_all();
+
+				$homework->members = $homework->members ? $homework->members : [];
 			}
 		}
 
@@ -423,10 +425,12 @@ class Step extends Authenticated_Controller
 
 		if ($homeworks) {
 			foreach ($homeworks as &$homework) {
-				$homework->members = $this->homework_member_model->select('avatar, email, last_name, first_name')
+				$homework->members = $this->homework_member_model->select('u.user_id, avatar, email, last_name, first_name')
 				->join('users u', 'u.user_id = homework_members.user_id')
 				->where('homework_id', $homework->homework_id)
 				->find_all();
+
+				$homework->members = $homework->members ? $homework->members : [];
 			}
 		}
 
@@ -628,6 +632,16 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
+		
+		$homeworks = $this->homework_model->select('homework_id, description, status, time_spent')
+										->where('step_id', $step_id)
+										->find_all();
+		$homeworks = $homeworks ? $homeworks : [];
+
+		foreach ($homeworks as &$hw) {
+			$hw->short_description = word_limiter($hw->description, 18);
+		}
+
 		$current_time = gmdate('Y-m-d H:i:s');
 
 		// Real-time joiner
@@ -640,11 +654,10 @@ class Step extends Authenticated_Controller
 													->order_by('u.user_id')
 													->find_all();
 
-
-
 		echo json_encode([
 			'message_type' => 'success',
 			'agendas' => $agendas,
+			'homeworks' => $homeworks ? $homeworks : [],
 			'step' => $this->step_model->select('status')->limit(1)->find($step_id),
 			'online_members' => $online_members ? $online_members : [],
 			'current_time' => $current_time,
