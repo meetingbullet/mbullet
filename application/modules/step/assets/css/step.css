@@ -142,6 +142,7 @@
 /****** Style Star Rating Widget *****/
 .rating {
 	float:left;
+	display: table-cell;
 }
 
 .rating > input {
@@ -149,8 +150,8 @@
 }
 
 .rating > label:before {
-	margin-top: 2px;
-	padding:0px 5px 0px 5px;
+	margin-top: 0px;
+	padding:0px 0px 0px 0px;
 	font-size: 1.25em;
 	font-family: 'Ionicons';
 	display: inline-block;
@@ -168,9 +169,8 @@
 
 .rating > label {
 	float: right;
-	margin:4px 1px 0px 0px;
+	margin: 0px 1px 0px 0px;
 	color:#D8D8D8;
-	height:25px;
 }
 
 /***** CSS Magic to Highlight Stars on Hover *****/
