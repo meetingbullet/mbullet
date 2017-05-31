@@ -5,7 +5,7 @@ Assets::add_js('bootstrap.min.js');
 $inline  = '$(".dropdown-toggle").dropdown();';
 $inline .= '$(".tooltips").tooltip();';
 Assets::add_js($inline, 'inline');
-Assets::add_css(['bootstrap-editable.css', 'fullcalendar.min.css', 'fullcalendar.print.min.css', 'animate.min.css', 'vendor-styles.css', 'styles.css']);
+Assets::add_css(['bootstrap-editable.css', 'fullcalendar.min.css', 'animate.min.css', 'vendor-styles.css', 'styles.css']);
 
 ?>
 <!doctype html>

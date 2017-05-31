@@ -96,11 +96,21 @@ $project_status_labels = [
 		</div>
 	</div>
 	<!-- end my projects -->
-	<!-- calendar -->
+
+	<!-- Calendar -->
 	<div class="col-md-5 col-xs-12">
+		<h1 class="db-h1">
+			<span class="an-settings-button">
+				<?php echo lang('db_meetings') ?>&nbsp
+				<a href="#" id="create_meeting" class="setting hidden"><i class="ion-plus"></i></a>
+			</span>
+		</h1>
 		
+		<div class="calendar-container">
+			<div id="meeting-calendar"></div>
+		</div>
 	</div>
-	<!-- end calendar -->
+	<!-- end Calendar -->
 </div>
 
 

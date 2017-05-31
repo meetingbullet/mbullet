@@ -113,7 +113,21 @@ class Dashboard extends Authenticated_Controller
 
 		$user->total_point_used = $this->mb_project->total_point_used('user', $this->current_user->user_id);
 
-		Assets::add_js($this->load->view('index_js', ['now' => gmdate('Y-m-d H:i:s')], true), 'inline');
+		// Meeting Calendar
+		$meeting_calendar = $this->step_model->select('CONCAT(step_key, " ", name) AS title, scheduled_start_time AS start, CONCAT("'. site_url('step/') .'", step_key) AS url')
+						->join('step_members sm', 'sm.step_id = steps.step_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
+						->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
+						->where('status', 'ready')
+						->where('scheduled_start_time IS NOT NULL', null, false)
+						->order_by('scheduled_start_time')
+						->group_by('step_key')
+						->find_all();
+
+		Assets::add_js($this->load->view('index_js', [
+			'now' => gmdate('Y-m-d H:i:s'),
+			'meeting_calendar' => $meeting_calendar ? $meeting_calendar : []
+		], true), 'inline');
+
 		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
 		Template::set('my_steps', array_merge($my_steps, $member_steps));
 		Template::set('current_user', $this->current_user);

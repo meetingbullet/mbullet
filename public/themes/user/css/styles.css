@@ -4978,27 +4978,16 @@ input[type="button"].btn-block {
     padding: 20px;
 }
 
-.fc .fc-button-group>* {
-    margin: 0;
-}
-
-.fc .fc-button-group .fc-state-default {
-    background: transparent;
-    box-shadow: none;
-    border: 0;
-    outline: 0;
-}
-
-.fc .fc-button-group .fc-state-default:hover {
-    color: #025d83;
-}
-
-.fc .fc-button-group .fc-state-default.fc-state-active {
-    color: #025d83;
+.fc .fc-day-header {
+    font-weight: normal;
 }
 
 .fc .fc-center h2 {
-    font-size: 18px;
+    font-size: 20px;
+}
+
+.fc .fc-left h2 {
+    font-size: 20px;
 }
 
 .fc .fc-event,
