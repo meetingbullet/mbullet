@@ -78,7 +78,7 @@ $project_status_labels = [
 	</div> <!-- end Welcome Professor -->
 
 	<!-- my projects -->
-	<div class="col-md-6 col-xs-12">
+	<div class="col-md-4 col-xs-12">
 		<h1 class="db-h1">
 			<span class="an-settings-button">
 				<?php echo lang('db_my_projects') ?>&nbsp
@@ -97,7 +97,7 @@ $project_status_labels = [
 	</div>
 	<!-- end my projects -->
 	<!-- calendar -->
-	<div class="col-md-3 col-xs-12">
+	<div class="col-md-5 col-xs-12">
 		
 	</div>
 	<!-- end calendar -->
