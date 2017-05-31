@@ -4,7 +4,7 @@ $(document).off('.decider');
 $(document).on('submit.decider', '.form-step-decider', (e) => {
 	// Validation
 	var is_valid = true;
-	$('.confirmation-status').each((i, item) => {
+	$('.form-step-decider .confirmation-status').each((i, item) => {
 		if ($(item).val() === null) {
 			$(item).addClass('danger');
 			is_valid = false;
@@ -36,7 +36,7 @@ $(document).on('submit.decider', '.form-step-decider', (e) => {
 		}
 
 		if (data.message_type == 'success') {
-			$('#step-decider').modal('hide');
+			$('#step-decider-modal').modal('hide');
 
 			/* 
 				If one of the agendas is marked as Closed Parking Lot the step owner is redirected to 

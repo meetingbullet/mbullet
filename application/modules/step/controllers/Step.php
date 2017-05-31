@@ -572,13 +572,12 @@ class Step extends Authenticated_Controller
 		}
 
 		if ($this->agenda_model->update_batch($agenda_data, 'agenda_key') ) {
+			$notes = $this->input->post('note') ? $this->input->post('note') : null;
 
-			if ($this->input->post('note')) {
-				$this->step_model->skip_validation(TRUE)->update($step_id, [
-					'manage_state' => 'evaluate',
-					'notes' => $this->input->post('note')
-				]);
-			}
+			$this->step_model->skip_validation(TRUE)->update($step_id, [
+				'manage_state' => 'evaluate',
+				'notes' => $notes
+			]);
 
 			echo json_encode([
 				'message_type' => 'success',
