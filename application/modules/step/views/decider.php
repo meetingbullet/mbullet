@@ -41,15 +41,6 @@ $confirmation_status = [
 	'closed', 'skipped', 'resolved', 'open_parking_lot', 'closed_parking_lot'
 ];
 
-$cost_of_time_to_badge = [
-	'', // Skip cost_of_time_to_badge[0]
-	'default',	// XS
-	'info',	// S
-	'success',		// M
-	'primary',	// L
-	'warning',	// XL
-];
-
 ?>
 <div class="step-decider" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
@@ -125,7 +116,7 @@ $cost_of_time_to_badge = [
 							<li>
 								<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
 
-								<span class="badge badge-<?php e($cost_of_time_to_badge[$user['cost_of_time']])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
+								<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
 							</li>
 							<?php } ?>
 						</ul>
@@ -156,7 +147,7 @@ $cost_of_time_to_badge = [
 							<td><?php echo display_time($agenda->started_on) ?></td>
 							<td><?php echo timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) ?></td>
 							<td>
-								<span class="<?php e($agenda_status_labels[$agenda->status])?>">
+								<span class="label label-bordered label-<?php e($agenda->status)?>">
 									<?php e(lang('st_' . $agenda->status))?>
 								</span>
 							</td>

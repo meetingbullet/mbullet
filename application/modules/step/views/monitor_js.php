@@ -35,7 +35,7 @@ if ($('.step-monitor .label-inprogress').length) {
 	$('.btn-finish').prop('disabled', true);
 }
 
-if ($('.step-monitor .label-inprogress').length == 0 && $('.step-monitor .label-open').length == 0) {
+if ($('.step-monitor .table-agenda .label-inprogress').length == 0 && $('.step-monitor .table-agenda .label-open').length == 0) {
 	$('.btn-finish').prop('disabled', false);
 }
 
@@ -120,7 +120,7 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 			// $('.btn-start-step').prop('disabled', false);
 			$('#datetimepicker1').removeClass('danger');
 
-			$('.modal-monitor').modal('hide');
+			$('#step-monitor-modal').modal('hide');
 			setTimeout(() => {
 				location.reload();
 			}, 600);
@@ -204,7 +204,7 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			$('.modal-monitor').modal('hide');
+			$('#step-monitor-modal').modal('hide');
 
 			// Open step decider if is owner
 			if ($('.step-monitor').data('is-owner') == '1') {
@@ -310,7 +310,7 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 			$(row).find('.btn-start-agenda').addClass('hidden');
 			$(row).find('.agenda-status').html('<span class="label label-bordered label-skipped"><?php e(lang('st_skipped'))?></span>');
 
-			if ($('.step-monitor .label-open, .step-monitor .label-inprogress').length == 0) {
+			if ($('.step-monitor .table-agenda .label-open, .step-monitor .table-agenda .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -348,7 +348,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 				}
 			});
 
-			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
+			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -379,7 +379,7 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
 			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-resolved"><?php e(lang('st_resolved'))?></span>');
 
-			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
+			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -410,7 +410,7 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
 			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-parking_lot"><?php e(lang('st_parking_lot'))?></span>');
 
-			if ($('.step-monitor .label-open,.step-monitor  .label-inprogress').length == 0) {
+			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
 				$('.btn-finish').prop('disabled', false);
 			}
 		}
@@ -638,7 +638,7 @@ function update_monitor()
 				type: 'success',
 				z_index: 1051
 			});
-			$('.modal-monitor').modal('hide');
+			$('#step-monitor-modal').modal('hide');
 
 			// Open step decider if is owner
 			if ($('.step-monitor').data('is-owner') == '1') {
@@ -678,8 +678,8 @@ function update_monitor()
 
 							$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
 								data = JSON.parse(data);
-								$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
-								$('.modal-monitor-evaluator').modal({
+								$('#step-monitor-modal-evaluator .modal-content').html(data.modal_content);
+								$('#step-monitor-modal-evaluator').modal({
 									backdrop: 'static'
 								});
 							});

@@ -96,7 +96,7 @@ $members = array_column($invited_members, 'user_id');
 
 	<?php if ($step->manage_state == 'decide' && $is_owner): ?>
 
-	<a href='#' id="open-step-decider" class='an-btn an-btn-primary'
+	<a href='#' class='an-btn an-btn-primary mb-open-modal'
 		data-modal-id="step-decider-modal"
 		data-url="<?php e(site_url('step/decider/' . $step_key)) ?>" 
 		data-modal-dialog-class="modal-80"
