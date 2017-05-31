@@ -86,11 +86,13 @@ $project_status_labels = [
 			</span>
 		</h1>
 		<div class="project-list">
-		<?php //if (! empty($project)) : ?>
+		<?php if (! empty($projects)) : ?>
+			<?php foreach ($projects as $project) : ?>
 			<div class="item">
-
+				<?php dump($project) ?>
 			</div>
-		<?php //endif ?>
+			<?php endforeach ?>
+		<?php endif ?>
 		</div>
 	</div>
 	<!-- end my projects -->
