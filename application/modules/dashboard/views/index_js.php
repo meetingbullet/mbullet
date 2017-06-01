@@ -67,3 +67,19 @@ $('.step-timer.ready').each((i, item) => {
 		$(item).text('');
 	}
 });
+
+// Calendar
+$('#meeting-calendar').fullCalendar({
+	header: {
+		center: 'prev, today, next ',
+		left: 'title',
+		right: 'month,agendaWeek,agendaDay,listWeek'
+	},
+	
+	navLinks: true,
+	firstDay: 1, // Monday
+	aspectRatio: 1, // content Width-to-Height
+	editable: false,
+	eventLimit: true, // allow "more" link when too many events
+	events: <?php echo json_encode($meeting_calendar) ?>
+});
