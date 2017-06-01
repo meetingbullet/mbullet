@@ -13,3 +13,12 @@ $lang['db_has_the_ball'] = 'has the ball';
 $lang['db_project_pts'] = 'Project PTS';
 $lang['db_meetings'] = 'Meetings';
 $lang['db_my_todo'] = 'My To Do';
+$lang['db_homework'] = 'Homework';
+$lang['db_evaluate'] = 'Evaluate';
+$lang['db_decide'] = 'Decide';
+$lang['db_resolved'] = 'Resolved';
+$lang['db_open_parking_lot'] = 'Open Parking Lot';
+$lang['db_closed_parking_lot'] = 'Closed parking lot';
+$lang['db_skipped'] = 'Skipped';
+$lang['db_closed'] = 'Closed';
+

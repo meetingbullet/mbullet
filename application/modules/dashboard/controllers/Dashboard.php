@@ -14,6 +14,8 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('homework/homework_member_model');
 		$this->load->model('meeting/meeting_model');
 		$this->load->model('meeting/meeting_member_model');
+		$this->load->model('agenda/agenda_model');
+		$this->load->model('agenda/agenda_member_model');
 		$this->load->helper('date');
 
 		Assets::add_module_js('dashboard', 'dashboard.js');
@@ -128,6 +130,7 @@ class Dashboard extends Authenticated_Controller
 		], true), 'inline');
 
 		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
+		Template::set('my_todo', $my_todo && count($my_todo) > 0 ? $my_todo : []);
 		Template::set('my_meetings', array_merge($my_meetings, $member_meetings));
 		Template::set('current_user', $this->current_user);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
@@ -221,7 +224,8 @@ class Dashboard extends Authenticated_Controller
 
 	private function get_my_todo()
 	{
-		$homeworks = $this->homework_model->select('homework.*')
+
+		$homeworks = $this->homework_model->select('homework.*, "homework" as todo_type')
 										->join('meetings s', 's.meeting_id = homework.meeting_id')
 										->join('actions a', 'a.action_id = s.action_id')
 										->join('projects p', 'p.project_id = a.project_id')
@@ -234,31 +238,31 @@ class Dashboard extends Authenticated_Controller
 		if (empty($homeworks)) {
 			$homeworks = [];
 		}
-		$evaluates = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
-								->join('users u', 'u.user_id = meetings.owner_id')
+		$evaluates = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "evaluate" as todo_type')
 								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
+								->join('agendas ag', 'ag.meeting_id = meetings.meeting_id', 'LEFT')
 								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
 								->where('(sm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
 								->where('organization_id', $this->current_user->current_organization_id)
 								->where('meetings.manage_state = \'evaluate\'')
-								->group_by('meetings.meeting_id')
 								->find_all();
 		if (empty($evaluates)) {
 			$evaluates = [];
 		}
-		$decides = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
-								->join('users u', 'u.user_id = meetings.owner_id')
+		$decides = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "decide" as todo_type')
 								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
+								->join('agendas ag', 'ag.meeting_id = meetings.meeting_id', 'LEFT')
 								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
 								->where('meetings.owner_id', $this->current_user->user_id)
 								->where('organization_id', $this->current_user->current_organization_id)
 								->where('meetings.manage_state = \'decide\'')
-								->group_by('meetings.meeting_id')
 								->find_all();
 		if (empty($decides)) {
 			$decides = [];
 		}
+
+		return array_merge($homeworks, $evaluates, $decides);
 	}
 }
