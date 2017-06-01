@@ -34,13 +34,13 @@
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_min'))?></span></div>
-												<input type="number" name="constraints[min_hour]" class="an-form-control<?php e(iif( form_error('constraints[min_hour]') , ' danger')) ?>" value="<?php e(set_value('constraints[min_hour]')) ?>" step="0.1"/>
+												<input type="number" name="constraints[min_hour]" class="an-form-control<?php e(iif( form_error('constraints[min_hour]') , ' danger')) ?>" value="<?php e(set_value('constraints[min_hour]')) ?>" meeting="0.1"/>
 											</div>
 										</div>
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_max'))?></span></div>
-												<input type="number" name="constraints[max_hour]" class="an-form-control<?php e(iif( form_error('constraints[max_hour]') , ' danger')) ?>" value="<?php e(set_value('constraints[max_hour]')) ?>" step="0.1"/>
+												<input type="number" name="constraints[max_hour]" class="an-form-control<?php e(iif( form_error('constraints[max_hour]') , ' danger')) ?>" value="<?php e(set_value('constraints[max_hour]')) ?>" meeting="0.1"/>
 											</div>
 										</div>
 									</div>
@@ -52,7 +52,7 @@
 							<?php echo mb_form_input('number', 'constraints[total_point_project]', lang('pj_total_point_project'), true) ?>
 							<?php echo mb_form_input('number', 'constraints[total_point_action]', lang('pj_total_point_action'), true) ?>
 							<?php echo mb_form_input('number', 'constraints[total_point_resource]', lang('pj_total_point_resource'), true) ?>
-							<?php echo mb_form_input('number', 'constraints[min_value_cost_ratio_per_step]', lang('pj_min_value_cost_ratio_per_step'), true) ?>
+							<?php echo mb_form_input('number', 'constraints[min_value_cost_ratio_per_meeting]', lang('pj_min_value_cost_ratio_per_meeting'), true) ?>
 							<?php echo mb_form_input('number', 'constraints[max_time_action]', lang('pj_max_time_action'), true) ?>
 
 							<div class="row">
@@ -86,13 +86,13 @@
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_min'))?></span></div>
-												<input type="number" name="constraints[min_period]" class="an-form-control<?php e(iif( form_error('constraints[min_period]') , ' danger')) ?>" value="<?php e(set_value('constraints[min_period]')) ?>" step="0.1"/>
+												<input type="number" name="constraints[min_period]" class="an-form-control<?php e(iif( form_error('constraints[min_period]') , ' danger')) ?>" value="<?php e(set_value('constraints[min_period]')) ?>" meeting="0.1"/>
 											</div>
 										</div>
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_max'))?></span></div>
-												<input type="number" name="constraints[max_period]" class="an-form-control<?php e(iif( form_error('constraints[max_period]') , ' danger')) ?>" value="<?php e(set_value('constraints[max_period]')) ?>" step="0.1"/>
+												<input type="number" name="constraints[max_period]" class="an-form-control<?php e(iif( form_error('constraints[max_period]') , ' danger')) ?>" value="<?php e(set_value('constraints[max_period]')) ?>" meeting="0.1"/>
 											</div>
 										</div>
 										<div class="col-md-3">
@@ -126,13 +126,13 @@
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_min'))?></span></div>
-												<input type="number" name="expectations[min_hour]" class="an-form-control<?php e(iif( form_error('expectations[min_hour]') , ' danger')) ?>" value="<?php e(set_value('expectations[min_hour]')) ?>" step="0.1"/>
+												<input type="number" name="expectations[min_hour]" class="an-form-control<?php e(iif( form_error('expectations[min_hour]') , ' danger')) ?>" value="<?php e(set_value('expectations[min_hour]')) ?>" meeting="0.1"/>
 											</div>
 										</div>
 										<div class="col-md-3">
 											<div class="an-input-group">
 												<div class="an-input-group-addon"><span><?php e(lang('pj_max'))?></span></div>
-												<input type="number" name="expectations[max_hour]" class="an-form-control<?php e(iif( form_error('expectations[max_hour]') , ' danger')) ?>" value="<?php e(set_value('expectations[max_hour]')) ?>" step="0.1"/>
+												<input type="number" name="expectations[max_hour]" class="an-form-control<?php e(iif( form_error('expectations[max_hour]') , ' danger')) ?>" value="<?php e(set_value('expectations[max_hour]')) ?>" meeting="0.1"/>
 											</div>
 										</div>
 									</div>
@@ -162,7 +162,7 @@
 								<div class="col-md-9 col-sm-12">
 									<div class="row">
 										<div class="col-md-3">
-											<input type="number" name="expectations[outcomes_per_period]" class="an-form-control<?php e(iif( form_error('expectations[outcomes_per_period]') , ' danger')) ?>" value="<?php e(set_value('expectations[outcomes_per_period]')) ?>" step="0.1">
+											<input type="number" name="expectations[outcomes_per_period]" class="an-form-control<?php e(iif( form_error('expectations[outcomes_per_period]') , ' danger')) ?>" value="<?php e(set_value('expectations[outcomes_per_period]')) ?>" meeting="0.1">
 										</div>
 
 										<div class="col-md-3">

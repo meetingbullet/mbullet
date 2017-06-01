@@ -10,7 +10,7 @@
 	margin-bottom: 30px;
 }
 
-.step-detail {
+.meeting-detail {
 	line-height: 30px;
 }
 
@@ -30,7 +30,7 @@
 	margin-bottom: 0;
 }
 
-.step-monitor .topbar {
+.meeting-monitor .topbar {
 	align-items: flex-start;
 	position: relative;
 	display: flex;
@@ -38,7 +38,7 @@
 	width: 100%;
 }
 
-.step-monitor .homework .status .btn-group {
+.meeting-monitor .homework .status .btn-group {
 	margin: 0;
 }
 
@@ -46,28 +46,28 @@
 	margin-top: 0;
 }
 
-#step-joiner {
+#meeting-joiner {
 	position: relative;
 	min-height: 30px;
 	margin: 0 15px 10px 15px;
 }
 
-#step-joiner .avatar {
+#meeting-joiner .avatar {
 	margin-left: 0;
 }
 
-#step-joiner .ui-effects-placeholder {
+#meeting-joiner .ui-effects-placeholder {
 	display: none !important;
 }
 
-#step-joiner .avatar {
+#meeting-joiner .avatar {
 	width: 30px;
 	height: 30px;
 }
 
-.step-time-schedule .an-btn-danger-transparent:hover,
-.step-time-schedule .an-btn-danger-transparent:focus,
-.step-time-schedule .an-btn-danger-transparent:active {
+.meeting-time-schedule .an-btn-danger-transparent:hover,
+.meeting-time-schedule .an-btn-danger-transparent:focus,
+.meeting-time-schedule .an-btn-danger-transparent:active {
 	background-color: initial;
 	color: #eb547c;
 }
@@ -95,7 +95,7 @@
 	border-right: none !important;
 }
 
-.step-action {
+.meeting-action {
 	display: inline-block;
 	margin-bottom: 20px;
 	vertical-align: middle;
@@ -105,7 +105,7 @@
 	width: auto;
 }
 
-.step-action > button {
+.meeting-action > button {
 	height: 36px;
 }
 
@@ -122,7 +122,7 @@
 	white-space: nowrap;
 }
 
-.step-goal-container {
+.meeting-goal-container {
 	position: relative;
 }
 
@@ -193,7 +193,7 @@
 	cursor:pointer;
 }
 
-.decider-step-container .an-component-header + .an-component-body{
+.decider-meeting-container .an-component-header + .an-component-body{
 	max-height: 150px;
 	overflow: auto;
 }
@@ -208,24 +208,24 @@
 	margin-bottom: 0;
 }
 
-.btn-close-out-step {
+.btn-close-out-meeting {
 	vertical-align: bottom;
 	margin-bottom: 6px;
 }
 
-.form-step-decider {
+.form-meeting-decider {
 	max-height: 800px;
 	overflow: auto;
 }
 
-.table-step-time {
+.table-meeting-time {
 	margin-bottom: 0;
 }
 
-.goal, .step-notes, .notes-container {
+.goal, .meeting-notes, .notes-container {
 	overflow: hidden;
 }
 
-.step-goal-container, .step-notes-container {
+.meeting-goal-container, .meeting-notes-container {
 	position: relative;
 }

@@ -41,7 +41,7 @@ $action_types = [
 		<div class="col-md-9 col-sm-12">
 			<div class="row">
 				<div class="col-md-3">
-					<input type="number" name="point_value" id="point_value" class="an-form-control<?php e(iif( form_error('point_value') , ' danger')) ?>" value="<?php e(set_value('point_value', ! empty($action->point_value) ? $action->point_value : 0)) ?>" step="0.1">
+					<input type="number" name="point_value" id="point_value" class="an-form-control<?php e(iif( form_error('point_value') , ' danger')) ?>" value="<?php e(set_value('point_value', ! empty($action->point_value) ? $action->point_value : 0)) ?>" meeting="0.1">
 				</div>
 			</div>
 		</div>

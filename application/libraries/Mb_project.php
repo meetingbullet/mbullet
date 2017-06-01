@@ -10,7 +10,7 @@ class Mb_project
 	}
 
 	/**
-	 * Get next key for Project, Action, Step, Agenda
+	 * Get next key for Project, Action, Meeting, Agenda
 	 *
 	 * @param string $parent_key
 	 * @param string $table Table name (not include prefix)
@@ -29,13 +29,13 @@ class Mb_project
 			}
 
 			if (count($keys) == 2) {
-				$table = 'steps';
+				$table = 'meetings';
 			}
 
 			if (count($keys) == 3) {
 				$table = 'agendas';
 			}
-		} elseif ($table != 'actions' && $table != 'steps' && $table != 'agendas') {
+		} elseif ($table != 'actions' && $table != 'meetings' && $table != 'agendas') {
 			return false;
 		}
 
@@ -54,7 +54,7 @@ class Mb_project
 	/**
 	 * Get object ID from object key (Organization checked)
 	 *
-	 * @param string $object_type One of following values: project, action, step, agenda
+	 * @param string $object_type One of following values: project, action, meeting, agenda
 	 * @param string $object_key
 	 * @param int $organization_id If this value is NULL, it will get current organization ID
 	 * @return int if found, otherwise return false
@@ -75,13 +75,13 @@ class Mb_project
 				if ($query->num_rows() > 0) return $query->row()->action_id;
 				else return false;
 				break;
-			case 'step':
-				$query = $this->ci->db->select('s.step_id')->from('steps s')->join('actions a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('s.step_key', $object_key)->where('p.organization_id', $organization_id)->get();
-				if ($query->num_rows() > 0) return $query->row()->step_id;
+			case 'meeting':
+				$query = $this->ci->db->select('s.meeting_id')->from('meetings s')->join('actions a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('s.meeting_key', $object_key)->where('p.organization_id', $organization_id)->get();
+				if ($query->num_rows() > 0) return $query->row()->meeting_id;
 				else return false;
 				break;
 			case 'agenda':
-				$query = $this->ci->db->select('t.agenda_id')->from('agendas t')->join('steps s', 's.step_id = t.step_id')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.agenda_key', $object_key)->where('p.organization_id', $organization_id)->get();
+				$query = $this->ci->db->select('t.agenda_id')->from('agendas t')->join('meetings s', 's.meeting_id = t.meeting_id')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.agenda_key', $object_key)->where('p.organization_id', $organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->agenda_id;
 				else return false;
 				break;
@@ -93,7 +93,7 @@ class Mb_project
 	/**
 	 * Check user has permission or not
 	 *
-	 * @param string $object_type One of following values: project, action, step, agenda
+	 * @param string $object_type One of following values: project, action, meeting, agenda
 	 * @param int $object_id
 	 * @param string $permission_name
 	 * @return boolean
@@ -113,13 +113,13 @@ class Mb_project
 					if ($query->num_rows() > 0) $project_id = $query->row()->project_id;
 					else return false;
 					break;
-				case 'step':
-					$query = $this->ci->db->select('a.project_id')->from('actions a')->join('steps s', 'a.action_id = s.action_id')->where('s.step_id', $object_id)->get();
+				case 'meeting':
+					$query = $this->ci->db->select('a.project_id')->from('actions a')->join('meetings s', 'a.action_id = s.action_id')->where('s.meeting_id', $object_id)->get();
 					if ($query->num_rows() > 0) $project_id = $query->row()->project_id;
 					else return false;
 					break;
 				case 'agenda':
-					$query = $this->ci->db->select('a.project_id')->from('actions a')->join('steps s', 'a.action_id = s.action_id')->join('agendas t', 't.step_id = s.step_id')->where('t.agenda_id', $object_id)->get();
+					$query = $this->ci->db->select('a.project_id')->from('actions a')->join('meetings s', 'a.action_id = s.action_id')->join('agendas t', 't.meeting_id = s.meeting_id')->where('t.agenda_id', $object_id)->get();
 					if ($query->num_rows() > 0) $project_id = $query->row()->project_id;
 					else return false;
 					break;
@@ -145,7 +145,7 @@ class Mb_project
 	/**
 	 * Calculate total point used of an object
 	 *
-	 * @param string $object_type One of following values: project, action, step, agenda
+	 * @param string $object_type One of following values: project, action, meeting, agenda
 	 * @param int $object_id
 	 * @param int $organization_id If this value is NULL, it will get current organization ID
 	 * @return double
@@ -167,16 +167,16 @@ class Mb_project
 				$query = $query->where('t.agenda_id', $object_id)->get();
 				if ($query->num_rows() > 0) return doubleval($query->row()->total);
 				break;
-			case 'step':
-				$query = $query->where('t.step_id', $object_id)->get();
+			case 'meeting':
+				$query = $query->where('t.meeting_id', $object_id)->get();
 				if ($query->num_rows() > 0) return doubleval($query->row()->total);
 				break;
 			case 'action':
-				$query = $query->join('steps s', 's.step_id = t.step_id')->where('s.action_id', $object_id)->get();
+				$query = $query->join('meetings s', 's.meeting_id = t.meeting_id')->where('s.action_id', $object_id)->get();
 				if ($query->num_rows() > 0) return doubleval($query->row()->total);
 				break;
 			case 'project':
-				$query = $query->join('steps s', 's.step_id = t.step_id')->join('actions a', 'a.action_id = s.action_id')->where('a.project_id', $object_id)->get();
+				$query = $query->join('meetings s', 's.meeting_id = t.meeting_id')->join('actions a', 'a.action_id = s.action_id')->where('a.project_id', $object_id)->get();
 				if ($query->num_rows() > 0) return doubleval($query->row()->total);
 				break;
 			case 'user':
@@ -190,10 +190,10 @@ class Mb_project
 		return false;
 	}
 	/**
-	 * Send email to project/action/step/agenda members
+	 * Send email to project/action/meeting/agenda members
 	 *
-	 * @param int $object_id - project/action/step/agenda id
-	 * @param string $object_type - project/action/step/agenda
+	 * @param int $object_id - project/action/meeting/agenda id
+	 * @param string $object_type - project/action/meeting/agenda
 	 * @param string $title - email title
 	 * @param string $content - email content maybe a normal string or a template
 	 * @param array $exclude - excluded member ids
@@ -216,7 +216,7 @@ class Mb_project
 			return false;
 		}
 		$object_type = strtolower($object_type);
-		$types = ['project', 'action', 'step', 'agenda'];
+		$types = ['project', 'action', 'meeting', 'agenda'];
 		if (! in_array($object_type, $types)) {
 			return false;
 		}
@@ -347,10 +347,10 @@ class Mb_project
 		return (boolean) $count;
 	}
 	/**
-	 * Send notification mail to project/action/step/agenda members after create a project/action/step/agenda or change project/action/step/agenda status
+	 * Send notification mail to project/action/meeting/agenda members after create a project/action/meeting/agenda or change project/action/meeting/agenda status
 	 *
-	 * @param int $object_id - project/action/step/agenda id
-	 * @param string $object_type - project/action/step/agenda
+	 * @param int $object_id - project/action/meeting/agenda id
+	 * @param string $object_type - project/action/meeting/agenda
 	 * @param string $current_user_id - id of current user for excluding from email targets
 	 * @param string $action_type - to determine which type of email need to send
 	 * @return boolean - true if sent successfully and vice versa
@@ -370,7 +370,7 @@ class Mb_project
 			return false;
 		}
 
-		$object_types = ['project', 'action', 'step', 'agenda'];
+		$object_types = ['project', 'action', 'meeting', 'agenda'];
 		if (! in_array($object_type, $object_types)) {
 			return false;
 		}

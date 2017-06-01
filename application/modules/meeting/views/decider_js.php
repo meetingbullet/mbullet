@@ -1,10 +1,10 @@
 // Prevent duplicate binding function
 $(document).off('.decider');
 
-$(document).on('submit.decider', '.form-step-decider', (e) => {
+$(document).on('submit.decider', '.form-meeting-decider', (e) => {
 	// Validation
 	var is_valid = true;
-	$('.form-step-decider .confirmation-status').each((i, item) => {
+	$('.form-meeting-decider .confirmation-status').each((i, item) => {
 		if ($(item).val() === null) {
 			$(item).addClass('danger');
 			is_valid = false;
@@ -36,22 +36,22 @@ $(document).on('submit.decider', '.form-step-decider', (e) => {
 		}
 
 		if (data.message_type == 'success') {
-			$('#step-decider-modal').modal('hide');
+			$('#meeting-decider-modal').modal('hide');
 
 			/* 
-				If one of the agendas is marked as Closed Parking Lot the step owner is redirected to 
-				the Step creation screen and prompted to create a new step to resolve the Closed Parking Lot agenda.
+				If one of the agendas is marked as Closed Parking Lot the meeting owner is redirected to 
+				the Meeting creation screen and prompted to create a new meeting to resolve the Closed Parking Lot agenda.
 			*/
 			if ($('.confirmation-status option[value="open_parking_lot"]:selected').length > 0) {
-				$.post('<?php e(site_url('step/create/' . $action_key)) ?>', {from_step: '<?php e($step_id) ?>'}, (data) => {
+				$.post('<?php e(site_url('meeting/create/' . $action_key)) ?>', {from_meeting: '<?php e($meeting_id) ?>'}, (data) => {
 					data = JSON.parse(data);
-					$('#create-step .modal-content').html(data.modal_content);
-					$('#create-step').modal({backdrop: "static"});
+					$('#create-meeting .modal-content').html(data.modal_content);
+					$('#create-meeting').modal({backdrop: "static"});
 
 					// Open Evaluator for Owner
-					$('#create-step').on('hidden.bs.modal', function () {
+					$('#create-meeting').on('hidden.bs.modal', function () {
 						// @Bao: Open Evaluator for Owner
-						$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+						$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
 							data = JSON.parse(data);
 							$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
 							$('.modal-monitor-evaluator').modal({
@@ -62,7 +62,7 @@ $(document).on('submit.decider', '.form-step-decider', (e) => {
 				});
 			} else {
 				// @Bao: Open Evaluator for Owner
-				$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+				$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
 					data = JSON.parse(data);
 					$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
 					$('.modal-monitor-evaluator').modal({

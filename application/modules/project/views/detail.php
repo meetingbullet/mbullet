@@ -93,8 +93,8 @@ $project_label = [
 				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->total_point_action); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_point_resource') . ':'; ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->total_point_resource); ?></div>
-				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min_value_cost_ratio_per_step') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->min_value_cost_ratio_per_step); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min_value_cost_ratio_per_meeting') . ':'; ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->min_value_cost_ratio_per_meeting); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_max_time_action') . ':'; ?></div>
 				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->max_time_action); ?></div>
 			</div> <!-- end .AN-COMPONENT-BODY -->

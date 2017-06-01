@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Step_member_rate_model extends BF_Model
+class Meeting_member_rate_model extends BF_Model
 {
-	protected $table_name	= 'step_member_rates';
-	protected $key			= 'step_id';
+	protected $table_name	= 'meeting_member_rates';
+	protected $key			= 'meeting_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;

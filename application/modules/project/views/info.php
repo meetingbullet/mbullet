@@ -82,7 +82,7 @@ $agenda_status_labels = [
 
 <div class="an-single-component with-shadow">
 	<div class="an-component-header">
-		<h6><?php e(lang('pj_detail_tab_info_table_all_steps')) ?></h6>
+		<h6><?php e(lang('pj_detail_tab_info_table_all_meetings')) ?></h6>
 	</div>
 	<div class="an-component-body padding20">
 		<div class="an-user-lists user-stats">
@@ -95,15 +95,15 @@ $agenda_status_labels = [
 
 			<div class="an-lists-body">
 
-			<?php if (is_array($lists['steps']) && count($lists['steps']) > 0) : ?>
-				<?php foreach ($lists['steps'] as $item) : ?>
+			<?php if (is_array($lists['meetings']) && count($lists['meetings']) > 0) : ?>
+				<?php foreach ($lists['meetings'] as $item) : ?>
 
-				<div data-step-id="<?php e($item->step_id) ?>" class="list-user-single">
+				<div data-meeting-id="<?php e($item->meeting_id) ?>" class="list-user-single">
 					<div class="list-date number basis-30">
-						<a href="<?php e("/step/{$item->step_key}") ?>"><?php e($item->step_key) ?></a>
+						<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
 					</div>
 					<div class="list-name basis-50">
-						<a href="<?php e("/step/{$item->step_key}") ?>"><?php e($item->name) ?></a>
+						<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
 					</div>
 					<div class="list-name basis-30">
 						<?php e($item->point_used) ?>
@@ -119,7 +119,7 @@ $agenda_status_labels = [
 					<div class="list-text basis-30">
 					</div>
 					<div class="list-date email approve basis-40">
-						<?php e(lang('pj_no_step')) ?>
+						<?php e(lang('pj_no_meeting')) ?>
 					</div>
 					<div class="list-text basis-30">
 					</div>
@@ -128,9 +128,9 @@ $agenda_status_labels = [
 			</div> <!-- end .AN-LISTS-BODY -->
 		</div>
 
-		<?php if (! empty($paginations['steps'])) : ?>
+		<?php if (! empty($paginations['meetings'])) : ?>
 		<div class="an-pagination-container right">
-			<?php echo $paginations['steps'] ?>
+			<?php echo $paginations['meetings'] ?>
 		</div>
 		<?php endif ?>
 	</div> <!-- end .AN-COMPONENT-BODY -->

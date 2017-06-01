@@ -11,7 +11,7 @@ class Homework extends Authenticated_Controller
 		$this->load->helper('text');
 
 		$this->load->library('mb_project');
-		$this->load->model('step/step_model');
+		$this->load->model('meeting/meeting_model');
 		$this->load->model('users/user_model');
 		
 		$this->load->model('homework/homework_model');
@@ -19,27 +19,27 @@ class Homework extends Authenticated_Controller
 
 	}
 
-	public function create($step_key)
+	public function create($meeting_key)
 	{
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
-			Template::set_message(lang('hw_step_key_does_not_exist'), 'danger');
+		if (empty($meeting_id)) {
+			Template::set_message(lang('hw_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$keys = explode('-', $step_key);
+		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_key = $keys[0];
 
-		if (! $this->mb_project->has_permission('step', $step_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
@@ -48,7 +48,7 @@ class Homework extends Authenticated_Controller
 			$organization_members = [];
 		}
 
-		if ($step_id === false) {
+		if ($meeting_id === false) {
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('hw_not_have_permission'));
 		} else {
@@ -57,7 +57,7 @@ class Homework extends Authenticated_Controller
 
 			if ($this->input->post()) {
 				$data = $this->homework_model->prep_data($this->input->post());
-				$data['step_id'] = $step_id;
+				$data['meeting_id'] = $meeting_id;
 
 				$this->form_validation->set_rules($this->homework_model->get_validation_rules('update'));
 
@@ -139,7 +139,7 @@ class Homework extends Authenticated_Controller
 		// Only member of HW or Creator can edit
 		$test = $this->homework_model->select('homework.' . $this->input->post('name'))
 		->join('homework_members hwm', 'hwm.homework_id = homework.homework_id AND hwm.user_id = ' . $this->current_user->user_id, 'LEFT')
-		->join('steps s', 's.step_id = homework.step_id AND (s.status = "open" OR s.status = "ready" OR s.status = "inprogress")') // Can only edit when step is OPEN
+		->join('meetings s', 's.meeting_id = homework.meeting_id AND (s.status = "open" OR s.status = "ready" OR s.status = "inprogress")') // Can only edit when meeting is OPEN
 		->where('homework.created_by', $this->current_user->user_id)
 		->or_where('hwm.user_id', $this->current_user->user_id)
 		->find($this->input->post('pk'));

@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Step_member_model extends BF_Model
+class Meeting_member_model extends BF_Model
 {
-	protected $table_name	= 'step_members';
-	protected $key			= 'step_id';
+	protected $table_name	= 'meeting_members';
+	protected $key			= 'meeting_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;
@@ -51,7 +51,7 @@ class Step_member_model extends BF_Model
 		parent::__construct();
 	}
 
-	public function get_step_member($step_id)
+	public function get_meeting_member($meeting_id)
 	{
 		$query = $this->select('uto.user_id, email, first_name, last_name, CONCAT(first_name, " ", last_name) AS fullname, avatar,
 							avatar, cost_of_time, 
@@ -72,12 +72,12 @@ class Step_member_model extends BF_Model
 									)
 								)
 							) AS cost_of_time_name', false)
-							->join('users u', 'step_members.user_id = u.user_id')
-							->join('steps s', 'step_members.step_id = s.step_id')
+							->join('users u', 'meeting_members.user_id = u.user_id')
+							->join('meetings s', 'meeting_members.meeting_id = s.meeting_id')
 							->join('actions a', 's.action_id = a.action_id')
 							->join('projects p', 'p.project_id = a.project_id')
 							->join('user_to_organizations uto', 'u.user_id = uto.user_id AND enabled = 1 AND uto.organization_id = ' . $this->auth->user()->current_organization_id)
-							->where('step_members.step_id', $step_id)
+							->where('meeting_members.meeting_id', $meeting_id)
 							->order_by('fullname')
 							->order_by('uto.cost_of_time', 'DESC')
 							->as_array()

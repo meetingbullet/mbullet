@@ -1,72 +1,72 @@
 <?php
-$is_homework_editable = $step->status == 'open' || $step->status == 'ready' || $step->status == 'inprogress';
-$is_owner = $step->owner_id == $current_user->user_id;
+$is_homework_editable = $meeting->status == 'open' || $meeting->status == 'ready' || $meeting->status == 'inprogress';
+$is_owner = $meeting->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
-if ($step->scheduled_start_time) {
-	$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $step->scheduled_start_time);
-	$scheduled_end_time->modify('+' . $step->in . ' ' . $step->in_type);
+if ($meeting->scheduled_start_time) {
+	$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $meeting->scheduled_start_time);
+	$scheduled_end_time->modify('+' . $meeting->in . ' ' . $meeting->in_type);
 
-	$scheduled_start_time = display_time($step->scheduled_start_time);
+	$scheduled_start_time = display_time($meeting->scheduled_start_time);
 	$scheduled_end_time = display_time($scheduled_end_time->format('Y-m-d H:i:s'));
 }
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
 
 ?>
-<div data-step-id="<?php e($step->step_id)?>" class="step-monitor" data-status="<?php e($step->status) ?>" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
+<div data-meeting-id="<?php e($meeting->meeting_id)?>" class="meeting-monitor" data-status="<?php e($meeting->status) ?>" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-		<h4 class="modal-title"><?php e(lang('st_step_monitor'))?></h4>
+		<h4 class="modal-title"><?php e(lang('st_meeting_monitor'))?></h4>
 	</div> <!-- end MODAL-HEADER -->
 	<?php endif; ?>
 
-	<?php echo form_open(site_url('step/update_step_schedule'), ['class' => 'form-inline form-step-schedule']) ?>
+	<?php echo form_open(site_url('meeting/update_meeting_schedule'), ['class' => 'form-inline form-meeting-schedule']) ?>
 		<input type="hidden" name="scheduled_start_time"/>
 
 		<div class="topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
-					<h2><?php e($step->name)?></h2>
+					<h2><?php e($meeting->name)?></h2>
 
-					<?php if ($step->status != 'open'): ?>
+					<?php if ($meeting->status != 'open'): ?>
 					<h5 class='text-muted'><?php e($scheduled_time)?></h5>
 					<?php endif; ?>
 				</div>
 			</div>
 			<div class="pull-right">
 				<div class="an-bootstrap-custom-tab">
-					<div class="step-time-schedule">
-							<input type="hidden" name="step_id" value="<?php e($step->step_id) ?>">
+					<div class="meeting-time-schedule">
+							<input type="hidden" name="meeting_id" value="<?php e($meeting->meeting_id) ?>">
 
-							<h3 id="scheduled-timer" class="step-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $step->status == 'inprogress' ? $step->actual_start_time : ''?>"></h3>
+							<h3 id="scheduled-timer" class="meeting-action hidden" data-now="<?php e($now)?>" data-actual-start-time="<?php echo $meeting->status == 'inprogress' ? $meeting->actual_start_time : ''?>"></h3>
 							
 							<?php if ($is_owner): ?>
-							<?php if ($step->status != 'open'): ?>
-							<div class="step-action">
+							<?php if ($meeting->status != 'open'): ?>
+							<div class="meeting-action">
 								<button type="submit" 
-										name='start-step' 
-										class="an-btn an-btn-danger btn-start-step<?php echo $step->status == 'open' || $step->status == 'ready' ? '' : ' hidden' ?>">
+										name='start-meeting' 
+										class="an-btn an-btn-danger btn-start-meeting<?php echo $meeting->status == 'open' || $meeting->status == 'ready' ? '' : ' hidden' ?>">
 									<i class="ion-ios-play"></i> <?php e(lang('st_start'))?>
 								</button>
-								<button class="an-btn an-btn-success btn-finish<?php echo $step->status == 'inprogress' && $is_owner ? '' : ' hidden' ?>" disabled>
+								<button class="an-btn an-btn-success btn-finish<?php echo $meeting->status == 'inprogress' && $is_owner ? '' : ' hidden' ?>" disabled>
 									<i class="ion-checkmark"></i> <?php e(lang('st_finish'))?>
 								</button>
 							</div>
 							<?php else: ?>
-							<div class="an input-group input-group-schedule <?php echo $step->status == 'open' ? ' input-group-btn-right' : '' ?>">
+							<div class="an input-group input-group-schedule <?php echo $meeting->status == 'open' ? ' input-group-btn-right' : '' ?>">
 								<div class="input-group-addon"><i class="ion-android-calendar"></i></div>
 								<input type="text" 
 										id="datetimepicker1"
 										name="scheduled_time" 
 										class="form-control an-form-control schedule-time" 
 										value="<?php echo $scheduled_start_time ?>" 
-										placeholder="<?php e(lang('st_scheduled_start_time'))?>" <?php echo $step->status == 'open' ? '' : 'disabled' ?>/>
+										placeholder="<?php e(lang('st_scheduled_start_time'))?>" <?php echo $meeting->status == 'open' ? '' : 'disabled' ?>/>
 								<span class="input-group-btn">
 									<button type="submit" 
 											name='save-time' 
-											class="an-btn an-btn-danger btn-update-step-schedule<?php echo $step->status == 'open' ? '' : ' hidden' ?>">
+											class="an-btn an-btn-danger btn-update-meeting-schedule<?php echo $meeting->status == 'open' ? '' : ' hidden' ?>">
 										<i class="glyphicon glyphicon-floppy-disk"></i> <?php e(lang('st_save'))?>
 									</button>
 								</span>
@@ -79,7 +79,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 		</div> <!-- end AN-BODY-TOPBAR -->
 	<?php echo form_close() ?>
 
-	<div id="step-joiner"></div>
+	<div id="meeting-joiner"></div>
 
 	<!-- Agenda -->
 	<div class="an-single-component with-shadow">
@@ -116,7 +116,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 								<?php e($agenda->time_assigned)?>
 							</span>
 
-							<input type="number" name="time_assigned" data-agenda-id='<?php e($agenda->agenda_id)?>' class='an-form-control form-td<?php echo ($agenda->time_assigned == NULL && $is_owner ? '' : ' hidden' ) ?>' step="0.01" value="<?php e($agenda->time_assigned)?>"/>
+							<input type="number" name="time_assigned" data-agenda-id='<?php e($agenda->agenda_id)?>' class='an-form-control form-td<?php echo ($agenda->time_assigned == NULL && $is_owner ? '' : ' hidden' ) ?>' meeting="0.01" value="<?php e($agenda->time_assigned)?>"/>
 						</td>
 						<td class='text-center skip-votes '><?php e($agenda->skip_votes)?></td>
 						<td class='agenda-status' <?php echo "data-time-assigned='{$agenda->time_assigned}' " . ($agenda->status == 'inprogress' ? "data-now='{$now}' data-started-on='{$agenda->started_on}'" : '') ?>>
@@ -125,10 +125,10 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 
 						<?php if ($is_owner): ?>
 						<td class='agenda-action '>
-							<button class="an-btn an-btn-small an-btn-primary btn-start-agenda<?php e($step->status == 'inprogress' && $agenda->status == 'open' ? '' : ' hidden')?>"<?php e($agenda->time_assigned ? '' : ' disabled')?>>
+							<button class="an-btn an-btn-small an-btn-primary btn-start-agenda<?php e($meeting->status == 'inprogress' && $agenda->status == 'open' ? '' : ' hidden')?>"<?php e($agenda->time_assigned ? '' : ' disabled')?>>
 								<?php e(lang('st_start'))?>
 							</button>
-							<button class="an-btn an-btn-small an-btn-primary btn-skip<?php e($step->status == 'inprogress' && $agenda->status == 'open' ? '' : ' hidden')?>"><?php e(lang('st_skip'))?></button>
+							<button class="an-btn an-btn-small an-btn-primary btn-skip<?php e($meeting->status == 'inprogress' && $agenda->status == 'open' ? '' : ' hidden')?>"><?php e(lang('st_skip'))?></button>
 							<button class="an-btn an-btn-small an-btn-primary btn-jump<?php e($agenda->status == 'inprogress' ? '' : ' hidden')?>"><?php e(lang('st_jump'))?></button>
 						</td>
 						<?php else: ?>
@@ -153,7 +153,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 			<h6><?php e(lang('hw_homework'))?></h6>
 
 			<div class="pull-right">
-				<button class="an-btn an-btn-primary mb-open-modal <?php e($step->status != 'open' ? 'hidden' : '') ?>" data-modal-id="create-homework-modal" data-url="<?php echo site_url('homework/create/' . $step->step_key) ?>" >
+				<button class="an-btn an-btn-primary mb-open-modal <?php e($meeting->status != 'open' ? 'hidden' : '') ?>" data-modal-id="create-homework-modal" data-url="<?php echo site_url('homework/create/' . $meeting->meeting_key) ?>" >
 					<?php echo '<i class="ion-android-add"></i> ' . lang('hw_add_homework')?>
 				</button>
 			</div>
@@ -198,7 +198,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 						<td class='time-spent-container'>
 							<a href='#' class='time-spent'
 								data-type="text" 
-								data-tpl="<input type='number' step='0.01'>"
+								data-tpl="<input type='number' meeting='0.01'>"
 								data-name="time_spent"
 								data-pk="<?php e($homework->homework_id) ?>" 
 								data-url="<?php echo site_url('homework/ajax_edit') ?>"
@@ -232,7 +232,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('monitor_js', [
-		'step_key' => $step_key,
+		'meeting_key' => $meeting_key,
 		'current_user' => $current_user
 	], true) . '</script>';
 }
