@@ -12,8 +12,17 @@ $project_status_labels = [
 	'inactive' => 'label label-warning label-bordered',
 	'archive' => 'label label-success label-bordered',
 ];
+$confirmation_status = [
+	'closed', 'skipped', 'resolved', 'open_parking_lot', 'closed_parking_lot'
+];
 ?>
-
+<div style="display: none;" class="rating">
+	<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+	<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+	<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+	<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+	<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+</div>
 <div class="row">
 	<!-- Welcome Professor -->
 	<div class="col-md-3 col-xs-12">
@@ -80,6 +89,53 @@ $project_status_labels = [
 							<!--a href="#" class="setting"><i class="ion-plus"></i></a-->
 						</span>
 					</h1>
+					<div class="todo-list">
+					<?php if (! empty($my_todo)) : ?>
+						<?php foreach ($my_todo as $todo) : ?>
+						<div class="item">
+							<?php if ($todo->todo_type == 'homework') : ?>
+							<div class="">
+								<span class="msg-tag label label-bordered label-inprogress">
+									<?php echo lang('db_homework') ?>
+								</span>&nbsp;
+								<?php echo ucfirst($todo->name) . ": " . ucfirst($todo->description) ?>
+							</div>
+							<?php elseif ($todo->todo_type == 'evaluate') : ?>
+							<div class="todo-left">
+								<span class="msg-tag label label-bordered label-skipped">
+									<?php echo lang('db_evaluate') ?>
+								</span>&nbsp;
+								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . ucfirst($todo->agenda_description) ?>
+							</div>
+							<div class="todo-right">
+								<div class="rating">
+									<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+									<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+									<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+									<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+									<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+								</div>
+							</div>
+							<?php else : ?>
+							<div class="todo-left">
+								<span class="msg-tag label label-bordered label-ready">
+									<?php echo lang('db_decide') ?>
+								</span>&nbsp;
+								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . ucfirst($todo->agenda_description) ?>
+							</div>
+							<div class="todo-right">
+								<select name="" class="an-form-control">
+									<option disabled selected value><?php e(lang('st_select_an_option')) ?></option>
+									<?php foreach ($confirmation_status as $status) : ?>
+										<option value="$status"><?php echo lang('db_' . $status) ?></option>
+									<?php endforeach ?>
+								</select>
+							</div>
+							<?php endif ?>
+						</div>
+						<?php endforeach ?>
+					<?php endif ?>
+					</div>
 				</div>
 			</div> <!-- end .welcome-panel -->
 		</div>
@@ -93,12 +149,12 @@ $project_status_labels = [
 				<a href="#" id="create" class="setting"><i class="ion-plus"></i></a>
 			</span>
 		</h1>
-		<div class="project-list ps-container ps-theme-default ps-active-y" style="">
+		<div class="project-list" style="">
 		<?php if (! empty($projects)) : ?>
 			<?php foreach ($projects as $project) : ?>
 			<div class="item">
 				<div class="general-info">
-					<h3><?php echo "{$project->name} [{$project->cost_code}]" ?></h3>
+					<h3><a href="<?php echo site_url('project/' . $project->cost_code) ?>"><?php echo "{$project->name} [{$project->cost_code}]" ?></a></h3>
 					<div class="project-info">
 						<div class="col-xs-4">
 							<label><?php echo lang('db_project_pts') ?></label>

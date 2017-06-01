@@ -135,3 +135,84 @@
 	padding-left: 30px;
 	padding-bottom: 5px;
 }
+
+@media only screen and (min-width: 768px) {
+	.an-page-content > .an-content-body > .row > div.col-xs-12 {
+		border-left: 1px solid #aaa;
+		border-right: 1px solid #aaa;
+	}
+
+	.an-page-content > .an-content-body > .row > div.col-xs-12:first-child {
+		border-left: none;
+		margin-right: -1px;
+	}
+
+	.an-page-content > .an-content-body > .row > div.col-xs-12:last-child {
+		border-right: none;
+		margin-left: -1px;
+	}
+}
+
+.my-todo > .todo-list > .item {
+	padding-bottom: 10px;
+	overflow: hidden;
+}
+
+.my-todo > .todo-list > .item .todo-left {
+	width: 60%;
+	overflow: hidden;
+	float: left;
+}
+
+.my-todo > .todo-list > .item .todo-right {
+	width: 40%;
+	overflow: hidden;
+	float: left;
+}
+
+/****** Style Star Rating Widget *****/
+.my-todo > .todo-list > .item .rating {
+	float: right;
+	display: table-cell;
+}
+
+.rating > input {
+	display: none;
+}
+
+.rating > label:before {
+	margin-top: 0px;
+	padding:0px 0px 0px 0px;
+	font-size: 1.25em;
+	font-family: 'Ionicons';
+	display: inline-block;
+	content: "\f4b3";
+}
+
+.rating > .half:before { 
+	content: "\f4b1";
+	position: absolute;
+}
+
+
+.rating > label {
+	float: right;
+	margin: 0px 1px 0px 0px;
+	color:#D8D8D8;
+}
+
+/***** CSS Magic to Highlight Stars on Hover *****/
+
+.rating > input:checked ~ label,
+.rating:not(:checked) > label:hover, /* hover current star */
+.rating:not(:checked) > label:hover ~ label {
+	color:#FFD700 !important;
+	cursor:pointer;
+}/* hover previous stars in list */
+
+.rating > input:checked + label:hover, /* hover current star when changing rating */
+.rating > label:hover ~ input:checked ~ label, /* lighten current selection */
+.rating > input:checked ~ label:hover ~ label {
+	color:#FFED85 !important;
+	cursor:pointer;
+}
