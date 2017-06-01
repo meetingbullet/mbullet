@@ -1,7 +1,7 @@
-// Open step monitor
-$('.btn-open-step-monitor').click((e) => {
+// Open meeting monitor
+$('.btn-open-meeting-monitor').click((e) => {
 	e.preventDefault();
-	var key = $(e.target).data('step-key') ? $(e.target).data('step-key') : $(e.target).parent().data('step-key');
+	var key = $(e.target).data('meeting-key') ? $(e.target).data('meeting-key') : $(e.target).parent().data('meeting-key');
 
 	if (key == undefined) {
 		console.error('Unable to get STEP KEY on target', $(e.target));
@@ -11,7 +11,7 @@ $('.btn-open-step-monitor').click((e) => {
 	// Adjust diff between server and client on counters
 	$(document).data('ajax-start-time', moment().unix());
 
-	$.get('<?php e(site_url('step/monitor/')) ?>' + key, (data) => {
+	$.get('<?php e(site_url('meeting/monitor/')) ?>' + key, (data) => {
 		data = JSON.parse(data);
 
 		if (data.modal_content == '') {
@@ -28,22 +28,22 @@ $('.btn-open-step-monitor').click((e) => {
 		$('.modal-monitor').modal({backdrop: "static"});
 	});
 
-	if ($(this).hasClass('step-open')) {
-		$(this).removeClass('step-open');
+	if ($(this).hasClass('meeting-open')) {
+		$(this).removeClass('meeting-open');
 		$(this).find('span').text('<?php echo lang('st_monitor')?>')
 	}
 });
 
-$('.step-timer.ready').each((i, item) => {
+$('.meeting-timer.ready').each((i, item) => {
 	var eventTime = moment($(item).data('scheduled-start-time'), 'YYYY-MM-DD HH:mm:ss').unix(),
 		currentTime = moment($(item).data('now'), 'YYYY-MM-DD HH:mm:ss').unix(),
 		diffTime = currentTime - eventTime,
 		duration = moment.duration(diffTime * 1000, 'milliseconds');
 
 	if (diffTime <= 0) {
-		if ($(item).parent().find('.btn-open-step-monitor').hasClass('is-owner')) {
-			$(item).parent().find('.btn-open-step-monitor').text('<?php e(lang('st_start'))?>');
-			$(item).parent().find('.btn-open-step-monitor').removeClass('hidden');
+		if ($(item).parent().find('.btn-open-meeting-monitor').hasClass('is-owner')) {
+			$(item).parent().find('.btn-open-meeting-monitor').text('<?php e(lang('st_start'))?>');
+			$(item).parent().find('.btn-open-meeting-monitor').removeClass('hidden');
 		} else {
 			$(item).text('<?php e(lang('st_waiting_for_start'))?>');
 		}
@@ -66,4 +66,20 @@ $('.step-timer.ready').each((i, item) => {
 	if ($(item).text().trim() == 'in') {
 		$(item).text('');
 	}
+});
+
+// Calendar
+$('#meeting-calendar').fullCalendar({
+	header: {
+		center: 'prev, today, next ',
+		left: 'title',
+		right: 'month,agendaWeek,agendaDay,listWeek'
+	},
+	
+	navLinks: true,
+	firstDay: 1, // Monday
+	aspectRatio: 1, // content Width-to-Height
+	editable: false,
+	eventLimit: true, // allow "more" link when too many events
+	events: <?php echo json_encode($meeting_calendar) ?>
 });

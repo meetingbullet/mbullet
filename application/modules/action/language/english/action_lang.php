@@ -45,12 +45,12 @@ $lang['update_success'] = 'Update action successfully.';
 
 // Field
 $lang['ac_detail'] = 'Action Detail';
-$lang['ac_steps'] = 'Steps';
-$lang['ac_component_steps'] = 'Component / Steps';
+$lang['ac_meetings'] = 'Meetings';
+$lang['ac_component_meetings'] = 'Component / Meetings';
 $lang['ac_type'] = 'Type';
 $lang['ac_action_key'] = 'ACT-%s';
 $lang['ac_project_key'] = 'Project %s';
-$lang['ac_step_key'] = 'STE-%s';
+$lang['ac_meeting_key'] = 'STE-%s';
 $lang['ac_key'] = 'Key';
 $lang['ac_status'] = 'Status';
 $lang['ac_owner'] = 'Owner';
@@ -63,7 +63,7 @@ $lang['ac_update'] = 'Update';
 $lang['ac_update_action'] = 'Update Action';
 
 // Action
-$lang['ac_add_step'] = 'Add Step';
+$lang['ac_add_meeting'] = 'Add Meeting';
 $lang['ac_edit'] = 'Edit';
 $lang['ac_start_action'] = 'Start Action';
 $lang['ac_ready'] = 'Ready to review';

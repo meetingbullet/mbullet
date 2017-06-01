@@ -13,15 +13,15 @@ var homework_status_lang = {
 	'undone' : '<?php echo lang('hw_undone') ?>',
 };
 
-var update_step_timer_interval,
+var update_meeting_timer_interval,
 	update_agenda_timer_intervals = [];
 
 // Update skip votes periodly
 var update_monitor_interval = setInterval(update_monitor, 3000);
 
 // Clear all updater 
-$('#step-monitor-modal').on('hide.bs.modal', function () {
-	clearInterval(update_step_timer_interval);
+$('#meeting-monitor-modal').on('hide.bs.modal', function () {
+	clearInterval(update_meeting_timer_interval);
 	clearInterval(update_monitor_interval);
 
 	$.each(update_agenda_timer_intervals, (i, item) => {
@@ -30,17 +30,16 @@ $('#step-monitor-modal').on('hide.bs.modal', function () {
 })
 
 // Disable all Start agenda if there is a "In Progress" agenda
-if ($('.step-monitor .label-inprogress').length) {
+if ($('.meeting-monitor .label-inprogress').length) {
 	$('.btn-start-agenda').prop('disabled', true);
 	$('.btn-finish').prop('disabled', true);
 }
 
-if ($('.step-monitor .table-agenda .label-inprogress').length == 0 && $('.step-monitor .table-agenda .label-open').length == 0) {
-	$('.btn-finish').prop('disabled', false);
-}
+// Disable Finish monitor when agendas are not finished or homework are open
+shall_enable_finish_button();
 
 if ($('#scheduled-timer').data('actual-start-time')) {
-	update_step_timer()
+	update_meeting_timer()
 }
 
 $('#datetimepicker1').datetimepicker({
@@ -58,7 +57,7 @@ $(document).on('click.monitor', '.btn-vote-skip', (e) => {
 	e.preventDefault();
 	var agenda_id = $(e.target).parent().parent().data('agenda-id');
 
-	$.get('<?php e(site_url('step/vote_skip/'))?>' + agenda_id, (result) => {
+	$.get('<?php e(site_url('meeting/vote_skip/'))?>' + agenda_id, (result) => {
 		if (result == '1') {
 			update_monitor();
 
@@ -73,7 +72,7 @@ $(document).on('click.monitor', '.btn-vote-skip', (e) => {
 	return false;
 });
 
-$(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
+$(document).on('click.monitor', '.btn-update-meeting-schedule', (e) => {
 	e.preventDefault();
 
 	var time_assigned_data = "";
@@ -106,7 +105,7 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 	}
 
 
-	$.post($('.form-step-schedule').attr('action'), $('.form-step-schedule').serialize() + time_assigned_data, (result) => {
+	$.post($('.form-meeting-schedule').attr('action'), $('.form-meeting-schedule').serialize() + time_assigned_data, (result) => {
 		data = JSON.parse(result);
 
 		$.notify({
@@ -117,10 +116,9 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			// $('.btn-start-step').prop('disabled', false);
+			$('#meeting-monitor-modal').modal('hide');
 			$('#datetimepicker1').removeClass('danger');
 
-			$('#step-monitor-modal').modal('hide');
 			setTimeout(() => {
 				location.reload();
 			}, 600);
@@ -132,7 +130,7 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 	return false;
 });
 
-$(document).on('click.monitor', '.btn-start-step', (e) => {
+$(document).on('click.monitor', '.btn-start-meeting', (e) => {
 	e.preventDefault();
 
 	var time_assigned_data = "";
@@ -152,7 +150,7 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 		return false;
 	}
 
-	$.post($('.form-step-schedule').attr('action'),  $('.form-step-schedule').serialize() + '&start=1' + time_assigned_data, (result) => {
+	$.post($('.form-meeting-schedule').attr('action'),  $('.form-meeting-schedule').serialize() + '&start=1' + time_assigned_data, (result) => {
 		data = JSON.parse(result);
 
 		$.notify({
@@ -164,17 +162,18 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 
 		if (data.message_type == 'success') {
 			$('.btn-finish').toggleClass('hidden');
-			$('.btn-start-step').toggleClass('hidden');
+			$('.btn-start-meeting').toggleClass('hidden');
 
 			$('tr[data-agenda-status="open"] .btn-skip').removeClass('hidden');
 			$('tr[data-agenda-status="open"] .btn-start-agenda').removeClass('hidden');
 			$('tr[data-agenda-status="open"] .btn-start-agenda').prop('disabled', false);
 
-			$('.btn-update-step-schedule').addClass('hidden');
+			$('.btn-update-meeting-schedule').addClass('hidden');
 			$('.input-group-btn-right').removeClass('input-group-btn-right');
 			$('#scheduled-timer').data('actual-start-time', data.actual_start_time);
 			$('#scheduled-timer').data('now', data.actual_start_time);
-			update_step_timer();
+
+			update_meeting_timer();
 
 			$('.table-agenda tr input[name="time_assigned"]').each((i, item) => {
 				if ($(item).val() != '' && $(item).val() > 0) {
@@ -193,7 +192,7 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 $(document).on('click.monitor', '.btn-finish', (e) => {
 	e.preventDefault();
 
-	$.post($('.form-step-schedule').attr('action'),  $('.form-step-schedule').serialize() + '&finish=1', (result) => {
+	$.post($('.form-meeting-schedule').attr('action'),  $('.form-meeting-schedule').serialize() + '&finish=1', (result) => {
 		data = JSON.parse(result);
 
 		$.notify({
@@ -204,13 +203,13 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			$('#step-monitor-modal').modal('hide');
+			$('#meeting-monitor-modal').modal('hide');
 
-			// Open step decider if is owner
-			if ($('.step-monitor').data('is-owner') == '1') {
-				$('#step-decider .modal-content').html('');
+			// Open meeting decider if is owner
+			if ($('.meeting-monitor').data('is-owner') == '1') {
+				$('#meeting-decider .modal-content').html('');
 
-				$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+				$.get('<?php e(site_url('meeting/decider/' . $meeting_key)) ?>', (data) => {
 					data = JSON.parse(data);
 
 					if (data.modal_content == '') {
@@ -223,8 +222,8 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 						return;
 					}
 
-					$('#step-decider .modal-content').html(data.modal_content);
-					$('#step-decider').modal({backdrop: "static"});
+					$('#meeting-decider .modal-content').html(data.modal_content);
+					$('#meeting-decider').modal({backdrop: "static"});
 				});
 			}
 		}
@@ -253,7 +252,7 @@ $(document).on('click.monitor', '.btn-start-agenda', (e) => {
 
 	$(document).data('ajax-start-time', moment().unix());
 
-	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+	$.post('<?php echo site_url('meeting/update_agenda_status') ?>', {
 		agenda_id: $(e.target).parent().parent().data('agenda-id'), 
 		status: 'inprogress', 
 		time_assigned: time_assigned
@@ -292,7 +291,7 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 						? $(row).find('input[name="time_assigned"]').val()
 						: $(row).find('.time-assigned').text();
 
-	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+	$.post('<?php echo site_url('meeting/update_agenda_status') ?>', {
 		agenda_id, 
 		status: 'skipped'
 	}, (result) => {
@@ -310,9 +309,7 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 			$(row).find('.btn-start-agenda').addClass('hidden');
 			$(row).find('.agenda-status').html('<span class="label label-bordered label-skipped"><?php e(lang('st_skipped'))?></span>');
 
-			if ($('.step-monitor .table-agenda .label-open, .step-monitor .table-agenda .label-inprogress').length == 0) {
-				$('.btn-finish').prop('disabled', false);
-			}
+			shall_enable_finish_button();
 		}
 	});
 });
@@ -324,7 +321,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 						? $(row).find('input[name="time_assigned"]').val()
 						: $(row).find('.time-assigned').text();
 
-	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+	$.post('<?php echo site_url('meeting/update_agenda_status') ?>', {
 		agenda_id, 
 		status: 'jumped'
 	}, (result) => {
@@ -348,9 +345,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 				}
 			});
 
-			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
-				$('.btn-finish').prop('disabled', false);
-			}
+			shall_enable_finish_button();
 		}
 	});
 });
@@ -359,7 +354,7 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 	e.preventDefault();
 	var agenda_id = $('.form-resolve-agenda').data('agenda-id');
 
-	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+	$.post('<?php echo site_url('meeting/update_agenda_status') ?>', {
 		agenda_id, 
 		status: 'resolved',
 		comment: $('textarea[name="comment"]').val()
@@ -379,9 +374,7 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
 			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-resolved"><?php e(lang('st_resolved'))?></span>');
 
-			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
-				$('.btn-finish').prop('disabled', false);
-			}
+			shall_enable_finish_button();
 		}
 	});
 });
@@ -390,7 +383,7 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 	e.preventDefault();
 	var agenda_id = $('.form-resolve-agenda').data('agenda-id');
 
-	$.post('<?php echo site_url('step/update_agenda_status') ?>', {
+	$.post('<?php echo site_url('meeting/update_agenda_status') ?>', {
 		agenda_id, 
 		status: 'parking_lot',
 		comment: $('textarea[name="comment"]').val()
@@ -410,17 +403,15 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
 			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-parking_lot"><?php e(lang('st_parking_lot'))?></span>');
 
-			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
-				$('.btn-finish').prop('disabled', false);
-			}
+			shall_enable_finish_button();
 		}
 	});
 });
 
 // Editable homework when status is OPEN
-if ($('.step-monitor[data-status="open"]').length > 0
-	|| $('.step-monitor[data-status="ready"]').length > 0
-	|| $('.step-monitor[data-status="inprogress"]').length > 0
+if ($('.meeting-monitor[data-status="open"]').length > 0
+	|| $('.meeting-monitor[data-status="ready"]').length > 0
+	|| $('.meeting-monitor[data-status="inprogress"]').length > 0
 	) {
 	homework_editable();
 }
@@ -481,10 +472,13 @@ $(document).on('click.monitor', 'tr.homework.can-edit .btn-update-homework-statu
 			$(btn_status).text( $(e.target).text() );
 			$(btn_status).prop('class', 'btn btn-status label-' + $(e.target).data('value'));
 			$(btn_status).data('status', $(e.target).data('value'));
+			$(btn_status).attr('data-status', $(e.target).data('value'));
 			$(btn_status_caret).prop('class', 'btn dropdown-toggle label-' + $(e.target).data('value'));
 
 			$(e.target).parents('ul').find('.btn-update-homework-status').removeClass('hidden');
 			$(e.target).addClass('hidden');
+
+			shall_enable_finish_button();
 		}
 	}).fail((data) => {
 		data = JSON.parse(data.responseText);
@@ -513,7 +507,7 @@ $('.table-agenda .agenda-status').each((index, item) => {
 });
 
 
-function update_step_timer(clock)
+function update_meeting_timer(clock)
 {
 	var clock = '#scheduled-timer';
 
@@ -530,7 +524,7 @@ function update_step_timer(clock)
 		
 	$(clock).removeClass('hidden');
 
-	update_step_timer_interval = setInterval(function(){
+	update_meeting_timer_interval = setInterval(function(){
 
 		duration = moment.duration(duration.asMilliseconds() + interval, 'milliseconds');
 		var d = moment.duration(duration).days(),
@@ -580,11 +574,11 @@ function update_agenda_timer(clock)
 				s = moment.duration(duration).seconds();
 
 			// Time alotted for agenda
-			if (duration.asMinutes() >= time_assigned && $('.step-monitor').data('is-owner') == '1') {
+			if (duration.asMinutes() >= time_assigned && $('.meeting-monitor').data('is-owner') == '1') {
 				if (update_agenda_timer_intervals[agenda_id]) {
 					clearInterval(update_agenda_timer_intervals[agenda_id]);
 
-					$.getJSON('<?php echo site_url('step/resolve_agenda/') ?>' + agenda_id, (data) => {
+					$.getJSON('<?php echo site_url('meeting/resolve_agenda/') ?>' + agenda_id, (data) => {
 						if (data.message != '') {
 							$.notify({
 								message: data.message
@@ -617,7 +611,7 @@ function update_monitor()
 {
 	$(document).data('ajax-start-time', moment().unix());
 
-	$.get('<?php e(site_url('step/get_monitor_data/'))?>' + $('.step-monitor').data('step-id'), (result) => {
+	$.get('<?php e(site_url('meeting/get_monitor_data/'))?>' + $('.meeting-monitor').data('meeting-id'), (result) => {
 		data = JSON.parse(result);
 
 		if (data.message_type == 'danger') {
@@ -631,20 +625,20 @@ function update_monitor()
 			return;
 		}
 
-		if ( ! (data.step.status == 'open' || data.step.status == 'ready' || data.step.status == 'inprogress') ) {
+		if ( ! (data.meeting.status == 'open' || data.meeting.status == 'ready' || data.meeting.status == 'inprogress') ) {
 			$.notify({
-				message: '<?php e(lang('st_step_finished'))?>'
+				message: '<?php e(lang('st_meeting_finished'))?>'
 			}, {
 				type: 'success',
 				z_index: 1051
 			});
-			$('#step-monitor-modal').modal('hide');
+			$('#meeting-monitor-modal').modal('hide');
 
-			// Open step decider if is owner
-			if ($('.step-monitor').data('is-owner') == '1') {
-				$('#step-decider .modal-content').html('');
+			// Open meeting decider if is owner
+			if ($('.meeting-monitor').data('is-owner') == '1') {
+				$('#meeting-decider .modal-content').html('');
 
-				$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+				$.get('<?php e(site_url('meeting/decider/' . $meeting_key)) ?>', (data) => {
 					data = JSON.parse(data);
 
 					if (data.modal_content == '') {
@@ -657,8 +651,8 @@ function update_monitor()
 						return;
 					}
 
-					$('#step-decider .modal-content').html(data.modal_content);
-					$('#step-decider').modal({backdrop: "static"});
+					$('#meeting-decider .modal-content').html(data.modal_content);
+					$('#meeting-decider').modal({backdrop: "static"});
 				});
 			} else {
 				// Wait for owner finish decider
@@ -671,15 +665,15 @@ function update_monitor()
 				});
 
 				var check_state_interval = setInterval(function(){
-					$.get('<?php echo site_url('step/check_state/' . $step_key) ?>').done(function(data) {
+					$.get('<?php echo site_url('meeting/check_state/' . $meeting_key) ?>').done(function(data) {
 						if (data == 1) {
 							clearInterval(check_state_interval);
 							swal.close();
 
-							$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+							$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
 								data = JSON.parse(data);
-								$('#step-monitor-modal-evaluator .modal-content').html(data.modal_content);
-								$('#step-monitor-modal-evaluator').modal({
+								$('#meeting-monitor-modal-evaluator .modal-content').html(data.modal_content);
+								$('#meeting-monitor-modal-evaluator').modal({
 									backdrop: 'static'
 								});
 							});
@@ -689,19 +683,19 @@ function update_monitor()
 			}
 		}
 
-		// Real-time step joiner
-		$('#step-joiner span').addClass('inactive');
+		// Real-time meeting joiner
+		$('#meeting-joiner span').addClass('inactive');
 		$.each(data.online_members, (index, item) => {
-			if ($('#step-joiner span[data-user-id="'+ item.user_id +'"]').length) {
-				$('#step-joiner span[data-user-id="'+ item.user_id +'"]').removeClass('inactive');
+			if ($('#meeting-joiner span[data-user-id="'+ item.user_id +'"]').length) {
+				$('#meeting-joiner span[data-user-id="'+ item.user_id +'"]').removeClass('inactive');
 			} else {
 				var new_joiner_html = '<span class="avatar" data-user-id="'+ item.user_id +'" style="background-image: url(\''+ item.avatar +'\'); display: none;"></span>';
-				$(new_joiner_html).appendTo('#step-joiner').slideDown(300);
+				$(new_joiner_html).appendTo('#meeting-joiner').slideDown(300);
 			}
 		});
 
 		// Remove joiner whose has left
-		$('#step-joiner span.inactive').animate({width: 0, marginRight: 0}, 300, function() {
+		$('#meeting-joiner span.inactive').animate({width: 0, marginRight: 0}, 300, function() {
 			$(this).remove();
 		});
 
@@ -716,7 +710,7 @@ function update_monitor()
 				$('#agenda-' + item.agenda_id + ' .skip-votes').effect("highlight", {}, 3000);
 			}
 
-			if (item.status != old_status && $('.step-monitor').data('is-owner') == 0) {
+			if (item.status != old_status && $('.meeting-monitor').data('is-owner') == 0) {
 				$('#agenda-' + item.agenda_id).data('agenda-status', item.status);
 				$('#agenda-' + item.agenda_id + ' .agenda-status').effect("highlight", {}, 3000);
 				$('#agenda-' + item.agenda_id + ' .label').removeClass('label-' + old_status);
@@ -760,6 +754,7 @@ function update_monitor()
 			if (item.status != old_status) {
 				$('#homework-' + item.homework_id + ' .btn-status').text(homework_status_lang[item.status]);
 				$('#homework-' + item.homework_id + ' .btn-status').data('status', item.status);
+				$('#homework-' + item.homework_id + ' .btn-status').attr('data-status', item.status);
 				$('#homework-' + item.homework_id + ' .btn-status').prop('class', 'btn btn-status label-' + item.status);
 				$('#homework-' + item.homework_id + ' .btn-status + .btn').prop('class', 'btn dropdown-toggle label-' + item.status);
 				$('#homework-' + item.homework_id + ' .status-container').effect("highlight", {}, 3000);
@@ -772,4 +767,13 @@ function update_monitor()
 			}
 		});
 	});
+}
+
+function shall_enable_finish_button()
+{
+	if ($('.meeting-monitor .table-agenda .label-open, \
+			.meeting-monitor .table-agenda .label-inprogress, \
+			.table-monitor-homework .btn-status[data-status="open"]').length == 0) {
+		$('.btn-finish').prop('disabled', false);
+	}
 }

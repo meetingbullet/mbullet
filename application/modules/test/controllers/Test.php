@@ -29,4 +29,11 @@ class Test extends Front_Controller
 			echo 'false';die;
 		}
 	}
+
+	public function index() {
+		$this->load->model('project/project_model');
+		for($i=1; $i<30; $i++) {
+			dump($this->project_model->get_agendas($i), $this->db->last_query());
+		}
+	}
 }

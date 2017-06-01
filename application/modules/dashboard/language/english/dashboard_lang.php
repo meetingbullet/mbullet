@@ -8,3 +8,5 @@ $lang['db_what_do_you_want_to_do'] = 'What do you want to do?';
 $lang['db_create_work'] = 'Create Work';
 $lang['db_do_work'] = 'Do Work';
 $lang['db_review_work'] = 'Review Work';
+
+$lang['db_meetings'] = 'Meetings';

@@ -2,7 +2,7 @@ $(document).ready(function() {
 	$('#submit_evaluator').click(function(e) {
 		e.preventDefault();
 		$.post({
-			url: '<?php echo site_url('step/evaluator/' . $step_key) ?>',
+			url: '<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>',
 			data: $('.form-ajax').serialize()
 		}).done(function(data) {
 			data = JSON.parse(data);console.log(data);
@@ -21,7 +21,7 @@ $(document).ready(function() {
 				});
 
 				if (data.message_type == 'success') {
-					// @TODO Refresh Step list
+					// @TODO Refresh Meeting list
 					location.reload();
 				}
 			}

@@ -95,7 +95,7 @@
 					<div class="list-title">
 						<h6 class="basis-40"></h6>
 						<h6 class="basis-20"><?php e(lang('pj_decision')) ?></h6>
-						<h6 class="basis-20"><?php e(lang('pj_step_owner')) ?></h6>
+						<h6 class="basis-20"><?php e(lang('pj_meeting_owner')) ?></h6>
 						<h6 class="basis-20"><?php e(lang('pj_contributor')) ?></h6>
 					</div>
 
@@ -108,7 +108,7 @@
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('project_no_of_hour')) ? 'danger' : '') ?>" name="project_no_of_hour" value="<?php echo set_value('project_no_of_hour', empty($project->project_no_of_hour) ? '' : $project->project_no_of_hour) ?>"/>
 							</div>
 							<div class="list-name basis-20">
-								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('step_owner_no_of_hour')) ? 'danger' : '') ?>" name="step_owner_no_of_hour" value="<?php echo set_value('step_owner_no_of_hour', empty($project->step_owner_no_of_hour) ? '' : $project->step_owner_no_of_hour) ?>"/>
+								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('meeting_owner_no_of_hour')) ? 'danger' : '') ?>" name="meeting_owner_no_of_hour" value="<?php echo set_value('meeting_owner_no_of_hour', empty($project->meeting_owner_no_of_hour) ? '' : $project->meeting_owner_no_of_hour) ?>"/>
 							</div>
 							<div class="list-name basis-20">
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('contributor_no_of_hour')) ? 'danger' : '') ?>" name="contributor_no_of_hour" value="<?php echo set_value('contributor_no_of_hour', empty($project->contributor_no_of_hour) ? '' : $project->contributor_no_of_hour) ?>"/>
@@ -123,7 +123,7 @@
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('project_total_cost')) ? 'danger' : '') ?>" name="project_total_cost" value="<?php echo set_value('project_total_cost', empty($project->project_total_cost) ? '' : $project->project_total_cost) ?>"/>
 							</div>
 							<div class="list-name basis-20">
-								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('step_owner_total_cost')) ? 'danger' : '') ?>" name="step_owner_total_cost" value="<?php echo set_value('step_owner_total_cost', empty($project->step_owner_total_cost) ? '' : $project->step_owner_total_cost) ?>"/>
+								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('meeting_owner_total_cost')) ? 'danger' : '') ?>" name="meeting_owner_total_cost" value="<?php echo set_value('meeting_owner_total_cost', empty($project->meeting_owner_total_cost) ? '' : $project->meeting_owner_total_cost) ?>"/>
 							</div>
 							<div class="list-name basis-20">
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('contributor_total_cost')) ? 'danger' : '') ?>" name="contributor_total_cost" value="<?php echo set_value('contributor_total_cost', empty($project->contributor_total_cost) ? '' : $project->contributor_total_cost) ?>"/>
@@ -138,7 +138,7 @@
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('project_no_of_point')) ? 'danger' : '') ?>" name="project_no_of_point" value="<?php echo set_value('project_no_of_point', empty($project->project_no_of_point) ? '' : $project->project_no_of_point) ?>"/>
 							</div>
 							<div class="list-name basis-20">
-								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('step_owner_no_of_point')) ? 'danger' : '') ?>" name="step_owner_no_of_point" value="<?php echo set_value('step_owner_no_of_point', empty($project->step_owner_no_of_point) ? '' : $project->step_owner_no_of_point) ?>"/>
+								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('meeting_owner_no_of_point')) ? 'danger' : '') ?>" name="meeting_owner_no_of_point" value="<?php echo set_value('meeting_owner_no_of_point', empty($project->meeting_owner_no_of_point) ? '' : $project->meeting_owner_no_of_point) ?>"/>
 							</div>
 							<div class="list-name basis-20">
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('contributor_no_of_point')) ? 'danger' : '') ?>" name="contributor_no_of_point" value="<?php echo set_value('contributor_no_of_point', empty($project->contributor_no_of_point) ? '' : $project->contributor_no_of_point) ?>"/>
@@ -153,7 +153,7 @@
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('project_min_ratio')) ? 'danger' : '') ?>" name="project_min_ratio" value="<?php echo set_value('project_min_ratio', empty($project->project_min_ratio) ? '' : $project->project_min_ratio) ?>"/>
 							</div>
 							<div class="list-name basis-20">
-								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('step_owner_min_ratio')) ? 'danger' : '') ?>" name="step_owner_min_ratio" value="<?php echo set_value('step_owner_min_ratio', empty($project->step_owner_min_ratio) ? '' : $project->step_owner_min_ratio) ?>"/>
+								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('meeting_owner_min_ratio')) ? 'danger' : '') ?>" name="meeting_owner_min_ratio" value="<?php echo set_value('meeting_owner_min_ratio', empty($project->meeting_owner_min_ratio) ? '' : $project->meeting_owner_min_ratio) ?>"/>
 							</div>
 							<div class="list-name basis-20">
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('contributor_min_ratio')) ? 'danger' : '') ?>" name="contributor_min_ratio" value="<?php echo set_value('contributor_min_ratio', empty($project->contributor_min_ratio) ? '' : $project->contributor_min_ratio) ?>"/>
@@ -168,7 +168,7 @@
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('project_min_star')) ? 'danger' : '') ?>" name="project_min_star" value="<?php echo set_value('project_min_star', empty($project->project_min_star) ? '' : $project->project_min_star) ?>"/>
 							</div>
 							<div class="list-name basis-20">
-								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('step_owner_min_star')) ? 'danger' : '') ?>" name="step_owner_min_star" value="<?php echo set_value('step_owner_min_star', empty($project->step_owner_min_star) ? '' : $project->step_owner_min_star) ?>"/>
+								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('meeting_owner_min_star')) ? 'danger' : '') ?>" name="meeting_owner_min_star" value="<?php echo set_value('meeting_owner_min_star', empty($project->meeting_owner_min_star) ? '' : $project->meeting_owner_min_star) ?>"/>
 							</div>
 							<div class="list-name basis-20">
 								<input type="text" class="an-form-control margin-0 <?php echo (! empty(form_error('contributor_min_star')) ? 'danger' : '') ?>" name="contributor_min_star" value="<?php echo set_value('contributor_min_star', empty($project->contributor_min_star) ? '' : $project->contributor_min_star) ?>"/>

@@ -16,7 +16,7 @@ class Project extends Authenticated_Controller
 		$this->load->model('project_constraint_model');
 		$this->load->model('project_expectation_model');
 		$this->load->model('project_member_model');
-		$this->load->model('step/step_model');
+		$this->load->model('meeting/meeting_model');
 		$this->load->model('action/action_model');
 
 		Assets::add_module_js('project', 'projects.js');
@@ -399,13 +399,13 @@ class Project extends Authenticated_Controller
 		// generate links
 		$actions_links = $this->pagination->create_links();
 
-		// pagination for steps
-		$config_steps = $pagination_config;
-		$config_steps['query_string_segment'] = 'steps_page';
-		$config_steps['total_rows'] = $this->project_model->count_steps($project_id);
-		$this->pagination->initialize($config_steps);
+		// pagination for meetings
+		$config_meetings = $pagination_config;
+		$config_meetings['query_string_segment'] = 'meetings_page';
+		$config_meetings['total_rows'] = $this->project_model->count_meetings($project_id);
+		$this->pagination->initialize($config_meetings);
 		// generate links
-		$steps_links = $this->pagination->create_links();
+		$meetings_links = $this->pagination->create_links();
 
 		// pagination for agendas
 		$config_agendas = $pagination_config;
@@ -434,18 +434,18 @@ class Project extends Authenticated_Controller
 			}
 		}
 
-		// get steps current page
-		$steps_current_page = 1;
-		if (! empty($this->input->get('steps_page'))) {
-			$steps_current_page = $this->input->get('steps_page');
+		// get meetings current page
+		$meetings_current_page = 1;
+		if (! empty($this->input->get('meetings_page'))) {
+			$meetings_current_page = $this->input->get('meetings_page');
 		}
-		// get steps list
-		$steps = $this->project_model->get_steps($project_id, $pagination_config['per_page'], ($steps_current_page - 1) * $pagination_config['per_page']);
+		// get meetings list
+		$meetings = $this->project_model->get_meetings($project_id, $pagination_config['per_page'], ($meetings_current_page - 1) * $pagination_config['per_page']);
 
 		// @TODO need to optimize query
-		if ($steps) {
-			foreach ($steps as &$step) {
-				$step->point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
+		if ($meetings) {
+			foreach ($meetings as &$meeting) {
+				$meeting->point_used = number_format($this->mb_project->total_point_used('meeting', $meeting->meeting_id), 2);
 			}
 		}
 
@@ -460,12 +460,12 @@ class Project extends Authenticated_Controller
 		Template::set('info_tab_data', [
 			'paginations' => [
 				'actions' => $actions_links,
-				'steps' => $steps_links,
+				'meetings' => $meetings_links,
 				'agendas' => $agendas_links,
 			],
 			'lists' => [
 				'actions' => $actions,
-				'steps' => $steps,
+				'meetings' => $meetings,
 				'agendas' => $agendas,
 			]
 		]);
@@ -748,7 +748,7 @@ class Project extends Authenticated_Controller
 	private function update_childs($new_cost_code, $project_id)
 	{
 		$actions = $this->project_model->get_actions($project_id, null, null, true, null, 'a.action_key, a.action_id', true);
-		$steps = $this->project_model->get_steps($project_id, null, null, true, null, 's.step_key, s.step_id', true);
+		$meetings = $this->project_model->get_meetings($project_id, null, null, true, null, 's.meeting_key, s.meeting_id', true);
 		$agendas = $this->project_model->get_agendas($project_id, null, null, true, null, 't.agenda_key, t.agenda_id', true);
 
 		if (! empty($actions)) {
@@ -761,14 +761,14 @@ class Project extends Authenticated_Controller
 			$this->db->update_batch('actions', $actions, 'action_id');
 		}
 
-		if (! empty($steps)) {
-			foreach ($steps as &$step) {
-				$keys = explode('-', $step['step_key']);
+		if (! empty($meetings)) {
+			foreach ($meetings as &$meeting) {
+				$keys = explode('-', $meeting['meeting_key']);
 				$keys[0] = $new_cost_code;
-				$step['step_key'] = implode('-', $keys);
+				$meeting['meeting_key'] = implode('-', $keys);
 			}
 
-			$this->db->update_batch('steps', $steps, 'step_id');
+			$this->db->update_batch('meetings', $meetings, 'meeting_id');
 		}
 
 		if (! empty($agendas)) {

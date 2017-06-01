@@ -5,13 +5,13 @@ var rm_option = {
 	lessLink: '<a class=\'readmore rm-less\' href="#"><?php e(lang('show_less'))?></a>'
 };
 
-$('.goal, .step-notes').readmore(rm_option);
+$('.goal, .meeting-notes').readmore(rm_option);
 
-// Edit step
-$('#edit-step').click((e) => {
+// Edit meeting
+$('#edit-meeting').click((e) => {
 	e.preventDefault();
 
-	$.get('<?php e(site_url('step/edit/' . $step_key)) ?>', (data) => {
+	$.get('<?php e(site_url('meeting/edit/' . $meeting_key)) ?>', (data) => {
 		data = JSON.parse(data);
 		$('.modal-edit .modal-content').html(data.modal_content);
 		$('.modal-edit').modal({backdrop: "static"});
@@ -19,27 +19,27 @@ $('#edit-step').click((e) => {
 
 });
 
-$('#start-step').click((e) => {
+$('#start-meeting').click((e) => {
 	e.preventDefault();
 	var _this = this;
 
-	$.post('<?php e(site_url('step/update_status/' . $step_key)) ?>', {status: 'ready'}, (result) => {
+	$.post('<?php e(site_url('meeting/update_status/' . $meeting_key)) ?>', {status: 'ready'}, (result) => {
 		data = JSON.parse(result);
 		
 		if (data.message_type == 'success') {
-			$('#start-step').addClass('hidden');
-			$('#open-step-monitor').removeClass('hidden');
+			$('#start-meeting').addClass('hidden');
+			$('#open-meeting-monitor').removeClass('hidden');
 		}
 	});
 });
 
-// Open step decider if there is a agenda without confirmed status
-if ($('#step-status').data('is-owner') == '1' && ($('#step-status').data('status') == 'resolved' || $('#step-status').data('status') == 'finished')) {
+// Open meeting decider if there is a agenda without confirmed status
+if ($('#meeting-status').data('is-owner') == '1' && ($('#meeting-status').data('status') == 'resolved' || $('#meeting-status').data('status') == 'finished')) {
 	$('.table-detail-agenda tr').each((i, item) => {
 		if ($(item).data('confirm-status') == '') {
-			$('#step-decider .modal-content').html('');
+			$('#meeting-decider .modal-content').html('');
 
-			$.get('<?php e(site_url('step/decider/' . $step_key)) ?>', (data) => {
+			$.get('<?php e(site_url('meeting/decider/' . $meeting_key)) ?>', (data) => {
 				data = JSON.parse(data);
 
 				if (data.modal_content == '') {
@@ -52,8 +52,8 @@ if ($('#step-status').data('is-owner') == '1' && ($('#step-status').data('status
 					return;
 				}
 
-				$('#step-decider .modal-content').html(data.modal_content);
-				$('#step-decider').modal({backdrop: "static"});
+				$('#meeting-decider .modal-content').html(data.modal_content);
+				$('#meeting-decider').modal({backdrop: "static"});
 			});
 		}
 	});
@@ -108,16 +108,16 @@ $(document).on("submit", '.form-ajax', (e) => {
 						}
 					}
 
-					// Step updated
-					if ($(e.target).prop('id') == 'form-update-step') {
+					// Meeting updated
+					if ($(e.target).prop('id') == 'form-update-meeting') {
 						// Gather form data
-						var step_name = $('#form-update-step input[name="name"]').val();
-						var lang_status = $('#form-update-step select[name="status"] option:selected').text();
-						var status = $('#form-update-step select[name="status"] option:selected').val();
-						var goal = $('#form-update-step textarea[name="goal"]').val();
-						var owner_id = $('#form-update-step input[name="owner_id"]').val();
-						var team = $('#form-update-step input[name="team"]').val().split(',');
-						var owner_html = $('.step-detail .owner').html();
+						var meeting_name = $('#form-update-meeting input[name="name"]').val();
+						var lang_status = $('#form-update-meeting select[name="status"] option:selected').text();
+						var status = $('#form-update-meeting select[name="status"] option:selected').val();
+						var goal = $('#form-update-meeting textarea[name="goal"]').val();
+						var owner_id = $('#form-update-meeting input[name="owner_id"]').val();
+						var team = $('#form-update-meeting input[name="team"]').val().split(',');
+						var owner_html = $('.meeting-detail .owner').html();
 						var resource_html = '';
 
 						project_members.forEach((item) => {
@@ -135,18 +135,18 @@ $(document).on("submit", '.form-ajax', (e) => {
 						});
 
 						// Update view
-						$('#step-name').text(step_name);
-						$('.step-detail .status').html('<span class="label label-'+ status +' label-bordered" id="step-status" data-status="'+ status +'" data-is-owner="'+ $('#step-status').data('is-owner') +'">'+ lang_status +'</span>');
-						$('.step-detail .owner').html(owner_html);
-						$('.step-detail .goal').html(goal);
+						$('#meeting-name').text(meeting_name);
+						$('.meeting-detail .status').html('<span class="label label-'+ status +' label-bordered" id="meeting-status" data-status="'+ status +'" data-is-owner="'+ $('#meeting-status').data('is-owner') +'">'+ lang_status +'</span>');
+						$('.meeting-detail .owner').html(owner_html);
+						$('.meeting-detail .goal').html(goal);
 						$('.goal').readmore(rm_option);
-						$('#step-resource').html(resource_html);
+						$('#meeting-resource').html(resource_html);
 
 						// Hide\Show Button for Owner
 						if (owner_id == <?php e($current_user->user_id) ?>) {
-							$('.open-step-monitor').removeClass('hidden');
+							$('.open-meeting-monitor').removeClass('hidden');
 						} else {
-							$('.open-step-monitor').addClass('hidden');
+							$('.open-meeting-monitor').addClass('hidden');
 						}
 					} 
 				}
@@ -173,10 +173,10 @@ $(document).on("submit", '.form-ajax', (e) => {
 	});
 });
 
-// open step evaluator
-$('#open-step-evaluator').click((e) => {
+// open meeting evaluator
+$('#open-meeting-evaluator').click((e) => {
 	e.preventDefault();
-	var is_owner = $('#open-step-evaluator').data('is-owner');
+	var is_owner = $('#open-meeting-evaluator').data('is-owner');
 	if (is_owner == 0) {
 		swal({
 			title: '<?php echo lang('st_waiting') ?>',
@@ -187,12 +187,12 @@ $('#open-step-evaluator').click((e) => {
 		});
 
 		var interval = setInterval(function(){
-			$.get('<?php echo site_url('step/check_state/' . $step_key) ?>').done(function(data) {
+			$.get('<?php echo site_url('meeting/check_state/' . $meeting_key) ?>').done(function(data) {
 				if (data == 1) {
 					clearInterval(interval);
 					swal.close();
 
-					$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+					$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
 						data = JSON.parse(data);
 						$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
 						$('.modal-monitor-evaluator').modal({
@@ -203,7 +203,7 @@ $('#open-step-evaluator').click((e) => {
 			});
 		}, 3000);
 	} else {
-		$.get('<?php echo site_url('step/evaluator/' . $step_key) ?>').done(function(data) {
+		$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
 			data = JSON.parse(data);
 			$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
 			$('.modal-monitor-evaluator').modal({

@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Step_model extends BF_Model
+class Meeting_model extends BF_Model
 {
-	protected $table_name	= 'steps';
-	protected $key			= 'step_id';
+	protected $table_name	= 'meetings';
+	protected $key			= 'meeting_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= true;
@@ -45,7 +45,7 @@ class Step_model extends BF_Model
 	protected $validation_rules		= array(
 		array(
 			'field' => 'name',
-			'label' => 'lang:st_step_name',
+			'label' => 'lang:st_meeting_name',
 			'rules' => 'trim|required|max_length[255]',
 		),
 		array(
@@ -67,31 +67,31 @@ class Step_model extends BF_Model
 		parent::__construct();
 	}
 
-	public function get_step_by_key($step_key, $organization_id, $select = '*', $with_owner = true)
+	public function get_meeting_by_key($meeting_key, $organization_id, $select = '*', $with_owner = true)
 	{
 		$this->select($select);
 		if ($with_owner) {
-			$this->join('users u', 'u.user_id = steps.owner_id', 'left');
+			$this->join('users u', 'u.user_id = meetings.owner_id', 'left');
 		}
 
-		$step = $this->join('actions a', 'a.action_id = steps.action_id', 'inner')
+		$meeting = $this->join('actions a', 'a.action_id = meetings.action_id', 'inner')
 					->join('projects p', 'p.project_id = a.project_id', 'inner')
 					->where('p.organization_id', $organization_id)
-					->find_by('steps.step_key', $step_key);
+					->find_by('meetings.meeting_key', $meeting_key);
 
-        if (! empty($step)) {
-            return $step;
+        if (! empty($meeting)) {
+            return $meeting;
         }
 
         return false;
 	}
 	
-    public function get_step_id($step_key, $organization_id)
+    public function get_meeting_id($meeting_key, $organization_id)
     {
-		$step = $this->get_step_by_key($step_key, $organization_id, 'steps.step_id');
+		$meeting = $this->get_meeting_by_key($meeting_key, $organization_id, 'meetings.meeting_id');
 
-        if (! empty($step)) {
-            return $step->step_id;
+        if (! empty($meeting)) {
+            return $meeting->meeting_id;
         }
 
         return false;
