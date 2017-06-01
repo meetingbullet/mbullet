@@ -171,11 +171,11 @@ class Dashboard extends Authenticated_Controller
 									->join('users u', 'u.user_id = meetings.owner_id')
 									->join('actions a', 'a.action_id = meetings.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
-									->join('step_members sm', 'sm.step_id = meetings.step_id', 'LEFT')
+									->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
 									->where('(meetings.status = "ready" OR meetings.status = "inprogress")', null, false)
 									->where('organization_id', $this->current_user->current_organization_id)
 									->where('p.project_id', $project->project_id)
-									->group_by('meetings.step_id')
+									->group_by('meetings.meeting_id')
 									->find_all();
 			if (empty($active_steps)) {
 				$active_steps = [];
@@ -190,7 +190,7 @@ class Dashboard extends Authenticated_Controller
 			$rate = $this->meeting_model->select('SUM(sm.rate) as total_rate, (COUNT(*) * 5) as max_rate')
 									->join('actions a', 'a.action_id = meetings.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
-									->join('step_members sm', 'sm.step_id = meetings.step_id', 'LEFT')
+									->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
 									->where('organization_id', $this->current_user->current_organization_id)
 									->find_by('p.project_id', $project->project_id);
 			$project->total_rate = empty($rate->total_rate) ? 0 : $rate->total_rate;
@@ -222,7 +222,7 @@ class Dashboard extends Authenticated_Controller
 	private function get_my_todo()
 	{
 		$homeworks = $this->homework_model->select('homework.*')
-										->join('meetings s', 's.step_id = homework.step_id')
+										->join('meetings s', 's.meeting_id = homework.meeting_id')
 										->join('actions a', 'a.action_id = s.action_id')
 										->join('projects p', 'p.project_id = a.project_id')
 										->join('homework_members hm', 'hm.homework_id = homework.homework_id', 'LEFT')
@@ -238,11 +238,11 @@ class Dashboard extends Authenticated_Controller
 								->join('users u', 'u.user_id = meetings.owner_id')
 								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
-								->join('step_members sm', 'sm.step_id = meetings.step_id', 'LEFT')
+								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
 								->where('(sm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
 								->where('organization_id', $this->current_user->current_organization_id)
 								->where('meetings.manage_state = \'evaluate\'')
-								->group_by('meetings.step_id')
+								->group_by('meetings.meeting_id')
 								->find_all();
 		if (empty($evaluates)) {
 			$evaluates = [];
@@ -251,11 +251,11 @@ class Dashboard extends Authenticated_Controller
 								->join('users u', 'u.user_id = meetings.owner_id')
 								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
-								->join('step_members sm', 'sm.step_id = meetings.step_id', 'LEFT')
+								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
 								->where('meetings.owner_id', $this->current_user->user_id)
 								->where('organization_id', $this->current_user->current_organization_id)
 								->where('meetings.manage_state = \'decide\'')
-								->group_by('meetings.step_id')
+								->group_by('meetings.meeting_id')
 								->find_all();
 		if (empty($decides)) {
 			$decides = [];

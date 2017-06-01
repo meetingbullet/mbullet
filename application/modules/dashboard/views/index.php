@@ -127,7 +127,7 @@ $project_status_labels = [
 						<div class="steps">
 							<?php foreach($owner['items'] as $step) : ?>
 							<div class="item">
-								<a href="<?php echo site_url('step/' . $step->step_key) ?>"><?php echo "<span class='msg-tag label label-bordered label-inactive'>{$step->step_key}</span> {$step->name}" ?></a>
+								<a href="<?php echo site_url('step/' . $step->meeting_key) ?>"><?php echo "<span class='msg-tag label label-bordered label-inactive'>{$step->meeting_key}</span> {$step->name}" ?></a>
 							</div>
 							<?php endforeach ?>
 						</div>
