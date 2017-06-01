@@ -51,9 +51,87 @@
 	border-bottom: 1px solid #025d83;
 	padding-bottom: 10px;
 	display: table;
-	padding-right: 5%;
+	padding-right: 10%;
 }
 
 .project-list > .item {
-	border-bottom: 1px solid #aaa
+	border-bottom: 1px solid #aaa;
+}
+
+.project-list > .item .general-info h3 {
+	text-transform: capitalize;
+}
+
+.project-list > .item .general-info .project-info {
+	padding-left: 15px;
+	padding-bottom: 15px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.project-list > .item .general-info .project-info > div {
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+}
+
+.project-list > .item .general-info .project-info > div > * {
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 100%;
+	margin-bottom: 0;
+}
+
+.project-list > .item .owners {
+	padding-left: 65px;
+}
+
+.project-list > .item .owners > .item {
+	padding-bottom: 15px;
+}
+
+.project-list > .item .owners > .item .owner-info {
+	position: relative;
+}
+
+.project-list > .item .owners > .item .owner-info::before {
+	content: '';
+	position: absolute;
+	display: block;
+	height: 100%;
+	width: 15px;
+	border-bottom: 2px solid #025d83;
+	left: -20px;
+	top: -9px;
+}
+
+.project-list > .item .owners > .item {
+	position: relative;
+}
+
+.project-list > .item .owners > .item::after {
+	content: '';
+	position: absolute;
+	display: block;
+	height: 100%;
+	width: 1px;
+	border-left: 2px solid #025d83;
+	left: -20px;
+	top: -10px;
+}
+
+.project-list > .item .owners > .item:last-child::after {
+	height: 25px;
+}
+
+.project-list > .item .owners > .item .steps {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.project-list > .item .owners > .item .steps > .item {
+	padding-left: 30px;
+	padding-bottom: 5px;
 }

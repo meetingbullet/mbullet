@@ -56,8 +56,12 @@ $(document).ready(function() {
 
 					if (data.message_type == 'success') {
 						// New project created, insert to project list
-						$('#project-list .an-lists-body').append($.templates('#project-row').render(data.data));
-						$('#project-list .an-lists-body > div:last-child').effect("highlight", {}, 3000);
+						// $('#project-list .an-lists-body').append($.templates('#project-row').render(data.data));
+						// $('#project-list .an-lists-body > div:last-child').effect("highlight", {}, 3000);
+						$.get($('.my-projects').data('my-projects-url')).done(function(data) {
+							data = JSON.parse(data);
+							$('.my-projects .project-list').html(data.modal_content);
+						})
 					}
 				}
 			}
