@@ -208,7 +208,7 @@ class Mb_project
 			->having('NOT(total IS NULL)');
 
 		switch ($object_type) {
-			case 'agenda':
+			case 'homework':
 				$homework_point = $homework_point->where('hw.homework_id', $object_id)->get();
 				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
 				break;
@@ -225,7 +225,7 @@ class Mb_project
 				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
 				break;
 			case 'user':
-				$homework_point = $agenda_phomework_pointoint->where('tm.user_id', $object_id)->get();
+				$homework_point = $homework_point->where('hwm.user_id', $object_id)->get();
 				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
 				break;
 			default:
