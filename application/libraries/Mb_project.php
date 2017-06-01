@@ -155,7 +155,15 @@ class Mb_project
 		return $this->total_agenda_point_used($object_type, $object_id, $organization_id) + $this->total_homework_point_used($object_type, $object_id, $organization_id);
 	}
 
-	public function total_agenda_point_used($object_type, $object_id, $organization_id = null)
+	/**
+	 * Calculate total agenda point used of an object
+	 *
+	 * @param string $object_type One of following values: project, action, meeting, agenda
+	 * @param int $object_id
+	 * @param int $organization_id If this value is NULL, it will get current organization ID
+	 * @return double
+	 */
+	private function total_agenda_point_used($object_type, $object_id, $organization_id = null)
 	{
 		if (! isset($this->ci->auth->user()->current_organization_id) && is_null($organization_id)) return false;
 		elseif (is_null($organization_id)) $organization_id = $this->ci->auth->user()->current_organization_id;
@@ -189,13 +197,21 @@ class Mb_project
 				if ($agenda_point->num_rows() > 0) return doubleval($agenda_point->row()->total);
 				break;
 			default:
-				return false;
+				return 0;
 		}
 
-		return -1;
+		return 0;
 	}
 
-	public function total_homework_point_used($object_type, $object_id, $organization_id = null)
+	/**
+	 * Calculate total homework point used of an object
+	 *
+	 * @param string $object_type One of following values: project, action, meeting, agenda
+	 * @param int $object_id
+	 * @param int $organization_id If this value is NULL, it will get current organization ID
+	 * @return double
+	 */
+	private function total_homework_point_used($object_type, $object_id, $organization_id = null)
 	{
 		if (! isset($this->ci->auth->user()->current_organization_id) && is_null($organization_id)) return false;
 		elseif (is_null($organization_id)) $organization_id = $this->ci->auth->user()->current_organization_id;
@@ -229,10 +245,10 @@ class Mb_project
 				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
 				break;
 			default:
-				return -1;
+				return 0;
 		}
 
-		return -1;
+		return 0;
 	}
 
 	/**
