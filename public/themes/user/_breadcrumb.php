@@ -31,7 +31,7 @@ if (! is_null($this->uri->segment(1))) {
 				'path' => null
 			];
 			break;
-		case 'step':
+		case 'meeting':
 			$action = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
 			$project = substr($action, 0, strrpos($action, '-'));
 

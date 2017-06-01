@@ -152,10 +152,15 @@ class Mb_project
 	 */
 	public function total_point_used($object_type, $object_id, $organization_id = null)
 	{
+		return $this->total_agenda_point_used($object_type, $object_id, $organization_id) + $this->total_homework_point_used($object_type, $object_id, $organization_id);
+	}
+
+	public function total_agenda_point_used($object_type, $object_id, $organization_id = null)
+	{
 		if (! isset($this->ci->auth->user()->current_organization_id) && is_null($organization_id)) return false;
 		elseif (is_null($organization_id)) $organization_id = $this->ci->auth->user()->current_organization_id;
 
-		$query = $this->ci->db->select('IFNULL(SUM((t.finished_on - t.started_on) / 60 * uo.cost_of_time), 0) AS total')
+		$agenda_point = $this->ci->db->select('IFNULL(SUM((t.finished_on - t.started_on) / 60 * uo.cost_of_time), 0) AS total')
 			->from('agendas t')
 			->join('agenda_members tm', 'tm.agenda_id = t.agenda_id')
 			->join('user_to_organizations uo', 'uo.user_id = tm.user_id')
@@ -164,31 +169,72 @@ class Mb_project
 
 		switch ($object_type) {
 			case 'agenda':
-				$query = $query->where('t.agenda_id', $object_id)->get();
-				if ($query->num_rows() > 0) return doubleval($query->row()->total);
+				$agenda_point = $agenda_point->where('t.agenda_id', $object_id)->get();
+				if ($agenda_point->num_rows() > 0) return doubleval($agenda_point->row()->total);
 				break;
 			case 'meeting':
-				$query = $query->where('t.meeting_id', $object_id)->get();
-				if ($query->num_rows() > 0) return doubleval($query->row()->total);
+				$agenda_point = $agenda_point->where('t.meeting_id', $object_id)->get();
+				if ($agenda_point->num_rows() > 0) return doubleval($agenda_point->row()->total);
 				break;
 			case 'action':
-				$query = $query->join('meetings s', 's.meeting_id = t.meeting_id')->where('s.action_id', $object_id)->get();
-				if ($query->num_rows() > 0) return doubleval($query->row()->total);
+				$agenda_point = $agenda_point->join('meetings s', 's.meeting_id = t.meeting_id')->where('s.action_id', $object_id)->get();
+				if ($agenda_point->num_rows() > 0) return doubleval($agenda_point->row()->total);
 				break;
 			case 'project':
-				$query = $query->join('meetings s', 's.meeting_id = t.meeting_id')->join('actions a', 'a.action_id = s.action_id')->where('a.project_id', $object_id)->get();
-				if ($query->num_rows() > 0) return doubleval($query->row()->total);
+				$agenda_point = $agenda_point->join('meetings s', 's.meeting_id = t.meeting_id')->join('actions a', 'a.action_id = s.action_id')->where('a.project_id', $object_id)->get();
+				if ($agenda_point->num_rows() > 0) return doubleval($agenda_point->row()->total);
 				break;
 			case 'user':
-				$query = $query->where('tm.user_id', $object_id)->get();
-				if ($query->num_rows() > 0) return doubleval($query->row()->total);
+				$agenda_point = $agenda_point->where('tm.user_id', $object_id)->get();
+				if ($agenda_point->num_rows() > 0) return doubleval($agenda_point->row()->total);
 				break;
 			default:
 				return false;
 		}
 
-		return false;
+		return -1;
 	}
+
+	public function total_homework_point_used($object_type, $object_id, $organization_id = null)
+	{
+		if (! isset($this->ci->auth->user()->current_organization_id) && is_null($organization_id)) return false;
+		elseif (is_null($organization_id)) $organization_id = $this->ci->auth->user()->current_organization_id;
+
+		$homework_point = $this->ci->db->select('IFNULL(SUM(hw.time_spent * uo.cost_of_time), 0) AS total')
+			->from('homework hw')
+			->join('homework_members hwm', 'hwm.homework_id = hw.homework_id')
+			->join('user_to_organizations uo', 'uo.user_id = hwm.user_id')
+			->where('uo.organization_id', $organization_id)
+			->having('NOT(total IS NULL)');
+
+		switch ($object_type) {
+			case 'agenda':
+				$homework_point = $homework_point->where('hw.homework_id', $object_id)->get();
+				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
+				break;
+			case 'meeting':
+				$homework_point = $homework_point->where('hw.meeting_id', $object_id)->get();
+				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
+				break;
+			case 'action':
+				$homework_point = $homework_point->join('meetings s', 's.meeting_id = hw.meeting_id')->where('s.action_id', $object_id)->get();
+				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
+				break;
+			case 'project':
+				$homework_point = $homework_point->join('meetings s', 's.meeting_id = hw.meeting_id')->join('actions a', 'a.action_id = s.action_id')->where('a.project_id', $object_id)->get();
+				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
+				break;
+			case 'user':
+				$homework_point = $agenda_phomework_pointoint->where('tm.user_id', $object_id)->get();
+				if ($homework_point->num_rows() > 0) return doubleval($homework_point->row()->total);
+				break;
+			default:
+				return -1;
+		}
+
+		return -1;
+	}
+
 	/**
 	 * Send email to project/action/meeting/agenda members
 	 *
