@@ -10,7 +10,7 @@
 <div class="container-fluid modal-body">
 	<?php echo mb_form_input('text', 'name', lang('hw_name'), true, null) ?>
 	<?php echo mb_form_input('text', 'description', lang('hw_description'), false, null) ?>
-	<?php echo mb_form_input('number', 'time_spent', lang('hw_time_spent'), true, null, 'an-form-control', null, null, null, 'step=".01"') ?>
+	<?php echo mb_form_input('number', 'time_spent', lang('hw_time_spent'), true, null, 'an-form-control', null, null, null, 'meeting=".01"') ?>
 	<?php echo mb_form_input('text', 'member', lang('hw_member'), true, null, 'team select-member an-tags-input', '', lang('hw_add_team_member')) ?>
 </div>
 

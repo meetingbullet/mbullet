@@ -3,12 +3,12 @@
 		<?php if ($this->input->is_ajax_request()): ?>
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-			<h4 class="modal-title"><?php e(lang('st_create_step'))?></h4>
+			<h4 class="modal-title"><?php e(lang('st_create_meeting'))?></h4>
 		</div> <!-- end MODAL-HEADER -->
 		<?php else: ?>
 		<div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 			<div class="an-page-title">
-			<h2><?php e(lang('st_create_step'))?></h2>
+			<h2><?php e(lang('st_create_meeting'))?></h2>
 			</div>
 		</div> <!-- end AN-BODY-TOPBAR -->
 		<?php endif; ?>
@@ -33,7 +33,7 @@
 							<li><?php echo $agenda->name . ' - ' . word_limiter($agenda->description, 10)?></li>
 							<?php endforeach;?>
 						</ul>
-						<?php e(lang('st_please_create_a_new_step_to_finish_it')); ?>
+						<?php e(lang('st_please_create_a_new_meeting_to_finish_it')); ?>
 					</div>
 					<?php endif; ?>
 				<?php endif; ?>
@@ -56,7 +56,7 @@
 					<div class="col-md-9 col-sm-12">
 						<div class="row">
 							<div class="col-md-3">
-								<input type="number" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in', 0)) ?>" step="0.1">
+								<input type="number" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in', 0)) ?>" meeting="0.1">
 							</div>
 							<div class="col-md-3">
 								<?php e(lang('st_minutes'))?>

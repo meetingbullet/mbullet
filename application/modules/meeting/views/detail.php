@@ -1,11 +1,11 @@
 <?php
 
 $scheduled_start_time = null;
-$is_owner = $step->owner_id == $current_user->user_id;
+$is_owner = $meeting->owner_id == $current_user->user_id;
 
-if ($step->scheduled_start_time) {
-	$scheduled_start_time = strtotime($step->scheduled_start_time);
-	$scheduled_end_time = strtotime('+' . $step->in . ' ' . $step->in_type, $scheduled_start_time);
+if ($meeting->scheduled_start_time) {
+	$scheduled_start_time = strtotime($meeting->scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $meeting->in . ' ' . $meeting->in_type, $scheduled_start_time);
 
 	$scheduled_start_time = gmdate('Y-m-d H:i:s', $scheduled_start_time);
 	$scheduled_end_time = gmdate('Y-m-d H:i:s', $scheduled_end_time);
@@ -19,22 +19,10 @@ $label = [
 	'resolved' => 'label label-success label-bordered'
 ];
 
-$agenda_status_labels = [
-	'open' => 'label label-default label-bordered',
-	'inprogress' => 'label label-warning label-bordered',
-	'resolved' => 'label label-success label-bordered',
-	'jumped' => 'label label-info label-bordered',
-	'skipped' => 'label label-success label-bordered',
-	'parking_lot' => 'label label-info label-bordered',
-	'closed' => 'label label-default label-bordered',
-	'closed_parking_lot' => 'label label-primary label-bordered',
-	'open_parking_lot' => 'label label-primary label-bordered',
-];
-
 $buttons = [
 	'open' => [
 		'icon' => 'ion-ios-play',
-		'label' => lang('st_start_step'),
+		'label' => lang('st_start_meeting'),
 		'next_status' => 'inprogress',
 	],
 	'inprogress' => [
@@ -44,7 +32,7 @@ $buttons = [
 	],
 	'ready' => [
 		'icon' => 'ion-android-done-all',
-		'label' => lang('st_resolve_step'),
+		'label' => lang('st_resolve_meeting'),
 		'next_status' => 'resolved',
 	],
 	'resolved' => [
@@ -54,58 +42,56 @@ $buttons = [
 	]
 ];
 
-$action_key = explode('-', $step_key);
+$action_key = explode('-', $meeting_key);
 $action_key = $action_key['0'] . '-' . $action_key[1];
 $members = array_column($invited_members, 'user_id');
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
-		<h2 id="step-name"><?php e($step->name)?></h2>
+		<h2 id="meeting-name"><?php e($meeting->name)?></h2>
 	</div>
 </div> <!-- end AN-BODY-TOPBAR -->
 
 <div class="btn-block">
 	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
-	<a href='#' id="edit-step" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
-	<?php if (in_array($current_user->user_id, $members) || $is_owner) : ?>
-		<?php if ($step->status == 'open'): ?>
-			<a href='#' class='mb-open-modal open-step-monitor an-btn an-btn-primary step-open<?php echo ($is_owner ? '' : ' hidden')?>'
-				data-modal-id="step-monitor-modal"
-				data-url="<?php e(site_url('step/monitor/' . $step_key)) ?>" 
-				data-modal-dialog-class="modal-80"
-			>
-				<i class="ion-ios-play"></i> <?php e(lang('st_set_up')); ?>
-			</a>
-		<?php elseif ($step->status == 'ready' || $step->status == 'inprogress'): ?>
-			<a href='#' class='mb-open-modal open-step-monitor an-btn an-btn-primary<?php echo ($is_owner ? '' : ' hidden')?>'
-				data-modal-id="step-monitor-modal"
-				data-url="<?php e(site_url('step/monitor/' . $step_key)) ?>" 
-				data-modal-dialog-class="modal-80"
-			>
-				<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
-			</a>
-			<a href='#' class='mb-open-modal open-step-monitor an-btn an-btn-primary<?php echo (!$is_owner && $step->status == 'inprogress'? '' : ' hidden')?>'
-				data-modal-id="step-monitor-modal"
-				data-url="<?php e(site_url('step/monitor/' . $step_key)) ?>" 
-				data-modal-dialog-class="modal-80"
-			>
-				<i class="ion-ios-play"></i> <?php e(lang('st_join')); ?>
-			</a>
-		<?php endif; ?>
+	<a href='#' id="edit-meeting" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
+	<?php if ($meeting->status == 'open'): ?>
+		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-primary meeting-open<?php echo ($is_owner ? '' : ' hidden')?>'
+			data-modal-id="meeting-monitor-modal"
+			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
+			data-modal-dialog-class="modal-80"
+		>
+			<i class="ion-ios-play"></i> <?php e(lang('st_set_up')); ?>
+		</a>
+	<?php elseif ($meeting->status == 'ready' || $meeting->status == 'inprogress'): ?>
+		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-primary<?php echo ($is_owner ? '' : ' hidden')?>'
+			data-modal-id="meeting-monitor-modal"
+			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
+			data-modal-dialog-class="modal-80"
+		>
+			<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
+		</a>
+		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-primary<?php echo (!$is_owner && $meeting->status == 'inprogress'? '' : ' hidden')?>'
+			data-modal-id="meeting-monitor-modal"
+			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
+			data-modal-dialog-class="modal-80"
+		>
+			<i class="ion-ios-play"></i> <?php e(lang('st_join')); ?>
+		</a>
 	<?php endif; ?>
 
-	<?php if ($step->manage_state == 'decide' && $is_owner): ?>
+	<?php if ($meeting->manage_state == 'decide' && $is_owner): ?>
 
 	<a href='#' class='an-btn an-btn-primary mb-open-modal'
-		data-modal-id="step-decider-modal"
-		data-url="<?php e(site_url('step/decider/' . $step_key)) ?>" 
+		data-modal-id="meeting-decider-modal"
+		data-url="<?php e(site_url('meeting/decider/' . $meeting_key)) ?>" 
 		data-modal-dialog-class="modal-80"
 	><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
 
 	<?php endif; ?>
 
-	<?php if ($step->manage_state == 'evaluate' && $evaluated === false): ?>
-	<a href='#' id="open-step-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
+	<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false): ?>
+	<a href='#' id="open-meeting-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
 	<?php endif; ?>
 </div>
 
@@ -116,24 +102,24 @@ $members = array_column($invited_members, 'user_id');
 				<h6><?php e(lang('st_detail'))?> </h6>
 			</div>
 			<div class="an-component-body">
-				<div class="an-helper-block step-detail readmore-container">
+				<div class="an-helper-block meeting-detail readmore-container">
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_owner'))?></div>
-						<div class="col-xs-8 owner"><?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?></div>
+						<div class="col-xs-8 owner"><?php echo display_user($meeting->email, $meeting->first_name, $meeting->last_name, $meeting->avatar); ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_goal'))?></div>
 						<div class="col-xs-8">
-							<div class="step-goal-container">
+							<div class="meeting-goal-container">
 								<div class="goal">
-									<?php echo $step->goal?></div>
+									<?php echo $meeting->goal?></div>
 								</div>
 							</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
 						<div class="col-xs-8 status">
-							<span class="<?php e($label[$step->status])?>" id="step-status" data-status="<?php e($step->status)?>" data-is-owner="<?php e($is_owner ? 1 : 0)?>"><?php e(lang('st_' . $step->status))?></span>
+							<span class="<?php e($label[$meeting->status])?>" id="meeting-status" data-status="<?php e($meeting->status)?>" data-is-owner="<?php e($is_owner ? 1 : 0)?>"><?php e(lang('st_' . $meeting->status))?></span>
 						</div>
 
 					</div>
@@ -141,31 +127,31 @@ $members = array_column($invited_members, 'user_id');
 						<div class="col-xs-4"><?php e(lang('st_point_used')) ?></div>
 						<div class="col-xs-8 point-used"><?php e($point_used) ?></div>
 					</div>
-					<?php if ($step->scheduled_start_time): ?>
+					<?php if ($meeting->scheduled_start_time): ?>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_scheduled_duration')) ?></div>
-						<div class="col-xs-8"><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time)) ?></div>
+						<div class="col-xs-8"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time)) ?></div>
 					</div>
 					<?php endif;?>
-					<?php if ($step->actual_start_time && $step->actual_end_time): ?>
+					<?php if ($meeting->actual_start_time && $meeting->actual_end_time): ?>
 					<div class="row">
 						<div class="col-xs-4"><?php e(ucfirst(lang('st_actual_duration')))?></div>
-						<div class="col-xs-8"><?php echo timespan(strtotime($step->actual_start_time), strtotime($step->actual_end_time)) ?></div>
+						<div class="col-xs-8"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></div>
 					</div>
 					<?php endif;?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div> <!-- end .AN-SINGLE-COMPONENT  -->
 
-		<?php if (! empty($step->notes)) : ?>
+		<?php if (! empty($meeting->notes)) : ?>
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_notes_summary'))?></h6>
 			</div>
 			<div class="an-component-body">
 				<div class="an-helper-block readmore-container">
-					<div class="an-input-group step-notes">
-						<?php echo nl2br($step->notes) ?>
+					<div class="an-input-group meeting-notes">
+						<?php echo nl2br($meeting->notes) ?>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -188,7 +174,7 @@ $members = array_column($invited_members, 'user_id');
 									<th><?php e(lang('st_description'))?></th>
 									<th><?php e(lang('st_assignee'))?></th>
 									<th class="text-center"><?php e(lang('st_status'))?></th>
-									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
+									<?php if ($meeting->status == 'finished' || $meeting->status == 'resolved') : ?>
 									<th class="text-center"><?php e(lang('st_confirmation_status'))?></th>
 									<?php endif ?>
 								</tr>
@@ -209,7 +195,7 @@ $members = array_column($invited_members, 'user_id');
 									<td class='basis-10 agenda-status text-center'>
 										<span class="label label-bordered label-<?php e($agenda->status)?>"><?php e(lang('st_' . $agenda->status))?></span>
 									</td>
-									<?php if ($step->status == 'finished' || $step->status == 'resolved') : ?>
+									<?php if ($meeting->status == 'finished' || $meeting->status == 'resolved') : ?>
 									<td class='basis-10 agenda-status text-center'>
 										<span class="label label-bordered label-<?php e($agenda->confirm_status) ?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 									</td>
@@ -220,8 +206,8 @@ $members = array_column($invited_members, 'user_id');
 						</table>
 					</div>
 
-					<?php if ($step->status == 'open'): ?>
-					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-agenda-url="<?php echo site_url('agenda/create/' . $step_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-agenda"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_agenda')?></button>
+					<?php if ($meeting->status == 'open'): ?>
+					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-agenda-url="<?php echo site_url('agenda/create/' . $meeting_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-agenda"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_agenda')?></button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -267,8 +253,8 @@ $members = array_column($invited_members, 'user_id');
 						</table>
 					</div>
 
-					<?php if ($step->status == 'open'): ?>
-					<button class="an-btn an-btn-primary mb-open-modal" data-modal-id="create-homework-modal" data-url="<?php echo site_url('homework/create/' . $step->step_key) ?>" ><?php echo '<i class="ion-android-add"></i> ' . lang('hw_add_homework')?></button>
+					<?php if ($meeting->status == 'open'): ?>
+					<button class="an-btn an-btn-primary mb-open-modal" data-modal-id="create-homework-modal" data-url="<?php echo site_url('homework/create/' . $meeting->meeting_key) ?>" ><?php echo '<i class="ion-android-add"></i> ' . lang('hw_add_homework')?></button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -284,7 +270,7 @@ $members = array_column($invited_members, 'user_id');
 			<div class="an-component-body">
 				<div class="an-helper-block">
 					<div class="an-input-group">
-						<ul id="step-resource" class="list-unstyled list-member">
+						<ul id="meeting-resource" class="list-unstyled list-member">
 							<?php if ($invited_members) { foreach ($invited_members as $user) { ?>
 							<li>
 								<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
@@ -303,7 +289,7 @@ $members = array_column($invited_members, 'user_id');
 				<h6><?php e(lang('st_date'))?></h6>
 			</div>
 			<div class="an-component-body">
-				<div class="an-helper-block step-detail">
+				<div class="an-helper-block meeting-detail">
 					<?php if ($scheduled_start_time): ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_scheduled_start_time'))?></div>
@@ -315,29 +301,29 @@ $members = array_column($invited_members, 'user_id');
 					</div>
 					<hr/>
 					<?php endif; ?>
-					<?php if ($step->actual_start_time): ?>
+					<?php if ($meeting->actual_start_time): ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_actual_start_time'))?></div>
-						<div class="col-xs-7"><?php e(display_time($step->actual_start_time)); ?></div>
+						<div class="col-xs-7"><?php e(display_time($meeting->actual_start_time)); ?></div>
 					</div>
 
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_actual_end_time'))?></div>
-						<?php if ($step->status == 'inprogress') : ?>
+						<?php if ($meeting->status == 'inprogress') : ?>
 						<div class="col-xs-7"><?php e(lang('st_actual_end_time_still_inprogress')); ?></div>
 						<?php else: ?>
-						<div class="col-xs-7"><?php e(display_time($step->actual_start_time)); ?></div>
+						<div class="col-xs-7"><?php e(display_time($meeting->actual_start_time)); ?></div>
 						<?php endif; ?>
 					</div>
 					<hr/>
 					<?php endif; ?>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_created'))?></div>
-						<div class="col-xs-7"><?php e(display_time($step->created_on)); ?></div>
+						<div class="col-xs-7"><?php e(display_time($meeting->created_on)); ?></div>
 					</div>
 					<div class="row">
 						<div class="col-xs-5"><?php e(lang('st_updated'))?></div>
-						<div class="col-xs-7"><?php e(display_time($step->modified_on)); ?></div>
+						<div class="col-xs-7"><?php e(display_time($meeting->modified_on)); ?></div>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -353,14 +339,14 @@ $members = array_column($invited_members, 'user_id');
 	</div>
 </div>
 
-<div id="step-decider" class="modal fade" tabindex="-1" role="dialog">
+<div id="meeting-decider" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-80" role="document">
 		<div class="modal-content">
 		</div>
 	</div>
 </div>
 
-<div id="create-step" class="modal fade" tabindex="-1" role="dialog">
+<div id="create-meeting" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
@@ -448,7 +434,7 @@ $members = array_column($invited_members, 'user_id');
 		<td>
 			<a href="#" class="time-spent" 
 			data-type="text" 
-			data-tpl="<input type='number' step='0.01'>" 
+			data-tpl="<input type='number' meeting='0.01'>" 
 			data-name="time_spent" 
 			data-pk="{{:homework_id}}" 
 			data-url="<?php echo site_url('homework/ajax_edit') ?>" 

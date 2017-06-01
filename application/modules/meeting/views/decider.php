@@ -1,26 +1,26 @@
 <?php
-$is_owner = $step->owner_id == $current_user->user_id;
+$is_owner = $meeting->owner_id == $current_user->user_id;
 $scheduled_start_time = null;
 
-if ($step->scheduled_start_time) {
+if ($meeting->scheduled_start_time) {
 	// Fix add StrToTime with Float number
-	if ( (int) $step->in !== $step->in ) {
-		switch ($step->in_type) {
+	if ( (int) $meeting->in !== $meeting->in ) {
+		switch ($meeting->in_type) {
 			case 'weeks':
-				$step->in *= 7;
+				$meeting->in *= 7;
 			case 'days':
-				$step->in *= 24;
+				$meeting->in *= 24;
 			case 'hours':
-				$step->in *= 60;
+				$meeting->in *= 60;
 			case 'minutes':
-				$step->in *= 60;
+				$meeting->in *= 60;
 		}
 	}
 
-	$scheduled_start_time = strtotime($step->scheduled_start_time);
-	$scheduled_end_time = strtotime('+' . $step->in . ' seconds', $scheduled_start_time);
-	$step->in = round( $step->in / 60, 2);
-	$step->in_type = 'minutes';
+	$scheduled_start_time = strtotime($meeting->scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $meeting->in . ' seconds', $scheduled_start_time);
+	$meeting->in = round( $meeting->in / 60, 2);
+	$meeting->in_type = 'minutes';
 
 	$scheduled_start_time = date('Y-m-d H:i:s', $scheduled_start_time);
 	$scheduled_end_time = date('Y-m-d H:i:s', $scheduled_end_time);
@@ -42,30 +42,30 @@ $confirmation_status = [
 ];
 
 ?>
-<div class="step-decider" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
+<div class="meeting-decider" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-		<h4 class="modal-title"><?php e(lang('st_step_decider'))?></h4>
+		<h4 class="modal-title"><?php e(lang('st_meeting_decider'))?></h4>
 	</div> <!-- end MODAL-HEADER -->
 	<?php endif; ?>
 
-	<?php echo form_open(site_url('step/update_decider/' . $step->step_key), ['class' => 'form-inline form-step-decider an-helper-block']) ?>
+	<?php echo form_open(site_url('meeting/update_decider/' . $meeting->meeting_key), ['class' => 'form-inline form-meeting-decider an-helper-block']) ?>
 		<div class="an-body-topbar">
 			<div class="an-page-title">
 				<div class="an-bootstrap-custom-tab">
-					<h2><?php e($step->name)?></h2>
+					<h2><?php e($meeting->name)?></h2>
 				</div>
 			</div>
 			<div class="pull-right">
 			</div>
 		</div> <!-- end AN-BODY-TOPBAR -->
 
-		<div class="decider-step-container row">
+		<div class="decider-meeting-container row">
 			<div class="col-md-5">
 				<div class="an-single-component with-shadow">
 					<div class="an-component-body an-helper-block">
-						<table class="table table-striped table-step-time">
+						<table class="table table-striped table-meeting-time">
 							<thead>
 								<tr>
 									<th></th>
@@ -77,17 +77,17 @@ $confirmation_status = [
 								<tr>
 									<td><strong><?php e(lang('st_start_time')) ?></strong></td>
 									<td class="text-center"><?php echo display_time($scheduled_start_time) ?></td>
-									<td class="text-center"><?php echo display_time($step->actual_start_time) ?></td>
+									<td class="text-center"><?php echo display_time($meeting->actual_start_time) ?></td>
 								</tr>
 								<tr>
 									<td><strong><?php e(lang('st_end_time')) ?></strong></td>
 									<td class="text-center"><?php echo display_time($scheduled_end_time) ?></td>
-									<td class="text-center"><?php echo display_time($step->actual_end_time) ?></td>
+									<td class="text-center"><?php echo display_time($meeting->actual_end_time) ?></td>
 								</tr>
 								<tr>
 									<td><strong><?php e(lang('st_elapsed_time')) ?></strong></td>
-									<td class="text-center"><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
-									<td class="text-center"><?php echo timespan(strtotime($step->actual_start_time), strtotime($step->actual_end_time)) ?></td>
+									<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
+									<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
 								</tr>
 							</tbody>
 						</table>
@@ -101,7 +101,7 @@ $confirmation_status = [
 						<h6><?php e(lang('st_goal'))?></h6>
 					</div>
 					<div class="an-component-body an-helper-block">
-						<?php echo nl2br($step->goal)?>
+						<?php echo nl2br($meeting->goal)?>
 					</div> <!-- end .AN-COMPONENT-BODY -->
 				</div>
 			</div>
@@ -112,7 +112,7 @@ $confirmation_status = [
 					</div>
 					<div class="an-component-body an-helper-block">
 						<ul class="list-unstyled list-member">
-							<?php foreach ($step->members as $user) { ?>
+							<?php foreach ($meeting->members as $user) { ?>
 							<li>
 								<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
 
@@ -130,7 +130,7 @@ $confirmation_status = [
 				<h6><?php e(lang('st_agendas'))?></h6>
 			</div>
 			<div class="an-component-body an-helper-block">
-				<table class="table table-striped table-step-time">
+				<table class="table table-striped table-meeting-time">
 					<thead>
 						<tr>
 							<th><?php e(lang('st_name'))?></th>
@@ -170,7 +170,7 @@ $confirmation_status = [
 		<div class="row">
 			<div class="col-md-12">
 				<textarea id="note" name="note" rows="6" class="an-form-control note" placeholder="<?php e(lang('st_write_a_note_here')) ?>"></textarea>
-				<button class="an-btn an-btn-primary btn-close-out-step"><?php e(lang('st_close_out_step')) ?></button>
+				<button class="an-btn an-btn-primary btn-close-out-meeting"><?php e(lang('st_close_out_meeting')) ?></button>
 			</div>
 		</div>
 
@@ -180,8 +180,8 @@ $confirmation_status = [
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('decider_js', [
 		'action_key' => $action_key,
-		'step_key' => $step->step_key,
-		'step_id' => $step->step_id
+		'meeting_key' => $meeting->meeting_key,
+		'meeting_id' => $meeting->meeting_id
 	], true) . '</script>';
 }
 ?>

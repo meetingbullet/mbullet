@@ -110,8 +110,8 @@ class Project_model extends BF_Model
 				'rules' => 'trim|numeric'
 			),
 			array(
-				'field' => 'step_owner_no_of_hour',
-				'label' => 'lang:pj_step_owner_no_of_hour',
+				'field' => 'meeting_owner_no_of_hour',
+				'label' => 'lang:pj_meeting_owner_no_of_hour',
 				'rules' => 'trim|numeric'
 			),
 			array(
@@ -125,8 +125,8 @@ class Project_model extends BF_Model
 				'rules' => 'trim|numeric'
 			),
 			array(
-				'field' => 'step_owner_total_cost',
-				'label' => 'lang:pj_step_owner_total_cost',
+				'field' => 'meeting_owner_total_cost',
+				'label' => 'lang:pj_meeting_owner_total_cost',
 				'rules' => 'trim|numeric'
 			),
 			array(
@@ -140,8 +140,8 @@ class Project_model extends BF_Model
 				'rules' => 'trim|numeric'
 			),
 			array(
-				'field' => 'step_owner_no_of_point',
-				'label' => 'lang:pj_step_owner_no_of_point',
+				'field' => 'meeting_owner_no_of_point',
+				'label' => 'lang:pj_meeting_owner_no_of_point',
 				'rules' => 'trim|numeric'
 			),
 			array(
@@ -155,8 +155,8 @@ class Project_model extends BF_Model
 				'rules' => 'trim|numeric'
 			),
 			array(
-				'field' => 'step_owner_min_ratio',
-				'label' => 'lang:pj_step_owner_min_ratio',
+				'field' => 'meeting_owner_min_ratio',
+				'label' => 'lang:pj_meeting_owner_min_ratio',
 				'rules' => 'trim|numeric'
 			),
 			array(
@@ -170,8 +170,8 @@ class Project_model extends BF_Model
 				'rules' => 'trim|numeric'
 			),
 			array(
-				'field' => 'step_owner_min_star',
-				'label' => 'lang:pj_step_owner_min_star',
+				'field' => 'meeting_owner_min_star',
+				'label' => 'lang:pj_meeting_owner_min_star',
 				'rules' => 'trim|numeric'
 			),
 			array(
@@ -262,16 +262,16 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function count_steps($project_id, $all = true, $user_id = null)
+	public function count_meetings($project_id, $all = true, $user_id = null)
 	{
-		$this->db->select('COUNT(*) AS total')->from('steps s');
+		$this->db->select('COUNT(*) AS total')->from('meetings s');
 		if (! $all) {
-			$this->db->join('step_members sm', 'sm.step_id = s.step_id', 'LEFT')
+			$this->db->join('meeting_members sm', 'sm.meeting_id = s.meeting_id', 'LEFT')
 					->where('(sm.user_id = \'' . $user_id . '\' OR s.owner_id = \'' . $user_id . '\')');
 		}
 		$query = $this->db->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
-						->group_by('s.step_id')
+						->group_by('s.meeting_id')
 						->get();
 		if ($query->num_rows() > 0) {
 			return $query->row()->total;
@@ -287,7 +287,7 @@ class Project_model extends BF_Model
 			$this->db->join('agenda_members tm', 'tm.agenda_id = t.agenda_id', 'LEFT')
 					->where('(tm.user_id = \'' . $user_id . '\' OR t.owner_id = \'' . $user_id . '\')');
 		}
-		$query = $this->db->join('steps s', 't.step_id = s.step_id', 'LEFT')
+		$query = $this->db->join('meetings s', 't.meeting_id = s.meeting_id', 'LEFT')
 						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
 						->group_by('t.agenda_id')
@@ -323,16 +323,16 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_steps($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, s.name, s.status, s.step_id', $as_array = false)
+	public function get_meetings($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.meeting_key, s.name, s.status, s.meeting_id', $as_array = false)
 	{
-		$this->db->select($select)->from('steps s');
+		$this->db->select($select)->from('meetings s');
 		if (! $all) {
-			$this->db->join('step_members sm', 'sm.step_id = s.step_id', 'LEFT')
+			$this->db->join('meeting_members sm', 'sm.meeting_id = s.meeting_id', 'LEFT')
 					->where('(sm.user_id = \'' . $user_id . '\' OR s.owner_id = \'' . $user_id . '\')');
 		}
 		$this->db->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
-						->group_by('s.step_id')
+						->group_by('s.meeting_id')
 						->order_by('s.created_on', 'DESC');
 		if (! (empty($limit) && empty($offset))) {
 			$this->db->limit($limit, $offset);
@@ -348,14 +348,14 @@ class Project_model extends BF_Model
 		}
 	}
 
-	public function get_agendas($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.step_key, t.agenda_id, t.agenda_key, t.name, t.status', $as_array = false)
+	public function get_agendas($project_id, $limit = null, $offset = null, $all = true, $user_id = null, $select = 'a.action_key, s.meeting_key, t.agenda_id, t.agenda_key, t.name, t.status', $as_array = false)
 	{
 		$this->db->select($select)->from('agendas t');
 		if (! $all) {
 			$this->db->join('agenda_members tm', 'tm.agenda_id = t.agenda_id', 'LEFT')
 					->where('(tm.user_id = \'' . $user_id . '\' OR t.owner_id = \'' . $user_id . '\')');
 		}
-		$this->db->join('steps s', 's.step_id = t.step_id', 'LEFT')
+		$this->db->join('meetings s', 's.meeting_id = t.meeting_id', 'LEFT')
 						->join('actions a', 'a.action_id = s.action_id', 'LEFT')
 						->where('a.project_id', $project_id)
 						->group_by('t.agenda_id')

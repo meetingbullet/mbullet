@@ -22,7 +22,7 @@ $lang['hw_description'] = 'Description';
 $lang['hw_member'] = 'Member';
 
 // Messages
-$lang['hw_step_key_does_not_exist'] = 'Step key does not exist';
+$lang['hw_meeting_key_does_not_exist'] = 'Meeting key does not exist';
 $lang['hw_not_have_permission'] = 'You have no permission to access this page';
 $lang['hw_no_permission_to_edit'] = 'You are not allowed to edit this field';
 $lang['hw_new_homework_added'] = 'New Homework added';

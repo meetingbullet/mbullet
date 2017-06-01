@@ -1,11 +1,11 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Step extends Authenticated_Controller
+class Meeting extends Authenticated_Controller
 {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->lang->load('step');
+		$this->lang->load('meeting');
 		$this->load->helper('mb_form');
 		$this->load->helper('text');
 		$this->load->helper('date');
@@ -21,9 +21,9 @@ class Step extends Authenticated_Controller
 		$this->load->model('agenda/agenda_member_model');
 		$this->load->model('agenda/agenda_rate_model');
 
-		$this->load->model('step_model');
-		$this->load->model('step_member_model');
-		$this->load->model('step_member_rate_model');
+		$this->load->model('meeting_model');
+		$this->load->model('meeting_member_model');
+		$this->load->model('meeting_member_rate_model');
 
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
@@ -31,8 +31,8 @@ class Step extends Authenticated_Controller
 		$this->load->model('project/project_model');
 		$this->load->model('project/project_member_model');
 
-		Assets::add_module_css('step', 'step.css');
-		Assets::add_module_js('step', 'step.js');
+		Assets::add_module_css('meeting', 'meeting.css');
+		Assets::add_module_js('meeting', 'meeting.js');
 	}
 
 	public function _remap($method, $params = array())
@@ -83,10 +83,10 @@ class Step extends Authenticated_Controller
 
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $action->project_id);
 
-		// Create Step from Open Parking Lot agendas
-		if (isset($_POST['from_step'])) {
+		// Create Meeting from Open Parking Lot agendas
+		if (isset($_POST['from_meeting'])) {
 			$open_agendas = $this->agenda_model->where('confirm_status', 'open_parking_lot')
-											->where('step_id', $this->input->post('from_step'))
+											->where('meeting_id', $this->input->post('from_meeting'))
 											->find_all();
 											
 			Template::set('open_agendas', $open_agendas);
@@ -99,7 +99,7 @@ class Step extends Authenticated_Controller
 		], true), 'inline');
 
 		if (isset($_POST['save'])) {
-			$data = $this->step_model->prep_data($this->input->post());
+			$data = $this->meeting_model->prep_data($this->input->post());
 			$data['action_id'] = $action->action_id;
 			$data['created_by'] = $this->current_user->user_id;
 
@@ -107,28 +107,28 @@ class Step extends Authenticated_Controller
 				$data['owner_id'] = $this->current_user->user_id;
 			}
 
-			$data['step_key'] = $this->mb_project->get_next_key($action_key);
+			$data['meeting_key'] = $this->mb_project->get_next_key($action_key);
 
-			if ($id = $this->step_model->insert($data)) {
+			if ($id = $this->meeting_model->insert($data)) {
 				if ($team = $this->input->post('team')) {
 					if ($team = explode(',', $team)) {
 						$member_data = [];
 						foreach ($team as $member) {
 							$member_data[] = [
-								'step_id' => $id,
+								'meeting_id' => $id,
 								'user_id' => $member
 							];
 						}
 
-						$this->step_member_model->insert_batch($member_data);
-						$this->mb_project->notify_members($id, 'step', $this->current_user, 'insert');
+						$this->meeting_member_model->insert_batch($member_data);
+						$this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
 					}
 				}
 
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
-				Template::set('message', lang('st_step_successfully_created'));
-				Template::set('data', $this->ajax_step_data($id));
+				Template::set('message', lang('st_meeting_successfully_created'));
+				Template::set('data', $this->ajax_meeting_data($id));
 				// Just to reduce AJAX request size
 				if (IS_AJAX) {
 					Template::set('content', '');
@@ -137,7 +137,7 @@ class Step extends Authenticated_Controller
 			} else {
 				Template::set('close_modal', 0);
 				Template::set('message_type', 'danger');
-				Template::set('message', lang('st_there_was_a_problem_while_creating_step'));
+				Template::set('message', lang('st_there_was_a_problem_while_creating_meeting'));
 			}
 
 			Template::render();
@@ -149,25 +149,25 @@ class Step extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function edit($step_key = null)
+	public function edit($meeting_key = null)
 	{
 
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
-			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+		if (empty($meeting_id)) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->mb_project->has_permission('step', $step_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
-		$keys = explode('-', $step_key);
+		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
@@ -186,26 +186,26 @@ class Step extends Authenticated_Controller
 		// 	redirect(DEFAULT_LOGIN_LOCATION);
 		// }
 
-		$step = $this->step_model->select('steps.*, p.project_id')
-								->join('actions a', 'a.action_id = steps.action_id')
+		$meeting = $this->meeting_model->select('meetings.*, p.project_id')
+								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
 								->limit(1)
-								->find_by('step_key', $step_key);
+								->find_by('meeting_key', $meeting_key);
 
-		if ($step === false) {
+		if ($meeting === false) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_members = $this->step_member_model->where('step_id', $step->step_id)->as_array()->find_all();
-		$step_members = $step_members && count($step_members) > 0 ? array_column($step_members, 'user_id') : [];
-		Template::set('step_members', $step_members);
-		Template::set('step', $step);
+		$meeting_members = $this->meeting_member_model->where('meeting_id', $meeting->meeting_id)->as_array()->find_all();
+		$meeting_members = $meeting_members && count($meeting_members) > 0 ? array_column($meeting_members, 'user_id') : [];
+		Template::set('meeting_members', $meeting_members);
+		Template::set('meeting', $meeting);
 
-		$project_key = explode('-', $step_key);
+		$project_key = explode('-', $meeting_key);
 		$project_key = $project_key[0];
 
-		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $step->project_id);
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $meeting->project_id);
 
 		Template::set('project_members', $project_members);
 		Assets::add_js($this->load->view('create_js', [
@@ -213,7 +213,7 @@ class Step extends Authenticated_Controller
 		], true), 'inline');
 
 		if ($data = $this->input->post()) {
-			$data = $this->step_model->prep_data($data);
+			$data = $this->meeting_model->prep_data($data);
 			$data['modified_by'] = $this->current_user->user_id;
 
 			if ($this->input->post('owner_id') == '') {
@@ -223,29 +223,29 @@ class Step extends Authenticated_Controller
 			// Add to project members if not in
 			// Prevent duplicate row by MySQL Insert Ignore
 			$query = $this->db->insert_string('project_members', [
-				'project_id' => $step->project_id,
+				'project_id' => $meeting->project_id,
 				'user_id' => $data['owner_id']
 			]);
 
 			$query = str_replace('INSERT', 'INSERT IGNORE', $query);
 			$this->db->query($query);
 
-			if ($this->step_model->update($step->step_id, $data)) {
-				$this->step_member_model->delete_where(['step_id' => $step->step_id]);
+			if ($this->meeting_model->update($meeting->meeting_id, $data)) {
+				$this->meeting_member_model->delete_where(['meeting_id' => $meeting->meeting_id]);
 
 				if ($team = $this->input->post('team')) {
 					if ($team = explode(',', $team)) {
 						$member_data = [];
 						foreach ($team as $member) {
 							$member_data[] = [
-								'step_id' => $step->step_id,
+								'meeting_id' => $meeting->meeting_id,
 								'user_id' => $member
 							];
 
 							// Add to project members if not in
 							// Prevent duplicate row by MySQL Insert Ignore
 							$query = $this->db->insert_string('project_members', [
-								'project_id' => $step->project_id,
+								'project_id' => $meeting->project_id,
 								'user_id' => $member
 							]);
 
@@ -253,16 +253,16 @@ class Step extends Authenticated_Controller
 							$this->db->query($query);
 						}
 
-						$this->step_member_model->insert_batch($member_data);
-						if ((! empty($data['status'])) && $data['status'] != $step->status) {
-							$this->mb_project->notify_members($step->step_id, 'step', $this->current_user, 'update_status');
+						$this->meeting_member_model->insert_batch($member_data);
+						if ((! empty($data['status'])) && $data['status'] != $meeting->status) {
+							$this->mb_project->notify_members($meeting->meeting_id, 'meeting', $this->current_user, 'update_status');
 						}
 					}
 				}
 
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
-				Template::set('message', lang('st_step_successfully_updated'));
+				Template::set('message', lang('st_meeting_successfully_updated'));
 
 				// Just to reduce AJAX request size
 				if (IS_AJAX) {
@@ -272,7 +272,7 @@ class Step extends Authenticated_Controller
 			} else {
 				Template::set('close_modal', 0);
 				Template::set('message_type', 'danger');
-				Template::set('message', lang('st_there_was_a_problem_while_creating_step'));
+				Template::set('message', lang('st_there_was_a_problem_while_creating_meeting'));
 			}
 
 			Template::render();
@@ -283,25 +283,25 @@ class Step extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function detail($step_key = null)
+	public function detail($meeting_key = null)
 	{
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$keys = explode('-', $step_key);
+		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
-			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+		if (empty($meeting_id)) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->mb_project->has_permission('step', $step_id, 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
 
@@ -313,15 +313,15 @@ class Step extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step = $this->step_model->get_step_by_key($step_key, $this->current_user->current_organization_id, 'steps.*, u.email, u.first_name, u.last_name, u.avatar');
+		$meeting = $this->meeting_model->get_meeting_by_key($meeting_key, $this->current_user->current_organization_id, 'meetings.*, u.email, u.first_name, u.last_name, u.avatar');
 
-		if (! $step) {
+		if (! $meeting) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$agendas = $this->agenda_model->select('agendas.*, u.email, u.first_name, u.last_name, u.avatar')
 								->join('users u', 'u.user_id = agendas.owner_id', 'left')
-								->where('step_id', $step_id)->find_all();
+								->where('meeting_id', $meeting_id)->find_all();
 
 		if ($agendas) {
 			foreach ($agendas as &$agenda) {
@@ -332,7 +332,7 @@ class Step extends Authenticated_Controller
 			}
 		}
 
-		$homeworks = $this->homework_model->where('step_id', $step_id)->find_all();
+		$homeworks = $this->homework_model->where('meeting_id', $meeting_id)->find_all();
 
 		if ($homeworks) {
 			foreach ($homeworks as &$homework) {
@@ -345,60 +345,60 @@ class Step extends Authenticated_Controller
 			}
 		}
 
-		$invited_members = $this->step_member_model->get_step_member($step_id);
+		$invited_members = $this->meeting_member_model->get_meeting_member($meeting_id);
 									
-		$point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
+		$point_used = number_format($this->mb_project->total_point_used('meeting', $meeting->meeting_id), 2);
 
-		$evaluated = $this->is_evaluated($step_id);
+		$evaluated = $this->is_evaluated($meeting_id);
 		if ($evaluated === true) {
-			Template::set_message(lang('st_step_already_evaluated'), 'info');
+			Template::set_message(lang('st_meeting_already_evaluated'), 'info');
 		}
 
-		Assets::add_js($this->load->view('detail_js', ['step_key' => $step_key, 'current_user' => $this->current_user], true), 'inline');
+		Assets::add_js($this->load->view('detail_js', ['meeting_key' => $meeting_key, 'current_user' => $this->current_user], true), 'inline');
 		Template::set('evaluated', $evaluated);
 		Template::set('invited_members', $invited_members);
 		Template::set('point_used', $point_used);
-		Template::set('step', $step);
+		Template::set('meeting', $meeting);
 		Template::set('agendas', $agendas);
 		Template::set('homeworks', $homeworks);
 		Template::set('project_key', $project_key);
 		Template::set('action_key', $action_key);
-		Template::set('step_key', $step_key);
+		Template::set('meeting_key', $meeting_key);
 		Template::set('current_user', $this->current_user);
 		Template::set_view('detail');
 		Template::render();
 	}
 
-	public function monitor($step_key = null)
+	public function monitor($meeting_key = null)
 	{
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$keys = explode('-', $step_key);
+		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
-			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+		if (empty($meeting_id)) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->mb_project->has_permission('step', $step_id, 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
 
 		/*
-			To access Step Monitor, user must be owner or team member of Step
+			To access Meeting Monitor, user must be owner or team member of Meeting
 		*/
 
-		$step = $this->step_model->find_by('step_key', $step_key);
+		$meeting = $this->meeting_model->find_by('meeting_key', $meeting_key);
 
-		if (! $step) {
-			Template::set_message(lang('st_invalid_step_key'), 'danger');
+		if (! $meeting) {
+			Template::set_message(lang('st_invalid_meeting_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -406,12 +406,12 @@ class Step extends Authenticated_Controller
 											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
 											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
 									->join('users u', 'u.user_id = agendas.owner_id', 'left')
-									->where('step_id', $step->step_id)->find_all();
+									->where('meeting_id', $meeting->meeting_id)->find_all();
 
 		// We can't start without agendas
 		if ($agendas === false) {
 			Template::set('message_type', 'warning');
-			Template::set('message', lang('st_cannot_start_step_without_any_agenda'));
+			Template::set('message', lang('st_cannot_start_meeting_without_any_agenda'));
 			Template::set('content', '');
 			Template::render();
 			return;
@@ -421,7 +421,7 @@ class Step extends Authenticated_Controller
 			$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
 		}
 
-		$homeworks = $this->homework_model->where('step_id', $step_id)->find_all();
+		$homeworks = $this->homework_model->where('meeting_id', $meeting_id)->find_all();
 
 		if ($homeworks) {
 			foreach ($homeworks as &$homework) {
@@ -435,62 +435,62 @@ class Step extends Authenticated_Controller
 		}
 
 		Assets::add_js($this->load->view('monitor_js', [
-			'step_key' => $step_key
+			'meeting_key' => $meeting_key
 		], true), 'inline');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
 		Template::set('agendas', $agendas);
 		Template::set('homeworks', $homeworks);
-		Template::set('step', $step);
+		Template::set('meeting', $meeting);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::render();
 	}
 
-	public function decider($step_key = null)
+	public function decider($meeting_key = null)
 	{
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$keys = explode('-', $step_key);
+		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
-			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+		if (empty($meeting_id)) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->mb_project->has_permission('step', $step_id, 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
 			$this->auth->restrict();
 		}
 
 		/*
-			To access Step Monitor, user must be owner or team member of Step
+			To access Meeting Monitor, user must be owner or team member of Meeting
 		*/
 
-		$step = $this->step_model->find_by('step_key', $step_key);
+		$meeting = $this->meeting_model->find_by('meeting_key', $meeting_key);
 
-		if (! $step) {
-			Template::set_message(lang('st_invalid_step_key'), 'danger');
+		if (! $meeting) {
+			Template::set_message(lang('st_invalid_meeting_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$action_key = $keys[0] . '-' . $keys[1];
-		$step->members = $this->step_member_model->get_step_member($step_id);
+		$meeting->members = $this->meeting_member_model->get_meeting_member($meeting_id);
 		$agendas = $this->agenda_model->select('agendas.*, (finished_on - started_on) / 60 AS duration, 
 											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
 											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
 									->join('users u', 'u.user_id = agendas.owner_id', 'left')
-									->where('step_id', $step->step_id)->find_all();
+									->where('meeting_id', $meeting->meeting_id)->find_all();
 		
 		// We can't start without agendas
 		if ($agendas === false) {
 			Template::set('message_type', 'warning');
-			Template::set('message', lang('st_cannot_start_step_without_any_agenda'));
+			Template::set('message', lang('st_cannot_start_meeting_without_any_agenda'));
 			Template::set('content', '');
 			Template::render();
 			return;
@@ -503,47 +503,47 @@ class Step extends Authenticated_Controller
 
 		Assets::add_js($this->load->view('decider_js', [
 			'action_key' => $action_key,
-			'step_key' => $step->step_key,
-			'step_id' => $step_id
+			'meeting_key' => $meeting->meeting_key,
+			'meeting_id' => $meeting_id
 		], true), 'inline');
 		Template::set('close_modal', 0);
 		Template::set('current_user', $this->current_user);
 		Template::set('agendas', $agendas);
-		Template::set('step', $step);
+		Template::set('meeting', $meeting);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::render();
 	}
 
-	public function update_decider($step_key)
+	public function update_decider($meeting_key)
 	{
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_step_key_does_not_exist')
+				'message' => lang('st_meeting_key_does_not_exist')
 			]);
 			return;
 		}
 
-		$keys = explode('-', $step_key);
+		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_step_key_does_not_exist')
+				'message' => lang('st_meeting_key_does_not_exist')
 			]);
 			return;
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
+		if (empty($meeting_id)) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_step_key_does_not_exist')
+				'message' => lang('st_meeting_key_does_not_exist')
 			]);
 			return;
 		}
 
-		if (! $this->mb_project->has_permission('step', $step_id, 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('st_invalid_action')
@@ -574,14 +574,14 @@ class Step extends Authenticated_Controller
 		if ($this->agenda_model->update_batch($agenda_data, 'agenda_key') ) {
 			$notes = $this->input->post('note') ? $this->input->post('note') : null;
 
-			$this->step_model->skip_validation(TRUE)->update($step_id, [
+			$this->meeting_model->skip_validation(TRUE)->update($meeting_id, [
 				'manage_state' => 'evaluate',
 				'notes' => $notes
 			]);
 
 			echo json_encode([
 				'message_type' => 'success',
-				'message' => lang('st_all_agenda_confirmed_step_closed_out')
+				'message' => lang('st_all_agenda_confirmed_meeting_closed_out')
 			]);
 			return;
 		}
@@ -608,12 +608,12 @@ class Step extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function get_monitor_data($step_id)
+	public function get_monitor_data($meeting_id)
 	{
-		if (empty($step_id)) {
+		if (empty($meeting_id)) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_invalid_step_key')
+				'message' => lang('st_invalid_meeting_key')
 			]);
 			return ;
 		}
@@ -621,19 +621,19 @@ class Step extends Authenticated_Controller
 		$agendas = $this->agenda_model->select('agendas.agenda_id, agendas.status, agendas.started_on, agendas.time_assigned, 
 											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
 									->join('users u', 'u.user_id = agendas.owner_id', 'left')
-									->where('step_id', $step_id)->find_all();
+									->where('meeting_id', $meeting_id)->find_all();
 
 		if ($agendas === false) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_invalid_step_key')
+				'message' => lang('st_invalid_meeting_key')
 			]);
 			return;
 		}
 
 		
 		$homeworks = $this->homework_model->select('homework_id, description, status, time_spent')
-										->where('step_id', $step_id)
+										->where('meeting_id', $meeting_id)
 										->find_all();
 		$homeworks = $homeworks ? $homeworks : [];
 
@@ -645,11 +645,11 @@ class Step extends Authenticated_Controller
 
 		// Real-time joiner
 		$interval = 3;
-		$this->step_member_model->where('user_id', $this->current_user->user_id)->update($step_id, ['last_online' => $current_time]);
-		$online_members = $this->step_member_model->select('u.user_id, CONCAT(first_name, " ", last_name) AS full_name, avatar, email')
-													->join('users u', 'u.user_id = step_members.user_id')
+		$this->meeting_member_model->where('user_id', $this->current_user->user_id)->update($meeting_id, ['last_online' => $current_time]);
+		$online_members = $this->meeting_member_model->select('u.user_id, CONCAT(first_name, " ", last_name) AS full_name, avatar, email')
+													->join('users u', 'u.user_id = meeting_members.user_id')
 													->where('TIMEDIFF(DATE_ADD(last_online, INTERVAL '. $interval  .' SECOND), "'. $current_time .'") >= 0 ', null, false)
-													->where('step_id', $step_id)
+													->where('meeting_id', $meeting_id)
 													->order_by('u.user_id')
 													->find_all();
 
@@ -657,7 +657,7 @@ class Step extends Authenticated_Controller
 			'message_type' => 'success',
 			'agendas' => $agendas,
 			'homeworks' => $homeworks ? $homeworks : [],
-			'step' => $this->step_model->select('status')->limit(1)->find($step_id),
+			'meeting' => $this->meeting_model->select('status')->limit(1)->find($meeting_id),
 			'online_members' => $online_members ? $online_members : [],
 			'current_time' => $current_time,
 		]);
@@ -682,37 +682,37 @@ class Step extends Authenticated_Controller
 		echo 0;
 	}
 
-	public function update_step_schedule() {
+	public function update_meeting_schedule() {
 
-		$step = $this->step_model->select('steps.*, u.timezone')
-								->join('actions a', 'a.action_id = steps.action_id')
+		$meeting = $this->meeting_model->select('meetings.*, u.timezone')
+								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
 								->join('users u', 'u.user_id = ' . $this->current_user->user_id)
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
-								->where('steps.owner_id', $this->current_user->user_id)
+								->where('meetings.owner_id', $this->current_user->user_id)
 								->limit(1)
-								->find($this->input->post('step_id'));
+								->find($this->input->post('meeting_id'));
 
-		if ($step === false) {
+		if ($meeting === false) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_invalid_step_key')
+				'message' => lang('st_invalid_meeting_key')
 			]);
 			return;
 		}
 
-		// Start step?
+		// Start meeting?
 		if ($this->input->post('start')) {
-			if ($step->status != 'ready') {
+			if ($meeting->status != 'ready') {
 				echo json_encode([
 					'message_type' => 'danger',
-					'message' => lang('st_invalid_step_status')
+					'message' => lang('st_invalid_meeting_status')
 				]);
 
 				return;
 			}
 
-			if ($step->scheduled_start_time === NULL) {
+			if ($meeting->scheduled_start_time === NULL) {
 				echo json_encode([
 					'message_type' => 'danger',
 					'message' => lang('st_invalid_schedule_time')
@@ -722,7 +722,7 @@ class Step extends Authenticated_Controller
 			}
 
 			$current_time = gmdate('Y-m-d H:i:s');
-			$query = $this->step_model->skip_validation(1)->update($step->step_id, [
+			$query = $this->meeting_model->skip_validation(1)->update($meeting->meeting_id, [
 				'status' => 'inprogress',
 				'actual_start_time' => $current_time,
 			]);
@@ -742,7 +742,7 @@ class Step extends Authenticated_Controller
 
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => lang('st_step_started'),
+					'message' => lang('st_meeting_started'),
 					'actual_start_time' => $current_time
 				]);
 
@@ -756,18 +756,18 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
-		// Finish step
+		// Finish meeting
 		if ($this->input->post('finish')) {
-			if ($step->status != 'inprogress') {
+			if ($meeting->status != 'inprogress') {
 				echo json_encode([
 					'message_type' => 'danger',
-					'message' => lang('st_invalid_step_status')
+					'message' => lang('st_invalid_meeting_status')
 				]);
 
 				return;
 			}
 
-			$agendas = $this->agenda_model->select('agenda_key')->where('step_id', $step->step_id)->where('(status = "inprogress" OR status ="open")', null, false)->find_all();
+			$agendas = $this->agenda_model->select('agenda_key')->where('meeting_id', $meeting->meeting_id)->where('(status = "inprogress" OR status ="open")', null, false)->find_all();
 
 			if ($agendas) {
 				echo json_encode([
@@ -779,17 +779,17 @@ class Step extends Authenticated_Controller
 			}
 
 			$current_time = gmdate('Y-m-d H:i:s');
-			$query = $this->step_model->skip_validation(1)->update($step->step_id, [
+			$query = $this->meeting_model->skip_validation(1)->update($meeting->meeting_id, [
 				'status' => 'finished',
 				'manage_state' => 'decide',
 				'actual_end_time' => $current_time,
 			]);
 			
 			if ($query) {
-				$this->mb_project->notify_members($step->step_id, 'step', $this->current_user, 'update_status');
+				$this->mb_project->notify_members($meeting->meeting_id, 'meeting', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => lang('st_step_finished'),
+					'message' => lang('st_meeting_finished'),
 					'actual_end_time' => $current_time
 				]);
 
@@ -813,7 +813,7 @@ class Step extends Authenticated_Controller
 			return;
 		}
 
-		$query = $this->step_model->skip_validation(1)->update($step->step_id, [
+		$query = $this->meeting_model->skip_validation(1)->update($meeting->meeting_id, [
 			'status' => 'ready',
 			'manage_state' => 'monitor',
 			'scheduled_start_time' => $this->input->post('scheduled_start_time')
@@ -847,8 +847,8 @@ class Step extends Authenticated_Controller
 
 	public function update_agenda_status()
 	{
-		$agenda = $this->agenda_model->select('agendas.*, u.timezone, s.step_id')
-								->join('steps s', 's.step_id = agendas.step_id')
+		$agenda = $this->agenda_model->select('agendas.*, u.timezone, s.meeting_id')
+								->join('meetings s', 's.meeting_id = agendas.meeting_id')
 								->join('actions a', 'a.action_id = s.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
@@ -882,7 +882,7 @@ class Step extends Authenticated_Controller
 
 				// We can only start 1 agenda at a time
 				$agenda_in_progress = $this->agenda_model->select('agendas.*, u.timezone')
-								->join('steps s', 's.step_id = agendas.step_id')
+								->join('meetings s', 's.meeting_id = agendas.meeting_id')
 								->join('actions a', 'a.action_id = s.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
 								->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
@@ -890,7 +890,7 @@ class Step extends Authenticated_Controller
 								->where('s.owner_id', $this->current_user->user_id)
 								->where('agendas.status', 'inprogress')
 								->limit(1)
-								->find_by('agendas.step_id', $agenda->step_id);
+								->find_by('agendas.meeting_id', $agenda->meeting_id);
 
 				if ($agenda_in_progress) {
 					echo json_encode([
@@ -1016,13 +1016,13 @@ class Step extends Authenticated_Controller
 		}
 	}
 
-	public function update_status($step_key = null)
+	public function update_status($meeting_key = null)
 	{
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('st_update_status_fail')
@@ -1030,8 +1030,8 @@ class Step extends Authenticated_Controller
 			exit;
 		}
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
-		if (! $step_id) {
+		$meeting_id = $this->meeting_model->get_meeting_id($meeting_key, $this->current_user->current_organization_id);
+		if (! $meeting_id) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('st_update_status_fail')
@@ -1042,7 +1042,7 @@ class Step extends Authenticated_Controller
 		$buttons = [
 			'open' => [
 				'icon' => 'ion-ios-play',
-				'label' => lang('st_start_step'),
+				'label' => lang('st_start_meeting'),
 				'next_status' => 'inprogress',
 			],
 			'in-progress' => [
@@ -1052,7 +1052,7 @@ class Step extends Authenticated_Controller
 			],
 			'ready-for-review' => [
 				'icon' => 'ion-android-done-all',
-				'label' => lang('st_resolve_step'),
+				'label' => lang('st_resolve_meeting'),
 				'next_status' => 'resolved',
 			],
 			'resolved' => [
@@ -1063,7 +1063,7 @@ class Step extends Authenticated_Controller
 		];
 
 		$status = $this->input->post('status');
-		$updated = $this->step_model->skip_validation(true)->update($step_id, [
+		$updated = $this->meeting_model->skip_validation(true)->update($meeting_id, [
 										'status' => $status
 									]);
 		if (! $updated) {
@@ -1073,7 +1073,7 @@ class Step extends Authenticated_Controller
 			]);
 			exit;
 		}
-		$this->mb_project->notify_members($step_id, 'step', $this->current_user, 'update_status');
+		$this->mb_project->notify_members($meeting_id, 'meeting', $this->current_user, 'update_status');
 		echo json_encode([
 			'message_type' => 'success',
 			'message' => lang('st_update_status_success')
@@ -1081,26 +1081,26 @@ class Step extends Authenticated_Controller
 		exit;
 	}
 
-	public function add_team_member($step_key = null)
+	public function add_team_member($meeting_key = null)
 	{
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			echo 0;
 			exit;
 		}
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
-		if (! $step_id) {
+		$meeting_id = $this->meeting_model->get_meeting_id($meeting_key, $this->current_user->current_organization_id);
+		if (! $meeting_id) {
 			echo 0;
 			exit;
 		}
 
 		$user_id = $this->input->post('user_id');
 
-		if ($user_id === NULL || $step_id === NULL) {
+		if ($user_id === NULL || $meeting_id === NULL) {
 			echo 0;
 			return;
 		}
@@ -1119,89 +1119,89 @@ class Step extends Authenticated_Controller
 		}
 
 		// Prevent duplicate row by MySQL Insert Ignore
-		$query = $this->db->insert_string('step_members', ['user_id' => $user_id, 'step_id' => $step_id]);
+		$query = $this->db->insert_string('meeting_members', ['user_id' => $user_id, 'meeting_id' => $meeting_id]);
 		$query = str_replace('INSERT', 'INSERT IGNORE', $query);
 		echo (int) $this->db->query($query);
 	}
 
-	public function remove_team_member($step_key = null)
+	public function remove_team_member($meeting_key = null)
 	{
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			echo 0;
 			exit;
 		}
 
-		$step_id = $this->step_model->get_step_id($step_key, $this->current_user->current_organization_id);
-		if (! $step_id) {
+		$meeting_id = $this->meeting_model->get_meeting_id($meeting_key, $this->current_user->current_organization_id);
+		if (! $meeting_id) {
 			echo 0;
 			exit;
 		}
 
 		$user_id = $this->input->post('user_id');
 
-		if ($user_id === NULL || $step_id === NULL) {
+		if ($user_id === NULL || $meeting_id === NULL) {
 			echo 0;
 			return;
 		}
 
 		// Prevent duplicate row by MySQL Insert Ignore
-		echo (int) $this->step_member_model->delete_where(['user_id' => $user_id, 'step_id' => $step_id]);
+		echo (int) $this->meeting_member_model->delete_where(['user_id' => $user_id, 'meeting_id' => $meeting_id]);
 	}
 
-	public function evaluator($step_key)
+	public function evaluator($meeting_key)
 	{
 		if (! $this->input->is_ajax_request()) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$keys = explode('-', $step_key);
+		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
-			Template::set_message(lang('st_step_key_does_not_exist'), 'danger');
+		if (empty($meeting_id)) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->mb_project->has_permission('step', $step_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
 		/*
-			To access Step Monitor, user must be owner or team member of Step
+			To access Meeting Monitor, user must be owner or team member of Meeting
 		*/
 
-		$step = $this->step_model->select('*, (actual_end_time - actual_start_time) / 60 AS actual_elapsed_time')->find($step_id);
+		$meeting = $this->meeting_model->select('*, (actual_end_time - actual_start_time) / 60 AS actual_elapsed_time')->find($meeting_id);
 
-		if (! $step) {
-			Template::set_message(lang('st_invalid_step_key'), 'danger');
+		if (! $meeting) {
+			Template::set_message(lang('st_invalid_meeting_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$evaluated = $this->is_evaluated($step_id);
+		$evaluated = $this->is_evaluated($meeting_id);
 
-		if ($evaluated === true || $step->manage_state != 'evaluate') {
-			Template::set('message', $evaluated === true ? lang('st_step_already_evaluated') : lang('st_step_not_ready_for_evaluate'));
+		if ($evaluated === true || $meeting->manage_state != 'evaluate') {
+			Template::set('message', $evaluated === true ? lang('st_meeting_already_evaluated') : lang('st_meeting_not_ready_for_evaluate'));
 			Template::set('message_type', 'danger');
 			Template::set('close_modal', 1);
 		}
 
-		$step->members = $this->step_member_model
+		$meeting->members = $this->meeting_member_model
 							->select('u.user_id, avatar, email, first_name, last_name')
-							->join('users u', 'u.user_id = step_members.user_id')
+							->join('users u', 'u.user_id = meeting_members.user_id')
 							->where('u.user_id !=', $this->current_user->user_id)
-							->where('step_id', $step_id)
+							->where('meeting_id', $meeting_id)
 							->as_array()
 							->find_all();
 
@@ -1209,7 +1209,7 @@ class Step extends Authenticated_Controller
 											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
 											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
 									->join('users u', 'u.user_id = agendas.owner_id', 'left')
-									->where('step_id', $step->step_id)->find_all();
+									->where('meeting_id', $meeting->meeting_id)->find_all();
 		if (is_array($agendas) && count($agendas) > 0) {
 			foreach ($agendas as &$agenda) {
 				$agenda->members = $this->agenda_member_model
@@ -1220,10 +1220,10 @@ class Step extends Authenticated_Controller
 			}
 		}
 
-		if ($evaluated === false || $step->manage_state == 'evaluate') {
+		if ($evaluated === false || $meeting->manage_state == 'evaluate') {
 			if ($this->input->post()) {
 				if (! is_array($this->input->post('attendee_rate'))
-				|| count($this->input->post('attendee_rate')) != count($step->members)
+				|| count($this->input->post('attendee_rate')) != count($meeting->members)
 				|| ! is_array($this->input->post('agenda_rate'))
 				|| count($this->input->post('agenda_rate')) != count($agendas)) {
 					$validation_error = true;
@@ -1234,14 +1234,14 @@ class Step extends Authenticated_Controller
 						$attendee_rate_data = [];
 						foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
 							$attendee_rate_data[] = [
-								'step_id' => $step_id,
+								'meeting_id' => $meeting_id,
 								'user_id' => $this->current_user->user_id,
 								'attendee_id' => $attendee_id,
 								'rate' => $rate
 							];
 						}
 
-						$attendees_rated = $this->step_member_rate_model->insert_batch($attendee_rate_data);
+						$attendees_rated = $this->meeting_member_rate_model->insert_batch($attendee_rate_data);
 						if (empty($attendees_rated)) {
 							$insert_error = true;
 						}
@@ -1267,7 +1267,7 @@ class Step extends Authenticated_Controller
 						Template::set('message', lang('st_rating_success'));
 						Template::set('message_type', 'success');
 						Template::set('close_modal', 0);
-						$this->done_step_if_qualified($step);
+						$this->done_meeting_if_qualified($meeting);
 					}
 				}
 			} else {
@@ -1287,33 +1287,33 @@ class Step extends Authenticated_Controller
 			Template::set('close_modal', 0);
 		}
 
-		$point_used = number_format($this->mb_project->total_point_used('step', $step_id), 2);
+		$point_used = number_format($this->mb_project->total_point_used('meeting', $meeting_id), 2);
 		Template::set('point_used', $point_used);
-		Template::set('step', $step);
+		Template::set('meeting', $meeting);
 		Template::set('agendas', $agendas);
 		Template::render('ajax');
 	}
 
-	public function check_state($step_key)
+	public function check_state($meeting_key)
 	{
 		if (! $this->input->is_ajax_request()) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (empty($step_key)) {
+		if (empty($meeting_key)) {
 			echo 0;
 			exit;
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
+		if (empty($meeting_id)) {
 			echo 0;
 			exit;
 		}
 
-		$step = $this->step_model->find($step_id);
-		if ($step->manage_state != 'evaluate') {
+		$meeting = $this->meeting_model->find($meeting_id);
+		if ($meeting->manage_state != 'evaluate') {
 			echo 0;
 			exit;
 		}
@@ -1322,12 +1322,12 @@ class Step extends Authenticated_Controller
 		exit;
 	}
 
-	private function ajax_step_data($step_id)
+	private function ajax_meeting_data($meeting_id)
 	{
-		$data = $this->step_model->select('steps.*, CONCAT(first_name, " ", last_name) AS full_name, first_name, last_name, avatar, email')
+		$data = $this->meeting_model->select('meetings.*, CONCAT(first_name, " ", last_name) AS full_name, first_name, last_name, avatar, email')
 									->join('users u', 'u.user_id = owner_id', 'LEFT')
 									->limit(1)
-									->find($step_id);
+									->find($meeting_id);
 
 		if ($data) {
 			$data->display_user = display_user($data->email, $data->first_name, $data->last_name, $data->avatar);
@@ -1337,31 +1337,31 @@ class Step extends Authenticated_Controller
 		return $data;
 	}
 
-	private function done_step_if_qualified($step)
+	private function done_meeting_if_qualified($meeting)
 	{
-		$member_ids[] = $step->owner_id;
-		if (! empty($step->members)) {
-			$members = (array) $step->members;
+		$member_ids[] = $meeting->owner_id;
+		if (! empty($meeting->members)) {
+			$members = (array) $meeting->members;
 			$member_ids = array_merge($member_ids, array_column($members, 'user_id'));
 		}
 
 		$member_ids = array_unique($member_ids);
-		$can_done = $this->step_member_rate_model
+		$can_done = $this->meeting_member_rate_model
 						->select('user_id')
-						->where('step_id', $step->step_id)
+						->where('meeting_id', $meeting->meeting_id)
 						->where_in('user_id', $member_ids)
 						->group_by('user_id')
 						->count_all() == count($member_ids) ? true : false;
 
 		if ($can_done) {
-			$this->step_model->skip_validation(true)->update($step->step_id, ['manage_state' => 'done']);
+			$this->meeting_model->skip_validation(true)->update($meeting->meeting_id, ['manage_state' => 'done']);
 		}
 	}
 
-	private function is_evaluated($step_id) {
-		$evaluated_members = $this->step_member_rate_model
+	private function is_evaluated($meeting_id) {
+		$evaluated_members = $this->meeting_member_rate_model
 								->select('user_id')
-								->where('step_id', $step_id)
+								->where('meeting_id', $meeting_id)
 								->where('user_id', $this->current_user->user_id)
 								->group_by('user_id')
 								->as_array()

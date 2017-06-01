@@ -7,11 +7,11 @@ class Action extends Authenticated_Controller
 		parent::__construct();
 		$this->load->library('mb_project');
 		$this->lang->load('action');
-		$this->lang->load('step/step');
+		$this->lang->load('meeting/meeting');
 		$this->load->helper('mb_form');
 		$this->load->helper('mb_general');
 		$this->load->model('action_model');
-		$this->load->model('step/step_model');
+		$this->load->model('meeting/meeting_model');
 		$this->load->model('users/user_model');
 		$this->load->model('action_member_model');
 		$this->load->model('project/project_model');
@@ -87,24 +87,24 @@ class Action extends Authenticated_Controller
 		
 		$action->point_used = number_format($this->mb_project->total_point_used('action', $action->action_id), 2);
 
-		$steps = $this->step_model->select('steps.*, u.email, u.first_name, u.last_name, u.avatar')
-									->join('users u', 'u.user_id = steps.owner_id')
+		$meetings = $this->meeting_model->select('meetings.*, u.email, u.first_name, u.last_name, u.avatar')
+									->join('users u', 'u.user_id = meetings.owner_id')
 									->where('action_id', $action->action_id)
-									->order_by('step_id')
+									->order_by('meeting_id')
 									->order_by('status')
 									->find_all();	
 
 
 		// @TODO need to optimize query
-		if ($steps) {
-			foreach ($steps as &$step) {
-				$point_used = $this->step_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
-								->join('step_members sm', 'steps.step_id = sm.step_id')
+		if ($meetings) {
+			foreach ($meetings as &$meeting) {
+				$point_used = $this->meeting_model->select('CAST(SUM(`cost_of_time` * `in`) AS DECIMAL(10,1)) AS point_used', false)
+								->join('meeting_members sm', 'meetings.meeting_id = sm.meeting_id')
 								->join('user_to_organizations uto', 'uto.user_id = sm.user_id')
-								->where('sm.step_id', $step->step_id)
+								->where('sm.meeting_id', $meeting->meeting_id)
 								->find_all();
 
-				$step->point_used = number_format($this->mb_project->total_point_used('step', $step->step_id), 2);
+				$meeting->point_used = number_format($this->mb_project->total_point_used('meeting', $meeting->meeting_id), 2);
 			}
 		}
 
@@ -145,7 +145,7 @@ class Action extends Authenticated_Controller
 		Template::set('invited_members', $invited_members);
 		Template::set('action_key', $action_key);
 		Template::set('action', $action);
-		Template::set('steps', $steps);
+		Template::set('meetings', $meetings);
 		Template::set_view('detail');
 		Template::render();
 	}

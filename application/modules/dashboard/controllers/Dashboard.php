@@ -6,19 +6,19 @@ class Dashboard extends Authenticated_Controller
 	{
 		parent::__construct();
 		$this->lang->load('dashboard');
-		$this->lang->load('step/step');
+		$this->lang->load('meeting/meeting');
 		$this->load->library('mb_project');
 		$this->load->model('project/project_model');
 		$this->load->model('project/project_member_model');
-		$this->load->model('step/step_model');
-		$this->load->model('step/step_member_model');
 		$this->load->model('homework/homework_model');
 		$this->load->model('homework/homework_member_model');
+		$this->load->model('meeting/meeting_model');
+		$this->load->model('meeting/meeting_member_model');
 		$this->load->helper('date');
 
 		Assets::add_module_js('dashboard', 'dashboard.js');
 		Assets::add_module_css('dashboard', 'dashboard.css');
-		Assets::add_module_css('step', 'step.css');
+		Assets::add_module_css('meeting', 'meeting.css');
 	}
 
 	// public function index()
@@ -30,33 +30,33 @@ class Dashboard extends Authenticated_Controller
 	// 									->where('organization_id', $this->current_user->current_organization_id)
 	// 									->find_all();
 
-	// 	$my_steps = $this->step_model->select('steps.*, u.first_name, u.last_name, u.email, u.avatar')
-	// 								->join('users u', 'u.user_id = steps.owner_id')
-	// 								->join('actions a', 'a.action_id = steps.action_id')
+	// 	$my_meetings = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
+	// 								->join('users u', 'u.user_id = meetings.owner_id')
+	// 								->join('actions a', 'a.action_id = meetings.action_id')
 	// 								->join('projects p', 'p.project_id = a.project_id')
-	// 								->where('(steps.status = "ready" OR steps.status = "inprogress")', null, false)
-	// 								->where('steps.owner_id', $this->current_user->user_id)
+	// 								->where('(meetings.status = "ready" OR meetings.status = "inprogress")', null, false)
+	// 								->where('meetings.owner_id', $this->current_user->user_id)
 	// 								->where('organization_id', $this->current_user->current_organization_id)
 	// 								->find_all();
-	// 	$my_steps = $my_steps && count($my_steps) > 0 ? $my_steps : [];
+	// 	$my_meetings = $my_meetings && count($my_meetings) > 0 ? $my_meetings : [];
 
-	// 	$member_steps = $this->step_member_model->select('s.*, u.first_name, u.last_name, u.email, u.avatar')
-	// 								->join('steps s', 's.step_id = step_members.step_id AND s.owner_id != ' . $this->current_user->user_id)
+	// 	$member_meetings = $this->meeting_member_model->select('s.*, u.first_name, u.last_name, u.email, u.avatar')
+	// 								->join('meetings s', 's.meeting_id = meeting_members.meeting_id AND s.owner_id != ' . $this->current_user->user_id)
 	// 								->join('users u', 'u.user_id = s.owner_id')
 	// 								->join('actions a', 'a.action_id = s.action_id')
 	// 								->join('projects p', 'p.project_id = a.project_id')
 	// 								->where('(s.status = "ready" OR s.status = "inprogress")', null, false)
-	// 								->where('step_members.user_id', $this->current_user->user_id)
+	// 								->where('meeting_members.user_id', $this->current_user->user_id)
 	// 								->find_all();
 
-	// 	$member_steps = $member_steps && count($member_steps) > 0 ? $member_steps : [];
+	// 	$member_meetings = $member_meetings && count($member_meetings) > 0 ? $member_meetings : [];
 
 	// 	$user = $this->user_model->select('users.user_id, avatar, email, first_name, CONCAT(first_name, " ", last_name) AS full_name, ROUND(SUM(smr.rate) / COUNT(smr.rate)) AS avarage_rate')
-	// 								->join('step_member_rates smr', 'smr.attendee_id = users.user_id')
+	// 								->join('meeting_member_rates smr', 'smr.attendee_id = users.user_id')
 	// 								->find($this->current_user->user_id);
 
-	// 	$user->meeting_count = $this->step_model->select('COUNT(*) AS meeting_count')
-	// 								->join('step_members sm', 'sm.step_id = steps.step_id')
+	// 	$user->meeting_count = $this->meeting_model->select('COUNT(*) AS meeting_count')
+	// 								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id')
 	// 								->where('owner_id', $this->current_user->user_id)
 	// 								->or_where('sm.user_id', $this->current_user->user_id)
 	// 								->find_all();
@@ -66,7 +66,7 @@ class Dashboard extends Authenticated_Controller
 
 	// 	Assets::add_js($this->load->view('index_js', ['now' => gmdate('Y-m-d H:i:s')], true), 'inline');
 	// 	Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
-	// 	Template::set('my_steps', array_merge($my_steps, $member_steps));
+	// 	Template::set('my_meetings', array_merge($my_meetings, $member_meetings));
 	// 	Template::set('current_user', $this->current_user);
 	// 	Template::set('now', gmdate('Y-m-d H:i:s'));
 	// 	Template::set('user', $user);
@@ -78,33 +78,33 @@ class Dashboard extends Authenticated_Controller
 		$projects = $this->get_my_projects();
 		$my_todo = $this->get_my_todo();
 
-		$my_steps = $this->step_model->select('steps.*, u.first_name, u.last_name, u.email, u.avatar')
-									->join('users u', 'u.user_id = steps.owner_id')
-									->join('actions a', 'a.action_id = steps.action_id')
+		$my_meetings = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
+									->join('users u', 'u.user_id = meetings.owner_id')
+									->join('actions a', 'a.action_id = meetings.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
-									->where('(steps.status = "ready" OR steps.status = "inprogress")', null, false)
-									->where('steps.owner_id', $this->current_user->user_id)
+									->where('(meetings.status = "ready" OR meetings.status = "inprogress")', null, false)
+									->where('meetings.owner_id', $this->current_user->user_id)
 									->where('organization_id', $this->current_user->current_organization_id)
 									->find_all();
-		$my_steps = $my_steps && count($my_steps) > 0 ? $my_steps : [];
+		$my_meetings = $my_meetings && count($my_meetings) > 0 ? $my_meetings : [];
 
-		$member_steps = $this->step_member_model->select('s.*, u.first_name, u.last_name, u.email, u.avatar')
-									->join('steps s', 's.step_id = step_members.step_id AND s.owner_id != ' . $this->current_user->user_id)
+		$member_meetings = $this->meeting_member_model->select('s.*, u.first_name, u.last_name, u.email, u.avatar')
+									->join('meetings s', 's.meeting_id = meeting_members.meeting_id AND s.owner_id != ' . $this->current_user->user_id)
 									->join('users u', 'u.user_id = s.owner_id')
 									->join('actions a', 'a.action_id = s.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
 									->where('(s.status = "ready" OR s.status = "inprogress")', null, false)
-									->where('step_members.user_id', $this->current_user->user_id)
+									->where('meeting_members.user_id', $this->current_user->user_id)
 									->find_all();
 
-		$member_steps = $member_steps && count($member_steps) > 0 ? $member_steps : [];
+		$member_meetings = $member_meetings && count($member_meetings) > 0 ? $member_meetings : [];
 
 		$user = $this->user_model->select('users.user_id, avatar, email, first_name, CONCAT(first_name, " ", last_name) AS full_name, ROUND(SUM(smr.rate) / COUNT(smr.rate)) AS avarage_rate')
-									->join('step_member_rates smr', 'smr.attendee_id = users.user_id')
+									->join('meeting_member_rates smr', 'smr.attendee_id = users.user_id')
 									->find($this->current_user->user_id);
 
-		$user->meeting_count = $this->step_model->select('COUNT(*) AS meeting_count')
-									->join('step_members sm', 'sm.step_id = steps.step_id')
+		$user->meeting_count = $this->meeting_model->select('COUNT(*) AS meeting_count')
+									->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id')
 									->where('owner_id', $this->current_user->user_id)
 									->or_where('sm.user_id', $this->current_user->user_id)
 									->find_all();
@@ -113,13 +113,13 @@ class Dashboard extends Authenticated_Controller
 		$user->total_point_used = $this->mb_project->total_point_used('user', $this->current_user->user_id);
 
 		// Meeting Calendar
-		$meeting_calendar = $this->step_model->select('CONCAT(step_key, " ", name) AS title, scheduled_start_time AS start, CONCAT("'. site_url('step/') .'", step_key) AS url')
-						->join('step_members sm', 'sm.step_id = steps.step_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		$meeting_calendar = $this->meeting_model->select('CONCAT(meeting_key, " ", name) AS title, scheduled_start_time AS start, CONCAT("'. site_url('meeting/') .'", meeting_key) AS url')
+						->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
 						->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
 						->where('status', 'ready')
 						->where('scheduled_start_time IS NOT NULL', null, false)
 						->order_by('scheduled_start_time')
-						->group_by('step_key')
+						->group_by('meeting_key')
 						->find_all();
 
 		Assets::add_js($this->load->view('index_js', [
@@ -128,7 +128,7 @@ class Dashboard extends Authenticated_Controller
 		], true), 'inline');
 
 		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
-		Template::set('my_steps', array_merge($my_steps, $member_steps));
+		Template::set('my_meetings', array_merge($my_meetings, $member_meetings));
 		Template::set('current_user', $this->current_user);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::set('user', $user);
@@ -167,30 +167,30 @@ class Dashboard extends Authenticated_Controller
 		foreach ($projects as &$project) {
 			$project->point_used = $this->mb_project->total_point_used('project', $project->project_id, $this->current_user->current_organization_id);
 			$project->step_owners = [];
-			$active_steps = $this->step_model->select('steps.*, u.first_name, u.last_name, u.email, u.avatar')
-									->join('users u', 'u.user_id = steps.owner_id')
-									->join('actions a', 'a.action_id = steps.action_id')
+			$active_steps = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
+									->join('users u', 'u.user_id = meetings.owner_id')
+									->join('actions a', 'a.action_id = meetings.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
-									->join('step_members sm', 'sm.step_id = steps.step_id', 'LEFT')
-									->where('(steps.status = "ready" OR steps.status = "inprogress")', null, false)
+									->join('step_members sm', 'sm.step_id = meetings.step_id', 'LEFT')
+									->where('(meetings.status = "ready" OR meetings.status = "inprogress")', null, false)
 									->where('organization_id', $this->current_user->current_organization_id)
 									->where('p.project_id', $project->project_id)
-									->group_by('steps.step_id')
+									->group_by('meetings.step_id')
 									->find_all();
 			if (empty($active_steps)) {
 				$active_steps = [];
 			}
 
 			$project->no_of_unfinished_step = count($active_steps);
-			$project->no_of_step = $this->step_model->join('actions a', 'a.action_id = steps.action_id')
+			$project->no_of_step = $this->meeting_model->join('actions a', 'a.action_id = meetings.action_id')
 													->join('projects p', 'p.project_id = a.project_id')
 													->where('organization_id', $this->current_user->current_organization_id)
 													->where('p.project_id', $project->project_id)->count_all();
 
-			$rate = $this->step_model->select('SUM(sm.rate) as total_rate, (COUNT(*) * 5) as max_rate')
-									->join('actions a', 'a.action_id = steps.action_id')
+			$rate = $this->meeting_model->select('SUM(sm.rate) as total_rate, (COUNT(*) * 5) as max_rate')
+									->join('actions a', 'a.action_id = meetings.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
-									->join('step_members sm', 'sm.step_id = steps.step_id', 'LEFT')
+									->join('step_members sm', 'sm.step_id = meetings.step_id', 'LEFT')
 									->where('organization_id', $this->current_user->current_organization_id)
 									->find_by('p.project_id', $project->project_id);
 			$project->total_rate = empty($rate->total_rate) ? 0 : $rate->total_rate;
@@ -222,7 +222,7 @@ class Dashboard extends Authenticated_Controller
 	private function get_my_todo()
 	{
 		$homeworks = $this->homework_model->select('homework.*')
-										->join('steps s', 's.step_id = homework.step_id')
+										->join('meetings s', 's.step_id = homework.step_id')
 										->join('actions a', 'a.action_id = s.action_id')
 										->join('projects p', 'p.project_id = a.project_id')
 										->join('homework_members hm', 'hm.homework_id = homework.homework_id', 'LEFT')
@@ -234,28 +234,28 @@ class Dashboard extends Authenticated_Controller
 		if (empty($homeworks)) {
 			$homeworks = [];
 		}
-		$evaluates = $this->step_model->select('steps.*, u.first_name, u.last_name, u.email, u.avatar')
-								->join('users u', 'u.user_id = steps.owner_id')
-								->join('actions a', 'a.action_id = steps.action_id')
+		$evaluates = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
+								->join('users u', 'u.user_id = meetings.owner_id')
+								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
-								->join('step_members sm', 'sm.step_id = steps.step_id', 'LEFT')
-								->where('(sm.user_id = \'' . $this->current_user->user_id . '\' OR steps.owner_id = \'' . $this->current_user->user_id . '\')')
+								->join('step_members sm', 'sm.step_id = meetings.step_id', 'LEFT')
+								->where('(sm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
 								->where('organization_id', $this->current_user->current_organization_id)
-								->where('steps.manage_state = \'evaluate\'')
-								->group_by('steps.step_id')
+								->where('meetings.manage_state = \'evaluate\'')
+								->group_by('meetings.step_id')
 								->find_all();
 		if (empty($evaluates)) {
 			$evaluates = [];
 		}
-		$decides = $this->step_model->select('steps.*, u.first_name, u.last_name, u.email, u.avatar')
-								->join('users u', 'u.user_id = steps.owner_id')
-								->join('actions a', 'a.action_id = steps.action_id')
+		$decides = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
+								->join('users u', 'u.user_id = meetings.owner_id')
+								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
-								->join('step_members sm', 'sm.step_id = steps.step_id', 'LEFT')
-								->where('steps.owner_id', $this->current_user->user_id)
+								->join('step_members sm', 'sm.step_id = meetings.step_id', 'LEFT')
+								->where('meetings.owner_id', $this->current_user->user_id)
 								->where('organization_id', $this->current_user->current_organization_id)
-								->where('steps.manage_state = \'decide\'')
-								->group_by('steps.step_id')
+								->where('meetings.manage_state = \'decide\'')
+								->group_by('meetings.step_id')
 								->find_all();
 		if (empty($decides)) {
 			$decides = [];

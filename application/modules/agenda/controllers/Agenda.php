@@ -15,34 +15,34 @@ class Agenda extends Authenticated_Controller
 		$this->load->model('agenda_model');
 		$this->load->model('agenda_member_model');
 
-		$this->load->model('step/step_model');
+		$this->load->model('meeting/meeting_model');
 		$this->load->model('users/user_model');
 		
 		$this->load->model('project/project_model');
 		$this->load->model('project/project_member_model');
 	}
 
-	public function create($step_key)
+	public function create($meeting_key)
 	{
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$step_id = $this->mb_project->get_object_id('step', $step_key);
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($step_id)) {
-			Template::set_message(lang('tk_step_key_does_not_exist'), 'danger');
+		if (empty($meeting_id)) {
+			Template::set_message(lang('tk_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$keys = explode('-', $step_key);
+		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$project_key = $keys[0];
 
-		if (! $this->mb_project->has_permission('step', $step_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
@@ -51,7 +51,7 @@ class Agenda extends Authenticated_Controller
 			$organization_members = [];
 		}
 
-		if ($step_id === false) {
+		if ($meeting_id === false) {
 			Template::set('message', lang('tk_not_have_permission'));
 			Template::set('message_type', 'danger');
 		} else {
@@ -63,10 +63,10 @@ class Agenda extends Authenticated_Controller
 
 				if ($this->form_validation->run() !== false) {
 					$data = $this->agenda_model->prep_data($this->input->post());
-					$data['step_id'] = $step_id;
+					$data['meeting_id'] = $meeting_id;
 					$data['owner_id'] = $this->current_user->user_id;
 					$data['created_by'] = $this->current_user->user_id;
-					$data['agenda_key'] = $this->mb_project->get_next_key($step_key);
+					$data['agenda_key'] = $this->mb_project->get_next_key($meeting_key);
 
 					$agenda_id = $this->agenda_model->insert($data);
 					if ($agenda_id) {

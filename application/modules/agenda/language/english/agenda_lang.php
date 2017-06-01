@@ -16,7 +16,7 @@ $lang['tk_create'] = 'Create';
 $lang['tk_cancel'] = 'Cancel';
 $lang['tk_add_agenda_member_fail'] = 'Unable to add agenda members.';
 $lang['tk_agenda_key_does_not_exist'] = 'Agenda key does not exist';
-$lang['tk_step_key_does_not_exist'] = 'Step key does not exist';
+$lang['tk_meeting_key_does_not_exist'] = 'Meeting key does not exist';
 
 // Status
 $lang['tk_open'] = 'Open';

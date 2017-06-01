@@ -1,5 +1,5 @@
 <?php
-$step_status_labels = [
+$meeting_status_labels = [
 	'open' => 'label label-default label-bordered',
 	'inprogress' => 'label label-warning label-bordered',
 	'resolved' => 'label label-success label-bordered',
@@ -188,14 +188,14 @@ $project_status_labels = [
 	</div>
 </div>
 
-<div id="step-decider" class="modal fade" tabindex="-1" role="dialog">
+<div id="meeting-decider" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-80" role="document">
 		<div class="modal-content">
 		</div>
 	</div>
 </div>
 
-<div id="create-step" class="modal fade" tabindex="-1" role="dialog">
+<div id="create-meeting" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>

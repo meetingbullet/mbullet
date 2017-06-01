@@ -14,7 +14,7 @@
 		</div>
 	</div>
 
-	<?php echo form_open(site_url('step/resolve_agenda/'), ['class' => 'form-inline form-resolve-agenda', 'data-agenda-id' => $agenda_id]) ?>
+	<?php echo form_open(site_url('meeting/resolve_agenda/'), ['class' => 'form-inline form-resolve-agenda', 'data-agenda-id' => $agenda_id]) ?>
 		<div class="an-helper-block">
 				<label for="comment"><?php e(lang('st_comment_topics'))?></label>
 				<textarea class='an-form-control' name="comment" rows="6"></textarea>

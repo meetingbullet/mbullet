@@ -1,30 +1,30 @@
 <?php
 
-if ($step->scheduled_start_time) {
+if ($meeting->scheduled_start_time) {
 	// Fix add StrToTime with Float number
-	if ( (int) $step->in !== $step->in ) {
-		switch ($step->in_type) {
+	if ( (int) $meeting->in !== $meeting->in ) {
+		switch ($meeting->in_type) {
 			case 'weeks':
-				$step->in *= 7;
+				$meeting->in *= 7;
 			case 'days':
-				$step->in *= 24;
+				$meeting->in *= 24;
 			case 'hours':
-				$step->in *= 60;
+				$meeting->in *= 60;
 			case 'minutes':
-				$step->in *= 60;
+				$meeting->in *= 60;
 		}
 	}
 
-	$scheduled_start_time = strtotime($step->scheduled_start_time);
-	$scheduled_end_time = strtotime('+' . $step->in . ' seconds', $scheduled_start_time);
-	$step->in = round( $step->in / 60, 2);
-	$step->in_type = 'minutes';
+	$scheduled_start_time = strtotime($meeting->scheduled_start_time);
+	$scheduled_end_time = strtotime('+' . $meeting->in . ' seconds', $scheduled_start_time);
+	$meeting->in = round( $meeting->in / 60, 2);
+	$meeting->in_type = 'minutes';
 
 	$scheduled_start_time = date('Y-m-d H:i:s', $scheduled_start_time);
 	$scheduled_end_time = date('Y-m-d H:i:s', $scheduled_end_time);
 }
 ?>
-<?php echo form_open('', ['class' => 'form-inline form-ajax form-step-schedule']) ?>
+<?php echo form_open('', ['class' => 'form-inline form-ajax form-meeting-schedule']) ?>
 <div style="display:none" class="rating">
 	<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
 	<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
@@ -32,16 +32,16 @@ if ($step->scheduled_start_time) {
 	<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
 	<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
 </div>
-<div class="step-monitor">
+<div class="meeting-monitor">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-		<h4 class="modal-title"><?php e(lang('st_step_evaluator'))?></h4>
+		<h4 class="modal-title"><?php e(lang('st_meeting_evaluator'))?></h4>
 	</div> <!-- end MODAL-HEADER -->
 
 	<div class="an-body-topbar">
 		<div class="an-page-title">
 			<div class="an-bootstrap-custom-tab">
-				<h2><?php e($step->name)?></h2>
+				<h2><?php e($meeting->name)?></h2>
 			</div>
 		</div>
 	</div> <!-- end AN-BODY-TOPBAR -->
@@ -49,7 +49,7 @@ if ($step->scheduled_start_time) {
 	<div class="col-md-5">
 		<div class="an-single-component">
 			<div class="an-component-body an-helper-block">
-				<table class="table table-striped table-step-time">
+				<table class="table table-striped table-meeting-time">
 					<thead>
 						<tr>
 							<th></th>
@@ -61,17 +61,17 @@ if ($step->scheduled_start_time) {
 						<tr>
 							<td><strong><?php echo lang('st_start_time') ?></strong></td>
 							<td class="text-center"><?php e(display_time($scheduled_start_time)) ?></td>
-							<td class="text-center"><?php e(display_time($step->actual_start_time)) ?></td>
+							<td class="text-center"><?php e(display_time($meeting->actual_start_time)) ?></td>
 						</tr>
 						<tr>
 							<td><strong><?php echo lang('st_end_time') ?></strong></td>
 							<td class="text-center"><?php e(display_time($scheduled_end_time)) ?></td>
-							<td class="text-center"><?php e(display_time($step->actual_end_time)) ?></td>
+							<td class="text-center"><?php e(display_time($meeting->actual_end_time)) ?></td>
 						</tr>
 						<tr>
 							<td><strong><?php echo lang('st_elapsed_time') ?></strong></td>
-							<td class="text-center"><?php echo timespan(strtotime($step->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
-							<td class="text-center"><?php echo timespan(strtotime($step->actual_start_time), strtotime($step->actual_end_time)) ?></td>
+							<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
+							<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
 						</tr>
 					</tbody>
 				</table>
@@ -85,7 +85,7 @@ if ($step->scheduled_start_time) {
 				<h6><?php e(lang('st_goal'))?></h6>
 			</div>
 			<div class="an-component-body an-helper-block" style="max-height: 300px; overflow-y: auto">
-				<?php echo nl2br($step->goal) ?>
+				<?php echo nl2br($meeting->goal) ?>
 			</div>
 		</div>
 	</div>
@@ -96,8 +96,8 @@ if ($step->scheduled_start_time) {
 				<h6><?php e(lang('st_attendees'))?></h6>
 			</div>
 			<div class="an-component-body an-helper-block">
-			<?php if (is_array($step->members) && count($step->members) > 0) : ?>
-				<?php foreach ($step->members as $member) : ?>
+			<?php if (is_array($meeting->members) && count($meeting->members) > 0) : ?>
+				<?php foreach ($meeting->members as $member) : ?>
 				<div class="attendee">
 					<div class="info"><?php echo display_user($member['email'], $member['first_name'], $member['last_name'], $member['avatar']) ?></div>
 					<div class="rating">
@@ -176,9 +176,9 @@ if ($step->scheduled_start_time) {
 
 	<div class="col-md-12">
 		<label><?php echo lang('st_notes') ?></label>
-		<div class="step-notes-container">
-			<div class='step-notes'>
-			<?php echo nl2br($step->notes) ?>
+		<div class="meeting-notes-container">
+			<div class='meeting-notes'>
+			<?php echo nl2br($meeting->notes) ?>
 			</div>
 		</div>
 	</div>
@@ -200,7 +200,7 @@ if ($step->scheduled_start_time) {
 <script>
 	<?php
 	echo $this->load->view('evaluator_js', [
-		'step_key' => $step->step_key
+		'meeting_key' => $meeting->meeting_key
 	], true);
 	?>
 </script>

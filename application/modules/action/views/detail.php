@@ -9,7 +9,7 @@ $cost_of_time_to_badge = [
 	'warning',	// XL
 ];
 
-$step_label = [
+$meeting_label = [
 	'open' => 'label label-default label-bordered',
 	'inprogress' => 'label label-warning label-bordered',
 	'ready' => 'label label-success label-bordered',
@@ -95,12 +95,12 @@ $project_key = $project_key['0'];
 
 			<div class="an-single-component with-shadow">
 				<div class="an-component-header">
-					<h6><?php e(lang('ac_steps'))?></h6>
+					<h6><?php e(lang('ac_meetings'))?></h6>
 					</div>
-				<div id="step-list" class="an-component-body">
+				<div id="meeting-list" class="an-component-body">
 					<div class="an-helper-block">
 						<div class="an-scrollable-x">
-							<table class="table table-striped table-step">
+							<table class="table table-striped table-meeting">
 								<thead>
 									<tr>
 										<th><?php e(lang('ac_key'))?></th>
@@ -111,20 +111,20 @@ $project_key = $project_key['0'];
 									</tr>
 								</thead>
 								<tbody>
-									<?php if (is_array($steps)) : foreach ($steps as $step): ?>
-									<tr data-step-id="<?php e($step->step_id)?> " >
-										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->step_key); ?></td>
-										<td><?php echo anchor(site_url('step/' . $step->step_key), $step->name); ?></td>
-										<td><?php e($step->point_used); ?></td>
-										<td><?php echo display_user($step->email, $step->first_name, $step->last_name, $step->avatar); ?></td>
-										<td><span class="label label-bordered label-<?php echo $step->status ?>"><?php e(lang('st_' . $step->status))?></span></td>
+									<?php if (is_array($meetings)) : foreach ($meetings as $meeting): ?>
+									<tr data-meeting-id="<?php e($meeting->meeting_id)?> " >
+										<td><?php echo anchor(site_url('meeting/' . $meeting->meeting_key), $meeting->meeting_key); ?></td>
+										<td><?php echo anchor(site_url('meeting/' . $meeting->meeting_key), $meeting->name); ?></td>
+										<td><?php e($meeting->point_used); ?></td>
+										<td><?php echo display_user($meeting->email, $meeting->first_name, $meeting->last_name, $meeting->avatar); ?></td>
+										<td><span class="label label-bordered label-<?php echo $meeting->status ?>"><?php e(lang('st_' . $meeting->status))?></span></td>
 									</tr>
 									<?php endforeach; endif;?>
 								</tbody>
 							</table>
 						</div>
 
-						<button class="an-btn an-btn-primary" id="add-step"><?php echo '<i class="ion-android-add"></i> ' . lang('ac_add_step')?></button>
+						<button class="an-btn an-btn-primary" id="add-meeting"><?php echo '<i class="ion-android-add"></i> ' . lang('ac_add_meeting')?></button>
 					</div> <!-- end .AN-HELPER-BLOCK -->
 				</div> <!-- end .AN-COMPONENT-BODY -->
 			</div>
@@ -178,10 +178,10 @@ $project_key = $project_key['0'];
 	</div>
 </div>
 
-<script type="text" id="step-row">
-	<tr data-step-id="{{:step_id}}" >
-		<td><a href="<?php echo site_url('step/') ?>{{:step_key}}">{{:step_key}}</a></td>
-		<td><a href="<?php echo site_url('step/') ?>{{:step_key}}">{{:name}}</a></td>
+<script type="text" id="meeting-row">
+	<tr data-meeting-id="{{:meeting_id}}" >
+		<td><a href="<?php echo site_url('meeting/') ?>{{:meeting_key}}">{{:meeting_key}}</a></td>
+		<td><a href="<?php echo site_url('meeting/') ?>{{:meeting_key}}">{{:name}}</a></td>
 		<td>0</td>
 		<td>{{:display_user}}</td>
 		<td><span class="label label-bordered label-{{:status}}">{{:lang_status}}</span></td>

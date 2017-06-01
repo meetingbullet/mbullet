@@ -96,8 +96,8 @@ class Project_constraint_model extends BF_Model
             'rules' => 'numeric|required|max_length[11]',
         ),
         array(
-            'field' => 'min_value_cost_ratio_per_step',
-            'label' => 'lang:pj_min_value_cost_ratio_per_step',
+            'field' => 'min_value_cost_ratio_per_meeting',
+            'label' => 'lang:pj_min_value_cost_ratio_per_meeting',
             'rules' => 'numeric|required|max_length[11]',
         ),
         array(

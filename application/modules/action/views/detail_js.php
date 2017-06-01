@@ -12,11 +12,11 @@ Selectize.define('select-member', function(options) {
 	})();
 });
 
-// Add step
-$('#add-step').click((e) => {
+// Add meeting
+$('#add-meeting').click((e) => {
 	e.preventDefault();
 
-	$.get('<?php e(site_url('step/create/' . $action_key)) ?>', (data) => {
+	$.get('<?php e(site_url('meeting/create/' . $action_key)) ?>', (data) => {
 		data = JSON.parse(data);
 		$('.modal .modal-content').html(data.modal_content);
 		$('.modal').modal({backdrop: "static"});
@@ -58,9 +58,9 @@ $(document).on("submit", '.form-ajax', (e) => {
 				});
 
 				if (data.message_type == 'success') {
-					// Step created
-					if (data.data.step_key) {
-						$('#step-list tbody').append($.templates('#step-row').render(data.data));
+					// Meeting created
+					if (data.data.meeting_key) {
+						$('#meeting-list tbody').append($.templates('#meeting-row').render(data.data));
 					}
 
 					// Action edited
