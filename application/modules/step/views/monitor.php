@@ -215,7 +215,6 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 									<span class="caret"></span>
 								</button>
 								<ul class="dropdown-menu">
-									<li><a href="#" class='btn-update-homework-status <?php e($homework->status == 'open' ? 'hidden' : '')?>' data-pk="<?php e($homework->homework_id) ?>" data-value="open"><?php e(lang('hw_open'))?></a></li>
 									<li><a href="#" class='btn-update-homework-status <?php e($homework->status == 'done' ? 'hidden' : '')?>' data-pk="<?php e($homework->homework_id) ?>" data-value="done"><?php e(lang('hw_done'))?></a></li>
 									<li><a href="#" class='btn-update-homework-status <?php e($homework->status == 'undone' ? 'hidden' : '')?>' data-pk="<?php e($homework->homework_id) ?>" data-value="undone"><?php e(lang('hw_undone'))?></a></li>
 								</ul>

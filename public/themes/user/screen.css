@@ -338,7 +338,7 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	background: #2388b3;
 }
 
-.label-inactive, .label-undone, .label-undone:hover, .label-undone:active, .label-undone:focus {
+.label-inactive {
 	color: white;
 	background: #346c84;
 }
@@ -352,7 +352,8 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	background: #70c1b3;
 }
 
-.label-archive {
+.label-archive, .label-undone, .label-undone:hover, .label-undone:active, .label-undone:focus {
+	color: white;
 	background: #999;
 }
 

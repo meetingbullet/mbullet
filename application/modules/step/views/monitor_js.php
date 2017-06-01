@@ -35,9 +35,8 @@ if ($('.step-monitor .label-inprogress').length) {
 	$('.btn-finish').prop('disabled', true);
 }
 
-if ($('.step-monitor .table-agenda .label-inprogress').length == 0 && $('.step-monitor .table-agenda .label-open').length == 0) {
-	$('.btn-finish').prop('disabled', false);
-}
+// Disable Finish monitor when agendas are not finished or homework are open
+shall_enable_finish_button();
 
 if ($('#scheduled-timer').data('actual-start-time')) {
 	update_step_timer()
@@ -117,10 +116,9 @@ $(document).on('click.monitor', '.btn-update-step-schedule', (e) => {
 		});
 
 		if (data.message_type == 'success') {
-			// $('.btn-start-step').prop('disabled', false);
+			$('#step-monitor-modal').modal('hide');
 			$('#datetimepicker1').removeClass('danger');
 
-			$('#step-monitor-modal').modal('hide');
 			setTimeout(() => {
 				location.reload();
 			}, 600);
@@ -174,6 +172,7 @@ $(document).on('click.monitor', '.btn-start-step', (e) => {
 			$('.input-group-btn-right').removeClass('input-group-btn-right');
 			$('#scheduled-timer').data('actual-start-time', data.actual_start_time);
 			$('#scheduled-timer').data('now', data.actual_start_time);
+
 			update_step_timer();
 
 			$('.table-agenda tr input[name="time_assigned"]').each((i, item) => {
@@ -310,9 +309,7 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 			$(row).find('.btn-start-agenda').addClass('hidden');
 			$(row).find('.agenda-status').html('<span class="label label-bordered label-skipped"><?php e(lang('st_skipped'))?></span>');
 
-			if ($('.step-monitor .table-agenda .label-open, .step-monitor .table-agenda .label-inprogress').length == 0) {
-				$('.btn-finish').prop('disabled', false);
-			}
+			shall_enable_finish_button();
 		}
 	});
 });
@@ -348,9 +345,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 				}
 			});
 
-			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
-				$('.btn-finish').prop('disabled', false);
-			}
+			shall_enable_finish_button();
 		}
 	});
 });
@@ -379,9 +374,7 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
 			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-resolved"><?php e(lang('st_resolved'))?></span>');
 
-			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
-				$('.btn-finish').prop('disabled', false);
-			}
+			shall_enable_finish_button();
 		}
 	});
 });
@@ -410,9 +403,7 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
 			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-parking_lot"><?php e(lang('st_parking_lot'))?></span>');
 
-			if ($('.step-monitor .table-agenda .label-open,.step-monitor .table-agenda .label-inprogress').length == 0) {
-				$('.btn-finish').prop('disabled', false);
-			}
+			shall_enable_finish_button();
 		}
 	});
 });
@@ -481,10 +472,13 @@ $(document).on('click.monitor', 'tr.homework.can-edit .btn-update-homework-statu
 			$(btn_status).text( $(e.target).text() );
 			$(btn_status).prop('class', 'btn btn-status label-' + $(e.target).data('value'));
 			$(btn_status).data('status', $(e.target).data('value'));
+			$(btn_status).attr('data-status', $(e.target).data('value'));
 			$(btn_status_caret).prop('class', 'btn dropdown-toggle label-' + $(e.target).data('value'));
 
 			$(e.target).parents('ul').find('.btn-update-homework-status').removeClass('hidden');
 			$(e.target).addClass('hidden');
+
+			shall_enable_finish_button();
 		}
 	}).fail((data) => {
 		data = JSON.parse(data.responseText);
@@ -760,6 +754,7 @@ function update_monitor()
 			if (item.status != old_status) {
 				$('#homework-' + item.homework_id + ' .btn-status').text(homework_status_lang[item.status]);
 				$('#homework-' + item.homework_id + ' .btn-status').data('status', item.status);
+				$('#homework-' + item.homework_id + ' .btn-status').attr('data-status', item.status);
 				$('#homework-' + item.homework_id + ' .btn-status').prop('class', 'btn btn-status label-' + item.status);
 				$('#homework-' + item.homework_id + ' .btn-status + .btn').prop('class', 'btn dropdown-toggle label-' + item.status);
 				$('#homework-' + item.homework_id + ' .status-container').effect("highlight", {}, 3000);
@@ -772,4 +767,13 @@ function update_monitor()
 			}
 		});
 	});
+}
+
+function shall_enable_finish_button()
+{
+	if ($('.step-monitor .table-agenda .label-open, \
+			.step-monitor .table-agenda .label-inprogress, \
+			.table-monitor-homework .btn-status[data-status="open"]').length == 0) {
+		$('.btn-finish').prop('disabled', false);
+	}
 }

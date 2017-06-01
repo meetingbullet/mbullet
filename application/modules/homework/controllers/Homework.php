@@ -122,6 +122,12 @@ class Homework extends Authenticated_Controller
 	public function ajax_edit()
 	{
 		// Validation
+		if ( ! in_array($this->input->post('name'), ['time-spent', 'status', 'description'])) {
+				header('HTTP/1.0 403 Forbidden City', true, 403);
+				echo lang('hw_unknown_error');
+				return;
+		}
+
 		if ($this->input->post('name') == 'time-spent') {
 			if ( ! is_numeric($this->input->post('value')) ) {
 				header('HTTP/1.0 403 Forbidden City', true, 403);
