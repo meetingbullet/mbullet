@@ -226,7 +226,7 @@ class Dashboard extends Authenticated_Controller
 	private function get_my_todo()
 	{
 
-		$homeworks = $this->homework_model->select('homework.*, "homework" as todo_type')
+		$homeworks = $this->homework_model->select('homework.*, "homework" as todo_type, meeting_key')
 										->join('meetings s', 's.meeting_id = homework.meeting_id')
 										->join('actions a', 'a.action_id = s.action_id')
 										->join('projects p', 'p.project_id = a.project_id')

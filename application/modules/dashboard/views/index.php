@@ -101,6 +101,11 @@ $confirmation_status = [
 								<?php echo ucfirst($todo->name) . ": " . ucfirst($todo->description) ?>
 							</div>
 							<div class="todo-right">
+								<div class="detail">
+									<a href="<?php echo site_url('meeting/') . $todo->meeting_key ?>" target="_blank">
+										<i class="ion-document"></i>
+									</a>
+								</div>
 								<a href="#" class="setting action an-btn-danger submit undone"><i class="ion-close"></i></a>
 								<a href="#" class="setting action an-btn-info submit done"><i class="ion-checkmark"></i></a>
 							</div>
