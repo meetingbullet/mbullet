@@ -25,7 +25,7 @@ $confirmation_status = [
 </div>
 <div class="row">
 	<!-- Welcome Professor -->
-	<div class="col-md-3 col-xs-12">
+	<div class="col-md-4 col-xs-12">
 		<div class="welcome-panel">
 			<div class="user-info">
 				<div class="avatar" style="background-image: url('<?php echo avatar_url($user->avatar, $user->email, 128) ?>')"></div>
@@ -198,7 +198,7 @@ $confirmation_status = [
 	<!-- end my projects -->
 
 	<!-- Calendar -->
-	<div class="col-md-5 col-xs-12">
+	<div class="col-md-4 col-xs-12">
 		<h1 class="db-h1">
 			<span class="an-settings-button">
 				<?php echo lang('db_meetings') ?>&nbsp
