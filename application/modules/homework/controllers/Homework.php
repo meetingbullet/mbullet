@@ -118,7 +118,12 @@ class Homework extends Authenticated_Controller
 	}
 
 	
-	// X-Editable AJAX request to edit homework fields
+	/**
+		X-Editable AJAX request to edit homework fields
+		pk: primary key
+		name: column name
+		value: new value
+	*/
 	public function ajax_edit()
 	{
 		// Validation
