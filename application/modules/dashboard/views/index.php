@@ -91,7 +91,7 @@ $confirmation_status = [
 					</h1>
 					<div class="todo-list">
 					<?php if (! empty($my_todo)) : ?>
-						<?php foreach ($my_todo as $todo) : ?>
+						<?php foreach ($my_todo as $todo) : if (! ($todo->todo_type == 'evaluate' && $todo->evaluate_mode == 'user' && $todo->user_id == $current_user->user_id)) : ?>
 						<div class="item">
 							<?php if ($todo->todo_type == 'homework') : ?>
 							<div class="todo-left">
@@ -109,7 +109,11 @@ $confirmation_status = [
 								<span class="msg-tag label label-bordered label-skipped">
 									<?php echo lang('db_evaluate') ?>
 								</span>&nbsp;
-								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
+								<?php if ($todo->evaluate_mode == 'agenda') : ?>
+									<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
+								<?php else : ?>
+									<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar); ?>
+								<?php endif ?>
 							</div>
 							<div class="todo-right">
 								<a href="#" class="setting action an-btn-info submit"><i class="ion-checkmark"></i></a>
@@ -141,7 +145,7 @@ $confirmation_status = [
 							</div>
 							<?php endif ?>
 						</div>
-						<?php endforeach ?>
+						<?php endif; endforeach; ?>
 					<?php endif ?>
 					</div>
 				</div>
@@ -191,7 +195,7 @@ $confirmation_status = [
 						<div class="steps">
 							<?php foreach($owner['items'] as $step) : ?>
 							<div class="item">
-								<a href="<?php echo site_url('step/' . $step->meeting_key) ?>"><?php echo "<span class='msg-tag label label-bordered label-inactive'>{$step->meeting_key}</span> {$step->name}" ?></a>
+								<a href="<?php echo site_url('meeting/' . $step->meeting_key) ?>"><?php echo "<span class='msg-tag label label-bordered label-inactive'>{$step->meeting_key}</span> {$step->name}" ?></a>
 							</div>
 							<?php endforeach ?>
 						</div>

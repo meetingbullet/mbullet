@@ -90,5 +90,6 @@ $(".todo-rating label").click(function(){
 	$(this).css({"color": "#FFED85"});
 	$(this).nextAll().css({"color": "#FFED85"});
 	var input_id = $(this).attr('for');
-	$(this).parent().find('#' + input_id).click();
+	$(this).parent().find('input[type=radio]').removeAttr('checked');
+	$(this).parent().find('input[type=radio]#' + input_id).attr('checked', '');
 });

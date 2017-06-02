@@ -207,11 +207,6 @@
 	display: inline-block
 }
 
-.todo-rating {
-	float:left;
-	display: table-cell;
-}
-
 .todo-rating > input {
 	display: none;
 }
