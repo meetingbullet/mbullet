@@ -1322,6 +1322,68 @@ class Meeting extends Authenticated_Controller
 		exit;
 	}
 
+	public function dashboard_evaluate($mode = 'user')
+	{
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$modes = ['agenda', 'user'];
+
+		if (! in_array($mode, $modes)) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => 'Wrong evaluate mode'
+			]); return;
+		}
+
+		if ($mode == 'user') {
+			$user_id = $this->input->post('user_id');
+			$meeting_id = $this->input->post('meeting_id');
+			$rate = $this->input->post('rate');
+
+			if (empty($user_id) || empty($rate) || empty($meeting_id)) {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => 'Missing data.'
+				]); return;
+			}
+
+			$manage_state = $this->meeting_model->get_field($meeting_id, 'manage_state');
+			$evaluated = $this->is_evaluated($meeting_id);
+
+			if ($evaluated === false || $manage_state == 'evaluate') {
+				$added = $this->meeting_member_rate_model->skip_validation(true)->insert([
+					'meeting_id' => $meeting_id,
+					'user_id' => $this->current_user->user_id,
+					'attendee_id' => $user_id,
+					'rate' => $rate
+				]);
+
+				$meeting = $this->meeting_model->select('owner_id')->find($meeting_id);
+				$meeting->meeting_id = $meeting_id;
+				$meeting->members = $this->meeting_member_model
+										->select('u.user_id, avatar, email, first_name, last_name')
+										->join('users u', 'u.user_id = meeting_members.user_id')
+										->where('u.user_id !=', $this->current_user->user_id)
+										->where('meeting_id', $meeting_id)
+										->as_array()
+										->find_all();
+
+				$this->done_meeting_if_qualified($meeting);
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => 'User rated successfully.'
+				]); return;
+			} else {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => 'This meeting is already evaluated or unable to rate.'
+				]); return;
+			}
+		}
+	}
+
 	private function ajax_meeting_data($meeting_id)
 	{
 		$data = $this->meeting_model->select('meetings.*, CONCAT(first_name, " ", last_name) AS full_name, first_name, last_name, avatar, email')
@@ -1339,19 +1401,32 @@ class Meeting extends Authenticated_Controller
 
 	private function done_meeting_if_qualified($meeting)
 	{
-		$member_ids[] = $meeting->owner_id;
+		$team_ids[] = $meeting->owner_id;
 		if (! empty($meeting->members)) {
 			$members = (array) $meeting->members;
-			$member_ids = array_merge($member_ids, array_column($members, 'user_id'));
+			$team_ids = array_merge($team_ids, array_column($members, 'user_id'));
 		}
 
-		$member_ids = array_unique($member_ids);
+		$team_ids = array_unique($team_ids);
+		// $can_done = $this->meeting_member_rate_model
+		// 				->select('user_id')
+		// 				->where('meeting_id', $meeting->meeting_id)
+		// 				->where_in('user_id', $team_ids)
+		// 				->group_by('user_id')
+		// 				->count_all() == count($team_ids) ? true : false;
+
+		$time_voted_by_members = pow((count($members) - 1), 2);
+		$time_voted_by_owner = count($members);
+
+		if (in_array($meeting->owner_id, array_column($members, 'user_id'))) {
+			$time_voted_by_owner = 0;
+		}
+
 		$can_done = $this->meeting_member_rate_model
 						->select('user_id')
 						->where('meeting_id', $meeting->meeting_id)
-						->where_in('user_id', $member_ids)
-						->group_by('user_id')
-						->count_all() == count($member_ids) ? true : false;
+						->where_in('user_id', $team_ids)
+						->count_all() == ($time_voted_by_members + $time_voted_by_owner) ? true : false;
 
 		if ($can_done) {
 			$this->meeting_model->skip_validation(true)->update($meeting->meeting_id, ['manage_state' => 'done']);
@@ -1359,19 +1434,45 @@ class Meeting extends Authenticated_Controller
 	}
 
 	private function is_evaluated($meeting_id) {
+		// $evaluated_members = $this->meeting_member_rate_model
+		// 						->select('user_id')
+		// 						->where('meeting_id', $meeting_id)
+		// 						->where('user_id', $this->current_user->user_id)
+		// 						->group_by('user_id')
+		// 						->as_array()
+		// 						->find_all();
+		
+		// $evaluated_ids = [];
+		// $evaluated = false;
+
+		// if (is_array($evaluated_members) && count($evaluated_members) > 0) {
+		// 	$evaluated_ids = array_column($evaluated_members, 'user_id');
+		// 	if (in_array($this->current_user->user_id, $evaluated_ids)) {
+		// 		$evaluated = true;
+		// 	}
+		// }
+
+		$evaluated = false;
+
 		$evaluated_members = $this->meeting_member_rate_model
 								->select('user_id')
 								->where('meeting_id', $meeting_id)
 								->where('user_id', $this->current_user->user_id)
-								->group_by('user_id')
 								->as_array()
 								->find_all();
-		$evaluated_ids = [];
-		$evaluated = false;
 
-		if (is_array($evaluated_members) && count($evaluated_members) > 0) {
+		$meeting_members = $this->meeting_member_model
+							->select('user_id')
+							->where('meeting_id', $meeting_id)
+							->as_array()
+							->find_all();
+
+		if (is_array($evaluated_members) && count($evaluated_members) > 0 && is_array($meeting_members) && count($meeting_members) > 0) {
 			$evaluated_ids = array_column($evaluated_members, 'user_id');
-			if (in_array($this->current_user->user_id, $evaluated_ids)) {
+			$member_ids = array_column($meeting_members, 'user_id');
+
+			if ((in_array($this->current_user->user_id, $member_ids) && count($evaluated_ids) == (count($member_ids) - 1))
+			|| ((! in_array($this->current_user->user_id, $member_ids)) && count($evaluated_ids) == (count($member_ids)))) {
 				$evaluated = true;
 			}
 		}

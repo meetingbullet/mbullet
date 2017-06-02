@@ -14,6 +14,7 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('homework/homework_member_model');
 		$this->load->model('meeting/meeting_model');
 		$this->load->model('meeting/meeting_member_model');
+		$this->load->model('meeting/meeting_member_rate_model');
 		$this->load->model('agenda/agenda_model');
 		$this->load->model('agenda/agenda_member_model');
 		$this->load->helper('date');
@@ -271,6 +272,22 @@ class Dashboard extends Authenticated_Controller
 
 		$evaluates = array_merge($evaluate_members, $evaluate_agendas);
 
+		foreach ($evaluates as $key => $item) {
+			if ($this->is_evaluated($item->meeting_id)) {
+				unset($evaluates[$key]);
+			}
+
+			if ($item->evaluate_mode == 'user') {
+				$rated = $this->meeting_member_rate_model
+							->where('meeting_id', $item->meeting_id)
+							->where('attendee_id', $item->user_id)
+							->where('user_id', $this->current_user->user_id)
+							->count_all() > 0 ? true : false;
+				
+				if ($rated) unset($evaluates[$key]);
+			}
+		}
+
 		$decides = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "decide" as todo_type')
 								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
@@ -287,5 +304,53 @@ class Dashboard extends Authenticated_Controller
 		}
 
 		return array_merge($homeworks, $evaluates, $decides);
+	}
+
+	// copied from meeting controller
+	private function is_evaluated($meeting_id) {
+		// $evaluated_members = $this->meeting_member_rate_model
+		// 						->select('user_id')
+		// 						->where('meeting_id', $meeting_id)
+		// 						->where('user_id', $this->current_user->user_id)
+		// 						->group_by('user_id')
+		// 						->as_array()
+		// 						->find_all();
+		
+		// $evaluated_ids = [];
+		// $evaluated = false;
+
+		// if (is_array($evaluated_members) && count($evaluated_members) > 0) {
+		// 	$evaluated_ids = array_column($evaluated_members, 'user_id');
+		// 	if (in_array($this->current_user->user_id, $evaluated_ids)) {
+		// 		$evaluated = true;
+		// 	}
+		// }
+
+		$evaluated = false;
+
+		$evaluated_members = $this->meeting_member_rate_model
+								->select('user_id')
+								->where('meeting_id', $meeting_id)
+								->where('user_id', $this->current_user->user_id)
+								->as_array()
+								->find_all();
+
+		$meeting_members = $this->meeting_member_model
+							->select('user_id')
+							->where('meeting_id', $meeting_id)
+							->as_array()
+							->find_all();
+
+		if (is_array($evaluated_members) && count($evaluated_members) > 0 && is_array($meeting_members) && count($meeting_members) > 0) {
+			$evaluated_ids = array_column($evaluated_members, 'user_id');
+			$member_ids = array_column($meeting_members, 'user_id');
+
+			if ((in_array($this->current_user->user_id, $member_ids) && count($evaluated_ids) == (count($member_ids) - 1))
+			|| ((! in_array($this->current_user->user_id, $member_ids)) && count($evaluated_ids) == (count($member_ids)))) {
+				$evaluated = true;
+			}
+		}
+
+		return $evaluated;
 	}
 }

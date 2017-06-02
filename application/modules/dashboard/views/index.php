@@ -92,24 +92,25 @@ $confirmation_status = [
 					<div class="todo-list">
 					<?php if (! empty($my_todo)) : ?>
 						<?php foreach ($my_todo as $todo) : if (! ($todo->todo_type == 'evaluate' && $todo->evaluate_mode == 'user' && $todo->user_id == $current_user->user_id)) : ?>
-						<div class="item">
+						<div class="item <?php echo $todo->todo_type ?>">
 							<?php if ($todo->todo_type == 'homework') : ?>
 							<div class="todo-label">
 								<span class="msg-tag label label-bordered label-inprogress">
 									<?php echo lang('db_homework') ?>
 								</span>&nbsp;
+								<?php echo ucfirst($todo->name) ?>
 							</div>
 							<div class="todo-left">
-								<?php echo "<b>" . ucfirst($todo->name) . ":</b> " . ucfirst($todo->description) ?>
+								<?php echo ucfirst($todo->description) ?>
 							</div>
-							<div class="todo-right">
+							<div class="todo-right" data-url="<?php echo site_url('homework/ajax_edit') ?>" data-homework-id="<?php echo $todo->homework_id ?>">
 								<div class="detail">
 									<a href="<?php echo site_url('meeting/') . $todo->meeting_key ?>" target="_blank">
 										<i class="ion-document"></i>
 									</a>
 								</div>
-								<a href="#" class="setting action an-btn-danger submit undone"><i class="ion-close"></i></a>
-								<a href="#" class="setting action an-btn-success submit done"><i class="ion-checkmark"></i></a>
+								<a href="#" class="setting action an-btn-danger submit" data-status="undone"><i class="ion-close"></i></a>
+								<a href="#" class="setting action an-btn-success submit" data-status="done"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php elseif ($todo->todo_type == 'evaluate') : ?>
 							<div class="todo-label">
@@ -121,19 +122,20 @@ $confirmation_status = [
 									<?php echo $todo->agenda_key ?>
 								</span>
 								<?php else : ?>
-								<span class="msg-tag label label-bordered label-undone">
-									<?php echo $todo->meeting_key ?>
-								</span>
+									<?php echo display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) ?>
 								<?php endif ?>
 							</div>
 							<div class="todo-left">
 								<?php if ($todo->evaluate_mode == 'agenda') : ?>
 									<?php echo "<b>" . ucfirst($todo->agenda_name) . ":</b> " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 								<?php else : ?>
-									<?php echo "<b>" . ucfirst($todo->meeting_name) . ":</b> " . display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) . ""; ?>
+									<span class="msg-tag label label-bordered label-undone">
+										<?php echo $todo->meeting_key ?>
+									</span>&nbsp;
+									<?php echo ucfirst($todo->meeting_name) ?>
 								<?php endif ?>
 							</div>
-							<div class="todo-right">
+							<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" <?php echo $todo->evaluate_mode != 'agenda' ? 'data-user-id="' . $todo->user_id . '"' : 'data-agenda-id="' . $todo->agenda_id . '"' ?>>
 								<a href="#" class="setting action an-btn-success submit"><i class="ion-checkmark"></i></a>
 								<div class="todo-rating-wraper">
 									<div class="todo-rating">

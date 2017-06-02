@@ -93,3 +93,85 @@ $(".todo-rating label").click(function(){
 	$(this).parent().find('input[type=radio]').removeAttr('checked');
 	$(this).parent().find('input[type=radio]#' + input_id).attr('checked', '');
 });
+
+$(document).ready(function() {
+	$(".my-todo").on("click", ".submit", function(e) {
+		e.preventDefault();
+		var submit_btn = $(this);
+
+		if (submit_btn.parent().parent().hasClass('homework')) {
+			var todo_type = 'homework';
+		}
+
+		if (submit_btn.parent().parent().hasClass('evaluate')) {
+			var todo_type = 'evaluate';
+		}
+
+		if (submit_btn.parent().parent().hasClass('decide')) {
+			var todo_type = 'decide';
+		}
+
+		if (todo_type == 'homework' || todo_type == 'evaluate') {
+			var url = submit_btn.parent().data('url');
+
+			if (todo_type == 'homework') {
+				var data = {};
+				data.pk = submit_btn.parent().data('homework-id');
+				data.value = submit_btn.data('status');
+				data.name = 'status'
+			}
+
+			if (todo_type == 'evaluate') {
+				var data = {};
+				data.rate = submit_btn.parent().find('input[type=radio]:checked').val();
+
+				if (typeof(data.rate) != 'undefined') {
+					data.meeting_id = submit_btn.parent().data('meeting-id');
+
+					if (submit_btn.parent().hasClass('user')) {
+						data.user_id = submit_btn.parent().data('user-id');
+					}
+
+					if (submit_btn.parent().hasClass('agenda')) {
+						data.agenda_id = submit_btn.parent().data('agenda-id');
+					}
+				} else {
+					var error = 'Please rate the member before submitting.';
+				}
+			}
+			if (typeof(error) == 'undefined') {
+				$.post({
+					url: url,
+					data: data,
+				}).done(function(data) {console.log(data);
+					data = JSON.parse(data);
+					if (data.message_type == 'success') {
+						submit_btn.parent().parent().slideUp();
+					}
+
+					$.notify({
+						message: data.message
+					}, {
+						type: data.message_type,
+						z_index: 1051
+					});
+				}).fail(function(xhr, statusText) {
+					console.log(xhr.status);
+					$.notify({
+						message: data.message
+					}, {
+						type: data.message_type,
+						z_index: 1051
+					});
+				});
+			} else {
+				$.notify({
+					message: error
+				}, {
+					type: 'danger',
+					z_index: 1051
+				});
+			}
+		}
+	});
+})
