@@ -14,9 +14,11 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('homework/homework_member_model');
 		$this->load->model('meeting/meeting_model');
 		$this->load->model('meeting/meeting_member_model');
+		$this->load->model('meeting/meeting_member_rate_model');
 		$this->load->model('agenda/agenda_model');
 		$this->load->model('agenda/agenda_member_model');
 		$this->load->helper('date');
+		$this->load->helper('text');
 
 		Assets::add_module_js('dashboard', 'dashboard.js');
 		Assets::add_module_css('dashboard', 'dashboard.css');
@@ -225,7 +227,7 @@ class Dashboard extends Authenticated_Controller
 	private function get_my_todo()
 	{
 
-		$homeworks = $this->homework_model->select('homework.*, "homework" as todo_type')
+		$homeworks = $this->homework_model->select('homework.*, "homework" as todo_type, meeting_key')
 										->join('meetings s', 's.meeting_id = homework.meeting_id')
 										->join('actions a', 'a.action_id = s.action_id')
 										->join('projects p', 'p.project_id = a.project_id')
@@ -238,18 +240,54 @@ class Dashboard extends Authenticated_Controller
 		if (empty($homeworks)) {
 			$homeworks = [];
 		}
-		$evaluates = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "evaluate" as todo_type')
+
+		// $evaluate_agendas = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "agenda" as evaluate_mode, "evaluate" as todo_type')
+		// 						->join('actions a', 'a.action_id = meetings.action_id')
+		// 						->join('projects p', 'p.project_id = a.project_id')
+		// 						->join('agendas ag', 'ag.meeting_id = meetings.meeting_id')
+		// 						->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
+		// 						->where('(sm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+		// 						->where('organization_id', $this->current_user->current_organization_id)
+		// 						->where('meetings.manage_state = \'evaluate\'')
+		// 						->group_by('ag.agenda_id')
+		// 						->find_all();
+		if (empty($evaluate_agendas)) {
+			$evaluate_agendas = [];
+		}
+
+		$evaluate_members = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, u.*, "user" as evaluate_mode, "evaluate" as todo_type')
 								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
 								->join('agendas ag', 'ag.meeting_id = meetings.meeting_id', 'LEFT')
 								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
+								->join('users u', 'u.user_id = sm.user_id')
 								->where('(sm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
 								->where('organization_id', $this->current_user->current_organization_id)
 								->where('meetings.manage_state = \'evaluate\'')
+								->group_by('u.user_id')
 								->find_all();
-		if (empty($evaluates)) {
-			$evaluates = [];
+		if (empty($evaluate_members)) {
+			$evaluate_members = [];
 		}
+
+		$evaluates = array_merge($evaluate_members, $evaluate_agendas);
+
+		foreach ($evaluates as $key => $item) {
+			if ($this->is_evaluated($item->meeting_id)) {
+				unset($evaluates[$key]);
+			}
+
+			if ($item->evaluate_mode == 'user') {
+				$rated = $this->meeting_member_rate_model
+							->where('meeting_id', $item->meeting_id)
+							->where('attendee_id', $item->user_id)
+							->where('user_id', $this->current_user->user_id)
+							->count_all() > 0 ? true : false;
+				
+				if ($rated) unset($evaluates[$key]);
+			}
+		}
+
 		$decides = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "decide" as todo_type')
 								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'p.project_id = a.project_id')
@@ -257,12 +295,62 @@ class Dashboard extends Authenticated_Controller
 								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
 								->where('meetings.owner_id', $this->current_user->user_id)
 								->where('organization_id', $this->current_user->current_organization_id)
-								->where('meetings.manage_state = \'decide\'')
+								->where('meetings.manage_state', 'decide')
+								->where('ag.confirm_status IS NULL')
+								->group_by('ag.agenda_id')
 								->find_all();
 		if (empty($decides)) {
 			$decides = [];
 		}
 
 		return array_merge($homeworks, $evaluates, $decides);
+	}
+
+	// copied from meeting controller
+	private function is_evaluated($meeting_id) {
+		// $evaluated_members = $this->meeting_member_rate_model
+		// 						->select('user_id')
+		// 						->where('meeting_id', $meeting_id)
+		// 						->where('user_id', $this->current_user->user_id)
+		// 						->group_by('user_id')
+		// 						->as_array()
+		// 						->find_all();
+		
+		// $evaluated_ids = [];
+		// $evaluated = false;
+
+		// if (is_array($evaluated_members) && count($evaluated_members) > 0) {
+		// 	$evaluated_ids = array_column($evaluated_members, 'user_id');
+		// 	if (in_array($this->current_user->user_id, $evaluated_ids)) {
+		// 		$evaluated = true;
+		// 	}
+		// }
+
+		$evaluated = false;
+
+		$evaluated_members = $this->meeting_member_rate_model
+								->select('user_id')
+								->where('meeting_id', $meeting_id)
+								->where('user_id', $this->current_user->user_id)
+								->as_array()
+								->find_all();
+
+		$meeting_members = $this->meeting_member_model
+							->select('user_id')
+							->where('meeting_id', $meeting_id)
+							->as_array()
+							->find_all();
+
+		if (is_array($evaluated_members) && count($evaluated_members) > 0 && is_array($meeting_members) && count($meeting_members) > 0) {
+			$evaluated_ids = array_column($evaluated_members, 'user_id');
+			$member_ids = array_column($meeting_members, 'user_id');
+
+			if ((in_array($this->current_user->user_id, $member_ids) && count($evaluated_ids) == (count($member_ids) - 1))
+			|| ((! in_array($this->current_user->user_id, $member_ids)) && count($evaluated_ids) == (count($member_ids)))) {
+				$evaluated = true;
+			}
+		}
+
+		return $evaluated;
 	}
 }

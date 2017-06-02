@@ -155,32 +155,77 @@
 
 .my-todo > .todo-list > .item {
 	padding-bottom: 10px;
+	padding-top: 10px;
 	overflow: hidden;
+	border-bottom: 1px solid #aaa;
+}
+
+.my-todo > .todo-list > .item:last-child {
+	border: none;
 }
 
 .my-todo > .todo-list > .item .todo-left {
-	width: 60%;
+	width: 55%;
 	overflow: hidden;
 	float: left;
+	line-height: 20px;
+	padding-top: 10px;
 }
 
 .my-todo > .todo-list > .item .todo-right {
-	width: 40%;
+	width: 45%;
 	overflow: hidden;
+	float: left;
+	padding-top: 5px;
+}
+
+.my-todo > .todo-list > .item .todo-right select.an-form-control{
+	margin-bottom: 0;
+	height: 30px;
+	width: 70%;
+}
+
+.my-todo > .todo-list > .item .todo-right .detail {
+	width: 70%;
+	text-align: center;
 	float: left;
 }
 
-/****** Style Star Rating Widget *****/
-.my-todo > .todo-list > .item .rating {
+.my-todo > .todo-list > .item .todo-right .detail i {
+	font-size: 2.25em;
+	line-height: 100%;
+}
+
+.my-todo > .todo-list > .item .todo-right .action {
+	border-radius: 2px;
+	display: inline-block;
+	padding: 0 5px;
 	float: right;
+	margin-left: 5px;
+}
+
+.my-todo > .todo-list > .item .todo-right .action i {
+	font-size: 1.25em
+}
+
+/****** Style Star Rating Widget *****/
+.my-todo > .todo-list > .item .todo-right .todo-rating-wraper {
+	width: 70%;
+	text-align: center;
+	float: left;
 	display: table-cell;
 }
 
-.rating > input {
+.my-todo > .todo-list > .item .todo-right .todo-rating-wraper .todo-rating {
+	float: none;
+	display: inline-block
+}
+
+.todo-rating > input {
 	display: none;
 }
 
-.rating > label:before {
+.todo-rating > label:before {
 	margin-top: 0px;
 	padding:0px 0px 0px 0px;
 	font-size: 1.25em;
@@ -189,13 +234,13 @@
 	content: "\f4b3";
 }
 
-.rating > .half:before { 
+.todo-rating > .half:before { 
 	content: "\f4b1";
 	position: absolute;
 }
 
 
-.rating > label {
+.todo-rating > label {
 	float: right;
 	margin: 0px 1px 0px 0px;
 	color:#D8D8D8;
@@ -203,16 +248,16 @@
 
 /***** CSS Magic to Highlight Stars on Hover *****/
 
-.rating > input:checked ~ label,
-.rating:not(:checked) > label:hover, /* hover current star */
-.rating:not(:checked) > label:hover ~ label {
+.todo-rating > input:checked ~ label,
+.todo-rating:not(:checked) > label:hover, /* hover current star */
+.todo-rating:not(:checked) > label:hover ~ label {
 	color:#FFD700 !important;
 	cursor:pointer;
 }/* hover previous stars in list */
 
-.rating > input:checked + label:hover, /* hover current star when changing rating */
-.rating > label:hover ~ input:checked ~ label, /* lighten current selection */
-.rating > input:checked ~ label:hover ~ label {
+.todo-rating > input:checked + label:hover, /* hover current star when changing rating */
+.todo-rating > label:hover ~ input:checked ~ label, /* lighten current selection */
+.todo-rating > input:checked ~ label:hover ~ label {
 	color:#FFED85 !important;
 	cursor:pointer;
 }

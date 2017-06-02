@@ -16,7 +16,7 @@ $confirmation_status = [
 	'closed', 'skipped', 'resolved', 'open_parking_lot', 'closed_parking_lot'
 ];
 ?>
-<div style="display: none;" class="rating">
+<div style="display: none;" class="todo-rating">
 	<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
 	<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
 	<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
@@ -25,7 +25,7 @@ $confirmation_status = [
 </div>
 <div class="row">
 	<!-- Welcome Professor -->
-	<div class="col-md-3 col-xs-12">
+	<div class="col-md-4 col-xs-12">
 		<div class="welcome-panel">
 			<div class="user-info">
 				<div class="avatar" style="background-image: url('<?php echo avatar_url($user->avatar, $user->email, 128) ?>')"></div>
@@ -91,49 +91,87 @@ $confirmation_status = [
 					</h1>
 					<div class="todo-list">
 					<?php if (! empty($my_todo)) : ?>
-						<?php foreach ($my_todo as $todo) : ?>
-						<div class="item">
+						<?php foreach ($my_todo as $todo) : if (! ($todo->todo_type == 'evaluate' && $todo->evaluate_mode == 'user' && $todo->user_id == $current_user->user_id)) : ?>
+						<div class="item <?php echo $todo->todo_type ?>">
 							<?php if ($todo->todo_type == 'homework') : ?>
-							<div class="">
+							<div class="todo-label">
 								<span class="msg-tag label label-bordered label-inprogress">
 									<?php echo lang('db_homework') ?>
 								</span>&nbsp;
-								<?php echo ucfirst($todo->name) . ": " . ucfirst($todo->description) ?>
+								<?php echo ucfirst($todo->name) ?>
+							</div>
+							<div class="todo-left">
+								<?php echo ucfirst($todo->description) ?>
+							</div>
+							<div class="todo-right" data-url="<?php echo site_url('homework/ajax_edit') ?>" data-homework-id="<?php echo $todo->homework_id ?>">
+								<div class="detail">
+									<a href="<?php echo site_url('meeting/') . $todo->meeting_key ?>" target="_blank">
+										<i class="ion-document"></i>
+									</a>
+								</div>
+								<a href="#" class="setting action an-btn-danger submit" data-status="undone"><i class="ion-close"></i></a>
+								<a href="#" class="setting action an-btn-success submit" data-status="done"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php elseif ($todo->todo_type == 'evaluate') : ?>
-							<div class="todo-left">
+							<div class="todo-label">
 								<span class="msg-tag label label-bordered label-skipped">
 									<?php echo lang('db_evaluate') ?>
 								</span>&nbsp;
-								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . ucfirst($todo->agenda_description) ?>
+								<?php if ($todo->evaluate_mode == 'agenda') : ?>
+								<span class="msg-tag label label-bordered label-done">
+									<?php echo $todo->agenda_key ?>
+								</span>
+								<?php else : ?>
+									<?php echo display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) ?>
+								<?php endif ?>
 							</div>
-							<div class="todo-right">
-								<div class="rating">
-									<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
-									<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
-									<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
-									<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
-									<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+							<div class="todo-left">
+								<?php if ($todo->evaluate_mode == 'agenda') : ?>
+									<?php echo "<b>" . ucfirst($todo->agenda_name) . ":</b> " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
+								<?php else : ?>
+									<span class="msg-tag label label-bordered label-undone">
+										<?php echo $todo->meeting_key ?>
+									</span>&nbsp;
+									<?php echo ucfirst($todo->meeting_name) ?>
+								<?php endif ?>
+							</div>
+							<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" <?php echo $todo->evaluate_mode != 'agenda' ? 'data-user-id="' . $todo->user_id . '"' : 'data-agenda-id="' . $todo->agenda_id . '"' ?>>
+								<a href="#" class="setting action an-btn-success submit"><i class="ion-checkmark"></i></a>
+								<div class="todo-rating-wraper">
+									<div class="todo-rating">
+										<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+										<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+										<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+										<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+										<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+									</div>
 								</div>
 							</div>
 							<?php else : ?>
-							<div class="todo-left">
+							<div class="todo-label">
 								<span class="msg-tag label label-bordered label-ready">
 									<?php echo lang('db_decide') ?>
 								</span>&nbsp;
-								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . ucfirst($todo->agenda_description) ?>
+								<span class="msg-tag label label-bordered label-done">
+									<?php echo $todo->agenda_key ?>
+								</span>&nbsp;
+								<?php echo ucfirst($todo->agenda_name) ?>
+							</div>
+							<div class="todo-left">
+								<?php echo word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 							</div>
 							<div class="todo-right">
-								<select name="" class="an-form-control">
+								<select name="confirm-status" data-pk="<?php e($todo->agenda_id)?>" class="an-form-control">
 									<option disabled selected value><?php e(lang('st_select_an_option')) ?></option>
 									<?php foreach ($confirmation_status as $status) : ?>
-										<option value="$status"><?php echo lang('db_' . $status) ?></option>
+										<option value="<?php echo $status ?>"><?php echo lang('db_' . $status) ?></option>
 									<?php endforeach ?>
 								</select>
+								<a href="#" class="setting action an-btn-success submit-confirm-status"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php endif ?>
 						</div>
-						<?php endforeach ?>
+						<?php endif; endforeach; ?>
 					<?php endif ?>
 					</div>
 				</div>
@@ -183,7 +221,7 @@ $confirmation_status = [
 						<div class="steps">
 							<?php foreach($owner['items'] as $step) : ?>
 							<div class="item">
-								<a href="<?php echo site_url('step/' . $step->meeting_key) ?>"><?php echo "<span class='msg-tag label label-bordered label-inactive'>{$step->meeting_key}</span> {$step->name}" ?></a>
+								<a href="<?php echo site_url('meeting/' . $step->meeting_key) ?>"><?php echo "<span class='msg-tag label label-bordered label-inactive'>{$step->meeting_key}</span> {$step->name}" ?></a>
 							</div>
 							<?php endforeach ?>
 						</div>
@@ -198,7 +236,7 @@ $confirmation_status = [
 	<!-- end my projects -->
 
 	<!-- Calendar -->
-	<div class="col-md-5 col-xs-12">
+	<div class="col-md-4 col-xs-12">
 		<h1 class="db-h1">
 			<span class="an-settings-button">
 				<?php echo lang('db_meetings') ?>&nbsp
