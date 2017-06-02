@@ -83,3 +83,12 @@ $('#meeting-calendar').fullCalendar({
 	eventLimit: true, // allow "more" link when too many events
 	events: <?php echo json_encode($meeting_calendar) ?>
 });
+
+// rating
+$(".todo-rating label").click(function(){
+	$(this).parent().find("label").css({"color": "#D8D8D8"});
+	$(this).css({"color": "#FFED85"});
+	$(this).nextAll().css({"color": "#FFED85"});
+	var input_id = $(this).attr('for');
+	$(this).parent().find('#' + input_id).click();
+});

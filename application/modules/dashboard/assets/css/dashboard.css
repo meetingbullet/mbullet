@@ -178,19 +178,45 @@
 
 .my-todo > .todo-list > .item .todo-right select.an-form-control{
 	margin-bottom: 0;
+	height: 30px;
+	width: 80%;
+}
+
+.my-todo > .todo-list > .item .todo-right .action {
+	border-radius: 2px;
+	display: inline-block;
+	padding: 0 5px;
+	float: right;
+	margin-left: 5px;
+}
+
+.my-todo > .todo-list > .item .todo-right .action i {
+	font-size: 1.25em
 }
 
 /****** Style Star Rating Widget *****/
-.my-todo > .todo-list > .item .rating {
+.my-todo > .todo-list > .item .todo-rating-wraper {
+	width: 80%;
+	text-align: center;
 	float: right;
 	display: table-cell;
 }
 
-.rating > input {
+.my-todo > .todo-list > .item .todo-rating-wraper .todo-rating {
+	float: none;
+	display: inline-block
+}
+
+.todo-rating {
+	float:left;
+	display: table-cell;
+}
+
+.todo-rating > input {
 	display: none;
 }
 
-.rating > label:before {
+.todo-rating > label:before {
 	margin-top: 0px;
 	padding:0px 0px 0px 0px;
 	font-size: 1.25em;
@@ -199,13 +225,13 @@
 	content: "\f4b3";
 }
 
-.rating > .half:before { 
+.todo-rating > .half:before { 
 	content: "\f4b1";
 	position: absolute;
 }
 
 
-.rating > label {
+.todo-rating > label {
 	float: right;
 	margin: 0px 1px 0px 0px;
 	color:#D8D8D8;
@@ -213,16 +239,16 @@
 
 /***** CSS Magic to Highlight Stars on Hover *****/
 
-.rating > input:checked ~ label,
-.rating:not(:checked) > label:hover, /* hover current star */
-.rating:not(:checked) > label:hover ~ label {
+.todo-rating > input:checked ~ label,
+.todo-rating:not(:checked) > label:hover, /* hover current star */
+.todo-rating:not(:checked) > label:hover ~ label {
 	color:#FFD700 !important;
 	cursor:pointer;
 }/* hover previous stars in list */
 
-.rating > input:checked + label:hover, /* hover current star when changing rating */
-.rating > label:hover ~ input:checked ~ label, /* lighten current selection */
-.rating > input:checked ~ label:hover ~ label {
+.todo-rating > input:checked + label:hover, /* hover current star when changing rating */
+.todo-rating > label:hover ~ input:checked ~ label, /* lighten current selection */
+.todo-rating > input:checked ~ label:hover ~ label {
 	color:#FFED85 !important;
 	cursor:pointer;
 }

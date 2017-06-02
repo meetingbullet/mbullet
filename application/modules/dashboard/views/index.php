@@ -16,7 +16,7 @@ $confirmation_status = [
 	'closed', 'skipped', 'resolved', 'open_parking_lot', 'closed_parking_lot'
 ];
 ?>
-<div style="display: none;" class="rating">
+<div style="display: none;" class="todo-rating">
 	<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
 	<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
 	<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
@@ -94,11 +94,15 @@ $confirmation_status = [
 						<?php foreach ($my_todo as $todo) : ?>
 						<div class="item">
 							<?php if ($todo->todo_type == 'homework') : ?>
-							<div class="">
+							<div class="todo-left">
 								<span class="msg-tag label label-bordered label-inprogress">
 									<?php echo lang('db_homework') ?>
 								</span>&nbsp;
 								<?php echo ucfirst($todo->name) . ": " . ucfirst($todo->description) ?>
+							</div>
+							<div class="todo-right">
+								<a href="#" class="setting action an-btn-danger submit undone"><i class="ion-close"></i></a>
+								<a href="#" class="setting action an-btn-info submit done"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php elseif ($todo->todo_type == 'evaluate') : ?>
 							<div class="todo-left">
@@ -108,12 +112,15 @@ $confirmation_status = [
 								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 							</div>
 							<div class="todo-right">
-								<div class="rating">
-									<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
-									<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
-									<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
-									<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
-									<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+								<a href="#" class="setting action an-btn-info submit"><i class="ion-checkmark"></i></a>
+								<div class="todo-rating-wraper">
+									<div class="todo-rating">
+										<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+										<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+										<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+										<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+										<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+									</div>
 								</div>
 							</div>
 							<?php else : ?>
@@ -130,6 +137,7 @@ $confirmation_status = [
 										<option value="$status"><?php echo lang('db_' . $status) ?></option>
 									<?php endforeach ?>
 								</select>
+								<a href="#" class="setting action an-btn-info submit"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php endif ?>
 						</div>
