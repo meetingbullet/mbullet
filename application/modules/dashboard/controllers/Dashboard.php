@@ -17,6 +17,7 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('agenda/agenda_model');
 		$this->load->model('agenda/agenda_member_model');
 		$this->load->helper('date');
+		$this->load->helper('text');
 
 		Assets::add_module_js('dashboard', 'dashboard.js');
 		Assets::add_module_css('dashboard', 'dashboard.css');

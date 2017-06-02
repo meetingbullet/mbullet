@@ -105,7 +105,7 @@ $confirmation_status = [
 								<span class="msg-tag label label-bordered label-skipped">
 									<?php echo lang('db_evaluate') ?>
 								</span>&nbsp;
-								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . ucfirst($todo->agenda_description) ?>
+								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 							</div>
 							<div class="todo-right">
 								<div class="rating">
@@ -121,7 +121,7 @@ $confirmation_status = [
 								<span class="msg-tag label label-bordered label-ready">
 									<?php echo lang('db_decide') ?>
 								</span>&nbsp;
-								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . ucfirst($todo->agenda_description) ?>
+								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 							</div>
 							<div class="todo-right">
 								<select name="" class="an-form-control">
