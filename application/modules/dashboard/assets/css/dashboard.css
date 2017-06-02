@@ -168,12 +168,15 @@
 	width: 55%;
 	overflow: hidden;
 	float: left;
+	line-height: 20px;
+	padding-top: 10px;
 }
 
 .my-todo > .todo-list > .item .todo-right {
 	width: 45%;
 	overflow: hidden;
 	float: left;
+	padding-top: 5px;
 }
 
 .my-todo > .todo-list > .item .todo-right select.an-form-control{

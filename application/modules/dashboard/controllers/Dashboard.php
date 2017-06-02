@@ -240,16 +240,16 @@ class Dashboard extends Authenticated_Controller
 			$homeworks = [];
 		}
 
-		$evaluate_agendas = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "agenda" as evaluate_mode, "evaluate" as todo_type')
-								->join('actions a', 'a.action_id = meetings.action_id')
-								->join('projects p', 'p.project_id = a.project_id')
-								->join('agendas ag', 'ag.meeting_id = meetings.meeting_id')
-								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
-								->where('(sm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
-								->where('organization_id', $this->current_user->current_organization_id)
-								->where('meetings.manage_state = \'evaluate\'')
-								->group_by('ag.agenda_id')
-								->find_all();
+		// $evaluate_agendas = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "agenda" as evaluate_mode, "evaluate" as todo_type')
+		// 						->join('actions a', 'a.action_id = meetings.action_id')
+		// 						->join('projects p', 'p.project_id = a.project_id')
+		// 						->join('agendas ag', 'ag.meeting_id = meetings.meeting_id')
+		// 						->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
+		// 						->where('(sm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+		// 						->where('organization_id', $this->current_user->current_organization_id)
+		// 						->where('meetings.manage_state = \'evaluate\'')
+		// 						->group_by('ag.agenda_id')
+		// 						->find_all();
 		if (empty($evaluate_agendas)) {
 			$evaluate_agendas = [];
 		}
@@ -278,7 +278,8 @@ class Dashboard extends Authenticated_Controller
 								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
 								->where('meetings.owner_id', $this->current_user->user_id)
 								->where('organization_id', $this->current_user->current_organization_id)
-								->where('meetings.manage_state = \'decide\'')
+								->where('meetings.manage_state', 'decide')
+								->where('ag.confirm_status IS NULL')
 								->group_by('ag.agenda_id')
 								->find_all();
 		if (empty($decides)) {

@@ -94,11 +94,13 @@ $confirmation_status = [
 						<?php foreach ($my_todo as $todo) : if (! ($todo->todo_type == 'evaluate' && $todo->evaluate_mode == 'user' && $todo->user_id == $current_user->user_id)) : ?>
 						<div class="item">
 							<?php if ($todo->todo_type == 'homework') : ?>
-							<div class="todo-left">
+							<div class="todo-label">
 								<span class="msg-tag label label-bordered label-inprogress">
 									<?php echo lang('db_homework') ?>
 								</span>&nbsp;
-								<?php echo ucfirst($todo->name) . ": " . ucfirst($todo->description) ?>
+							</div>
+							<div class="todo-left">
+								<?php echo "<b>" . ucfirst($todo->name) . ":</b> " . ucfirst($todo->description) ?>
 							</div>
 							<div class="todo-right">
 								<div class="detail">
@@ -107,21 +109,32 @@ $confirmation_status = [
 									</a>
 								</div>
 								<a href="#" class="setting action an-btn-danger submit undone"><i class="ion-close"></i></a>
-								<a href="#" class="setting action an-btn-info submit done"><i class="ion-checkmark"></i></a>
+								<a href="#" class="setting action an-btn-success submit done"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php elseif ($todo->todo_type == 'evaluate') : ?>
-							<div class="todo-left">
+							<div class="todo-label">
 								<span class="msg-tag label label-bordered label-skipped">
 									<?php echo lang('db_evaluate') ?>
 								</span>&nbsp;
 								<?php if ($todo->evaluate_mode == 'agenda') : ?>
-									<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
+								<span class="msg-tag label label-bordered label-done">
+									<?php echo $todo->agenda_key ?>
+								</span>
 								<?php else : ?>
-									<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar); ?>
+								<span class="msg-tag label label-bordered label-undone">
+									<?php echo $todo->meeting_key ?>
+								</span>
+								<?php endif ?>
+							</div>
+							<div class="todo-left">
+								<?php if ($todo->evaluate_mode == 'agenda') : ?>
+									<?php echo "<b>" . ucfirst($todo->agenda_name) . ":</b> " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
+								<?php else : ?>
+									<?php echo "<b>" . ucfirst($todo->meeting_name) . ":</b> " . display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) . ""; ?>
 								<?php endif ?>
 							</div>
 							<div class="todo-right">
-								<a href="#" class="setting action an-btn-info submit"><i class="ion-checkmark"></i></a>
+								<a href="#" class="setting action an-btn-success submit"><i class="ion-checkmark"></i></a>
 								<div class="todo-rating-wraper">
 									<div class="todo-rating">
 										<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
@@ -133,11 +146,16 @@ $confirmation_status = [
 								</div>
 							</div>
 							<?php else : ?>
-							<div class="todo-left">
+							<div class="todo-label">
 								<span class="msg-tag label label-bordered label-ready">
 									<?php echo lang('db_decide') ?>
 								</span>&nbsp;
-								<?php echo "[" . $todo->meeting_key . "] " . ucfirst($todo->meeting_name) . ": " . "[" . $todo->agenda_key . "] " . ucfirst($todo->agenda_name) . " - " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
+								<span class="msg-tag label label-bordered label-done">
+									<?php echo $todo->agenda_key ?>
+								</span>
+							</div>
+							<div class="todo-left">
+								<?php echo "<b>" . ucfirst($todo->agenda_name) . ":</b> " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 							</div>
 							<div class="todo-right">
 								<select name="" class="an-form-control">
@@ -146,7 +164,7 @@ $confirmation_status = [
 										<option value="$status"><?php echo lang('db_' . $status) ?></option>
 									<?php endforeach ?>
 								</select>
-								<a href="#" class="setting action an-btn-info submit"><i class="ion-checkmark"></i></a>
+								<a href="#" class="setting action an-btn-success submit"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php endif ?>
 						</div>
