@@ -155,7 +155,13 @@
 
 .my-todo > .todo-list > .item {
 	padding-bottom: 10px;
+	padding-top: 10px;
 	overflow: hidden;
+	border-bottom: 1px solid #aaa;
+}
+
+.my-todo > .todo-list > .item:last-child {
+	border: none;
 }
 
 .my-todo > .todo-list > .item .todo-left {
@@ -168,6 +174,10 @@
 	width: 40%;
 	overflow: hidden;
 	float: left;
+}
+
+.my-todo > .todo-list > .item .todo-right select.an-form-control{
+	margin-bottom: 0;
 }
 
 /****** Style Star Rating Widget *****/
