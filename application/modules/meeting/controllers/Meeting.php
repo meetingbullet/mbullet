@@ -1333,7 +1333,7 @@ class Meeting extends Authenticated_Controller
 		if (! in_array($mode, $modes)) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => 'Wrong evaluate mode'
+				'message' => lang('st_wrong_mode')
 			]); return;
 		}
 
@@ -1345,7 +1345,7 @@ class Meeting extends Authenticated_Controller
 			if (empty($user_id) || empty($rate) || empty($meeting_id)) {
 				echo json_encode([
 					'message_type' => 'danger',
-					'message' => 'Missing data.'
+					'message' => lang('st_missing_data')
 				]); return;
 			}
 
@@ -1373,12 +1373,12 @@ class Meeting extends Authenticated_Controller
 				$this->done_meeting_if_qualified($meeting);
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => 'User rated successfully.'
+					'message' => lang('st_rate_success')
 				]); return;
 			} else {
 				echo json_encode([
 					'message_type' => 'danger',
-					'message' => 'This meeting is already evaluated or unable to rate.'
+					'message' => lang('st_evaluated')
 				]); return;
 			}
 		}

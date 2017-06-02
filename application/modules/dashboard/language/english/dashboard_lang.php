@@ -21,4 +21,4 @@ $lang['db_open_parking_lot'] = 'Open Parking Lot';
 $lang['db_closed_parking_lot'] = 'Closed parking lot';
 $lang['db_skipped'] = 'Skipped';
 $lang['db_closed'] = 'Closed';
-
+$lang['db_rate_needed'] = 'Please rate the member before submitting.';

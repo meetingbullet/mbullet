@@ -173,3 +173,7 @@ $lang['st_ready'] = 'Ready';
 $lang['st_inprogress'] = 'In progress';
 $lang['st_finished'] = 'Finished';
 $lang['st_resolved'] = 'Resolved';
+$lang['st_wrong_mode'] = 'Wrong evaluate mode.';
+$lang['st_rate_success'] = 'User rated successfully.';
+$lang['st_evaluated'] = 'This meeting is already evaluated or unable to rate.';
+$lang['st_missing_data'] = 'Missing data.';

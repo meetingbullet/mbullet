@@ -137,7 +137,7 @@ $(document).ready(function() {
 						data.agenda_id = submit_btn.parent().data('agenda-id');
 					}
 				} else {
-					var error = 'Please rate the member before submitting.';
+					var error = '<?php echo lang("db_rate_needed") ?>';
 				}
 			}
 			if (typeof(error) == 'undefined') {
