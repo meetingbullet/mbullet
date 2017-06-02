@@ -207,7 +207,7 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 
 			// Open meeting decider if is owner
 			if ($('.meeting-monitor').data('is-owner') == '1') {
-				$('#meeting-decider .modal-content').html('');
+				$('#meeting-decider-modal .modal-content').html('');
 
 				$.get('<?php e(site_url('meeting/decider/' . $meeting_key)) ?>', (data) => {
 					data = JSON.parse(data);
@@ -222,8 +222,8 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 						return;
 					}
 
-					$('#meeting-decider .modal-content').html(data.modal_content);
-					$('#meeting-decider').modal({backdrop: "static"});
+					$('#meeting-decider-modal .modal-content').html(data.modal_content);
+					$('#meeting-decider-modal').modal({backdrop: "static"});
 				});
 			}
 		}
@@ -636,7 +636,7 @@ function update_monitor()
 
 			// Open meeting decider if is owner
 			if ($('.meeting-monitor').data('is-owner') == '1') {
-				$('#meeting-decider .modal-content').html('');
+				$('#meeting-decider-modal .modal-content').html('');
 
 				$.get('<?php e(site_url('meeting/decider/' . $meeting_key)) ?>', (data) => {
 					data = JSON.parse(data);
@@ -651,8 +651,8 @@ function update_monitor()
 						return;
 					}
 
-					$('#meeting-decider .modal-content').html(data.modal_content);
-					$('#meeting-decider').modal({backdrop: "static"});
+					$('#meeting-decider-modal .modal-content').html(data.modal_content);
+					$('#meeting-decider-modal').modal({backdrop: "static"});
 				});
 			} else {
 				// Wait for owner finish decider

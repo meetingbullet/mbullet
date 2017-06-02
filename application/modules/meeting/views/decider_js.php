@@ -39,7 +39,7 @@ $(document).on('submit.decider', '.form-meeting-decider', (e) => {
 			$('#meeting-decider-modal').modal('hide');
 
 			/* 
-				If one of the agendas is marked as Closed Parking Lot the meeting owner is redirected to 
+				If one of the agendas is marked as Open Parking Lot the meeting owner is redirected to 
 				the Meeting creation screen and prompted to create a new meeting to resolve the Closed Parking Lot agenda.
 			*/
 			if ($('.confirmation-status option[value="open_parking_lot"]:selected').length > 0) {
