@@ -321,17 +321,13 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	Project: 'open','inactive','archive'
 	Action: 'open','inprogress','ready','resolved'
 	Meeting: 'open','ready','inprogress','finished','resolved'
-	Agenda: 'open','inprogress','resolved','skipped','jumped','parking_lot'
+	Agenda: 'open','inprogress','resolved','skipped','jumped','parking_lot', 'open_parking_lot', 'closed_parking_lot'
 	Homework: 'open', 'done', 'undone'
 */
 
 .label-open, .label-open:hover, .label-open:active, .label-open:focus {
 	color: white;
 	background: #025d83;
-}
-
- {
-	color: white;
 }
 
 .label-ready {
@@ -347,12 +343,14 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	background: #eb547c;
 }
 
-.label-resolved, .label-finished, .label-done, .label-done:hover, .label-done:active, .label-done:focus {
+.label-resolved, .label-finished, .label-closed, 
+.label-done, .label-done:hover, .label-done:active, .label-done:focus {
 	color: white;
 	background: #70c1b3;
 }
 
-.label-archive, .label-undone, .label-undone:hover, .label-undone:active, .label-undone:focus {
+.label-archive, .label-closed_parking_lot, 
+.label-undone, .label-undone:hover, .label-undone:active, .label-undone:focus {
 	color: white;
 	background: #999;
 }
@@ -362,7 +360,7 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 	color: #333;
 }
 
-.label-parking_lot {
+.label-parking_lot, .label-open_parking_lot {
 	background: #b2dbbf;
 }
 

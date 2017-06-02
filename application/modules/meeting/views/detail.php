@@ -339,7 +339,7 @@ $members = array_column($invited_members, 'user_id');
 	</div>
 </div>
 
-<div id="meeting-decider" class="modal fade" tabindex="-1" role="dialog">
+<div id="meeting-decider-modal" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-80" role="document">
 		<div class="modal-content">
 		</div>

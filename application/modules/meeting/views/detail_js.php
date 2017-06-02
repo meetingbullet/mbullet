@@ -37,7 +37,7 @@ $('#start-meeting').click((e) => {
 if ($('#meeting-status').data('is-owner') == '1' && ($('#meeting-status').data('status') == 'resolved' || $('#meeting-status').data('status') == 'finished')) {
 	$('.table-detail-agenda tr').each((i, item) => {
 		if ($(item).data('confirm-status') == '') {
-			$('#meeting-decider .modal-content').html('');
+			$('#meeting-decider-modal .modal-content').html('');
 
 			$.get('<?php e(site_url('meeting/decider/' . $meeting_key)) ?>', (data) => {
 				data = JSON.parse(data);
@@ -52,8 +52,8 @@ if ($('#meeting-status').data('is-owner') == '1' && ($('#meeting-status').data('
 					return;
 				}
 
-				$('#meeting-decider .modal-content').html(data.modal_content);
-				$('#meeting-decider').modal({backdrop: "static"});
+				$('#meeting-decider-modal .modal-content').html(data.modal_content);
+				$('#meeting-decider-modal').modal({backdrop: "static"});
 			});
 		}
 	});
