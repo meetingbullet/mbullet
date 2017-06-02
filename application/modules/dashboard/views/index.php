@@ -160,13 +160,13 @@ $confirmation_status = [
 								<?php echo "<b>" . ucfirst($todo->agenda_name) . ":</b> " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 							</div>
 							<div class="todo-right">
-								<select name="" class="an-form-control">
+								<select name="confirm-status" data-pk="<?php e($todo->agenda_id)?>" class="an-form-control">
 									<option disabled selected value><?php e(lang('st_select_an_option')) ?></option>
 									<?php foreach ($confirmation_status as $status) : ?>
-										<option value="$status"><?php echo lang('db_' . $status) ?></option>
+										<option value="<?php echo $status ?>"><?php echo lang('db_' . $status) ?></option>
 									<?php endforeach ?>
 								</select>
-								<a href="#" class="setting action an-btn-success submit"><i class="ion-checkmark"></i></a>
+								<a href="#" class="setting action an-btn-success submit-confirm-status"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php endif ?>
 						</div>

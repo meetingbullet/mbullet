@@ -2,20 +2,20 @@
 ?>
 <div class="modal-header">
 	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-	<h4 class="modal-title" id="myModaloneLabel"><?php e(lang('tk_create_agenda')) ?></h4>
+	<h4 class="modal-title" id="myModaloneLabel"><?php e(lang('ag_create_agenda')) ?></h4>
 </div> <!-- end MODAL-HEADER -->
 
 <?php echo form_open($this->uri->uri_string(), ['class' => 'form-ajax', 'id' => 'create-agenda']) ?>
 
 <div class="container-fluid modal-body">
-	<?php echo mb_form_input('text', 'name', lang('tk_name'), true, set_value('name')) ?>
-	<?php echo mb_form_input('text', 'description', lang('tk_description'), false, set_value('description')) ?>
-	<?php echo mb_form_input('text', 'assignee', lang('tk_assignee'), true, set_value('assignee'), 'team select-member an-tags-input', '', lang('tk_add_team_member')) ?>
+	<?php echo mb_form_input('text', 'name', lang('ag_name'), true, set_value('name')) ?>
+	<?php echo mb_form_input('text', 'description', lang('ag_description'), false, set_value('description')) ?>
+	<?php echo mb_form_input('text', 'assignee', lang('ag_assignee'), true, set_value('assignee'), 'team select-member an-tags-input', '', lang('ag_add_team_member')) ?>
 </div>
 
 <div class="modal-footer">
-	<button type="submit" name="save" class="an-btn an-btn-primary"><?php e(lang('tk_create'))?></button>
-	<a href="#" class="an-btn an-btn-primary-transparent" data-dismiss="modal"><?php e(lang('tk_cancel'))?></a>
+	<button type="submit" name="save" class="an-btn an-btn-primary"><?php e(lang('ag_create'))?></button>
+	<a href="#" class="an-btn an-btn-primary-transparent" data-dismiss="modal"><?php e(lang('ag_cancel'))?></a>
 </div>
 
 <?php echo form_close(); ?>
