@@ -154,10 +154,11 @@ $confirmation_status = [
 								</span>&nbsp;
 								<span class="msg-tag label label-bordered label-done">
 									<?php echo $todo->agenda_key ?>
-								</span>
+								</span>&nbsp;
+								<?php echo ucfirst($todo->agenda_name) ?>
 							</div>
 							<div class="todo-left">
-								<?php echo "<b>" . ucfirst($todo->agenda_name) . ":</b> " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
+								<?php echo word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 							</div>
 							<div class="todo-right">
 								<select name="confirm-status" data-pk="<?php e($todo->agenda_id)?>" class="an-form-control">
