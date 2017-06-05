@@ -50,38 +50,35 @@ class Meeting extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function create($action_key = null)
+	public function create($project_key = null)
 	{
-		if (empty($action_key)) {
+		if (empty($project_key)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$action_id = $this->mb_project->get_object_id('action', $action_key);
+		$project_id = $this->mb_project->get_object_id('project', $project_key);
 
-		if (empty($action_id)) {
-			Template::set_message(lang('st_action_key_does_not_exist'), 'danger');
+		if (empty($project_id)) {
+			Template::set_message(lang('st_project_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->mb_project->has_permission('action', $action_id, 'Project.Edit.All')) {
+		if (! $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All')) {
 			$this->auth->restrict();
 		}
 
-		$action = $this->action_model->select('action_id, p.project_id')
+		$action = $this->action_model->select('action_id, action_key, p.project_id')
 									->join('projects p', 'actions.project_id = p.project_id')
 									->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
 									->limit(1)
-									->find_by('action_key', $action_key);
+									->find_by('action_key', $project_key . '-1');
 
 		if ($action === false) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		// Get list resource/team member
-		$project_key = explode('-', $action_key);
-		$project_key = $project_key[0];
-
-		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $action->project_id);
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $project_id);
 
 		// Create Meeting from Open Parking Lot agendas
 		if (isset($_POST['from_meeting'])) {
@@ -107,7 +104,7 @@ class Meeting extends Authenticated_Controller
 				$data['owner_id'] = $this->current_user->user_id;
 			}
 
-			$data['meeting_key'] = $this->mb_project->get_next_key($action_key);
+			$data['meeting_key'] = $this->mb_project->get_next_key($action->action_key);
 
 			if ($id = $this->meeting_model->insert($data)) {
 				if ($team = $this->input->post('team')) {
@@ -145,7 +142,7 @@ class Meeting extends Authenticated_Controller
 		}
 
 		Template::set('project_members', $project_members);
-		Template::set('action_key', $action_key);
+		Template::set('action_key', $action->action_key);
 		Template::render();
 	}
 

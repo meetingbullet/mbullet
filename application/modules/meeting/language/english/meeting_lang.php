@@ -116,6 +116,7 @@ $lang['st_cannot_start_meeting_without_any_agenda'] = 'Cannot start meeting with
 $lang['st_waiting_for_start'] = 'Waiting for start';
 $lang['st_please_resolve_all_agenda_before_finish'] = 'Please resolve all agendas before finish';
 $lang['st_action_key_does_not_exist'] = 'Action key does not exist';
+$lang['st_project_key_does_not_exist'] = 'Project key does not exist';
 $lang['st_meeting_key_does_not_exist'] = 'Meeting key does not exist';
 $lang['st_write_a_note_here'] = 'Write a note here...';
 $lang['st_all_agenda_confirmed_meeting_closed_out'] = 'All agendas confirmed. Meeting is now closed';

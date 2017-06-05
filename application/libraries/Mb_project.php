@@ -68,26 +68,24 @@ class Mb_project
 			case 'project':
 				$query = $this->ci->db->select('project_id')->from('projects')->where('cost_code', $object_key)->where('organization_id', $organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->project_id;
-				else return false;
 				break;
 			case 'action':
 				$query = $this->ci->db->select('a.action_id')->from('actions a')->join('projects p', 'p.project_id = a.project_id')->where('a.action_key', $object_key)->where('p.organization_id', $organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->action_id;
-				else return false;
 				break;
 			case 'meeting':
 				$query = $this->ci->db->select('s.meeting_id')->from('meetings s')->join('actions a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('s.meeting_key', $object_key)->where('p.organization_id', $organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->meeting_id;
-				else return false;
 				break;
 			case 'agenda':
 				$query = $this->ci->db->select('t.agenda_id')->from('agendas t')->join('meetings s', 's.meeting_id = t.meeting_id')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.agenda_key', $object_key)->where('p.organization_id', $organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->agenda_id;
-				else return false;
 				break;
 			default:
 				return false;
 		}
+
+		return false;
 	}
 
 	/**

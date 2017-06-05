@@ -13,19 +13,19 @@ $(document).ready(function() {
 /*
 	Create and open a modal by data from element's attribute
 */
-$(document).on('click.mb', '.mb-open-modal', (e) => {
+$(document).on('click.mb', '.mb-open-modal', function(e) {
 	e.preventDefault();
-	var modal_id = '#' + $(e.target).data('modal-id');
-	var dialog_class = $(e.target).data('modal-dialog-class') ? $(e.target).data('modal-dialog-class') : 'modal-lg';
+	var modal_id = '#' + $(this).data('modal-id');
+	var dialog_class = $(this).data('modal-dialog-class') ? $(this).data('modal-dialog-class') : 'modal-lg';
 	var template = '\
-	<div class="modal fade" id="'+ $(e.target).data('modal-id') +'" tabindex="-1" role="dialog">\
+	<div class="modal fade" id="'+ $(this).data('modal-id') +'" tabindex="-1" role="dialog">\
 		<div class="modal-dialog '+ dialog_class +'" role="document">\
 			<div class="modal-content">\
 			</div>\
 		</div>\
 	</div>';
 
-	$.get($(e.target).data('url'), (data) => {
+	$.get($(this).data('url'), (data) => {
 		data = JSON.parse(data);
 
 		$('body').append(template);
