@@ -94,13 +94,12 @@ $confirmation_status = [
 						<?php foreach ($my_todo as $todo) : if (! ($todo->todo_type == 'evaluate' && $todo->evaluate_mode == 'user' && $todo->user_id == $current_user->user_id)) : ?>
 						<div class="item <?php echo $todo->todo_type ?>">
 							<?php if ($todo->todo_type == 'homework') : ?>
-							<div class="todo-label">
+							<div class="todo-left">
 								<span class="msg-tag label label-bordered label-inprogress">
 									<?php echo lang('db_homework') ?>
 								</span>&nbsp;
 								<?php echo ucfirst($todo->name) ?>
-							</div>
-							<div class="todo-left">
+
 								<?php echo ucfirst($todo->description) ?>
 							</div>
 							<div class="todo-right" data-url="<?php echo site_url('homework/ajax_edit') ?>" data-homework-id="<?php echo $todo->homework_id ?>">
@@ -113,7 +112,7 @@ $confirmation_status = [
 								<a href="#" class="setting action an-btn-success submit" data-status="done"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php elseif ($todo->todo_type == 'evaluate') : ?>
-							<div class="todo-label">
+							<div class="todo-left">
 								<span class="msg-tag label label-bordered label-skipped">
 									<?php echo lang('db_evaluate') ?>
 								</span>&nbsp;
@@ -124,8 +123,7 @@ $confirmation_status = [
 								<?php else : ?>
 									<?php echo display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) ?>
 								<?php endif ?>
-							</div>
-							<div class="todo-left">
+
 								<?php if ($todo->evaluate_mode == 'agenda') : ?>
 									<?php echo "<b>" . ucfirst($todo->agenda_name) . ":</b> " . word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 								<?php else : ?>
@@ -148,7 +146,7 @@ $confirmation_status = [
 								</div>
 							</div>
 							<?php else : ?>
-							<div class="todo-label">
+							<div class="todo-left">
 								<span class="msg-tag label label-bordered label-ready">
 									<?php echo lang('db_decide') ?>
 								</span>&nbsp;
@@ -156,8 +154,7 @@ $confirmation_status = [
 									<?php echo $todo->agenda_key ?>
 								</span>&nbsp;
 								<?php echo ucfirst($todo->agenda_name) ?>
-							</div>
-							<div class="todo-left">
+
 								<?php echo word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
 							</div>
 							<div class="todo-right">
@@ -196,7 +193,7 @@ $confirmation_status = [
 					<div class="project-info">
 						<div class="col-xs-4">
 							<label><?php echo lang('db_project_pts') ?></label>
-							<p><?php echo (empty($project->point_used) ? 0 : $project->point_used) . "/" . (empty($project->project_no_of_point) ? 0 : $project->project_no_of_point) ?></p>
+							<p><?php echo (empty($project->point_used) ? 0 : number_format($project->point_used, 2 )) . "/" . ( empty($project->project_no_of_point) ? 0 : $project->project_no_of_point ) ?></p>
 						</div>
 						<div class="col-xs-4">
 							<label><?php echo lang('db_meetings') ?></label>
