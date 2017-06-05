@@ -13,7 +13,7 @@
 		</div> <!-- end AN-BODY-TOPBAR -->
 		<?php endif; ?>
 
-		<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '']) ?>
+		<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '', 'id' => 'create-meeting']) ?>
 
 		<div class='container-fluid<?php echo $this->input->is_ajax_request() ? ' modal-body' : ''?>'>
 				<?php if (is_array($open_agendas)): ?>

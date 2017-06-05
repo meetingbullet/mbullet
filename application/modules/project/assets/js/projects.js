@@ -12,28 +12,27 @@ $(document).ready(function() {
 	});
 
 	// Set form-ajax to work inside a modal
-	$(document).on("submit", '.form-ajax', (e) => {
+	$(document).on("submit", '.form-ajax', function(e) {
 		e.preventDefault();
 
-		var method = $(e.target).attr('method') ? $(e.target).attr('method') : 'post';
-		var data = $(e.target).serialize();
+		var method = $(this).attr('method') ? $(this).attr('method') : 'post';
+		var data = $(this).serialize();
 
 		// Since serialize does not include form's action button, 
 		// we need to add it on our own.
-		data += '&' + $(e.target).find('[type="submit"]').attr('name') + '=';
+		data += '&' + $(this).find('[type="submit"]').attr('name') + '=';
 
 		$.ajax({
 			type: "POST",
-			url: $(e.target).attr('action'),
+			url: $(this).attr('action'),
 			data: data,
 			success: (data) => {
 				data = JSON.parse(data);
 
 				if (data.close_modal === 0) {
-					$('#bigModal .modal-content').html(data.modal_content);
-					$('#bigModal').modal('show');
+					$('.modal .modal-content').html(data.modal_content);
 				} else {
-					$('#bigModal').modal('hide');
+					$('.modal').modal('hide');
 				}
 
 				if (data.message_type) {
@@ -45,10 +44,13 @@ $(document).ready(function() {
 					});
 
 					if (data.message_type == 'success') {
-						// New action created, insert to table
-						$('#no-action').remove();
-						$('#action-list .an-lists-body').append($.templates('#action-row').render(data.data));
-						$('#action-list .an-lists-body > div:last-child').effect("highlight", {}, 3000);
+						// New meeting created, insert to table
+
+						if ($(this).attr('id') == 'create-meeting') {
+							$('#no-meeting').remove();
+							$('#meeting-list .an-lists-body').append($.templates('#meeting-row').render(data.data));
+							$('#meeting-list .an-lists-body > div:last-child').effect("highlight", {}, 3000);
+						}
 					}
 				}
 			}

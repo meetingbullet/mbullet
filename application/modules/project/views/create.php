@@ -13,7 +13,7 @@
 		</div> <!-- end AN-BODY-TOPBAR -->
 		<?php endif; ?>
 
-		<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '']) ?>
+		<?php echo form_open($this->uri->uri_string(), ['class' => $this->input->is_ajax_request() ? 'form-ajax' : '', 'id' => 'create-project']) ?>
 
 		<div class='container-fluid<?php echo $this->input->is_ajax_request() ? ' modal-body' : ''?>'>
 				<?php echo mb_form_input('text', 'name', lang('pj_project_name'), true) ?>

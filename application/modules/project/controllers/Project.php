@@ -50,7 +50,7 @@ class Project extends Authenticated_Controller
 				Template::set('data', $project);
 
 				// Just to reduce AJAX request size
-				if ($this->input->is_ajax_request()) {
+				if (IS_AJAX) {
 					Template::set('content', '');
 				}
 				
@@ -72,7 +72,7 @@ class Project extends Authenticated_Controller
 
 	public function update($project_key)
 	{
-		if (! $this->input->is_ajax_request()) {
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 		$project_id = $this->mb_project->get_object_id('project', $project_key);
@@ -111,7 +111,7 @@ class Project extends Authenticated_Controller
 				Template::set('data', $project);
 
 				// Just to reduce AJAX request size
-				if ($this->input->is_ajax_request()) {
+				if (IS_AJAX) {
 					Template::set('content', '');
 				}
 				
@@ -234,6 +234,21 @@ class Project extends Authenticated_Controller
 			}
 
 			$this->project_member_model->insert_batch($project_members);
+
+			/*
+				Temporary disable Action functionality, auto create an Action after creating Project 
+				and automatically uses it as default action for creating Meeting
+			*/
+
+			$this->action_model->insert([
+				'project_id' => $project_id,
+				'action_key' => $project_data['cost_code'] . '-1', // PJK-1
+				'owner_id' => $this->current_user->user_id,
+				'name' => '[default_action]',
+				'action_type' => 'decide',
+				'success_condition' => 'action_gate',
+				'sort_order' => 999
+			]);
 
 			return $this->ajax_project_data($project_id);
 		} else {
@@ -490,7 +505,7 @@ class Project extends Authenticated_Controller
 
 	public function sort_action($project_key = null)
 	{
-		if (! $this->input->is_ajax_request()) {
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -578,7 +593,7 @@ class Project extends Authenticated_Controller
 
 	public function get_action_board_data($project_key = null)
 	{
-		if (! $this->input->is_ajax_request()) {
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -601,7 +616,7 @@ class Project extends Authenticated_Controller
 
 	public function get_members($project_key = null)
 	{
-		if (! $this->input->is_ajax_request()) {
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
