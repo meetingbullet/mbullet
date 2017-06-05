@@ -165,7 +165,6 @@
 }
 
 .my-todo > .todo-list > .item .todo-left {
-	width: 55%;
 	overflow: hidden;
 	float: left;
 	line-height: 20px;
@@ -175,7 +174,7 @@
 .my-todo > .todo-list > .item .todo-right {
 	width: 45%;
 	overflow: hidden;
-	float: left;
+	float: right;
 	padding-top: 5px;
 }
 
