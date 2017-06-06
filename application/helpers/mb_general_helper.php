@@ -47,10 +47,11 @@ if (! function_exists('display_user')) {
 	 * @param int $avatar_size
 	 * @return string html content include avatar image and full name
 	 */
-	function display_user($email, $first_name, $last_name, $avatar, $avatar_only = false, $avatar_size = 24)
+	function display_user($email, $first_name, $last_name, $avatar, $avatar_only = false, $avatar_size = 24, $id = null)
 	{
 		$full_name = $first_name . ' ' . $last_name;
-		$html = '<img class="user-avatar" title="' . $full_name . '" src="' . avatar_url($avatar, $email, $avatar_size) . '" style="width: ' . $avatar_size . 'px; height: ' . $avatar_size . 'px">';
+		$id = $id ? "id='{$id}'" : '';
+		$html = '<img '. $id .' class="user-avatar" title="' . $full_name . '" src="' . avatar_url($avatar, $email, $avatar_size) . '" style="width: ' . $avatar_size . 'px; height: ' . $avatar_size . 'px">';
 		if (! $avatar_only) $html .= ' <span class="user-name">' . $full_name . '</span>';
 		return $html;
 	}

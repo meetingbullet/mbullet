@@ -398,7 +398,7 @@ class Meeting extends Authenticated_Controller
 			Template::set_message(lang('st_invalid_meeting_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
-		
+
 		$meeting->members = $this->meeting_member_model->get_meeting_member($meeting_id);
 
 		$agendas = $this->agenda_model->select('agendas.*, 
@@ -650,7 +650,7 @@ class Meeting extends Authenticated_Controller
 		$online_members = $this->meeting_member_model->select('u.user_id, CONCAT(first_name, " ", last_name) AS full_name, avatar, email')
 													->join('users u', 'u.user_id = meeting_members.user_id')
 													->where('TIMEDIFF(DATE_ADD(last_online, INTERVAL '. $interval  .' SECOND), "'. $current_time .'") >= 0 ', null, false)
-													->where('meeting_id', $meeting_id)
+													->where('meeting_members.meeting_id', $meeting_id)
 													->order_by('u.user_id')
 													->find_all();
 

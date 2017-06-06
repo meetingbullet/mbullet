@@ -36,7 +36,8 @@ $(document).on('show.bs.modal', '.modal', function () {
 	}, 0);
 });
 
-$(document).on('hidden.bs.modal', '.modal', function () {
+$(document).on('hidden.bs.modal', '.modal', function (e) {
+	$(this).remove();
 	// Fix modal-open class remove when there are open modals
 	if ($('.modal.in').length > 0) {
 		$('body').addClass('modal-open');

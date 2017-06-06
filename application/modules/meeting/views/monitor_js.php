@@ -1,3 +1,5 @@
+var st_this_member_has_finished_his_homework = '<?php echo lang("st_this_member_has_finished_his_homework") ?>';
+
 var status_lang = {
 	'open' : '<?php echo lang('st_open') ?>',
 	'inprogress' : '<?php echo lang('st_inprogress') ?>',
@@ -37,6 +39,8 @@ if ($('.meeting-monitor .label-inprogress').length) {
 
 // Disable Finish monitor when agendas are not finished or homework are open
 shall_enable_finish_button();
+
+switch_finish_homework_indicator();
 
 if ($('#scheduled-timer').data('actual-start-time')) {
 	update_meeting_timer()
@@ -684,7 +688,7 @@ function update_monitor()
 		}
 
 		// Real-time meeting joiner
-		$('#meeting-joiner span').addClass('inactive');
+		$('#meeting-joiner .avatar').addClass('inactive');
 
 		$.each(data.online_members, (index, item) => {
 			$('#meeting-joiner #member-'+ item.user_id).removeClass('inactive');
@@ -692,7 +696,10 @@ function update_monitor()
 		});
 
 		// Remove joiner whose has left
-		$('#meeting-joiner span.inactive.active').removeClass('active');
+		$('#meeting-joiner .avatar.inactive.active').removeClass('active');
+
+		// Switch indicator if joiner has done all homework 
+		switch_finish_homework_indicator();
 
 
 		// Real-time agenda data
@@ -736,7 +743,7 @@ function update_monitor()
 		$.each(data.homeworks, (index, item) => {
 			old_description = $('#homework-' + item.homework_id + ' .description').data('value');
 			old_status = $('#homework-' + item.homework_id + ' .btn-status').data('status');
-			old_time_spent = parseFloat( $('#homework-' + item.homework_id + ' .time-spent').text() );
+			old_time_spent = parseFloat( $('#homework-' + item.homework_id + ' .time-spent').editable('getValue').time_spent );
 
 			if (item.description != old_description) {
 				$('#homework-' + item.homework_id + ' .description').editable('setValue', item.description);
@@ -771,4 +778,24 @@ function shall_enable_finish_button()
 			.table-monitor-homework .btn-status[data-status="open"]').length == 0) {
 		$('.btn-finish').prop('disabled', false);
 	}
+}
+
+function switch_finish_homework_indicator()
+{
+	$('#meeting-joiner .avatar-container .indicator-homework.is-not-finished').each(function() {
+		var user_id = $(this).data('user-id');
+		var is_all_done = true;
+
+		$('#meeting-monitor-modal .table-monitor-homework #user-' + user_id).each(function() {
+			if ($(this).parents('tr').find('.btn-status').data('status') != 'done') {
+				is_all_done = false;
+			}
+		});
+
+		if (is_all_done) {
+			$(this).addClass('finished').removeClass('is-not-finished');
+			$(this).children('i').removeClass('ion-alert').addClass('ion-checkmark');
+			$(this).attr('title', st_this_member_has_finished_his_homework);
+		}
+	});
 }

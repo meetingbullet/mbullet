@@ -53,8 +53,8 @@ class Meeting_member_model extends BF_Model
 
 	public function get_meeting_member($meeting_id)
 	{
-		$query = $this->select('uto.user_id, email, first_name, last_name, CONCAT(first_name, " ", last_name) AS full_name,
-							avatar, cost_of_time, 
+		$query = $this->select('uto.user_id, email, first_name, last_name, avatar, cost_of_time, 
+							CONCAT(first_name, " ", last_name) AS full_name,
 							IF(
 								uto.cost_of_time = 1, 
 								p.cost_of_time_1,
