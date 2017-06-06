@@ -43,7 +43,7 @@ $(document).on('submit.decider', '.form-meeting-decider', (e) => {
 				the Meeting creation screen and prompted to create a new meeting to resolve the Closed Parking Lot agenda.
 			*/
 			if ($('.confirmation-status option[value="open_parking_lot"]:selected').length > 0) {
-				$.post('<?php e(site_url('meeting/create/' . $action_key)) ?>', {from_meeting: '<?php e($meeting_id) ?>'}, (data) => {
+				$.post('<?php e(site_url('meeting/create/' . $project_key)) ?>', {from_meeting: '<?php e($meeting_id) ?>'}, (data) => {
 					data = JSON.parse(data);
 					$('#create-meeting .modal-content').html(data.modal_content);
 					$('#create-meeting').modal({backdrop: "static"});

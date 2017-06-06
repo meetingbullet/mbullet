@@ -15,33 +15,11 @@ $(document).ready(function() {
 */
 $(document).on('click.mb', '.mb-open-modal', function(e) {
 	e.preventDefault();
-	var modal_id = '#' + $(this).data('modal-id');
+	var modal_id = $(this).data('modal-id');
 	var dialog_class = $(this).data('modal-dialog-class') ? $(this).data('modal-dialog-class') : 'modal-lg';
-	var template = '\
-	<div class="modal fade" id="'+ $(this).data('modal-id') +'" tabindex="-1" role="dialog">\
-		<div class="modal-dialog '+ dialog_class +'" role="document">\
-			<div class="modal-content">\
-			</div>\
-		</div>\
-	</div>';
+	var url = $(this).data('url');
 
-	$.get($(this).data('url'), (data) => {
-		data = JSON.parse(data);
-
-		$('body').append(template);
-		$(modal_id +' .modal-content').html(data.modal_content);
-		$(modal_id).modal({backdrop: "static"});
-	});
-
-	// Clean after modal is closed
-	$(document).on('hidden.bs.modal', modal_id, function () {
-		$(modal_id).remove();
-
-		// Fix modal-open class remove when there are open modals
-		if ($('.modal.in').length > 0) {
-			$('body').addClass('modal-open');
-		}
-	});
+	$.mbOpenModal(modal_id, url, dialog_class);
 });
 /*
 	Backdrop z-index fix
@@ -57,3 +35,31 @@ $(document).on('show.bs.modal', '.modal', function () {
 		$('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
 	}, 0);
 });
+
+$(document).on('hidden.bs.modal', '.modal', function () {
+	// Fix modal-open class remove when there are open modals
+	if ($('.modal.in').length > 0) {
+		$('body').addClass('modal-open');
+	}
+});
+
+$.mbOpenModal = function(modal_id, url, dialog_class = 'modal-lg') {
+
+	var template = '\
+	<div class="modal fade mb-modal" id="'+ modal_id +'" tabindex="-1" role="dialog">\
+		<div class="modal-dialog '+ dialog_class +'" role="document">\
+			<div class="modal-content">\
+			</div>\
+		</div>\
+	</div>';
+
+	modal_id = '#' + modal_id;
+
+	$.get(url, (data) => {
+		data = JSON.parse(data);
+
+		$('body').append(template);
+		$(modal_id +' .modal-content').html(data.modal_content);
+		$(modal_id).modal({backdrop: "static"});
+	});
+}
