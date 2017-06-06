@@ -685,19 +685,14 @@ function update_monitor()
 
 		// Real-time meeting joiner
 		$('#meeting-joiner span').addClass('inactive');
+
 		$.each(data.online_members, (index, item) => {
-			if ($('#meeting-joiner span[data-user-id="'+ item.user_id +'"]').length) {
-				$('#meeting-joiner span[data-user-id="'+ item.user_id +'"]').removeClass('inactive');
-			} else {
-				var new_joiner_html = '<span class="avatar" data-user-id="'+ item.user_id +'" style="background-image: url(\''+ item.avatar +'\'); display: none;"></span>';
-				$(new_joiner_html).appendTo('#meeting-joiner').slideDown(300);
-			}
+			$('#meeting-joiner #member-'+ item.user_id).removeClass('inactive');
+			$('#meeting-joiner #member-'+ item.user_id).addClass('active');
 		});
 
 		// Remove joiner whose has left
-		$('#meeting-joiner span.inactive').animate({width: 0, marginRight: 0}, 300, function() {
-			$(this).remove();
-		});
+		$('#meeting-joiner span.inactive.active').removeClass('active');
 
 
 		// Real-time agenda data

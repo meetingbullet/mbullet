@@ -79,7 +79,15 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 		</div> <!-- end AN-BODY-TOPBAR -->
 	<?php echo form_close() ?>
 
-	<div id="meeting-joiner"></div>
+	<div id="meeting-joiner">
+		<?php foreach ($meeting->members as $member) :?>
+			<span	class="avatar" 
+					title="<?php echo $member['full_name'] ?>"
+					id="member-<?php e($member['user_id']) ?>" 
+					style="background-image: url('<?php echo avatar_url($member['avatar'], $member['email']) ?>');">
+			</span>
+		<?php endforeach; ?>
+	</div>
 
 	<!-- Agenda -->
 	<div class="an-single-component with-shadow">

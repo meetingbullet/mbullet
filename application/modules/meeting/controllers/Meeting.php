@@ -398,6 +398,8 @@ class Meeting extends Authenticated_Controller
 			Template::set_message(lang('st_invalid_meeting_key'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+		
+		$meeting->members = $this->meeting_member_model->get_meeting_member($meeting_id);
 
 		$agendas = $this->agenda_model->select('agendas.*, 
 											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
