@@ -131,6 +131,8 @@ $lang['st_waiting'] = 'Waiting...';
 $lang['st_evaluator'] = 'Evaluator';
 $lang['st_meeting_already_evaluated'] = 'You already evaluated this meeting.';
 $lang['st_meeting_not_ready_for_evaluate'] = 'This meeting hasn\'t ready for evaluating yet.';
+$lang['st_this_member_has_not_finished_his_homework_yet'] = 'This member has not finished his homework yet';
+$lang['st_this_member_has_finished_his_homework'] = 'This member has finished his homework';
 
 // Field
 $lang['st_detail'] = 'Detail';

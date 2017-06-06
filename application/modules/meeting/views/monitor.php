@@ -81,11 +81,17 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 
 	<div id="meeting-joiner">
 		<?php foreach ($meeting->members as $member) :?>
-			<span	class="avatar" 
-					title="<?php echo $member['full_name'] ?>"
-					id="member-<?php e($member['user_id']) ?>" 
-					style="background-image: url('<?php echo avatar_url($member['avatar'], $member['email']) ?>');">
-			</span>
+			<div class="avatar-container">
+				<div	class="avatar" 
+						title="<?php echo $member['full_name'] ?>"
+						id="member-<?php e($member['user_id']) ?>" 
+						style="background-image: url('<?php echo avatar_url($member['avatar'], $member['email']) ?>');">
+				</div>
+
+				<div class="indicator-homework is-not-finished" data-user-id="<?php e($member['user_id']) ?>" data-toggle="tooltip" title="<?php echo lang('st_this_member_has_not_finished_his_homework_yet') ?>">
+					<i class="ion-alert"></i>
+				</div>
+			</div>
 		<?php endforeach; ?>
 	</div>
 
@@ -199,7 +205,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 						<td>
 							<?php if ($homework->members) {
 								foreach ($homework->members as $member) {
-									echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
+									echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true, 24, 'user-' . $member->user_id) . ' ';
 								}
 							} ?>
 						</td>

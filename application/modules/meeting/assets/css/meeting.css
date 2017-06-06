@@ -48,7 +48,7 @@
 
 #meeting-joiner {
 	position: relative;
-	min-height: 30px;
+	height: 45px;
 	margin: 0 15px 10px 15px;
 }
 
@@ -56,14 +56,19 @@
 	display: none !important;
 }
 
+#meeting-joiner .avatar-container {
+	position: relative;
+	float: left;
+	margin: 0 10px 0 0;
+}
+
 #meeting-joiner .avatar {
-	-webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
-	filter: grayscale(100%);
-	margin-left: 0;
-	margin-right: 5px;
+	width: 45px;
+	height: 45px;
+	margin: 0;
 	opacity: 0.7;
-	width: 30px;
-	height: 30px;
+	filter: grayscale(100%);
+	-webkit-filter: grayscale(100%) blur(1px); /* Safari 6.0 - 9.0 */
 	transition: all 0.3s ease-out;
 }
 
@@ -71,30 +76,54 @@
 	-webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
 	filter: grayscale(0%);
 	opacity: 1;
-	animation: activeAvatar 0.3s 1 ease-out;
+	animation: poppy 0.3s 1 ease-out;
 }
 
-@keyframes activeAvatar {
+#meeting-joiner .indicator-homework {
+	position: absolute;
+	bottom: -4px;
+	right: -4px;
+	background: #ffbc00;
+	width: 17px;
+	height: 17px;
+	border: 1.5px solid white;
+	border-radius: 50%;
+	transition: all 0.3s ease-out;
+	text-align: center;
+	font-size: 10px;
+	color: #fff;
+}
+
+#meeting-joiner .indicator-homework.finished {
+	background: #00e200;
+	animation: poppy 0.3s 1 ease-out;
+}
+
+@keyframes poppy {
 	0% {
 		transform: scale(1, 1);
 	}
 	40% {
 		transform: scale(1.2, 1.2);
+		filter: blur(2px)
 	}
 	100% {
 		transform: scale(1, 1);
+		filter: blur(0px)
 	}
 }
 
-@-webkit-keyframes activeAvatar {
+@-webkit-keyframes poppy {
 	0% {
 		transform: scale(1, 1);
 	}
 	40% {
 		transform: scale(1.2, 1.2);
+		filter: blur(2px)
 	}
 	100% {
 		transform: scale(1, 1);
+		filter: blur(0px)
 	}
 }
 

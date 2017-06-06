@@ -40,10 +40,10 @@ if (! is_null($this->uri->segment(1))) {
 				'path' => 'project/' . $project
 			];
 
-			$breadcrumb[] = [
-				'name' => $action,
-				'path' => 'action/' . $action
-			];
+			// $breadcrumb[] = [
+			// 	'name' => $action,
+			// 	'path' => 'action/' . $action
+			// ];
 
 			$breadcrumb[] = [
 				'name' => $this->uri->segment(2),
@@ -60,10 +60,10 @@ if (! is_null($this->uri->segment(1))) {
 				'path' => 'project/' . $project
 			];
 
-			$breadcrumb[] = [
-				'name' => $action,
-				'path' => 'action/' . $action
-			];
+			// $breadcrumb[] = [
+			// 	'name' => $action,
+			// 	'path' => 'action/' . $action
+			// ];
 
 			$breadcrumb[] = [
 				'name' => $step,
