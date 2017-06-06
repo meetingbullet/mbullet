@@ -454,6 +454,8 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
+		$project_key = $keys[0];
+
 		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
 		if (empty($meeting_id)) {
@@ -499,7 +501,7 @@ class Meeting extends Authenticated_Controller
 
 
 		Assets::add_js($this->load->view('decider_js', [
-			'action_key' => $action_key,
+			'project_key' => $project_key,
 			'meeting_key' => $meeting->meeting_key,
 			'meeting_id' => $meeting_id
 		], true), 'inline');
