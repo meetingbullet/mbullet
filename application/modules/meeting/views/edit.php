@@ -53,10 +53,35 @@
 					</div>
 					<div class="col-md-9 col-sm-12">
 						<div class="row">
-							<div class="col-md-3">
-								<input type="number" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in', $meeting->in)) ?>" meeting="0.1">
+							<div class="col-md-5">
+								<?php
+								$times = [
+									'1' => '1 minute',
+									'5' => '5 minutes',
+									'10' => '10 minutes',
+									'15' => '15 minutes',
+									'30' => '30 minutes',
+									'60' => '1 hour',
+									'120' => '2 hours',
+									'180' => '3 hours',
+									'300' => '5 hours',
+									'480' => '8 hours',
+									'other' => 'Input manually',
+								]
+								?>
+								<select id="meeting-in" class="an-form-control" name="meeting_in">
+								<?php foreach ($times as $in => $label) : ?>
+									<option value="<?php echo $in ?>"
+										<?php echo set_value('in', $meeting->in) == $in ? 'selected' : '' ?>
+										<?php if ($in == 'other' && ! empty(set_value('in', $meeting->in)) && ! in_array(set_value('in', $meeting->in), array_keys($times))) echo 'selected' ?>
+									><?php echo $label ?></option>
+								<?php endforeach ?>
+								</select>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-5">
+								<input type="number" style="display: none;" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in', $meeting->in)) ?>" meeting="0.1">
+							</div>
+							<div class="col-md-2" style="display: none;" id="in-unit">
 								<?php e(lang('st_minutes'))?>
 							</div>
 						</div>
@@ -153,5 +178,24 @@
 				},
 				create: false
 			});
+
+			$('#meeting-in').change(function() {
+				var val = $('#meeting-in option:selected').val();
+				if (val != 'other') {
+					if ($('input#in').css('display') != 'none') {
+						$('input#in, div#in-unit').fadeOut({
+							done: function() {
+								$('input#in').val(val);
+							}
+						});
+					} else {
+						$('input#in').val(val);
+					}
+				} else {
+					$('input#in, div#in-unit').fadeIn();
+				}
+			});
+
+			$('#meeting-in').change();
 		</script>
 	<?php endif; ?>

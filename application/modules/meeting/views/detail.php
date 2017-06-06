@@ -381,6 +381,56 @@ $members = array_column($invited_members, 'user_id');
 		</div>
 	</div>
 </div>
+<?php if (! empty($chosen_agenda)) : ?>
+<div id="agenda-modal" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title"><?php e($chosen_agenda->name) ?></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="row" style="padding-bottom: 10px;">
+							<div class="col-xs-4"><label><?php e(lang('st_key')) ?>:</label></div>
+							<div class="col-xs-8"><?php e($agenda->agenda_key) ?></div>
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="row" style="padding-bottom: 10px;">
+							<div class="col-xs-4"><label><?php e(lang('st_description')) ?>:</label></div>
+							<div class="col-xs-8"><?php echo word_limiter($agenda->description, 20)?></div>
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="row" style="padding-bottom: 10px;">
+							<div class="col-xs-4"><label><?php e(lang('st_assignee')) ?>:</label></div>
+							<div class="col-xs-8">
+							<?php if ($agenda->members) {
+								foreach ($agenda->members as $member) {
+									echo display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . ' ';
+								}
+							} ?>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="row">
+							<div class="col-xs-4"><label><?php e(lang('st_status')) ?>:</label></div>
+							<div class="col-xs-8"><span class="label label-bordered label-<?php e($agenda->status)?>"><?php e(lang('st_' . $agenda->status))?></span></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+<?php endif ?>
 
 <script type="text" id="agenda-row">
 	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="">

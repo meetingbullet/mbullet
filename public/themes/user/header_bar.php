@@ -33,7 +33,7 @@
 						</ul>
 					</div>
 
-					<button class="an-btn an-btn-primary"><i class="ion-calendar"></i> <?php e(lang('my_calendar')) ?></button>
+					<!-- button class="an-btn an-btn-primary"><i class="ion-calendar"></i> <?php e(lang('my_calendar')) ?></button-->
 				</div>
 
 				<!--<button class="an-btn an-btn-icon toggle-button js-toggle-sidebar">

@@ -326,6 +326,10 @@ class Meeting extends Authenticated_Controller
 				->join('users u', 'u.user_id = agenda_members.user_id')
 				->where('agenda_id', $agenda->agenda_id)
 				->find_all();
+
+				if (! empty($this->input->get('agenda_key')) && $this->input->get('agenda_key') == $agenda->agenda_key) {
+					$chosen_agenda = $agenda;
+				}
 			}
 		}
 
@@ -351,7 +355,11 @@ class Meeting extends Authenticated_Controller
 			Template::set_message(lang('st_meeting_already_evaluated'), 'info');
 		}
 
-		Assets::add_js($this->load->view('detail_js', ['meeting_key' => $meeting_key, 'current_user' => $this->current_user], true), 'inline');
+		Assets::add_js($this->load->view('detail_js', [
+			'meeting_key' => $meeting_key,
+			'current_user' => $this->current_user,
+			'chosen_agenda' => ! empty($chosen_agenda) ? $chosen_agenda : null
+		], true), 'inline');
 		Template::set('evaluated', $evaluated);
 		Template::set('invited_members', $invited_members);
 		Template::set('point_used', $point_used);

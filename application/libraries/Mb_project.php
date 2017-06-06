@@ -452,6 +452,16 @@ class Mb_project
 			return false;
 		}
 
+		if ($object_type != 'agenda') {
+			$url = site_url($object_type . '/' . $object_key);
+		} else {
+			$this->ci->load->model('meeting/meeting_model');
+			$agenda = $object;
+			$meeting_key = $this->ci->meeting_model->get_field($agenda->meeting_id, 'meeting_key');
+
+			$url = site_url('meeting/' . $meeting_key . '?agenda_key=' . $agenda->agenda_key);
+		}
+
 		$data = [
 			'OBJECT_TYPE_UC' => strtoupper($object_type),
 			'OBJECT_TYPE' => ucfirst($object_type),
@@ -460,7 +470,7 @@ class Mb_project
 				'user_data' => true,
 				'field_name' => 'full_name'
 			],
-			'URL' => site_url($object_type . '/' . $object_key),
+			'URL' => $url,
 			'LABEL' => site_url($object_type . '/' . $object_key)
 		];
 
