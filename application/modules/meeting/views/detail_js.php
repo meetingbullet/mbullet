@@ -213,3 +213,11 @@ $('#open-meeting-evaluator').click((e) => {
 	}
 });
 
+$(document).ready(function() {
+	<?php if (! empty($chosen_agenda)) : ?>
+	$('.modal').modal('hide');
+	$('#agenda-modal').modal({
+		backdrop: 'static'
+	});
+	<?php endif ?>
+});
