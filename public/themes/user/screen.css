@@ -573,3 +573,31 @@ header.an-header .an-notifications i, header.an-header .an-messages i, header.an
 .tooltip-inner {
 	max-width: 400px;
 }
+
+/* Blur effect */
+.mb-blur {
+	transition: filter 0.3s ease-out;
+	filter: blur(2px);
+}
+
+.mb-grayscale {
+	transition: filter 0.3s ease-out;
+	filter: grayscale(100%);
+}
+
+.mb-blur-grayscale {
+	transition: filter 0.3s ease-out;
+	filter: blur(2px) grayscale(100%);
+}
+
+.main-wrapper {
+	transition: filter 0.3s ease-out;
+}
+
+body.modal-open .main-wrapper:not(.modal) {
+	filter: blur(2px);
+}
+
+.modal-backdrop.in {
+	opacity: 0.1;
+}
