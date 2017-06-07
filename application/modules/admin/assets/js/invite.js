@@ -66,14 +66,3 @@ $(document).on('click', function(e) {
 		$('#toggle_dropdown').closest('li').removeClass('open');
 	}
 });
-
-$(document).on('click', '.an-user-lists.tables .edit-user', function() {
-	var url = $(this).data('edit-user-url');
-	$.get(url).done(function(data) {
-		data = JSON.parse(data);
-		$('#editModal .modal-content').html(data.modal_content);
-		$('#editModal').modal({
-			backdrop: 'static'
-		});
-	});
-});

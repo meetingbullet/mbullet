@@ -103,8 +103,9 @@ class Dashboard extends Authenticated_Controller
 
 		$member_meetings = $member_meetings && count($member_meetings) > 0 ? $member_meetings : [];
 
-		$user = $this->user_model->select('users.user_id, avatar, email, first_name, CONCAT(first_name, " ", last_name) AS full_name, ROUND(SUM(smr.rate) / COUNT(smr.rate)) AS avarage_rate')
+		$user = $this->user_model->select('users.user_id, avatar, email, first_name, CONCAT(first_name, " ", last_name) AS full_name, ROUND(SUM(smr.rate) / COUNT(smr.rate)) AS avarage_rate, uto.experience_point as total_xp')
 									->join('meeting_member_rates smr', 'smr.attendee_id = users.user_id')
+									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND uto.organization_id = "' . $this->current_user->current_organization_id . '"')
 									->find($this->current_user->user_id);
 
 		$user->meeting_count = $this->meeting_model->select('COUNT(*) AS meeting_count')
@@ -125,6 +126,10 @@ class Dashboard extends Authenticated_Controller
 						->order_by('scheduled_start_time')
 						->group_by('meeting_key')
 						->find_all();
+
+		if ($this->input->is_ajax_request()) {
+			echo json_encode([$user, $projects, $my_todo]); exit;
+		}
 
 		Assets::add_js($this->load->view('index_js', [
 			'now' => gmdate('Y-m-d H:i:s'),
@@ -239,6 +244,13 @@ class Dashboard extends Authenticated_Controller
 										->find_all();
 		if (empty($homeworks)) {
 			$homeworks = [];
+		}
+
+		foreach ($homeworks as &$item) {
+			$item->members = $this->homework_member_model->select('u.*')
+														->join('users u', 'u.user_id = homework_members.user_id')
+														->where('homework_members.homework_id', $item->homework_id)
+														->find_all();
 		}
 
 		// $evaluate_agendas = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "agenda" as evaluate_mode, "evaluate" as todo_type')

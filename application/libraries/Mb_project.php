@@ -489,7 +489,7 @@ class Mb_project
 			$members = '';
 			if (! empty($object_members)) {
 				foreach ($object_members as $key => $member) {
-					$members .= $member->full_name . '(' . $member->email . ')';
+					$members .= $member->full_name . ' (' . $member->email . ')';
 					if ($key < (count($object_members) - 1)) {
 						$members .= ', ';
 					}
@@ -498,7 +498,7 @@ class Mb_project
 
 			$this->ci->load->model('users/user_model');
 			$object_owner = $this->ci->user_model->select('CONCAT(first_name, " ", last_name) as full_name, email')->find($object->owner_id);
-			$owner = $object_owner->full_name . '(' . $object_owner->email . ')';
+			$owner = $object_owner->full_name . ' (' . $object_owner->email . ')';
 
 			$this->ci->load->model('organization/organization_model');
 			$object_organization = $this->ci->organization_model->select('name')->organization_model->find($current_user->current_organization_id);

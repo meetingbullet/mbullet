@@ -175,6 +175,24 @@ $(document).ready(function() {
 			}
 		}
 	});
+
+	$(function() {
+		var current_info = $('#current-data').html();
+		var check = setInterval(function() {
+			console.log('checking...');
+			$.get("<?php echo site_url('dashboard') ?>").done(function(data) {
+				if (data != current_info) {
+					console.log('need to refresh!');
+					// console.log('current info:', current_info);
+					// console.log('data:', data);
+					$('.refresh-asking').fadeIn();
+					clearInterval(check);
+				} else {
+					console.log('no need to refresh!');
+				}
+			});
+		}, 60000);
+	});
 })
 
 // Decide
