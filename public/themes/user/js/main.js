@@ -8,6 +8,14 @@ $(document).ready(function() {
 			z_index: 1051
 		});
 	}
+
+	// Pull Modal inside main content to below Body in order to work with Blur Fx 
+	var modal_html ="";
+	$('.main-wrapper .modal').each(function(){
+		modal_html += $(this)[0].outerHTML;
+		$(this).remove();
+	});
+	$('body').append(modal_html);
 })
 
 /*
@@ -36,9 +44,9 @@ $(document).on('show.bs.modal', '.modal', function () {
 	}, 0);
 });
 
+// Fix modal-open class remove when there are open modals
 $(document).on('hidden.bs.modal', '.modal', function (e) {
 	$(this).remove();
-	// Fix modal-open class remove when there are open modals
 	if ($('.modal.in').length > 0) {
 		$('body').addClass('modal-open');
 	}

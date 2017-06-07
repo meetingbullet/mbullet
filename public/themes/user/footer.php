@@ -8,9 +8,9 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="<?php echo js_path(); ?>jquery-3.2.1.min.js"><\/script>');</script>
 	<script src="<?php echo js_path(); ?>jquery-ui.min.js"></script>
-	<?php echo Assets::js(); ?>
 
 	<!-- Theme Script -->
+	<script src="<?php echo Template::theme_url("js-plugins/bootstrap.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/moment.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/daterangepicker.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/wow.min.js"); ?>" type="text/javascript"></script>
@@ -31,6 +31,8 @@
 	<script src="<?php echo Template::theme_url("js-plugins/lc_switch.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js/bootstrap-editable.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js/scripts.js"); ?>" type="text/javascript"></script>
-    <script src="<?php echo Template::theme_url("js/main.js"); ?>" type="text/javascript"></script>
+	<script src="<?php echo Template::theme_url("js/main.js"); ?>" type="text/javascript"></script>
+
+	<?php echo Assets::js(); ?>
 </body>
 </html>

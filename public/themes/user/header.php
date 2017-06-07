@@ -1,7 +1,5 @@
 <?php
 
-Assets::add_js('bootstrap.min.js');
-
 $inline  = '$(".dropdown-toggle").dropdown();';
 $inline .= '$(".tooltips").tooltip();';
 Assets::add_js($inline, 'inline');

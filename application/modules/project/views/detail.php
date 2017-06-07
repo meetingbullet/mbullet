@@ -30,7 +30,13 @@ $project_label = [
 				</a>
 			</li>
 			<li role="separator" class="divider"></li>
-			<li class="update-info-btn"><a href="#" data-toggle="modal" data-target="#bigModal" data-update-project-url="<?php echo site_url('project/update/' . $project_key) ?>"><?php e(lang('pj_more_btn_pj_update')) ?></a></li>
+			<li class="update-info-btn">
+				<a href="#"	class='mb-open-modal' 
+							data-modal-id="create-project-modal"
+							data-url="<?php echo site_url('project/update/' . $project_key) ?>" >
+				<?php e(lang('pj_more_btn_pj_update')) ?>
+				</a>
+			</li>
 			<li><a href="<?php echo site_url('project/'. $project_key .'/settings') ?>"><?php e(lang('pj_more_btn_pj_setting')) ?></a></li>
 		</ul>
 	</div>

@@ -104,18 +104,23 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 			<table class="table table-striped table-agenda">
 				<thead>
 					<tr>
+						<th></th>
 						<th><?php e(lang('st_name'))?></th>
 						<th><?php e(lang('st_description'))?></th>
 						<th><?php e(lang('st_assignee'))?></th>
 						<th class='text-center'><?php e(lang('st_time_assigned_min'))?></th>
 						<th class='text-center'><?php e(lang('st_skip_votes'))?></th>
-						<th class="basis-30"><?php e(lang('st_status'))?></th>
+						<th class="basis-15"><?php e(lang('st_status'))?></th>
 						<th><?php e(lang('st_action'))?></th>
 					</tr>
 				</thead>
 				<tbody>
-					<?php if($agendas): foreach ($agendas as $agenda) : ?>
+					<?php if($agendas): 
+						$i = 1;
+						foreach ($agendas as $agenda) : 
+					?>
 					<tr id='agenda-<?php e($agenda->agenda_id)?>' data-agenda-id='<?php e($agenda->agenda_id)?>' data-agenda-status='<?php e($agenda->status)?>'>
+						<td><?php e($i++)?></td>
 						<td><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
 						<td><?php echo word_limiter($agenda->description, 24)?></td>
 						<td>

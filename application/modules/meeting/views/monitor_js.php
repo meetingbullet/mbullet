@@ -42,6 +42,13 @@ shall_enable_finish_button();
 
 switch_finish_homework_indicator();
 
+// Emphasis inprogress agenda
+if ($('.table-agenda tbody tr[data-agenda-status="inprogress"]').length) {
+	$('.table-agenda tbody tr:not([data-agenda-status="inprogress"])').animate({
+		opacity: 0.6
+	}, 300);
+}
+
 if ($('#scheduled-timer').data('actual-start-time')) {
 	update_meeting_timer()
 }
@@ -281,9 +288,14 @@ $(document).on('click.monitor', '.btn-start-agenda', (e) => {
 			update_agenda_timer($(row).find('.agenda-status'));
 
 			$('.btn-start-agenda').prop('disabled', true);
-
+			$(row).attr('data-agenda-status', 'inprogress');
 			$(row).find('input[name="time_assigned"]').addClass('hidden');
 			$(row).find('.time-assigned').text($(row).find('input[name="time_assigned"]').val());
+
+			// Emphasis
+			$('.table-agenda tbody tr:not([data-agenda-status="inprogress"])').animate({
+				opacity: 0.6
+			}, 300);
 		}
 	});
 });
@@ -342,6 +354,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 			$(e.target).addClass('hidden');
 			clearInterval(update_agenda_timer_intervals[agenda_id]);
 			$(row).find('.agenda-status').html('<span class="label label-bordered label-jumped"><?php e(lang('st_jumped'))?></span>');
+			$(row).attr('data-agenda-status', 'jumped');
 
 			$('.btn-start-agenda').each((i, item) => {
 				if ( $(item).parent().parent().find('input[name="time_assigned"]').val() ) {
@@ -350,6 +363,10 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 			});
 
 			shall_enable_finish_button();
+
+			$('.table-agenda tbody tr:not([data-agenda-status="inprogress"])').animate({
+				opacity: 1
+			}, 300);
 		}
 	});
 });
@@ -377,8 +394,12 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 			$('.btn-start-agenda').prop('disabled', false);
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
 			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-resolved"><?php e(lang('st_resolved'))?></span>');
-
+			$('#agenda-' + agenda_id).attr('data-agenda-status', 'resolved');
 			shall_enable_finish_button();
+
+			$('.table-agenda tbody tr:not([data-agenda-status="inprogress"])').animate({
+				opacity: 1
+			}, 300);
 		}
 	});
 });
@@ -406,8 +427,12 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 			$('.btn-start-agenda').prop('disabled', false);
 			$('#agenda-' + agenda_id).find('.btn-jump').addClass('hidden');
 			$('#agenda-' + agenda_id).find('.agenda-status').html('<span class="label label-bordered label-parking_lot"><?php e(lang('st_parking_lot'))?></span>');
-
+			$('#agenda-' + agenda_id).attr('data-agenda-status', 'parking_lot');
 			shall_enable_finish_button();
+
+			$('.table-agenda tbody tr:not([data-agenda-status="inprogress"])').animate({
+				opacity: 1
+			}, 300);
 		}
 	});
 });
@@ -582,19 +607,7 @@ function update_agenda_timer(clock)
 				if (update_agenda_timer_intervals[agenda_id]) {
 					clearInterval(update_agenda_timer_intervals[agenda_id]);
 
-					$.getJSON('<?php echo site_url('meeting/resolve_agenda/') ?>' + agenda_id, (data) => {
-						if (data.message != '') {
-							$.notify({
-								message: data.message
-							}, {
-								type: data.message_type,
-								z_index: 1051
-							});
-						}
-
-						$('#resolve-agenda .modal-content').html(data.modal_content);
-						$('#resolve-agenda').modal({backdrop: 'static'});
-					});
+					$.mbOpenModal('resolve-agenda', '<?php echo site_url('meeting/resolve_agenda/') ?>' + agenda_id)
 				}
 			}
 
