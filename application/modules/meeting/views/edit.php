@@ -72,8 +72,7 @@
 								<select id="meeting-in" class="an-form-control" name="meeting_in">
 								<?php foreach ($times as $in => $label) : ?>
 									<option value="<?php echo $in ?>"
-										<?php echo set_value('in', $meeting->in) == $in ? 'selected' : '' ?>
-										<?php if ($in == 'other' && ! empty(set_value('in', $meeting->in)) && ! in_array(set_value('in', $meeting->in), array_keys($times))) echo 'selected' ?>
+										<?php if(set_value('in', $meeting->in) == $in || ($in == 'other' && ! empty(set_value('in', $meeting->in)) && ! in_array(set_value('in', $meeting->in), array_keys($times)))) echo 'selected' ?>
 									><?php echo $label ?></option>
 								<?php endforeach ?>
 								</select>

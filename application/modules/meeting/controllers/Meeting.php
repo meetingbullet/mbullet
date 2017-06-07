@@ -355,6 +355,10 @@ class Meeting extends Authenticated_Controller
 			Template::set_message(lang('st_meeting_already_evaluated'), 'info');
 		}
 
+		if ($this->input->is_ajax_request()) {
+			echo json_encode([$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks]); exit;
+		}
+
 		Assets::add_js($this->load->view('detail_js', [
 			'meeting_key' => $meeting_key,
 			'current_user' => $this->current_user,

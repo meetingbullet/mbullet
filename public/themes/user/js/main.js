@@ -26,8 +26,14 @@ $(document).on('click.mb', '.mb-open-modal', function(e) {
 	var modal_id = $(this).data('modal-id');
 	var dialog_class = $(this).data('modal-dialog-class') ? $(this).data('modal-dialog-class') : 'modal-lg';
 	var url = $(this).data('url');
+	var content = $(this).data('content');
+	var title = $(this).data('title');
 
-	$.mbOpenModal(modal_id, url, dialog_class);
+	if (typeof url == 'undefined' || typeof url == 'null') {
+		$.mbOpenModal(modal_id, title, content, dialog_class);
+	} else {
+		$.mbOpenModalViaUrl(modal_id, url, dialog_class);
+	}
 });
 /*
 	Backdrop z-index fix
@@ -52,7 +58,32 @@ $(document).on('hidden.bs.modal', '.modal', function (e) {
 	}
 });
 
-$.mbOpenModal = function(modal_id, url, dialog_class = 'modal-lg') {
+$.mbOpenModal = function(modal_id, title, content, dialog_class) {
+	var template = `
+	<div class="modal fade mb-modal" id="${modal_id}" tabindex="-1" role="dialog">
+		<div class="modal-dialog ${dialog_class}" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">${title}</h4>
+				</div>
+				<div class="modal-body">
+					${content}
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>`;
+
+	modal_id = '#' + modal_id;
+
+	$('body').append(template);
+	$(modal_id).modal({backdrop: "static"});
+}
+
+$.mbOpenModalViaUrl = function(modal_id, url, dialog_class = 'modal-lg') {
 
 	var template = '\
 	<div class="modal fade mb-modal" id="'+ modal_id +'" tabindex="-1" role="dialog">\
@@ -71,4 +102,10 @@ $.mbOpenModal = function(modal_id, url, dialog_class = 'modal-lg') {
 		$(modal_id +' .modal-content').html(data.modal_content);
 		$(modal_id).modal({backdrop: "static"});
 	});
+}
+
+function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
 }

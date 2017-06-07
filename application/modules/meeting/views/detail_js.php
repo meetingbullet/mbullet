@@ -220,4 +220,22 @@ $(document).ready(function() {
 		backdrop: 'static'
 	});
 	<?php endif ?>
+
+	$(function() {
+		var current_info = $('#current-data').html();
+		var check = setInterval(function() {
+			console.log('checking...');
+			$.get(location.href).done(function(data) {
+				if (data != current_info) {
+					console.log('need to refresh!');
+					// console.log('current info:', current_info);
+					// console.log('data:', data);
+					$('.refresh-asking').fadeIn();
+					clearInterval(check);
+				} else {
+					console.log('no need to refresh!');
+				}
+			});
+		}, 60000);
+	});
 });

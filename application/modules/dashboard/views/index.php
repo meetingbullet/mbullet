@@ -59,7 +59,7 @@ $confirmation_status = [
 						</span>
 						<?php endif; ?>
 					</div>
-					<div class="total-points"><?php e(sprintf(lang('db_total_points_x'), round($user->total_point_used, 2) )) ?></div>
+					<div class="total-points"><?php e(sprintf(lang('db_total_xp'), empty($user->total_xp) ? 0 : $user->total_xp)) ?></div>
 				</div> <!-- end .user-info -->
 
 				<!--div class="action-panel an-helper-block">
@@ -104,7 +104,44 @@ $confirmation_status = [
 							</div>
 							<div class="todo-right" data-url="<?php echo site_url('homework/ajax_edit') ?>" data-homework-id="<?php echo $todo->homework_id ?>">
 								<div class="detail">
-									<a href="<?php echo site_url('meeting/') . $todo->meeting_key ?>" target="_blank">
+									<a href="#" class="mb-open-modal" data-modal-id="homwork-modal" data-title="<?php echo $todo->name ?>"
+									data-content="
+									<?php
+									$homework = $todo;
+									$content = '
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="row" style="padding-bottom: 10px;">
+												<div class="col-xs-4"><label>' . lang("st_description") . ':</label></div>
+												<div class="col-xs-8">' . word_limiter($homework->description, 20) . '</div>
+											</div>
+										</div>
+										<div class="col-xs-12">
+											<div class="row" style="padding-bottom: 10px;">
+												<div class="col-xs-4"><label>' . lang("st_assignee") . ':</label></div>
+												<div class="col-xs-8">';
+
+									if ($homework->members) {
+										foreach ($homework->members as $member) {
+											$content .= display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . " ";
+										}
+									}
+
+									$content .= '
+												</div>
+											</div>
+										</div>
+										<div class="col-xs-12">
+											<div class="row">
+												<div class="col-xs-4"><label>' . lang("st_status") . ':</label></div>
+												<div class="col-xs-8"><span class="label label-bordered label-' . $homework->status . '">' . lang("st_" . $homework->status) . '</span></div>
+											</div>
+										</div>
+									</div>
+									';
+
+									echo htmlentities($content);
+									?>">
 										<i class="ion-document"></i>
 									</a>
 								</div>
@@ -306,6 +343,12 @@ $confirmation_status = [
 			<?php echo '<p class="text-center">' . lang('st_waiting_evaluator') . '</p>' ?>
 		</div>
 	</div>
+</div>
+
+<div id="current-data" style="display: none;"><?php echo json_encode([$user, $projects, $my_todo]); ?></div>
+
+<div class="refresh-asking" style="display: none;">
+	<?php echo lang('refresh_asking') ?>
 </div>
 
 <script>

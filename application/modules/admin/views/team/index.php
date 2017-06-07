@@ -34,14 +34,15 @@
 				<div role="tabpanel" class="tab-pane fade in active">
 					<div class="an-user-lists tables messages">
 						<div class="list-title">
-							<h6 class="basis-30">
+							<h6 class="basis-20">
 								<!--span class="an-custom-checkbox">
 									<input id="check-11" type="checkbox">
 									<label for="check-11"></label>
 								</span-->
 								<?php echo lang('ad_tm_full_name') ?>
 							</h6>
-							<h6 class="basis-30"><?php echo lang('ad_tm_email') ?></h6>
+							<h6 class="basis-20"><?php echo lang('ad_tm_title') ?></h6>
+							<h6 class="basis-20"><?php echo lang('ad_tm_email') ?></h6>
 							<h6 class="basis-10"><?php echo lang('ad_tm_role') ?></h6>
 							<h6 class="basis-20"><?php echo lang('ad_tm_last_login') ?></h6>
 							<h6 class="basis-10"><?php echo lang('ad_tm_status') ?></h6>
@@ -57,15 +58,18 @@
 						<?php endif ?>
 
 						<?php foreach ($users_list['data'] as $user) : ?>
-							<div class="list-user-single edit-user" style="cursor: pointer;" data-id="<?php e($user->user_id) ?>" data-edit-user-url="<?php echo site_url('admin/team/edit_user/' . $user->user_id) ?>">
-								<div class="list-name basis-30">
+							<div class="list-user-single edit-user mb-open-modal" style="cursor: pointer;" data-id="edit-user" data-url="<?php echo site_url('admin/team/edit_user/' . $user->user_id) ?>">
+								<div class="list-name basis-20">
 									<!--span class="an-custom-checkbox">
 										<input id="check-40" type="checkbox">
 										<label for="check-40"></label>
 									</span-->
 									<a><?php e($user->first_name . ' ' . $user->last_name) ?></a>
 								</div>
-								<div class="list-date email approve basis-30">
+								<div class="list-text basis-20">
+									<p><?php e($user->title) ?></p>
+								</div>
+								<div class="list-date email approve basis-20">
 									<p><?php e($user->email) ?></p>
 								</div>
 								<div class="list-text basis-10">
@@ -94,13 +98,6 @@
 
 <div class="modal fade" id="inviteModal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 		</div>
 	</div>

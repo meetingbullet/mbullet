@@ -432,6 +432,12 @@ $members = array_column($invited_members, 'user_id');
 </div>
 <?php endif ?>
 
+<div id="current-data" style="display: none;"><?php echo json_encode([$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks]); ?></div>
+
+<div class="refresh-asking" style="display: none;">
+	<?php echo lang('refresh_asking') ?>
+</div>
+
 <script type="text" id="agenda-row">
 	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="">
 		<td class="basis-10">{{:agenda_key}}</td>
