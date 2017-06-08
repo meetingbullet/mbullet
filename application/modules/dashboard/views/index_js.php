@@ -96,6 +96,37 @@ $(".todo-rating label").click(function(){
 
 
 $(document).ready(function() {
+	
+	// Open homework modal
+	$('.homework-info').click(function(e){
+		e.preventDefault();
+
+		var modal_content = `
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="row" style="padding-bottom: 10px;">
+					<div class="col-xs-4"><label><?php echo lang("st_description") ?>:</label></div>
+					<div class="col-xs-8">`+ $(this).data('description') +`</div>
+				</div>
+			</div>
+			<div class="col-xs-12">
+				<div class="row" style="padding-bottom: 10px;">\
+					<div class="col-xs-4"><label><?php echo lang("st_assignee") ?>:</label></div>\
+					<div class="col-xs-8">`+ $(this).data('members') +`</div>\
+				</div>
+			</div>
+			<div class="col-xs-12">
+				<div class="row">\
+					<div class="col-xs-4"><label><?php echo lang("st_status") ?>:</label></div>\
+					<div class="col-xs-8"><span class="label label-bordered label-` + $(this).data('status') + `">` + $(this).data('lang-status') + `</span></div>\
+				</div>
+			</div>
+		</div>`;
+
+		$.mbOpenModal('homework-info-modal', $(this).data('title'), modal_content);
+	});
+
+
 	$(".my-todo").on("click", ".submit", function(e) {
 		e.preventDefault();
 		var submit_btn = $(this);

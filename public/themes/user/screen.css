@@ -606,3 +606,13 @@ body.modal-open .main-wrapper:not(.modal) {
 .datepicker > div {
 	display: block;
 }
+
+@media (max-width: 640px) {
+	h1 {
+		font-size: 26px;
+	}
+
+	.an-topbar-left-part {
+		background-color: #004e6f;
+	}
+}

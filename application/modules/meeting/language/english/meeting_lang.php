@@ -69,6 +69,7 @@ $lang['st_rating_success'] = 'agendas and Attendees are rated successfully.';
 $lang['st_meeting_status'] = 'Meeting Status';
 $lang['st_started_on'] = 'Started on';
 $lang['st_confirmation_status'] = 'Confimation Status';
+
 // Action
 $lang['st_action'] = 'Action';
 $lang['st_create'] = 'Create';
@@ -183,3 +184,5 @@ $lang['st_wrong_mode'] = 'Wrong evaluate mode.';
 $lang['st_rate_success'] = 'User rated successfully.';
 $lang['st_evaluated'] = 'This meeting is already evaluated or unable to rate.';
 $lang['st_missing_data'] = 'Missing data.';
+$lang['st_undone'] = 'Undone';
+$lang['st_done'] = 'Done';

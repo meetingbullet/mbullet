@@ -147,11 +147,21 @@
 		margin-right: -1px;
 	}
 
-	.an-page-content > .an-content-body > .row > div.col-xs-12:last-child {
+	#mb-my-projects {
 		border-right: none;
-		margin-left: -1px;
+	}
+
+	#mb-calendar {
+		border-left: none;
 	}
 }
+
+@media (max-width: 992px) {
+	.an-content-body {
+		padding-right: 30px;
+	}
+}
+
 
 .my-todo > .todo-list > .item {
 	padding-bottom: 10px;
@@ -172,7 +182,7 @@
 }
 
 .my-todo > .todo-list > .item .todo-right {
-	width: 45%;
+	width: 55%;
 	overflow: hidden;
 	float: right;
 	padding-top: 5px;
@@ -209,7 +219,7 @@
 
 /****** Style Star Rating Widget *****/
 .my-todo > .todo-list > .item .todo-right .todo-rating-wraper {
-	width: 70%;
+	width: 100%;
 	text-align: center;
 	float: left;
 	display: table-cell;
@@ -259,4 +269,24 @@
 .todo-rating > input:checked ~ label:hover ~ label {
 	color:#FFED85 !important;
 	cursor:pointer;
+}
+
+.fc-day-grid-event:focus {
+	color: white;
+}
+
+#homework-info-modal .user-avatar {
+	margin-right: 5px;
+}
+
+.fc button {
+	padding: 0 0.4em;
+}
+
+.fc button .fc-icon {
+	margin: 0;
+}
+
+.homework-info {
+	cursor: pointer;
 }
