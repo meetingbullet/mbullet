@@ -19,23 +19,6 @@ $(document).ready(function() {
 })
 
 /*
-	Create and open a modal by data from element's attribute
-*/
-$(document).on('click.mb', '.mb-open-modal', function(e) {
-	e.preventDefault();
-	var modal_id = $(this).data('modal-id');
-	var dialog_class = $(this).data('modal-dialog-class') ? $(this).data('modal-dialog-class') : 'modal-lg';
-	var url = $(this).data('url');
-	var content = $(this).data('content');
-	var title = $(this).data('title');
-
-	if (typeof url == 'undefined' || typeof url == 'null') {
-		$.mbOpenModal(modal_id, title, content, dialog_class);
-	} else {
-		$.mbOpenModalViaUrl(modal_id, url, dialog_class);
-	}
-});
-/*
 	Backdrop z-index fix
 	This solution uses a setTimeout because the .modal-backdrop isn't created 
 	when the event show.bs.modal is triggered.
@@ -62,6 +45,25 @@ $(document).on('hidden.bs.modal', '.mb-modal', function (e) {
 $(document).on('hidden.bs.modal', '.modal', function (e) {
 	if ($('.modal.in').length > 0) {
 		$('body').addClass('modal-open');
+	}
+});
+
+
+/*
+	Create and open a modal by data from element's attribute
+*/
+$(document).on('click.mb', '.mb-open-modal', function(e) {
+	e.preventDefault();
+	var modal_id = $(this).data('modal-id');
+	var dialog_class = $(this).data('modal-dialog-class') ? $(this).data('modal-dialog-class') : 'modal-lg';
+	var url = $(this).data('url');
+	var content = $(this).data('content');
+	var title = $(this).data('title');
+
+	if (typeof url == 'undefined' || typeof url == 'null') {
+		$.mbOpenModal(modal_id, title, content, dialog_class);
+	} else {
+		$.mbOpenModalViaUrl(modal_id, url, dialog_class);
 	}
 });
 
@@ -123,7 +125,7 @@ $.mbOpenModalViaUrl = function(modal_id, url, dialog_class = 'modal-lg') {
 }
 
 function decodeHtml(html) {
-    var txt = document.createElement("textarea");
-    txt.innerHTML = html;
-    return txt.value;
+	var txt = document.createElement("textarea");
+	txt.innerHTML = html;
+	return txt.value;
 }
