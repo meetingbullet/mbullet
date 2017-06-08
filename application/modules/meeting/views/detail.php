@@ -45,6 +45,10 @@ $buttons = [
 $action_key = explode('-', $meeting_key);
 $action_key = $action_key['0'] . '-' . $action_key[1];
 $members = array_column($invited_members, 'user_id');
+$is_member = in_array($current_user->user_id, $members);
+if ($is_member && $is_owner) {
+	$is_member = false;
+}
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
@@ -90,7 +94,7 @@ $members = array_column($invited_members, 'user_id');
 
 	<?php endif; ?>
 
-	<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false): ?>
+	<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false && (($is_member && ! empty($owner_evaluated)) || $is_owner)) : ?>
 	<a href='#' id="open-meeting-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
 	<?php endif; ?>
 </div>

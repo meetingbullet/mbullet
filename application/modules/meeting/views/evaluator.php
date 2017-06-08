@@ -41,7 +41,18 @@ if ($meeting->scheduled_start_time) {
 	<div class="an-body-topbar">
 		<div class="an-page-title">
 			<div class="an-bootstrap-custom-tab">
-				<h2><?php e($meeting->name)?></h2>
+				<h2>
+					<?php e($meeting->name)?>
+					<?php if ($role != 'owner') : ?>
+					<div style="display: inline-block; vertical-align: middle; padding-bottom: 5px;" class="meeting-rating">
+						<input type="radio" name="meeting-rate" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+						<input type="radio" name="meeting-rate" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+						<input type="radio" name="meeting-rate" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+						<input type="radio" name="meeting-rate" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+						<input type="radio" name="meeting-rate" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+					</div>
+					<?php endif ?>
+				</h2>
 			</div>
 		</div>
 	</div> <!-- end AN-BODY-TOPBAR -->
@@ -100,6 +111,7 @@ if ($meeting->scheduled_start_time) {
 				<?php foreach ($meeting->members as $member) : ?>
 				<div class="attendee">
 					<div class="info"><?php echo display_user($member['email'], $member['first_name'], $member['last_name'], $member['avatar']) ?></div>
+					<?php if ($role == 'owner') : ?>
 					<div class="rating">
 						<input type="radio" id="star5" name="attendee_rate[<?php echo $member['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $member['user_id'] . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
 						<!--input type="radio" id="star4half" name="attendee_rate[<?php echo $member->user_id ?>]" value="4.5" /><label class="half" for="star4half" title="4.5 stars"></label-->
@@ -112,6 +124,7 @@ if ($meeting->scheduled_start_time) {
 						<input type="radio" id="star1" name="attendee_rate[<?php echo $member['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $member['user_id'] . ']', 1) ?> value="1" /><label class = "full" for="star1" title="1 star"></label>
 						<!--input type="radio" id="starhalf" name="attendee_rate[<?php echo $member->user_id ?>]" value="0.5" /><label class="half" for="starhalf" title="0.5 stars"></label-->
 					</div>
+					<?php endif ?>
 				</div>
 				<?php endforeach ?>
 			<?php endif ?>
@@ -133,7 +146,9 @@ if ($meeting->scheduled_start_time) {
 							<th class="text-center"><?php e(lang('st_duration'))?></th>
 							<th class="text-center"><?php e(lang('st_status'))?></th>
 							<th class="text-center"><?php e(lang('st_confirm_status'))?></th>
+							<?php if ($role != 'owner') : ?>
 							<th><?php e(lang('st_rate'))?></th>
+							<?php endif ?>
 						</tr>
 					</thead>
 					<tbody>
@@ -152,6 +167,7 @@ if ($meeting->scheduled_start_time) {
 								<span class="label label-bordered label-<?php e($agenda->confirm_status)?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 								<?php endif ?>
 							</td>
+							<?php if ($role != 'owner') : ?>
 							<td>
 								<div class="rating">
 									<input type="radio" id="star5" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" <?php echo set_radio('agenda_rate[' . $agenda->agenda_id . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
@@ -166,8 +182,61 @@ if ($meeting->scheduled_start_time) {
 									<!--input type="radio" id="starhalf" name="agenda_rate[<?php echo $agenda->agenda_id ?>]" value="0.5" /><label class="half" for="starhalf" title="0.5 stars"></label-->
 								</div>
 							</td>
+							<?php endif ?>
 						</tr>
 						<?php endforeach; endif; ?>
+					</tbody>
+				</table>
+			</div> <!-- end .AN-COMPONENT-BODY -->
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="an-single-component with-shadow">
+			<div class="an-component-header">
+				<h6><?php e(lang('st_homeworks'))?></h6>
+			</div>
+			<div class="an-component-body an-helper-block">
+				<table class="table table-striped table-agenda">
+					<thead>
+						<tr>
+							<th><?php e(lang('st_name'))?></th>
+							<th class=""><?php e(lang('st_description'))?></th>
+							<th class=""><?php echo lang('hw_time_spent') ?></th>
+							<th class="text-center"><?php e(lang('st_status'))?></th>
+							<?php if ($role != 'owner') : ?>
+							<th><?php e(lang('st_rate'))?></th>
+							<?php endif ?>
+						</tr>
+					</thead>
+					<tbody>
+						<?php if(is_array($homeworks)): foreach ($homeworks as $homework) : ?>
+						<tr>
+							<td><?php echo $homework->name ?></td>
+							<td><?php echo $homework->description ?></td>
+							<td><?php echo $homework->time_spent ?></td>
+							<td class="text-center agenda-status">
+								<?php if (! empty($homework->status)) : ?>
+								<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('st_' . $homework->status))?></span>
+								<?php endif ?>
+							</td>
+							<?php if ($role != 'owner') : ?>
+							<td>
+								<div class="rating">
+									<input type="radio" id="star5" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
+									<input type="radio" id="star4" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 4) ?> value="4" /><label class = "full" for="star4" title="4 stars"></label>
+									<input type="radio" id="star3" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 3) ?> value="3" /><label class = "full" for="star3" title="3 stars"></label>
+									<input type="radio" id="star2" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 2) ?> value="2" /><label class = "full" for="star2" title="2 stars"></label>
+									<input type="radio" id="star1" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 1) ?> value="1" /><label class = "full" for="star1" title="1 star"></label>
+								</div>
+							</td>
+							<?php endif ?>
+						</tr>
+						<?php endforeach; else : ?>
+						<tr>
+							<td colspan="4" class="text-center"><?php echo lang('st_no_homeworks') ?></td>
+						</tr>
+						<?php endif ?>
 					</tbody>
 				</table>
 			</div> <!-- end .AN-COMPONENT-BODY -->

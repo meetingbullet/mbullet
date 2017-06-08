@@ -291,3 +291,45 @@
 .meeting-goal-container, .meeting-notes-container {
 	position: relative;
 }
+
+.meeting-rating > input {
+	display: none;
+}
+
+.meeting-rating > label:before {
+	margin-top: 0px;
+	padding:0px 0px 0px 0px;
+	font-size: 1.25em;
+	font-family: 'Ionicons';
+	display: inline-block;
+	content: "\f4b3";
+}
+
+.meeting-rating > .half:before { 
+	content: "\f4b1";
+	position: absolute;
+}
+
+
+.meeting-rating > label {
+	float: right;
+	margin: 0px 1px 0px 0px;
+	color:#D8D8D8;
+	line-height: 100%;
+}
+
+/***** CSS Magic to Highlight Stars on Hover *****/
+
+.meeting-rating > input:checked ~ label,
+.meeting-rating:not(:checked) > label:hover, /* hover current star */
+.meeting-rating:not(:checked) > label:hover ~ label {
+	color:#FFD700 !important;
+	cursor:pointer;
+}/* hover previous stars in list */
+
+.meeting-rating > input:checked + label:hover, /* hover current star when changing rating */
+.meeting-rating > label:hover ~ input:checked ~ label, /* lighten current selection */
+.meeting-rating > input:checked ~ label:hover ~ label {
+	color:#FFED85 !important;
+	cursor:pointer;
+}
