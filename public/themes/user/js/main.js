@@ -51,8 +51,15 @@ $(document).on('show.bs.modal', '.modal', function () {
 });
 
 // Fix modal-open class remove when there are open modals
-$(document).on('hidden.bs.modal', '.modal', function (e) {
+$(document).on('hidden.bs.modal', '.mb-modal', function (e) {
 	$(this).remove();
+
+	if ($('.modal.in').length > 0) {
+		$('body').addClass('modal-open');
+	}
+});
+
+$(document).on('hidden.bs.modal', '.modal', function (e) {
 	if ($('.modal.in').length > 0) {
 		$('body').addClass('modal-open');
 	}
@@ -97,6 +104,17 @@ $.mbOpenModalViaUrl = function(modal_id, url, dialog_class = 'modal-lg') {
 
 	$.get(url, (data) => {
 		data = JSON.parse(data);
+
+		if (data.message_type != 'success' && data.message_type != null) {
+			$.notify({
+				message: data.message
+			}, {
+				type: data.message_type,
+				z_index: 1051
+			});
+
+			return;
+		}
 
 		$('body').append(template);
 		$(modal_id +' .modal-content').html(data.modal_content);

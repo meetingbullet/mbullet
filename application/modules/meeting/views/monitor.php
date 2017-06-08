@@ -121,7 +121,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 					?>
 					<tr id='agenda-<?php e($agenda->agenda_id)?>' data-agenda-id='<?php e($agenda->agenda_id)?>' data-agenda-status='<?php e($agenda->status)?>'>
 						<td><?php e($i++)?></td>
-						<td><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
+						<td class="name"><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
 						<td><?php echo word_limiter($agenda->description, 24)?></td>
 						<td>
 							<?php if ($agenda->members) {
@@ -130,7 +130,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 								}
 							} ?>
 						</td>
-						<td class='text-center '>
+						<td class='text-center'>
 							<span class="time-assigned">
 								<?php e($agenda->time_assigned)?>
 							</span>
