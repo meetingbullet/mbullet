@@ -601,3 +601,8 @@ body.modal-open .main-wrapper:not(.modal) {
 .modal-backdrop.in {
 	opacity: 0.1;
 }
+
+/* Fix conflict bootstrap-editable & bootstrap-datetimepicker */
+.datepicker > div {
+	display: block;
+}

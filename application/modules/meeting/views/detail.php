@@ -11,14 +11,6 @@ if ($meeting->scheduled_start_time) {
 	$scheduled_end_time = gmdate('Y-m-d H:i:s', $scheduled_end_time);
 }
 
-$label = [
-	'open' => 'label label-default label-bordered',
-	'inprogress' => 'label label-warning label-bordered',
-	'ready' => 'label label-success label-bordered',
-	'finished' => 'label label-info label-bordered',
-	'resolved' => 'label label-success label-bordered'
-];
-
 $buttons = [
 	'open' => [
 		'icon' => 'ion-ios-play',
@@ -56,7 +48,7 @@ $members = array_column($invited_members, 'user_id');
 	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a href='#' id="edit-meeting" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
 	<?php if ($meeting->status == 'open'): ?>
-		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-primary meeting-open<?php echo ($is_owner ? '' : ' hidden')?>'
+		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger meeting-open<?php echo ($is_owner ? '' : ' hidden')?>'
 			data-modal-id="meeting-monitor-modal"
 			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
 			data-modal-dialog-class="modal-80"
@@ -64,14 +56,14 @@ $members = array_column($invited_members, 'user_id');
 			<i class="ion-ios-play"></i> <?php e(lang('st_set_up')); ?>
 		</a>
 	<?php elseif ($meeting->status == 'ready' || $meeting->status == 'inprogress'): ?>
-		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-primary<?php echo ($is_owner ? '' : ' hidden')?>'
+		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger<?php echo ($is_owner ? '' : ' hidden')?>'
 			data-modal-id="meeting-monitor-modal"
 			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
 			data-modal-dialog-class="modal-80"
 		>
 			<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
 		</a>
-		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-primary<?php echo (!$is_owner && $meeting->status == 'inprogress'? '' : ' hidden')?>'
+		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger<?php echo (!$is_owner && $meeting->status == 'inprogress'? '' : ' hidden')?>'
 			data-modal-id="meeting-monitor-modal"
 			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
 			data-modal-dialog-class="modal-80"
@@ -119,7 +111,7 @@ $members = array_column($invited_members, 'user_id');
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
 						<div class="col-xs-8 status">
-							<span class="<?php e($label[$meeting->status])?>" id="meeting-status" data-status="<?php e($meeting->status)?>" data-is-owner="<?php e($is_owner ? 1 : 0)?>"><?php e(lang('st_' . $meeting->status))?></span>
+							<span class="label label-bordered label-<?php e($meeting->status)?>" id="meeting-status" data-status="<?php e($meeting->status)?>" data-is-owner="<?php e($is_owner ? 1 : 0)?>"><?php e(lang('st_' . $meeting->status))?></span>
 						</div>
 
 					</div>
