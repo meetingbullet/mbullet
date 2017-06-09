@@ -5,7 +5,7 @@ $(document).ready(function() {
 			url: '<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>',
 			data: $('.form-ajax').serialize()
 		}).done(function(data) {
-			data = JSON.parse(data);console.log(data);
+			data = JSON.parse(data);
 			if (data.close_modal === 0) {
 				$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
 			} else {
@@ -25,7 +25,7 @@ $(document).ready(function() {
 					location.reload();
 				}
 			}
-		});
+		}).fail(function() {console.log('evaluated failed')});
 	});
 
 	$(".rating label").click(function(){
@@ -34,5 +34,14 @@ $(document).ready(function() {
 		$(this).nextAll().css({"color": "#FFED85"});
 		var input_id = $(this).attr('for');
 		$(this).parent().find('#' + input_id).click();
+	});
+
+	$(".meeting-rating label").click(function(){
+		$(this).parent().find("label").css({"color": "#D8D8D8"});
+		$(this).css({"color": "#FFED85"});
+		$(this).nextAll().css({"color": "#FFED85"});
+		var input_id = $(this).attr('for');
+		$(this).parent().find('input[type=radio]').removeAttr('checked');
+		$(this).parent().find('input[type=radio]#' + input_id).attr('checked', '');
 	});
 })

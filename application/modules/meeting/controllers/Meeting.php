@@ -355,6 +355,11 @@ class Meeting extends Authenticated_Controller
 			Template::set_message(lang('st_meeting_already_evaluated'), 'info');
 		}
 
+		if ($meeting->owner_id != $this->current_user->user_id) {
+			$owner_evaluated = $this->is_evaluated($meeting_id, $meeting->owner_id);
+			Template::set('owner_evaluated', $owner_evaluated);
+		}
+
 		if ($this->input->is_ajax_request()) {
 			echo json_encode([$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks]); exit;
 		}
@@ -1213,7 +1218,7 @@ class Meeting extends Authenticated_Controller
 		$meeting->members = $this->meeting_member_model
 							->select('u.user_id, avatar, email, first_name, last_name')
 							->join('users u', 'u.user_id = meeting_members.user_id')
-							->where('u.user_id !=', $this->current_user->user_id)
+							//->where('u.user_id !=', $this->current_user->user_id)
 							->where('meeting_id', $meeting_id)
 							->as_array()
 							->find_all();
@@ -1233,77 +1238,125 @@ class Meeting extends Authenticated_Controller
 			}
 		}
 
-		if ($evaluated === false || $meeting->manage_state == 'evaluate') {
+		if ($meeting->owner_id == $this->current_user->user_id) {
+			$role = 'owner';
+		} elseif (in_array($this->current_user->user_id, array_column($meeting->members, 'user_id'))) {
+			$role = 'member';
+		} else {
+			$role = 'other';
+		}
+
+		$homeworks = $this->homework_model->where('meeting_id', $meeting->meeting_id)->find_all();
+		if (empty($homeworks)) $homeworks = [];
+		//if ($evaluated === false || $meeting->manage_state == 'evaluate') {
+		if (($evaluated === false || $meeting->manage_state == 'evaluate') && $role != 'other') {
 			if ($this->input->post()) {
-				if (! is_array($this->input->post('attendee_rate'))
-				|| count($this->input->post('attendee_rate')) != count($meeting->members)
-				|| ! is_array($this->input->post('agenda_rate'))
-				|| count($this->input->post('agenda_rate')) != count($agendas)) {
-					$validation_error = true;
+				if ($role == 'owner') {
+					if (! is_array($this->input->post('attendee_rate'))
+					|| count($this->input->post('attendee_rate')) != count($meeting->members)) {
+						$validation_error = true;
+					}
+
+					if (empty($validation_error)) {
+						if (count($this->input->post('attendee_rate')) > 0) {
+							$attendee_rate_data = [];
+							foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
+								$attendee_rate_data[] = [
+									'meeting_id' => $meeting_id,
+									'user_id' => $this->current_user->user_id,
+									'attendee_id' => $attendee_id,
+									'rate' => $rate
+								];
+							}
+
+							$attendees_rated = $this->meeting_member_rate_model->insert_batch($attendee_rate_data);
+							if (empty($attendees_rated)) {
+								$insert_error = true;
+							}
+						}
+					}
+				} else {
+					if (empty($this->input->post('meeting_rate'))
+					|| ! is_array($this->input->post('agenda_rate'))
+					|| count($this->input->post('agenda_rate')) != count($agendas)
+					|| count($this->input->post('homework_rate')) != count($homeworks)) {
+						$validation_error = true;
+					}
+
+					if (empty($validation_error)) {
+						$meeting_rated = $this->meeting_member_model->where('meeting_id', $meeting->meeting_id)
+																	->update_where('user_id', $this->current_user->user_id, ['rate' => $this->input->post('meeting_rate')]);
+						if (empty($meeting_rated)) {
+							$insert_error = true;
+						}
+
+						if (count($this->input->post('agenda_rate')) > 0 && empty($insert_error)) {
+							$agenda_rate_data = [];
+							foreach ($this->input->post('agenda_rate') as $agenda_id => $rate) {
+								$agenda_rate_data[] = [
+									'agenda_id' => $agenda_id,
+									'user_id' => $this->current_user->user_id,
+									'rate' => $rate
+								];
+							}
+
+							$agendas_rated = $this->agenda_rate_model->insert_batch($agenda_rate_data);
+							if (empty($agendas_rated)) {
+								$insert_error = true;
+							}
+						}
+
+						if (count($this->input->post('homework_rate')) > 0 && empty($insert_error)) {
+							$homework_rate_data = [];
+							$homework_ids = [];
+							foreach ($this->input->post('homework_rate') as $homework_id => $rate) {
+								$homework_rate_data[] = [
+									'homework_id' => $homework_id,
+									'rate' => $rate
+								];
+							}
+
+							$homeworks_rated = $this->homework_member_model->where('user_id', $this->current_user->user_id)->update_batch($homework_rate_data, 'homework_id');
+							if (empty($homeworks_rated)) {
+								$insert_error = true;
+							}
+						}
+					}
 				}
 
-				if (empty($validation_error)) {
-					if (count($this->input->post('attendee_rate')) > 0) {
-						$attendee_rate_data = [];
-						foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
-							$attendee_rate_data[] = [
-								'meeting_id' => $meeting_id,
-								'user_id' => $this->current_user->user_id,
-								'attendee_id' => $attendee_id,
-								'rate' => $rate
-							];
-						}
-
-						$attendees_rated = $this->meeting_member_rate_model->insert_batch($attendee_rate_data);
-						if (empty($attendees_rated)) {
-							$insert_error = true;
-						}
-					}
-
-					if (count($this->input->post('agenda_rate'))) {
-						$agenda_rate_data = [];
-						foreach ($this->input->post('agenda_rate') as $agenda_id => $rate) {
-							$agenda_rate_data[] = [
-								'agenda_id' => $agenda_id,
-								'user_id' => $this->current_user->user_id,
-								'rate' => $rate
-							];
-						}
-
-						$agendas_rated = $this->agenda_rate_model->insert_batch($agenda_rate_data);
-						if (empty($agendas_rated)) {
-							$insert_error = true;
-						}
-					}
-
-					if (empty($insert_error)) {
-						Template::set('message', lang('st_rating_success'));
-						Template::set('message_type', 'success');
-						Template::set('close_modal', 0);
-						$this->done_meeting_if_qualified($meeting);
-					}
+				if (empty($insert_error)) {
+					Template::set('message', lang('st_rating_success'));
+					Template::set('message_type', 'success');
+					Template::set('close_modal', 0);
+					$this->done_meeting_if_qualified($meeting);
 				}
 			} else {
 				$validation_error = true;
 			}
+		} else {
+			Template::set('message', lang('st_unable_evaluate'));
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 0);
 		}
 
 		if (! empty($validation_error)) {
-			Template::set('message', lang('st_need_to_vote_all_agendas_and_attendees'));
+			Template::set('message', lang('st_need_to_vote_all_items'));
 			Template::set('message_type', 'danger');
 			Template::set('close_modal', 0);
 		}
 
 		if (! empty($insert_error)) {
-			Template::set('message', lang('st_there_was_a_problem_while_rating_attendees_and_agendas'));
+			Template::set('message', lang('st_there_was_a_problem_while_evaluate'));
 			Template::set('message_type', 'danger');
 			Template::set('close_modal', 0);
 		}
 
 		$point_used = number_format($this->mb_project->total_point_used('meeting', $meeting_id), 2);
+		Template::set('role', $role);
 		Template::set('point_used', $point_used);
 		Template::set('meeting', $meeting);
 		Template::set('agendas', $agendas);
+		Template::set('homeworks', $homeworks);
 		Template::render('ajax');
 	}
 
@@ -1326,7 +1379,7 @@ class Meeting extends Authenticated_Controller
 		}
 
 		$meeting = $this->meeting_model->find($meeting_id);
-		if ($meeting->manage_state != 'evaluate') {
+		if ($meeting->manage_state != 'evaluate' || ! $this->is_evaluated($meeting_id, $meeting->owner_id)) {
 			echo 0;
 			exit;
 		}
@@ -1414,39 +1467,90 @@ class Meeting extends Authenticated_Controller
 
 	private function done_meeting_if_qualified($meeting)
 	{
-		$team_ids[] = $meeting->owner_id;
-		if (! empty($meeting->members)) {
-			$members = (array) $meeting->members;
-			$team_ids = array_merge($team_ids, array_column($members, 'user_id'));
-		}
+		// $team_ids[] = $meeting->owner_id;
+		// if (! empty($meeting->members)) {
+		// 	$members = (array) $meeting->members;
+		// 	$team_ids = array_merge($team_ids, array_column($members, 'user_id'));
+		// }
 
-		$team_ids = array_unique($team_ids);
+		// $team_ids = array_unique($team_ids);
+		// // $can_done = $this->meeting_member_rate_model
+		// // 				->select('user_id')
+		// // 				->where('meeting_id', $meeting->meeting_id)
+		// // 				->where_in('user_id', $team_ids)
+		// // 				->group_by('user_id')
+		// // 				->count_all() == count($team_ids) ? true : false;
+
+		// $time_voted_by_members = pow((count($members) - 1), 2);
+		// $time_voted_by_owner = count($members);
+
+		// if (in_array($meeting->owner_id, array_column($members, 'user_id'))) {
+		// 	$time_voted_by_owner = 0;
+		// }
+
 		// $can_done = $this->meeting_member_rate_model
 		// 				->select('user_id')
 		// 				->where('meeting_id', $meeting->meeting_id)
 		// 				->where_in('user_id', $team_ids)
-		// 				->group_by('user_id')
-		// 				->count_all() == count($team_ids) ? true : false;
+		// 				->count_all() == ($time_voted_by_members + $time_voted_by_owner) ? true : false;
 
-		$time_voted_by_members = pow((count($members) - 1), 2);
-		$time_voted_by_owner = count($members);
+		$owner_evaluated = false;
+		$members_evaluated = false;
+		$owner_id = $meeting->owner_id;
+		$members = $meeting->members;
+		$meeting_id = $meeting->meeting_id;
+		// check owner evaluated or not
+		$evaluated_members = $this->meeting_member_rate_model
+							->where('meeting_id', $meeting_id)
+							->where('user_id', $owner_id)
+							->count_all();
+		$all = $this->meeting_member_model
+							->where('meeting_id', $meeting_id)
+							->count_all();
+		if ($all == $evaluated_members && $all > 0) {
+			$owner_evaluated = true;
+		}
+		// check members evaluated or not
+		$meeting_rated = $this->meeting_member_model
+							->where('meeting_id', $meeting_id)
+							->where('rate IS NOT NULL')
+							->count_all() == count($members);
 
-		if (in_array($meeting->owner_id, array_column($members, 'user_id'))) {
-			$time_voted_by_owner = 0;
+		$all_agendas = $this->agenda_model->select('agenda_id')
+								->join('meetings m', 'm.meeting_id = agendas.meeting_id')
+								->where('m.meeting_id', $meeting_id)
+								->as_array()
+								->find_all();
+		if (empty($all_agendas)) $all_agendas = [];
+		$all_agenda_ids = array_column($all_agendas, 'agenda_id');
+
+		$agendas_rated = count($all_agenda_ids) > 0 ? ($this->agenda_rate_model
+															->where_in('agenda_id', $all_agenda_ids)
+															->count_all() == (count($all_agenda_ids) * count($members))) : false;
+
+		$all_homeworks = $this->homework_model->select('homework_id')
+							->join('meetings m', 'm.meeting_id = homework.meeting_id')
+							->where('m.meeting_id', $meeting_id)
+							->as_array()
+							->find_all();
+		if (empty($all_homeworks)) $all_homeworks = [];
+		$all_homework_ids = array_column($all_homeworks, 'homework_id');
+
+		$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_member_model
+																->where_in('homework_id', $all_homework_ids)
+																->where('rate IS NOT NULL')
+																->count_all() == (count($all_homework_ids) * count($members))) : true;
+
+		if ($meeting_rated && $agendas_rated && $homeworks_rated) {
+			$members_evaluated = true;
 		}
 
-		$can_done = $this->meeting_member_rate_model
-						->select('user_id')
-						->where('meeting_id', $meeting->meeting_id)
-						->where_in('user_id', $team_ids)
-						->count_all() == ($time_voted_by_members + $time_voted_by_owner) ? true : false;
-
-		if ($can_done) {
+		if ($owner_evaluated && $members_evaluated) {
 			$this->meeting_model->skip_validation(true)->update($meeting->meeting_id, ['manage_state' => 'done']);
 		}
 	}
 
-	private function is_evaluated($meeting_id) {
+	private function is_evaluated($meeting_id, $user_id = null) {
 		// $evaluated_members = $this->meeting_member_rate_model
 		// 						->select('user_id')
 		// 						->where('meeting_id', $meeting_id)
@@ -1465,27 +1569,60 @@ class Meeting extends Authenticated_Controller
 		// 	}
 		// }
 
+		if (empty($user_id)) {
+			$user_id = $this->current_user->user_id;
+		}
+
+		$owner_id = $this->meeting_model->get_field($meeting_id, 'owner_id');
+
 		$evaluated = false;
 
-		$evaluated_members = $this->meeting_member_rate_model
-								->select('user_id')
+		if ($owner_id == $user_id) { // if is owner
+			$evaluated_members = $this->meeting_member_rate_model
 								->where('meeting_id', $meeting_id)
-								->where('user_id', $this->current_user->user_id)
+								->where('user_id', $user_id)
+								->count_all();
+			$all = $this->meeting_member_model
+								->where('meeting_id', $meeting_id)
+								->count_all();
+			if ($all == $evaluated_members && $all > 0) {
+				$evaluated = true;
+			}
+		} else {
+			$meeting_rated = $this->meeting_member_model
+									->where('meeting_id', $meeting_id)
+									->where('user_id', $user_id)
+									->where('rate IS NOT NULL')
+									->count_all() == 1;
+
+			$all_agendas = $this->agenda_model->select('agenda_id')
+								->join('meetings m', 'm.meeting_id = agendas.meeting_id')
+								->where('m.meeting_id', $meeting_id)
 								->as_array()
 								->find_all();
+			if (empty($all_agendas)) $all_agendas = [];
+			$all_agenda_ids = array_column($all_agendas, 'agenda_id');
 
-		$meeting_members = $this->meeting_member_model
-							->select('user_id')
-							->where('meeting_id', $meeting_id)
-							->as_array()
-							->find_all();
+			$agendas_rated = count($all_agenda_ids) > 0 ? ($this->agenda_rate_model
+																->where('user_id', $user_id)
+																->where_in('agenda_id', $all_agenda_ids)
+																->count_all() == count($all_agenda_ids)) : false;
 
-		if (is_array($evaluated_members) && count($evaluated_members) > 0 && is_array($meeting_members) && count($meeting_members) > 0) {
-			$evaluated_ids = array_column($evaluated_members, 'user_id');
-			$member_ids = array_column($meeting_members, 'user_id');
+			$all_homeworks = $this->homework_model->select('homework_id')
+								->join('meetings m', 'm.meeting_id = homework.meeting_id')
+								->where('m.meeting_id', $meeting_id)
+								->as_array()
+								->find_all();
+			if (empty($all_homeworks)) $all_homeworks = [];
+			$all_homework_ids = array_column($all_homeworks, 'homework_id');
 
-			if ((in_array($this->current_user->user_id, $member_ids) && count($evaluated_ids) == (count($member_ids) - 1))
-			|| ((! in_array($this->current_user->user_id, $member_ids)) && count($evaluated_ids) == (count($member_ids)))) {
+			$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_member_model
+																->where('user_id', $user_id)
+																->where_in('homework_id', $all_homework_ids)
+																->where('rate IS NOT NULL')
+																->count_all() == count($all_homework_ids)) : true;
+
+			if ($meeting_rated && $agendas_rated && $homeworks_rated) {
 				$evaluated = true;
 			}
 		}
