@@ -25,7 +25,7 @@ $confirmation_status = [
 </div>
 <div class="row">
 	<!-- Welcome Professor -->
-	<div class="col-md-4 col-xs-12">
+	<div id="mb-user-info" class="col-md-4 col-sm-6 col-xs-12">
 		<div class="welcome-panel">
 			<div class="user-info">
 				<div class="avatar" style="background-image: url('<?php echo avatar_url($user->avatar, $user->email, 128) ?>')"></div>
@@ -93,8 +93,20 @@ $confirmation_status = [
 					<?php if (! empty($my_todo)) : ?>
 						<?php foreach ($my_todo as $todo) : if (! ($todo->todo_type == 'evaluate' && $todo->evaluate_mode == 'user' && $todo->user_id == $current_user->user_id)) : ?>
 						<div class="item <?php echo $todo->todo_type ?>">
-							<?php if ($todo->todo_type == 'homework') : ?>
-							<div class="todo-left">
+							<?php 	if ($todo->todo_type == 'homework') : 
+										$homework = $todo;
+							?>
+							<div class="todo-left homework-info" 
+								data-title="<?php echo $homework->name ?>"
+								data-description="<?php echo $homework->description ?>"
+								data-members="<?php if ($homework->members) {
+									foreach ($homework->members as $member) {
+										echo htmlentities(display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true));
+									}
+								} ?>"
+								data-status="<?php echo $homework->status ?>"
+								data-lang-status="<?php echo lang("st_" . $homework->status) ?>"
+							>
 								<span class="msg-tag label label-bordered label-inprogress">
 									<?php echo lang('db_homework') ?>
 								</span>&nbsp;
@@ -103,53 +115,11 @@ $confirmation_status = [
 								<?php echo ucfirst($todo->description) ?>
 							</div>
 							<div class="todo-right" data-url="<?php echo site_url('homework/ajax_edit') ?>" data-homework-id="<?php echo $todo->homework_id ?>">
-								<div class="detail">
-									<a href="#" class="mb-open-modal" data-modal-id="homwork-modal" data-title="<?php echo $todo->name ?>"
-									data-content="
-									<?php
-									$homework = $todo;
-									$content = '
-									<div class="row">
-										<div class="col-xs-12">
-											<div class="row" style="padding-bottom: 10px;">
-												<div class="col-xs-4"><label>' . lang("st_description") . ':</label></div>
-												<div class="col-xs-8">' . word_limiter($homework->description, 20) . '</div>
-											</div>
-										</div>
-										<div class="col-xs-12">
-											<div class="row" style="padding-bottom: 10px;">
-												<div class="col-xs-4"><label>' . lang("st_assignee") . ':</label></div>
-												<div class="col-xs-8">';
-
-									if ($homework->members) {
-										foreach ($homework->members as $member) {
-											$content .= display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true) . " ";
-										}
-									}
-
-									$content .= '
-												</div>
-											</div>
-										</div>
-										<div class="col-xs-12">
-											<div class="row">
-												<div class="col-xs-4"><label>' . lang("st_status") . ':</label></div>
-												<div class="col-xs-8"><span class="label label-bordered label-' . $homework->status . '">' . lang("st_" . $homework->status) . '</span></div>
-											</div>
-										</div>
-									</div>
-									';
-
-									echo htmlentities($content);
-									?>">
-										<i class="ion-document"></i>
-									</a>
-								</div>
 								<a href="#" class="setting action an-btn-danger submit" data-status="undone"><i class="ion-close"></i></a>
 								<a href="#" class="setting action an-btn-success submit" data-status="done"><i class="ion-checkmark"></i></a>
 							</div>
 							<?php elseif ($todo->todo_type == 'evaluate') : ?>
-							<div class="todo-left">
+							<div class="todo-label">
 								<span class="msg-tag label label-bordered label-skipped">
 									<?php echo lang('db_evaluate') ?>
 								</span>&nbsp;
@@ -157,8 +127,6 @@ $confirmation_status = [
 								<span class="msg-tag label label-bordered label-done">
 									<?php echo $todo->agenda_key ?>
 								</span>
-								<?php else : ?>
-									<?php echo display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) ?>
 								<?php endif ?>
 
 								<?php if ($todo->evaluate_mode == 'agenda') : ?>
@@ -168,17 +136,29 @@ $confirmation_status = [
 										<?php echo $todo->meeting_key ?>
 									</span>&nbsp;
 									<?php echo ucfirst($todo->meeting_name) ?>
+
 								<?php endif ?>
 							</div>
+							<?php if ($todo->todo_type == 'evaluate') : ?>
+							<div class="todo-left">
+								<?php echo display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) ?>
+							</div>
+							<?php endif; ?>
 							<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" <?php echo $todo->evaluate_mode != 'agenda' ? 'data-user-id="' . $todo->user_id . '"' : 'data-agenda-id="' . $todo->agenda_id . '"' ?>>
-								<a href="#" class="setting action an-btn-success submit"><i class="ion-checkmark"></i></a>
-								<div class="todo-rating-wraper">
-									<div class="todo-rating">
-										<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
-										<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
-										<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
-										<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
-										<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+								<div class="row">
+									<div class="col-xs-9">
+										<div class="todo-rating-wraper">
+											<div class="todo-rating">
+												<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
+												<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
+												<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
+												<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
+												<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-3">
+										<a href="#" class="setting action an-btn-success submit"><i class="ion-checkmark"></i></a>
 									</div>
 								</div>
 							</div>
@@ -192,7 +172,7 @@ $confirmation_status = [
 								</span>&nbsp;
 								<?php echo ucfirst($todo->agenda_name) ?>
 
-								<?php echo word_limiter(ucfirst($todo->agenda_description), 20, '...') ?>
+								<?php echo word_limiter(ucfirst($todo->agenda_description), 20) ?>
 							</div>
 							<div class="todo-right">
 								<select name="confirm-status" data-pk="<?php e($todo->agenda_id)?>" class="an-form-control">
@@ -214,7 +194,7 @@ $confirmation_status = [
 	</div> <!-- end Welcome Professor -->
 
 	<!-- my projects -->
-	<div class="col-md-4 col-xs-12 my-projects" data-my-projects-url="<?php echo site_url('dashboard/my_projects') ?>">
+	<div id="mb-my-projects" class="col-md-4 col-sm-6 col-xs-12 my-projects" data-my-projects-url="<?php echo site_url('dashboard/my_projects') ?>">
 		<h1 class="db-h1">
 			<span class="an-settings-button">
 				<?php echo lang('db_my_projects') ?>&nbsp
@@ -230,13 +210,13 @@ $confirmation_status = [
 					<div class="project-info">
 						<div class="col-xs-4">
 							<label><?php echo lang('db_project_pts') ?></label>
-							<p><?php echo (empty($project->point_used) ? 0 : number_format($project->point_used, 2 )) . "/" . ( empty($project->project_no_of_point) ? 0 : $project->project_no_of_point ) ?></p>
+							<?php echo (empty($project->point_used) ? 0 : number_format($project->point_used, 2 )) . "/" . ( empty($project->project_no_of_point) ? 0 : $project->project_no_of_point ) ?>
 						</div>
-						<div class="col-xs-4">
+						<div class="col-xs-3">
 							<label><?php echo lang('db_meetings') ?></label>
 							<p><?php echo (empty($project->no_of_unfinished_step) ? '0' : $project->no_of_unfinished_step) . "/" . (empty($project->no_of_step) ? '0' : $project->no_of_step) ?></p>
 						</div>
-						<div class="col-xs-2">
+						<div class="col-xs-3">
 							<i class="ion-android-star" style="color: orange; font-size: 25px;"></i>
 							<p><?php echo (empty($project->total_rate) ? '0' : $project->total_rate) . "/" . (empty($project->max_rate) ? '0' : $project->max_rate) ?></p>
 						</div>
@@ -270,7 +250,7 @@ $confirmation_status = [
 	<!-- end my projects -->
 
 	<!-- Calendar -->
-	<div class="col-md-4 col-xs-12">
+	<div id="mb-calendar" class="col-md-4 col-sm-12 col-xs-12">
 		<h1 class="db-h1">
 			<span class="an-settings-button">
 				<?php echo lang('db_meetings') ?>&nbsp

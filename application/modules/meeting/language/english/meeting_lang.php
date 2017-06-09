@@ -69,6 +69,7 @@ $lang['st_rating_success'] = 'agendas and Attendees are rated successfully.';
 $lang['st_meeting_status'] = 'Meeting Status';
 $lang['st_started_on'] = 'Started on';
 $lang['st_confirmation_status'] = 'Confimation Status';
+
 // Action
 $lang['st_action'] = 'Action';
 $lang['st_create'] = 'Create';
@@ -133,6 +134,8 @@ $lang['st_meeting_already_evaluated'] = 'You already evaluated this meeting.';
 $lang['st_meeting_not_ready_for_evaluate'] = 'This meeting hasn\'t ready for evaluating yet.';
 $lang['st_this_member_has_not_finished_his_homework_yet'] = 'This member has not finished his homework yet';
 $lang['st_this_member_has_finished_his_homework'] = 'This member has finished his homework';
+$lang['mt_do_you_want_to_start_next_agenda'] = 'Do you want to start next agenda?';
+$lang['mt_do_you_want_to_finish_meeting'] = 'Do you want to finish the meeting';
 
 // Field
 $lang['st_detail'] = 'Detail';
@@ -171,6 +174,7 @@ $lang['st_actual_start_time'] = 'Actual start time';
 $lang['st_actual_end_time'] = 'Actual end time';
 $lang['st_actual_end_time_still_inprogress'] = 'Still in-progress';
 
+$lang['mt_ok'] = 'Ok';
 $lang['st_open'] = 'Open';
 $lang['st_ready'] = 'Ready';
 $lang['st_inprogress'] = 'In progress';
@@ -183,3 +187,5 @@ $lang['st_missing_data'] = 'Missing data.';
 $lang['st_homeworks'] = 'Homeworks';
 $lang['st_no_homeworks'] = 'There are no homeworks at the moment.';
 $lang['st_unable_evaluate'] = 'You are unable to evaluate this meeting.';
+$lang['st_undone'] = 'Undone';
+$lang['st_done'] = 'Done';
