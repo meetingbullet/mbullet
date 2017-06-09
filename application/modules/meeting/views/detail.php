@@ -94,7 +94,7 @@ if ($is_member && $is_owner) {
 
 	<?php endif; ?>
 
-	<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false && (($is_member && ! empty($owner_evaluated)) || $is_owner)) : ?>
+	<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false && (($is_member /*&& ! empty($owner_evaluated)*/) || $is_owner)) : ?>
 	<a href='#' id="open-meeting-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
 	<?php endif; ?>
 </div>
