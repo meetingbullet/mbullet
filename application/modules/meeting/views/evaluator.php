@@ -45,11 +45,11 @@ if ($meeting->scheduled_start_time) {
 					<?php e($meeting->name)?>
 					<?php if ($role != 'owner') : ?>
 					<div style="display: inline-block; vertical-align: middle; padding-bottom: 5px;" class="meeting-rating">
-						<input type="radio" name="meeting-rate" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
-						<input type="radio" name="meeting-rate" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
-						<input type="radio" name="meeting-rate" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
-						<input type="radio" name="meeting-rate" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
-						<input type="radio" name="meeting-rate" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 5 ? 'checked' : '' ?> id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 4 ? 'checked' : '' ?> id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 3 ? 'checked' : '' ?> id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 2 ? 'checked' : '' ?> id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 1 ? 'checked' : '' ?> id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
 					</div>
 					<?php endif ?>
 				</h2>
@@ -126,7 +126,7 @@ if ($meeting->scheduled_start_time) {
 					</div>
 					<?php endif ?>
 				</div>
-				<?php endforeach ?>
+				<?php endforeach; ?>
 			<?php endif ?>
 			</div>
 		</div>

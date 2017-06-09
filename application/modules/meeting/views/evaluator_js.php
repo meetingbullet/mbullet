@@ -5,7 +5,7 @@ $(document).ready(function() {
 			url: '<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>',
 			data: $('.form-ajax').serialize()
 		}).done(function(data) {
-			data = JSON.parse(data);console.log(data);
+			data = JSON.parse(data);
 			if (data.close_modal === 0) {
 				$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
 			} else {
@@ -25,7 +25,7 @@ $(document).ready(function() {
 					location.reload();
 				}
 			}
-		});
+		}).fail(function() {console.log('evaluated failed')});
 	});
 
 	$(".rating label").click(function(){

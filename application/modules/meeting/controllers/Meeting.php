@@ -1218,7 +1218,7 @@ class Meeting extends Authenticated_Controller
 		$meeting->members = $this->meeting_member_model
 							->select('u.user_id, avatar, email, first_name, last_name')
 							->join('users u', 'u.user_id = meeting_members.user_id')
-							->where('u.user_id !=', $this->current_user->user_id)
+							//->where('u.user_id !=', $this->current_user->user_id)
 							->where('meeting_id', $meeting_id)
 							->as_array()
 							->find_all();
@@ -1247,7 +1247,7 @@ class Meeting extends Authenticated_Controller
 		}
 
 		$homeworks = $this->homework_model->where('meeting_id', $meeting->meeting_id)->find_all();
-
+		if (empty($homeworks)) $homeworks = [];
 		//if ($evaluated === false || $meeting->manage_state == 'evaluate') {
 		if (($evaluated === false || $meeting->manage_state == 'evaluate') && $role != 'other') {
 			if ($this->input->post()) {
@@ -1284,9 +1284,8 @@ class Meeting extends Authenticated_Controller
 					}
 
 					if (empty($validation_error)) {
-						$meeting_rated = $this->meeting_member_model->where('user_id', $this->current_user->user_id)
-																	->where('meeting_id', $meeting->meeting_id)
-																	->update(['rate' => $this->input->post('meeting_rate')]);
+						$meeting_rated = $this->meeting_member_model->where('meeting_id', $meeting->meeting_id)
+																	->update_where('user_id', $this->current_user->user_id, ['rate' => $this->input->post('meeting_rate')]);
 						if (empty($meeting_rated)) {
 							$insert_error = true;
 						}
@@ -1313,12 +1312,11 @@ class Meeting extends Authenticated_Controller
 							foreach ($this->input->post('homework_rate') as $homework_id => $rate) {
 								$homework_rate_data[] = [
 									'homework_id' => $homework_id,
-									'user_id' => $this->current_user->user_id,
 									'rate' => $rate
 								];
 							}
 
-							$homeworks_rated = $this->homework_member_model->where('user_id', $this->current_user->user_id)->update_batch($agenda_rate_data, 'homework_id');
+							$homeworks_rated = $this->homework_member_model->where('user_id', $this->current_user->user_id)->update_batch($homework_rate_data, 'homework_id');
 							if (empty($homeworks_rated)) {
 								$insert_error = true;
 							}
@@ -1500,17 +1498,16 @@ class Meeting extends Authenticated_Controller
 		$members_evaluated = false;
 		$owner_id = $meeting->owner_id;
 		$members = $meeting->members;
-		$id = $meeting->meeting_id;
+		$meeting_id = $meeting->meeting_id;
 		// check owner evaluated or not
 		$evaluated_members = $this->meeting_member_rate_model
 							->where('meeting_id', $meeting_id)
-							->where('user_id', $user_id)
+							->where('user_id', $owner_id)
 							->count_all();
 		$all = $this->meeting_member_model
 							->where('meeting_id', $meeting_id)
-							->where('user_id', $user_id)
 							->count_all();
-		if ($all == $evaluated_members) {
+		if ($all == $evaluated_members && $all > 0) {
 			$owner_evaluated = true;
 		}
 		// check members evaluated or not
@@ -1524,25 +1521,25 @@ class Meeting extends Authenticated_Controller
 								->where('m.meeting_id', $meeting_id)
 								->as_array()
 								->find_all();
+		if (empty($all_agendas)) $all_agendas = [];
 		$all_agenda_ids = array_column($all_agendas, 'agenda_id');
 
-		$agendas_rated = $this->agenda_rate_model
-							->where('user_id', $user_id)
-							->where_in('agenda_id', $all_agenda_ids)
-							->count_all() == (count($all_agenda_ids) * count($members));
+		$agendas_rated = count($all_agenda_ids) > 0 ? ($this->agenda_rate_model
+															->where_in('agenda_id', $all_agenda_ids)
+															->count_all() == (count($all_agenda_ids) * count($members))) : false;
 
 		$all_homeworks = $this->homework_model->select('homework_id')
-							->join('meetings m', 'm.meeting_id = homeworks.meeting_id')
+							->join('meetings m', 'm.meeting_id = homework.meeting_id')
 							->where('m.meeting_id', $meeting_id)
 							->as_array()
 							->find_all();
+		if (empty($all_homeworks)) $all_homeworks = [];
 		$all_homework_ids = array_column($all_homeworks, 'homework_id');
 
-		$homeworks_rated = $this->homework_member_model
-							->where('user_id', $user_id)
-							->where_in('homework_id', $all_homework_ids)
-							->where('rate IS NOT NULL')
-							->count_all() == (count($all_homework_ids) * count($members));
+		$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_member_model
+																->where_in('homework_id', $all_homework_ids)
+																->where('rate IS NOT NULL')
+																->count_all() == (count($all_homework_ids) * count($members))) : true;
 
 		if ($meeting_rated && $agendas_rated && $homeworks_rated) {
 			$members_evaluated = true;
@@ -1587,9 +1584,8 @@ class Meeting extends Authenticated_Controller
 								->count_all();
 			$all = $this->meeting_member_model
 								->where('meeting_id', $meeting_id)
-								->where('user_id', $user_id)
 								->count_all();
-			if ($all == $evaluated_members) {
+			if ($all == $evaluated_members && $all > 0) {
 				$evaluated = true;
 			}
 		} else {
@@ -1604,25 +1600,27 @@ class Meeting extends Authenticated_Controller
 								->where('m.meeting_id', $meeting_id)
 								->as_array()
 								->find_all();
+			if (empty($all_agendas)) $all_agendas = [];
 			$all_agenda_ids = array_column($all_agendas, 'agenda_id');
 
-			$agendas_rated = $this->agenda_rate_model
-								->where('user_id', $user_id)
-								->where_in('agenda_id', $all_agenda_ids)
-								->count_all() == count($all_agenda_ids);
+			$agendas_rated = count($all_agenda_ids) > 0 ? ($this->agenda_rate_model
+																->where('user_id', $user_id)
+																->where_in('agenda_id', $all_agenda_ids)
+																->count_all() == count($all_agenda_ids)) : false;
 
 			$all_homeworks = $this->homework_model->select('homework_id')
-								->join('meetings m', 'm.meeting_id = homeworks.meeting_id')
+								->join('meetings m', 'm.meeting_id = homework.meeting_id')
 								->where('m.meeting_id', $meeting_id)
 								->as_array()
 								->find_all();
+			if (empty($all_homeworks)) $all_homeworks = [];
 			$all_homework_ids = array_column($all_homeworks, 'homework_id');
 
-			$homeworks_rated = $this->homework_member_model
-								->where('user_id', $user_id)
-								->where_in('homework_id', $all_homework_ids)
-								->where('rate IS NOT NULL')
-								->count_all() == count($all_homework_ids);
+			$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_member_model
+																->where('user_id', $user_id)
+																->where_in('homework_id', $all_homework_ids)
+																->where('rate IS NOT NULL')
+																->count_all() == count($all_homework_ids)) : true;
 
 			if ($meeting_rated && $agendas_rated && $homeworks_rated) {
 				$evaluated = true;
