@@ -16,6 +16,7 @@ class Meeting extends Authenticated_Controller
 		$this->lang->load('homework/homework');
 		$this->load->model('homework/homework_model');
 		$this->load->model('homework/homework_member_model');
+		$this->load->model('homework/homework_rate_model');
 		
 		$this->load->model('agenda/agenda_model');
 		$this->load->model('agenda/agenda_member_model');
@@ -1312,11 +1313,12 @@ class Meeting extends Authenticated_Controller
 							foreach ($this->input->post('homework_rate') as $homework_id => $rate) {
 								$homework_rate_data[] = [
 									'homework_id' => $homework_id,
+									'user_id' => $this->current_user->user_id,
 									'rate' => $rate
 								];
 							}
 
-							$homeworks_rated = $this->homework_member_model->where('user_id', $this->current_user->user_id)->update_batch($homework_rate_data, 'homework_id');
+							$homeworks_rated = $this->homework_rate_model->insert_batch($homework_rate_data);
 							if (empty($homeworks_rated)) {
 								$insert_error = true;
 							}
@@ -1394,7 +1396,7 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$modes = ['agenda', 'user'];
+		$modes = ['meeting', 'agenda', 'user', 'homework'];
 
 		if (! in_array($mode, $modes)) {
 			echo json_encode([
@@ -1403,51 +1405,118 @@ class Meeting extends Authenticated_Controller
 			]); return;
 		}
 
-		if ($mode == 'user') {
-			$user_id = $this->input->post('user_id');
-			$meeting_id = $this->input->post('meeting_id');
+		$meeting_id = $this->input->post('meeting_id');
+		if (empty($meeting_id)) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_missing_data')
+			]); return;
+		}
+
+		if ($mode == 'meeting') {
 			$rate = $this->input->post('rate');
 
-			if (empty($user_id) || empty($rate) || empty($meeting_id)) {
+			if (empty($rate)) {
 				echo json_encode([
 					'message_type' => 'danger',
 					'message' => lang('st_missing_data')
 				]); return;
 			}
+		}
 
-			$manage_state = $this->meeting_model->get_field($meeting_id, 'manage_state');
-			$evaluated = $this->is_evaluated($meeting_id);
+		if ($mode == 'user') {
+			$user_id = $this->input->post('user_id');
+			$rate = $this->input->post('rate');
 
-			if ($evaluated === false || $manage_state == 'evaluate') {
-				$added = $this->meeting_member_rate_model->skip_validation(true)->insert([
+			if (empty($user_id) || empty($rate)) {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_missing_data')
+				]); return;
+			}
+		}
+
+		if ($mode == 'agenda') {
+			$agenda_id = $this->input->post('agenda_id');
+			$meeting_id = $this->input->post('meeting_id');
+			$rate = $this->input->post('rate');
+
+			if (empty($agenda_id) || empty($rate)) {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_missing_data')
+				]); return;
+			}
+		}
+
+		if ($mode == 'homework') {
+			$homework_id = $this->input->post('homework_id');
+			$rate = $this->input->post('rate');
+
+			if (empty($homework_id) || empty($rate)) {
+				echo json_encode([
+					'message_type' => 'danger',
+					'message' => lang('st_missing_data')
+				]); return;
+			}
+		}
+
+		$manage_state = $this->meeting_model->get_field($meeting_id, 'manage_state');
+		$evaluated = $this->is_evaluated($meeting_id);
+
+		if ($evaluated === false && $manage_state == 'evaluate') {
+			if ($mode == 'user') {
+				$rated = $this->meeting_member_rate_model->skip_validation(true)->insert([
 					'meeting_id' => $meeting_id,
 					'user_id' => $this->current_user->user_id,
 					'attendee_id' => $user_id,
 					'rate' => $rate
 				]);
-
-				$meeting = $this->meeting_model->select('owner_id')->find($meeting_id);
-				$meeting->meeting_id = $meeting_id;
-				$meeting->members = $this->meeting_member_model
-										->select('u.user_id, avatar, email, first_name, last_name')
-										->join('users u', 'u.user_id = meeting_members.user_id')
-										->where('u.user_id !=', $this->current_user->user_id)
-										->where('meeting_id', $meeting_id)
-										->as_array()
-										->find_all();
-
-				$this->done_meeting_if_qualified($meeting);
-				echo json_encode([
-					'message_type' => 'success',
-					'message' => lang('st_rate_success')
-				]); return;
-			} else {
-				echo json_encode([
-					'message_type' => 'danger',
-					'message' => lang('st_evaluated')
-				]); return;
 			}
+
+			if ($mode == 'meeting') {
+				$rated = $this->meeting_member_model->skip_validation(true)
+													->where('meeting_id', $meeting_id)
+													->update_where('user_id', $this->current_user->user_id, ['rate' => $rate]);
+			}
+
+			if ($mode == 'agenda') {
+				$rated = $this->agenda_rate_model->skip_validation(true)->insert([
+					'agenda_id' => $agenda_id,
+					'user_id' => $this->current_user->user_id,
+					'rate' => $rate
+				]);
+			}
+
+			if ($mode == 'homework') {
+				$rated = $this->homework_rate_model->skip_validation(true)->insert([
+					'homework_id' => $homework_id,
+					'user_id' => $this->current_user->user_id,
+					'rate' => $rate
+				]);
+			}
+		} else {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_evaluated')
+			]); return;
 		}
+
+		$meeting = $this->meeting_model->select('owner_id')->find($meeting_id);
+		$meeting->meeting_id = $meeting_id;
+		$meeting->members = $this->meeting_member_model
+								->select('u.user_id, avatar, email, first_name, last_name')
+								->join('users u', 'u.user_id = meeting_members.user_id')
+								// ->where('u.user_id !=', $this->current_user->user_id)
+								->where('meeting_id', $meeting_id)
+								->as_array()
+								->find_all();
+
+		$this->done_meeting_if_qualified($meeting);
+		echo json_encode([
+			'message_type' => 'success',
+			'message' => lang('st_rate_db_success')
+		]); return;
 	}
 
 	private function ajax_meeting_data($meeting_id)
@@ -1536,9 +1605,8 @@ class Meeting extends Authenticated_Controller
 		if (empty($all_homeworks)) $all_homeworks = [];
 		$all_homework_ids = array_column($all_homeworks, 'homework_id');
 
-		$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_member_model
+		$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_rate_model
 																->where_in('homework_id', $all_homework_ids)
-																->where('rate IS NOT NULL')
 																->count_all() == (count($all_homework_ids) * count($members))) : true;
 
 		if ($meeting_rated && $agendas_rated && $homeworks_rated) {
@@ -1616,10 +1684,9 @@ class Meeting extends Authenticated_Controller
 			if (empty($all_homeworks)) $all_homeworks = [];
 			$all_homework_ids = array_column($all_homeworks, 'homework_id');
 
-			$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_member_model
+			$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_rate_model
 																->where('user_id', $user_id)
 																->where_in('homework_id', $all_homework_ids)
-																->where('rate IS NOT NULL')
 																->count_all() == count($all_homework_ids)) : true;
 
 			if ($meeting_rated && $agendas_rated && $homeworks_rated) {
