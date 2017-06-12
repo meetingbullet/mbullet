@@ -43,9 +43,19 @@ class Role_model extends BF_Model
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
 	protected $validation_rules		= array(
+		array(
+			'field' => 'name',
+			'label' => 'lang:rl_name',
+			'rules' => 'trim|required|max_length[255]',
+		),
+		array(
+			'field' => 'description',
+			'label' => 'lang:rl_description',
+			'rules' => 'trim|max_length[255]',
+		),
 	);
 	protected $insert_validation_rules  = array();
-	protected $skip_validation			= true;
+	protected $skip_validation			= false;
 
 	/**
 	 * Constructor
