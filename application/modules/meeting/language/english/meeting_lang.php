@@ -189,3 +189,4 @@ $lang['st_no_homeworks'] = 'There are no homeworks at the moment.';
 $lang['st_unable_evaluate'] = 'You are unable to evaluate this meeting.';
 $lang['st_undone'] = 'Undone';
 $lang['st_done'] = 'Done';
+$lang['st_rate_db_success'] = 'Rated successfully.';
