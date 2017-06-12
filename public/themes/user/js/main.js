@@ -54,9 +54,9 @@ $(document).on('hidden.bs.modal', '.modal', function (e) {
 */
 $(document).on('click.mb', '.mb-open-modal', function(e) {
 	e.preventDefault();
-	var modal_id = $(this).data('modal-id');
+	var modal_id = $(this).data('modal-id') ? $(this).data('modal-id') : 'mb-modal-' + Math.round(Math.random() * 10e10).toString();
 	var dialog_class = $(this).data('modal-dialog-class') ? $(this).data('modal-dialog-class') : 'modal-lg';
-	var url = $(this).data('url');
+	var url = $(this).data('url') ? $(this).data('url') : $(this).attr('href');
 	var content = $(this).data('content');
 	var title = $(this).data('title');
 
@@ -121,6 +121,15 @@ $.mbOpenModalViaUrl = function(modal_id, url, dialog_class = 'modal-lg') {
 		$('body').append(template);
 		$(modal_id +' .modal-content').html(data.modal_content);
 		$(modal_id).modal({backdrop: "static"});
+	});
+}
+
+$.mbNotify = function (message, message_type) {
+	$.notify({
+		message: message
+	}, {
+		type: message_type,
+		z_index: 1051
 	});
 }
 
