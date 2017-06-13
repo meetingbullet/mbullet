@@ -14,17 +14,15 @@ class Homework extends Authenticated_Controller
 		$this->load->model('meeting/meeting_model');
 		$this->load->model('users/user_model');
 		
-		$this->load->model('homework/homework_model');
-		$this->load->model('homework/homework_member_model');
+		$this->load->model('homework_model');
+		$this->load->model('homework_member_model');
+		$this->load->model('homework_attachment_model');
 
+		Assets::add_module_css('homework', 'homework.css');
 	}
 
 	public function create($meeting_key)
 	{
-		if (! IS_AJAX) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
-
 		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
 		if (empty($meeting_id)) {
@@ -85,6 +83,20 @@ class Homework extends Authenticated_Controller
 
 						if (! empty($homework_members)) {
 							if ($inserted = $this->homework_member_model->insert_batch($homework_members) ) {
+
+								if ($attachments = $this->input->post('attachments')) {
+									if (is_array($attachments)) {
+										foreach ($attachments as &$att) {
+											$att['homework_id'] = $homework_id;
+
+											if ($att['title'] == '') $att['title'] = null;
+											if ($att['favicon'] == '') $att['favicon'] = null;
+										}
+
+										$this->homework_attachment_model->insert_batch($attachments);
+									}
+								}
+
 								$this->mb_project->notify_members($homework_id, 'homework', $this->current_user, 'insert');
 								Template::set('message', lang('hw_new_homework_added'));
 								Template::set('message_type', 'success');
@@ -114,6 +126,9 @@ class Homework extends Authenticated_Controller
 			}
 		}
 		
+		Assets::add_js($this->load->view('create_js', [
+			'organization_members' => $organization_members
+		], true), 'inline');
 		Template::render();
 	}
 

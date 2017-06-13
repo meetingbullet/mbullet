@@ -20,6 +20,7 @@ $lang['hw_status'] = 'Status';
 $lang['hw_time_spent'] = 'Time spent';
 $lang['hw_description'] = 'Description';
 $lang['hw_member'] = 'Member';
+$lang['hw_attachment'] = 'Attachment';
 
 // Messages
 $lang['hw_meeting_key_does_not_exist'] = 'Meeting key does not exist';
@@ -29,3 +30,6 @@ $lang['hw_new_homework_added'] = 'New Homework added';
 $lang['hw_unable_to_add_homework'] = 'Unable to add Homework';
 $lang['hw_no_description'] = 'No description';
 $lang['hw_homework_status_updated'] = 'Homework status updated';
+$lang['hw_paste_your_attachment_url'] = 'Paste your attachment URL here';
+$lang['hw_invalid_url'] = 'Invalid URL';
+$lang['hw_duplicated_attachment'] = 'Duplicated attachment';
