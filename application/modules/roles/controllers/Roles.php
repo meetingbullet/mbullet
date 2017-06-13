@@ -17,14 +17,14 @@ class Roles extends Authenticated_Controller
 	{
 		$roles = $this->role_model->where('organization_id', $this->current_user->current_organization_id)->find_all();
 
-		Assets::add_js($this->load->view('index_js', null, true), 'inline');
+		Assets::add_js($this->load->view('roles_js', null, true), 'inline');
 		Template::set('current_role_id', $this->current_user->role_ids[$this->current_user->current_organization_id]);
 		Template::set('roles', $roles);
 		Template::set('breadcrumb', [['name' => lang('rl_roles')]]);
 		Template::render();
 	}
 
-	public function create($role_id = null)
+	public function create_role($role_id = null)
 	{
 		// Though Edit role reuses Create functionality, Its Template view still set to Edit.php, 
 		// We have to manually set view to Create.php
@@ -83,7 +83,7 @@ class Roles extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function edit($role_id = null)
+	public function edit_role($role_id = null)
 	{
 		if ( ! $role_id) {
 			Template::set('message', lang('rl_you_have_not_earned_permission_to_create_role') );
@@ -93,10 +93,10 @@ class Roles extends Authenticated_Controller
 			return;
 		}
 		
-		$this->create($role_id);
+		$this->create_role($role_id);
 	}
 
-	public function delete($role_id = null)
+	public function delete_role($role_id = null)
 	{
 		if ( ! has_permission('Role.Team.Delete') ) {
 			echo json_encode([

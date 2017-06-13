@@ -2,7 +2,8 @@
 
 // General
 $lang['rl_roles'] = 'Roles';
-$lang['rl_max_255_character'] = 'Max 255 characters.';
+$lang['rl_admin'] = 'Admin';
+$lang['rl_team'] = 'Team';
 
 // Action
 $lang['rl_create_role'] = 'Create role';
@@ -19,6 +20,8 @@ $lang['rl_action'] = 'Action';
 $lang['rl_join_default'] = 'Join default';
 $lang['rl_an_user_will_be_joint_to_this_role_after_accepting_an_invitation'] = '(An user will be joint to this role after accepting an invitation)';
 
+// Message & Info
+$lang['rl_max_255_character'] = 'Max 255 characters.';
 $lang['rl_ex_administrator'] = 'Ex: Administrator';
 $lang['rl_you_have_not_earned_permission_to_create_role'] = 'You have not earned permission to create role';
 $lang['rl_you_have_not_earned_permission_to_delete_role'] = 'You have not earned permission to delete role';
