@@ -26,7 +26,7 @@ $lang['rl_you_have_not_earned_permission_to_edit_role'] = 'You have not earned p
 $lang['rl_cannot_find_the_role'] = 'Cannot find the role, please <a href="javascript:location.reload();">reload</a> page and try again';
 $lang['rl_role_created'] = 'New role created';
 $lang['rl_role_updated'] = 'Role <strong>%s</strong> updated';
-$lang['rl_invited_user_will_be_automatically_joint_to_this_role'] = 'Invited user will be automatically joint to this this role, to change this rule please go to other <b>Role</b> and set as <b>Join default</b>';
+$lang['rl_invited_user_will_be_automatically_joint_to_this_role'] = 'Invited user will be automatically joint to this role, to change this rule please go to <b>other Role</b> and set as <b>Join default</b>';
 $lang['rl_you_wont_be_able_to_recover_role'] = 'You will not be able to recover this role!';
 $lang['rl_are_you_sure'] = 'Are you sure?';
 $lang['rl_role_x_has_been_deleted'] = 'Role %s has been deleted!';
