@@ -58,10 +58,10 @@ $can_delete = has_permission('Role.Team.Delete');
 									<?php foreach ($roles as $role) :?>
 									<div id="role-<?php e($role->role_id) ?>" class="list-user-single">
 										<div class="list-name basis-20">
-											<?php if ($can_edit && $role->role_id != $current_role_id): ?>
+											<?php if ($can_edit && $role->role_id != $current_role_id && $role->is_public == 0): ?>
 											<a href="<?php echo site_url('admin/team/edit_role/' . $role->role_id) ?>" class='mb-open-modal' data-modal-id="update-role-modal"><?php e($role->name)?></a>
 											<?php else: ?>
-											<?php e($role->name)?>
+											<strong><?php e($role->name)?></strong>
 											<?php endif; ?>
 										</div>
 										<div class="list-description basis-50">
@@ -73,13 +73,13 @@ $can_delete = has_permission('Role.Team.Delete');
 											<?php endif; ?>
 										</div>
 										<div class="list-action basis-20">
-											<?php if ($can_edit && $role->role_id != $current_role_id): ?>
+											<?php if ($can_edit && $role->role_id != $current_role_id && $role->is_public == 0): ?>
 											<a href="<?php echo site_url('admin/team/edit_role/' . $role->role_id) ?>" class="an-btn an-btn-icon muted mb-open-modal" data-modal-id="update-role-modal">
 												<i class="icon-setting"></i>
 											</a>
 											<?php endif; ?>
 
-											<?php if ($can_delete): ?>
+											<?php if ($can_delete && $role->is_public == 0): ?>
 											<button class="an-btn an-btn-icon small muted danger mb-btn-delete-role" data-role-id="<?php e($role->role_id) ?>"><i class="icon-trash"></i></button>
 											<?php endif; ?>
 										</div>
@@ -103,7 +103,7 @@ $can_delete = has_permission('Role.Team.Delete');
 				<?php if ($can_edit): ?>
 				<a href="<?php echo site_url('admin/team/edit_role/') ?>{{:role_id}}" class='mb-open-modal'>{{:name}}</a>
 				<?php else: ?>
-				{{:name}}
+				<strong>{{:name}}</strong>
 				<?php endif; ?>
 			</div>
 			<div class="list-name basis-50">

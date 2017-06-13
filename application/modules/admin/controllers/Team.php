@@ -251,15 +251,17 @@ class Team extends Authenticated_Controller
 
 	public function roles()
 	{
-		$roles = $this->role_model->where('organization_id', $this->current_user->current_organization_id)->find_all();
+		$roles = $this->role_model->where('organization_id', $this->current_user->current_organization_id)
+									->or_where('is_public', 1)
+									->find_all();
 
 		Assets::add_js($this->load->view('team/roles_js', null, true), 'inline');
 		Template::set('current_role_id', $this->current_user->role_ids[$this->current_user->current_organization_id]);
-		Template::set('roles', $roles);
 		Template::set('breadcrumb', [
 			[ 'name' => lang('rl_team'), 'path' => 'admin/team' ] ,
 			[ 'name' => lang('rl_roles') ] ,
 		]);
+		Template::set('roles', $roles);
 		Template::render();
 	}
 
@@ -278,8 +280,7 @@ class Team extends Authenticated_Controller
 				return;
 			}
 		} else {
-			// Cannot edit the role which user is currently inside
-			if (! has_permission('Role.Team.Edit') || $role_id == $this->current_user->role_ids[$this->current_user->current_organization_id]) {
+			if (! has_permission('Role.Team.Edit')) {
 				Template::set('message', lang('rl_you_have_not_earned_permission_to_edit_role') );
 				Template::set('message_type', 'danger');
 				Template::render();
@@ -305,10 +306,16 @@ class Team extends Authenticated_Controller
 		}
 
 		if (is_numeric($role_id) ) {
-			$role = $this->role_model->select('role_id, name, description, join_default')->find($role_id);
+			$role = $this->role_model->select('role_id, name, description, join_default, is_public')->find($role_id);
 
 			if ( ! $role) {
 				Template::set('message', lang('rl_cannot_find_the_role') );
+				Template::set('message_type', 'danger');
+				Template::render();
+				return;
+			} else if ($role->is_public == 1) {
+				// Cannot edit public roles
+				Template::set('message', lang('rl_you_have_not_earned_permission_to_edit_role') );
 				Template::set('message_type', 'danger');
 				Template::render();
 				return;
@@ -361,7 +368,7 @@ class Team extends Authenticated_Controller
 			return;
 		}
 
-		$role = $this->role_model->select('name')->limit(1)->find($role_id);
+		$role = $this->role_model->select('name')->where('organization_id', $this->current_user->current_organization_id)->limit(1)->find($role_id);
 
 		if (! $role) {
 			echo json_encode([
