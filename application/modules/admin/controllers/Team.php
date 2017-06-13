@@ -368,7 +368,10 @@ class Team extends Authenticated_Controller
 			return;
 		}
 
-		$role = $this->role_model->select('name')->where('organization_id', $this->current_user->current_organization_id)->limit(1)->find($role_id);
+		$role = $this->role_model->select('name')
+								->where('organization_id', $this->current_user->current_organization_id)
+								->limit(1)
+								->find($role_id);
 
 		if (! $role) {
 			echo json_encode([
