@@ -21,3 +21,4 @@ $lang['ad_tm_update_success'] = 'User updated successfully';
 $lang['ad_tm_update_fail'] = 'User updated not successfully';
 $lang['ad_tm_role_not_found'] = 'Role(s) not found';
 $lang['ad_tm_user_not_found'] = 'User not found';
+$lang['ad_tm_invite_user'] = 'Invite User';
