@@ -527,6 +527,14 @@ class Meeting extends Authenticated_Controller
 			$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
 		}
 
+		$homeworks = $this->homework_model->where('meeting_id', $meeting->meeting_id)->find_all();
+		if (empty($homeworks)) $homeworks = [];
+
+		foreach ($homeworks as &$homework) {
+			$homework->attachments = $this->homework_attachment_model->where('homework_id', $homework->homework_id)->find_all();
+			$homework->attachments = $homework->attachments ? $homework->attachments : [];
+		}
+
 
 		Assets::add_js($this->load->view('decider_js', [
 			'project_key' => $project_key,
@@ -537,6 +545,7 @@ class Meeting extends Authenticated_Controller
 		Template::set('current_user', $this->current_user);
 		Template::set('agendas', $agendas);
 		Template::set('meeting', $meeting);
+		Template::set('homeworks', $homeworks);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::render();
 	}
@@ -1257,6 +1266,12 @@ class Meeting extends Authenticated_Controller
 
 		$homeworks = $this->homework_model->where('meeting_id', $meeting->meeting_id)->find_all();
 		if (empty($homeworks)) $homeworks = [];
+
+		foreach ($homeworks as &$homework) {
+			$homework->attachments = $this->homework_attachment_model->where('homework_id', $homework->homework_id)->find_all();
+			$homework->attachments = $homework->attachments ? $homework->attachments : [];
+		}
+
 		//if ($evaluated === false || $meeting->manage_state == 'evaluate') {
 		if (($evaluated === false || $meeting->manage_state == 'evaluate') && $role != 'other') {
 			if ($this->input->post()) {

@@ -16,6 +16,9 @@ $(document).ready(function() {
 		$(this).remove();
 	});
 	$('body').append(modal_html);
+
+	// Enable jQuery tooltip
+	$('[data-toggle="tooltip"]').tooltip(); 
 })
 
 /*

@@ -21,7 +21,7 @@ var update_meeting_timer_interval,
 // Update skip votes periodly
 var update_monitor_interval = setInterval(update_monitor, 3000);
 
-// Clear all updater 
+// Clear all updater after closing monitor modal
 $('#meeting-monitor-modal').on('hide.bs.modal', function () {
 	clearInterval(update_meeting_timer_interval);
 	clearInterval(update_monitor_interval);
@@ -41,6 +41,9 @@ if ($('.meeting-monitor .label-inprogress').length) {
 shall_enable_finish_button();
 
 switch_finish_homework_indicator();
+
+// Enable jQuery tooltip
+$('[data-toggle="tooltip"]').tooltip(); 
 
 // Emphasis inprogress agenda
 if ($('.table-agenda tbody tr[data-agenda-status="inprogress"]').length) {
@@ -218,24 +221,7 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 
 			// Open meeting decider if is owner
 			if ($('.meeting-monitor').data('is-owner') == '1') {
-				$('#meeting-decider-modal .modal-content').html('');
-
-				$.get('<?php e(site_url('meeting/decider/' . $meeting_key)) ?>', (data) => {
-					data = JSON.parse(data);
-
-					if (data.modal_content == '') {
-						$.notify({
-							message: data.message
-						}, {
-							type: data.message_type,
-							z_index: 1051
-						});
-						return;
-					}
-
-					$('#meeting-decider-modal .modal-content').html(data.modal_content);
-					$('#meeting-decider-modal').modal({backdrop: "static"});
-				});
+				$.mbOpenModalViaUrl('meeting-decider-modal' , "<?php e(site_url('meeting/decider/' . $meeting_key)) ?>", 'modal-80');
 			}
 		}
 	});
@@ -657,24 +643,7 @@ function update_monitor()
 
 			// Open meeting decider if is owner
 			if ($('.meeting-monitor').data('is-owner') == '1') {
-				$('#meeting-decider-modal .modal-content').html('');
-
-				$.get('<?php e(site_url('meeting/decider/' . $meeting_key)) ?>', (data) => {
-					data = JSON.parse(data);
-
-					if (data.modal_content == '') {
-						$.notify({
-							message: data.message
-						}, {
-							type: data.message_type,
-							z_index: 1051
-						});
-						return;
-					}
-
-					$('#meeting-decider-modal .modal-content').html(data.modal_content);
-					$('#meeting-decider-modal').modal({backdrop: "static"});
-				});
+				$.mbOpenModalViaUrl('meeting-decider-modal' , "<?php e(site_url('meeting/decider/' . $meeting_key)) ?>", 'modal-80');
 			} else {
 				// Wait for owner finish decider
 				swal({

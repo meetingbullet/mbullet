@@ -1,3 +1,6 @@
+// Enable jQuery tooltip
+$('[data-toggle="tooltip"]').tooltip(); 
+
 // Read more Notes & Goal
 var rm_option = {
 	speed: 300,

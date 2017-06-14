@@ -155,8 +155,8 @@ if ($meeting->scheduled_start_time) {
 						<?php if(is_array($agendas)): foreach ($agendas as $agenda) : ?>
 						<tr>
 							<td><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
-							<td class="text-center"><?php e(empty($agenda->started_on) ? '' : display_time($agenda->started_on)) ?></td>
-							<td class="text-center"><?php echo timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) ?></td>
+							<td class="text-center"><?php echo display_time($agenda->started_on) ?></td>
+							<td class="text-center"><?php echo $agenda->started_on ? timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) : 0 ?></td>
 							<td class="text-center agenda-status">
 								<?php if (! empty($agenda->status)) : ?>
 								<span class="label label-bordered label-<?php e($agenda->status)?>"><?php e(lang('st_' . $agenda->status))?></span>
@@ -202,7 +202,8 @@ if ($meeting->scheduled_start_time) {
 						<tr>
 							<th><?php e(lang('st_name'))?></th>
 							<th class=""><?php e(lang('st_description'))?></th>
-							<th class=""><?php echo lang('hw_time_spent') ?></th>
+							<th class="text-center"><?php echo lang('hw_time_spent') ?></th>
+							<th><?php echo lang('hw_attachment') ?></th>
 							<th class="text-center"><?php e(lang('st_status'))?></th>
 							<?php if ($role != 'owner') : ?>
 							<th><?php e(lang('st_rate'))?></th>
@@ -214,7 +215,24 @@ if ($meeting->scheduled_start_time) {
 						<tr>
 							<td><?php echo $homework->name ?></td>
 							<td><?php echo $homework->description ?></td>
-							<td><?php echo $homework->time_spent ?></td>
+							<td class='text-center'><?php echo $homework->time_spent ?></td>
+							<td>
+								<?php if ($homework->attachments): ?>
+								<div class="attachment">
+									<?php foreach ($homework->attachments as $att): ?>
+									<a href="<?php echo $att->url ?>" target="_blank">
+										<span class="icon">
+											<?php if ($att->favicon): ?>
+											<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+											<?php else: ?>
+											<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+											<?php endif; ?>
+										</span>
+									</a>
+									<?php endforeach; ?>
+								</div>
+								<?php endif; ?>
+							</td>
 							<td class="text-center agenda-status">
 								<?php if (! empty($homework->status)) : ?>
 								<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('st_' . $homework->status))?></span>
@@ -234,7 +252,7 @@ if ($meeting->scheduled_start_time) {
 						</tr>
 						<?php endforeach; else : ?>
 						<tr>
-							<td colspan="4" class="text-center"><?php echo lang('st_no_homeworks') ?></td>
+							<td colspan="5" class="text-center"><?php echo lang('st_no_homeworks') ?></td>
 						</tr>
 						<?php endif ?>
 					</tbody>

@@ -145,7 +145,7 @@ $confirmation_status = [
 						<tr id='agenda-<?php e($agenda->agenda_id)?>' data-agenda-id='<?php e($agenda->agenda_id)?>' data-agenda-status='<?php e($agenda->status)?>'>
 							<td><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
 							<td><?php echo display_time($agenda->started_on) ?></td>
-							<td><?php echo timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) ?></td>
+							<td><?php echo $agenda->started_on ? timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) : '0' ?></td>
 							<td>
 								<span class="label label-bordered label-<?php e($agenda->status)?>">
 									<?php e(lang('st_' . $agenda->status))?>
@@ -166,7 +166,61 @@ $confirmation_status = [
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div>
 
-				<label for="note"><?php e(lang('st_notes'))?></label>
+		<div class="an-single-component with-shadow">
+			<div class="an-component-header">
+				<h6><?php e(lang('st_homeworks'))?></h6>
+			</div>
+			<div class="an-component-body an-helper-block">
+				<table class="table table-striped table-agenda">
+					<thead>
+						<tr>
+							<th><?php e(lang('hw_name'))?></th>
+							<th><?php e(lang('hw_description'))?></th>
+							<th class="text-center"><?php echo lang('hw_time_spent') ?></th>
+							<th><?php echo lang('hw_attachment') ?></th>
+							<th class="text-center"><?php e(lang('st_status'))?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php if(is_array($homeworks)): foreach ($homeworks as $homework) : ?>
+						<tr>
+							<td><?php echo $homework->name ?></td>
+							<td><?php echo $homework->description ?></td>
+							<td class='text-center'><?php echo $homework->time_spent ?></td>
+							<td>
+								<?php if ($homework->attachments): ?>
+								<div class="attachment">
+									<?php foreach ($homework->attachments as $att): ?>
+									<a href="<?php echo $att->url ?>" target="_blank">
+										<span class="icon">
+											<?php if ($att->favicon): ?>
+											<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+											<?php else: ?>
+											<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+											<?php endif; ?>
+										</span>
+									</a>
+									<?php endforeach; ?>
+								</div>
+								<?php endif; ?>
+							</td>
+							<td class="text-center agenda-status">
+								<?php if (! empty($homework->status)) : ?>
+								<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('st_' . $homework->status))?></span>
+								<?php endif ?>
+							</td>
+						</tr>
+						<?php endforeach; else : ?>
+						<tr>
+							<td colspan="5" class="text-center"><?php echo lang('st_no_homeworks') ?></td>
+						</tr>
+						<?php endif ?>
+					</tbody>
+				</table>
+			</div> <!-- end .AN-COMPONENT-BODY -->
+		</div>
+
+		<label for="note"><?php e(lang('st_notes'))?></label>
 		<div class="row">
 			<div class="col-md-12">
 				<textarea id="note" name="note" rows="6" class="an-form-control note" placeholder="<?php e(lang('st_write_a_note_here')) ?>"></textarea>

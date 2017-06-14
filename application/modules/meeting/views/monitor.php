@@ -166,7 +166,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 		</div> <!-- end .AN-COMPONENT-BODY -->
 	</div> <!-- end Agenda -->
 
-	<!-- homeowrk -->
+	<!-- Homework -->
 	<div class="an-single-component with-shadow">
 		<div class="an-component-header">
 			<h6><?php e(lang('hw_homework'))?></h6>
@@ -232,9 +232,9 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 								<a href="<?php echo $att->url ?>" target="_blank">
 									<span class="icon">
 										<?php if ($att->favicon): ?>
-										<img src="<?php echo $att->favicon ?>" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+										<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
 										<?php else: ?>
-										<i class="icon-file" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+										<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
 										<?php endif; ?>
 									</span>
 								</a>

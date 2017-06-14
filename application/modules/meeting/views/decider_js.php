@@ -1,3 +1,6 @@
+// Enable jQuery tooltip
+$('[data-toggle="tooltip"]').tooltip(); 
+
 // Prevent duplicate binding function
 $(document).off('.decider');
 
