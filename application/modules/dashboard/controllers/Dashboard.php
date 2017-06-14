@@ -26,6 +26,7 @@ class Dashboard extends Authenticated_Controller
 		Assets::add_module_js('dashboard', 'dashboard.js');
 		Assets::add_module_css('dashboard', 'dashboard.css');
 		Assets::add_module_css('meeting', 'meeting.css');
+		Assets::add_module_css('homework', 'homework.css');
 	}
 
 	public function index()
