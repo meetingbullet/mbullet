@@ -83,11 +83,12 @@ function insertAttachment()
 
 	// Begin insert
 	$('#attachment-data').append(`
-		<div class="single-attachment">
+		<div class="single-attachment attachment-${attachment_index}">
 			<a href="${url}" class="an-control-btn" target="_blank">
 				<span class="icon"><i class="icon-file"></i></span>
-				<span class="filename">${name}</span>
 			</a>
+
+			<span class="filename">${name}</span>
 
 			<i class="ion-close-round remove-attachment pull-right"></i>
 
@@ -105,7 +106,7 @@ function insertAttachment()
 	$.get(url, function(data) {
 
 		if (title = parseTitle(data)) {
-			$('.single-attachment a[href="'+ url +'"] .filename').text(title);
+			$('.single-attachment.attachment-'+ attachment_index + ' .filename').text(title);
 			$(`.single-attachment input[name="attachments[${attachment_index}][title]"]`).val(title);
 		}
 
@@ -123,7 +124,23 @@ function insertAttachment()
 				$(`.single-attachment input[name="attachments[${attachment_index}][favicon]"]`).val(favicon);
 			});
 		}
+	}).always(function() {
+		var title = $(`.single-attachment input[name="attachments[${attachment_index}][title]"]`).val();
+		title = title ? title : url;
+
+		// Make attachment name Editable
+		$('.single-attachment .filename').editable({
+			type: 'text',
+			title: '<?php echo lang("hw_edit_attachment_name") ?>',
+			value: title,
+			inputclass: 'title-editable',
+			unsavedclass: null,
+			success: function(response, newValue) {
+				$(`.single-attachment input[name="attachments[${attachment_index}][title]"]`).val(newValue);
+			}
+		});
 	});
+
 }
 
 $(document).on('click.mb', '.remove-attachment', function() {

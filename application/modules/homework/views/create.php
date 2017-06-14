@@ -31,8 +31,9 @@
 										<i class="icon-file"></i>
 										<?php endif; ?>
 									</span>
-									<span class="filename"><?php echo $att['title'] ? $att['title'] : word_limiter($att['url'], 60) ?></span>
 								</a>
+								
+								<span class="filename"><?php echo $att['title'] ? $att['title'] : word_limiter($att['url'], 60) ?></span>
 
 								<i class="ion-close-round remove-attachment pull-right"></i>
 

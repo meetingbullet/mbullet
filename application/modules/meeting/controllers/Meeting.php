@@ -33,6 +33,7 @@ class Meeting extends Authenticated_Controller
 		$this->load->model('project/project_model');
 		$this->load->model('project/project_member_model');
 
+		Assets::add_module_css('homework', 'homework.css');
 		Assets::add_module_css('meeting', 'meeting.css');
 		Assets::add_module_js('meeting', 'meeting.js');
 	}
