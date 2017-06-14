@@ -223,7 +223,8 @@ if ($is_member && $is_owner) {
 									<th><?php e(lang('hw_name'))?></th>
 									<th><?php e(lang('hw_description'))?></th>
 									<th><?php e(lang('hw_member'))?></th>
-									<th><?php e(lang('hw_time_spent'))?></th>
+									<th class='text-center'><?php e(lang('hw_time_spent'))?></th>
+									<th><?php e(lang('hw_attachment'))?></th>
 									<th class="text-center"><?php e(lang('hw_status'))?></th>
 								</tr>
 							</thead>
@@ -240,6 +241,23 @@ if ($is_member && $is_owner) {
 										} ?>
 									</td>
 									<td class='basis-20'><?php echo $homework->time_spent ?></td>
+									<td>
+										<?php if ($homework->attachments): ?>
+										<div class="attachment">
+											<?php foreach ($homework->attachments as $att): ?>
+											<a href="<?php echo $att->url ?>" target="_blank">
+												<span class="icon">
+													<?php if ($att->favicon): ?>
+													<img src="<?php echo $att->favicon ?>" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+													<?php else: ?>
+													<i class="icon-file" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+													<?php endif; ?>
+												</span>
+											</a>
+											<?php endforeach; ?>
+										</div>
+										<?php endif; ?>
+									</td>
 									<td class='basis-10 homework-status text-center'>
 										<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></span>
 									</td>
@@ -328,27 +346,6 @@ if ($is_member && $is_owner) {
 </div>
 
 <!-- Modal -->
-<div class="modal modal-monitor fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-80" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
-</div>
-
-<div id="meeting-decider-modal" class="modal fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-80" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
-</div>
-
-<div id="create-meeting" class="modal fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
-</div>
-
 <div id="bigModal" class="modal modal-edit fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">

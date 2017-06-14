@@ -82,7 +82,7 @@ function insertAttachment()
 	var attachment_index = Math.round(Math.random() * 1000000);
 
 	// Begin insert
-	$('.attachment-list').append(`
+	$('#attachment-data').append(`
 		<div class="single-attachment">
 			<a href="${url}" class="an-control-btn" target="_blank">
 				<span class="icon"><i class="icon-file"></i></span>
