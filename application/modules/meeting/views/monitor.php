@@ -184,7 +184,8 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 						<th><?php e(lang('hw_name'))?></th>
 						<th><?php e(lang('hw_description'))?></th>
 						<th><?php e(lang('hw_member'))?></th>
-						<th><?php e(lang('hw_time_spent'))?></th>
+						<th class='text-center'><?php e(lang('hw_time_spent'))?></th>
+						<th><?php e(lang('hw_attachment'))?></th>
 						<th><?php e(lang('hw_status'))?></th>
 					</tr>
 				</thead>
@@ -214,7 +215,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 								}
 							} ?>
 						</td>
-						<td class='time-spent-container'>
+						<td class='time-spent-container text-center'>
 							<a href='#' class='time-spent'
 								data-type="text" 
 								data-tpl="<input type='number' meeting='0.01'>"
@@ -224,6 +225,23 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 								data-emptytext="<i class='ion-edit'></i>"
 								data-emptyclass="text-muted"
 							><?php e($homework->time_spent) ?></a>
+						<td>
+							<?php if ($homework->attachments): ?>
+							<div class="attachment">
+								<?php foreach ($homework->attachments as $att): ?>
+								<a href="<?php echo $att->url ?>" target="_blank">
+									<span class="icon">
+										<?php if ($att->favicon): ?>
+										<img src="<?php echo $att->favicon ?>" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+										<?php else: ?>
+										<i class="icon-file" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+										<?php endif; ?>
+									</span>
+								</a>
+								<?php endforeach; ?>
+							</div>
+							<?php endif; ?>
+						</td>
 						<td class='status-container'>
 							<!-- Update homework status button -->
 							<div class="btn-group">

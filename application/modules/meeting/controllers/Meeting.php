@@ -452,6 +452,9 @@ class Meeting extends Authenticated_Controller
 				->find_all();
 
 				$homework->members = $homework->members ? $homework->members : [];
+
+				$homework->attachments = $this->homework_attachment_model->where('homework_id', $homework->homework_id)->find_all();
+				$homework->attachments = $homework->attachments ? $homework->attachments : [];
 			}
 		}
 

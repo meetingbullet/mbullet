@@ -240,7 +240,7 @@ if ($is_member && $is_owner) {
 											}
 										} ?>
 									</td>
-									<td class='basis-20'><?php echo $homework->time_spent ?></td>
+									<td class='basis-20 text-center'><?php echo $homework->time_spent ?></td>
 									<td>
 										<?php if ($homework->attachments): ?>
 										<div class="attachment">
@@ -456,7 +456,16 @@ if ($is_member && $is_owner) {
 				{{:html}}
 			{{/for}}
 		</td>
-		<td class='basis-20'>{{:time_spent}}</td>
+		<td class='basis-20 text-center'>{{:time_spent}}</td>
+		<td>
+			{{if attachments}}
+				<div class="attachment">
+					{{for attachments}}
+						{{:html}}
+					{{/for}}
+				</div>
+			{{/if}}
+		</td>
 		<td class='basis-10 homework-status text-center'>
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
@@ -480,7 +489,7 @@ if ($is_member && $is_owner) {
 			{{for members}}
 				{{:html}}
 			{{/for}}
-		<td>
+		<td class='text-center'>
 			<a href="#" class="time-spent" 
 			data-type="text" 
 			data-tpl="<input type='number' meeting='0.01'>" 
@@ -489,6 +498,15 @@ if ($is_member && $is_owner) {
 			data-url="<?php echo site_url('homework/ajax_edit') ?>" 
 			data-emptytext="<i class='ion-edit'></i>" 
 			data-emptyclass="text-muted">{{:time_spent}}</a>
+		</td>
+		<td>
+			{{if attachments}}
+				<div class="attachment">
+					{{for attachments}}
+						{{:html}}
+					{{/for}}
+				</div>
+			{{/if}}
 		</td>
 		<td class="status">
 			<!-- Update homework status button -->

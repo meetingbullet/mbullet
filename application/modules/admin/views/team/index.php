@@ -18,12 +18,12 @@
 				<ul class="nav nav-tabs text-left" role="tablist">
 					<li class='active'>
 						<a href="<?php echo site_url('admin/team') ?>">
-							<?php echo lang('rl_team') ?>
+							<?php echo lang('ad_tm_team') ?>
 						</a>
 					</li>
 					<li>
-						<a href="<?php echo site_url('admin/team/roles') ?>">
-							<?php echo lang('rl_roles') ?>
+						<a href="<?php echo site_url('admin/roles') ?>">
+							<?php echo lang('ad_tm_roles') ?>
 						</a>
 					</li>
 				</ul>
