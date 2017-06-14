@@ -18,8 +18,8 @@
 			<label for="attachment" class="pull-right"><?php echo lang('hw_attachment') ?></label>
 		</div>
 		<div class="col-md-9 col-xs-12">
-			<div class="attachment">
-				<div class="attachment-list">
+			<div class="attachment input">
+				<div id="attachment-data">
 					<?php if ($this->input->post('attachments')) :
 							foreach ($this->input->post('attachments') as $i => $att): ?>
 							<div class="single-attachment">
@@ -31,8 +31,9 @@
 										<i class="icon-file"></i>
 										<?php endif; ?>
 									</span>
-									<span class="filename"><?php echo $att['title'] ? $att['title'] : word_limiter($att['url'], 60) ?></span>
 								</a>
+								
+								<span class="filename"><?php echo $att['title'] ? $att['title'] : word_limiter($att['url'], 60) ?></span>
 
 								<i class="ion-close-round remove-attachment pull-right"></i>
 

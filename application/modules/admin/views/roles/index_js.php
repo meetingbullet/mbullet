@@ -11,7 +11,7 @@ $(document).on('click', '.mb-btn-delete-role', function(e) {
 		closeOnConfirm: false
 	},
 	function(){
-		$.get("<?php echo site_url('admin/team/delete_role/') ?>" + $(_this).data('role-id'), (data) => {
+		$.get("<?php echo site_url('admin/roles/delete/') ?>" + $(_this).data('role-id'), (data) => {
 			data = JSON.parse(data);
 			$.mbNotify(data.message, data.message_type);
 

@@ -15,8 +15,9 @@ class Meeting extends Authenticated_Controller
 
 		$this->lang->load('homework/homework');
 		$this->load->model('homework/homework_model');
-		$this->load->model('homework/homework_member_model');
 		$this->load->model('homework/homework_rate_model');
+		$this->load->model('homework/homework_member_model');
+		$this->load->model('homework/homework_attachment_model');
 		
 		$this->load->model('agenda/agenda_model');
 		$this->load->model('agenda/agenda_member_model');
@@ -32,6 +33,7 @@ class Meeting extends Authenticated_Controller
 		$this->load->model('project/project_model');
 		$this->load->model('project/project_member_model');
 
+		Assets::add_module_css('homework', 'homework.css');
 		Assets::add_module_css('meeting', 'meeting.css');
 		Assets::add_module_js('meeting', 'meeting.js');
 	}
@@ -344,6 +346,9 @@ class Meeting extends Authenticated_Controller
 				->find_all();
 
 				$homework->members = $homework->members ? $homework->members : [];
+
+				$homework->attachments = $this->homework_attachment_model->where('homework_id', $homework->homework_id)->find_all();
+				$homework->attachments = $homework->attachments ? $homework->attachments : [];
 			}
 		}
 
@@ -448,6 +453,9 @@ class Meeting extends Authenticated_Controller
 				->find_all();
 
 				$homework->members = $homework->members ? $homework->members : [];
+
+				$homework->attachments = $this->homework_attachment_model->where('homework_id', $homework->homework_id)->find_all();
+				$homework->attachments = $homework->attachments ? $homework->attachments : [];
 			}
 		}
 

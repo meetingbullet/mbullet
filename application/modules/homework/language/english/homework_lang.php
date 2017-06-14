@@ -33,3 +33,4 @@ $lang['hw_homework_status_updated'] = 'Homework status updated';
 $lang['hw_paste_your_attachment_url'] = 'Paste your attachment URL here';
 $lang['hw_invalid_url'] = 'Invalid URL';
 $lang['hw_duplicated_attachment'] = 'Duplicated attachment';
+$lang['hw_edit_attachment_name'] = 'Edit attachment name';

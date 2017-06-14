@@ -115,8 +115,24 @@ $confirmation_status = [
 								<?php echo ucfirst($todo->description) ?>
 							</div>
 							<div class="todo-right" data-url="<?php echo site_url('homework/ajax_edit') ?>" data-homework-id="<?php echo $todo->homework_id ?>">
-								<a href="#" class="setting action an-btn-danger submit <?php echo $todo->todo_type ?>" data-status="undone"><i class="ion-close"></i></a>
+								<?php if ($homework->attachments): ?>
+								<div class="attachment input inline">
+									<?php foreach ($homework->attachments as $att): ?>
+									<a href="<?php echo $att->url ?>" target="_blank">
+										<span class="icon">
+											<?php if ($att->favicon): ?>
+											<img src="<?php echo $att->favicon ?>" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+											<?php else: ?>
+											<i class="icon-file" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+											<?php endif; ?>
+										</span>
+									</a>
+									<?php endforeach; ?>
+								</div>
+								<?php endif; ?>
+
 								<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>" data-status="done"><i class="ion-checkmark"></i></a>
+								<a href="#" class="setting action an-btn-danger submit <?php echo $todo->todo_type ?>" data-status="undone"><i class="ion-close"></i></a>
 							</div>
 							<?php elseif ($todo->todo_type == 'evaluate') : ?>
 								<?php if ($todo->evaluate_mode == 'meeting') : ?>
@@ -132,22 +148,16 @@ $confirmation_status = [
 									<?php echo ucfirst($todo->meeting_name) ?>
 								</div>
 								<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>">
-									<div class="row">
-										<div class="col-xs-9">
-											<div class="todo-rating-wraper">
-												<div class="todo-rating">
-													<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
-													<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
-													<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
-													<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
-													<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
-												</div>
-											</div>
-										</div>
-										<div class="col-xs-3">
-											<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
+									<div class="todo-rating-wraper">
+										<div class="todo-rating">
+											<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
+											<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
+											<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
+											<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
+											<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
 										</div>
 									</div>
+									<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
 								</div>
 								<?php elseif ($todo->evaluate_mode == 'user') : ?>
 								<div class="todo-label">
@@ -162,22 +172,16 @@ $confirmation_status = [
 									<?php echo display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) ?>
 								</div>
 								<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" data-user-id="<?php echo $todo->user_id ?>">
-									<div class="row">
-										<div class="col-xs-9">
-											<div class="todo-rating-wraper">
-												<div class="todo-rating">
-													<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
-													<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
-													<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
-													<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
-													<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
-												</div>
-											</div>
-										</div>
-										<div class="col-xs-3">
-											<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
+									<div class="todo-rating-wraper">
+										<div class="todo-rating">
+											<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
+											<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
+											<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
+											<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
+											<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
 										</div>
 									</div>
+									<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
 								</div>
 								<?php elseif ($todo->evaluate_mode == 'agenda') : ?>
 								<div class="todo-label">
@@ -192,22 +196,16 @@ $confirmation_status = [
 									<?php echo ucfirst($todo->name) ?>
 								</div>
 								<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" data-agenda-id="<?php echo $todo->agenda_id ?>">
-									<div class="row">
-										<div class="col-xs-9">
-											<div class="todo-rating-wraper">
-												<div class="todo-rating">
-													<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
-													<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
-													<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
-													<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
-													<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
-												</div>
-											</div>
-										</div>
-										<div class="col-xs-3">
-											<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
+									<div class="todo-rating-wraper">
+										<div class="todo-rating">
+											<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
+											<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
+											<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
+											<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
+											<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
 										</div>
 									</div>
+									<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
 								</div>
 								<?php else : ?>
 								<div class="todo-label">
@@ -222,22 +220,16 @@ $confirmation_status = [
 									<?php echo ucfirst($todo->name) ?>
 								</div>
 								<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" data-homework-id="<?php echo $todo->homework_id ?>">
-									<div class="row">
-										<div class="col-xs-9">
-											<div class="todo-rating-wraper">
-												<div class="todo-rating">
-													<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
-													<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
-													<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
-													<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
-													<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
-												</div>
-											</div>
-										</div>
-										<div class="col-xs-3">
-											<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
+									<div class="todo-rating-wraper">
+										<div class="todo-rating">
+											<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
+											<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
+											<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
+											<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
+											<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
 										</div>
 									</div>
+									<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
 								</div>
 								<?php endif ?>
 							<?php else : ?>

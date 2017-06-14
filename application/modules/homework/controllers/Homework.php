@@ -208,12 +208,34 @@ class Homework extends Authenticated_Controller
 			$data->short_description = word_limiter($data->description, 18);
 			$data->lang_status = lang('hw_' . $data->status);
 			$data->members = [];
+			$data->attachments = [];
 
-			$members = $this->homework_member_model->select('avatar, email, CONCAT(first_name, " ", last_name) AS full_name')->join('users u', 'u.user_id = homework_members.user_id')->where('homework_id', $homework_id)->find_all();
+			$members = $this->homework_member_model->select('avatar, email, CONCAT(first_name, " ", last_name) AS full_name')
+			->join('users u', 'u.user_id = homework_members.user_id')
+			->where('homework_id', $homework_id)
+			->find_all();
 
 			if (is_array($members)) {
 				foreach ($members AS $user) {
 					$data->members[] = ['html' => '<img class="user-avatar" title="'. $user->full_name .'" src="'. avatar_url($user->avatar, $user->email) .'">'];
+				}
+			}
+
+			$attachments = $this->homework_attachment_model
+			->where('homework_id', $homework_id)
+			->find_all();
+
+
+			if (is_array($attachments)) {
+				foreach ($attachments AS $att) {
+					$data->attachments[] = [
+						'html' => "<a href='{$att->url}' title='". ($att->title ? $att->title : $att->url ) ."'>
+									<span class='icon'>" . 
+										($att->favicon 
+										? "<img src='{$att->favicon}' alt='[A]' title='". ($att->title ? $att->title : $att->url ) ."'/>" 
+										: '<i class="icon-file"></i>') . 
+									'</span></a>'
+					];
 				}
 			}
 		}

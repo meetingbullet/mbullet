@@ -1,12 +1,21 @@
+
 .attachment {
 	position: relative;
-	width: 100%;
-	background: white;
-	border: 1px solid #999;
 	padding: 5px 5px;
 }
 
-.attachment i {
+.attachment.input {
+	background: white;
+	width: 100%;
+	border: 1px solid #999;
+}
+
+.attachment.inline {
+	display: inline-block;
+	width: auto;
+}
+
+.attachment span > i {
 	position: relative;
 	top: 3px;
 	padding-right: 5px;
@@ -47,4 +56,18 @@
 	width: 16px;
 	height: 16px;
 	margin: 2px;
+}
+
+.attachment .remove-attachment {
+	font-size: 10px;
+	line-height: 22px;
+	cursor: pointer;
+}
+
+.attachment .remove-attachment:hover {
+	color: #eb547c;
+}
+
+.attachment .title-editable {
+	width: 500px;
 }

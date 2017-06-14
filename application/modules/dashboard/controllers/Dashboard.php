@@ -12,6 +12,7 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('project/project_member_model');
 		$this->load->model('homework/homework_model');
 		$this->load->model('homework/homework_member_model');
+		$this->load->model('homework/homework_attachment_model');
 		$this->load->model('homework/homework_rate_model');
 		$this->load->model('meeting/meeting_model');
 		$this->load->model('meeting/meeting_member_model');
@@ -218,6 +219,9 @@ class Dashboard extends Authenticated_Controller
 														->join('users u', 'u.user_id = homework_members.user_id')
 														->where('homework_members.homework_id', $item->homework_id)
 														->find_all();
+
+			$item->attachments = $this->homework_attachment_model->where('homework_id', $item->homework_id)->find_all();
+			$item->attachments = $item->attachments ? $item->attachments : [];
 		}
 
 		$evaluate_meetings = $this->meeting_model->select('meetings.*, sm.rate, meetings.name as meeting_name, u.first_name, u.last_name, u.email, IF(' . $this->db->dbprefix('meetings') . '.owner_id = "' . $this->current_user->user_id . '", 1 , 0) AS is_owner, "evaluate" AS todo_type, "meeting" AS evaluate_mode')
