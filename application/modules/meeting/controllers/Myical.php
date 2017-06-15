@@ -35,13 +35,11 @@ class Myical extends Front_Controller
 									->join('meeting_members mb', 'mb.meeting_id = meetings.meeting_id', 'LEFT')
 									->where('(meetings.owner_id = "' . $user->user_id . '" OR mb.user_id = "' . $user->user_id . '")')
 									->where('organization_id', $user->organization_id)
-									->where('meetings.status !=', 'open')
 									->group_by('meetings.meeting_id')
 									->find_all();
 		$my_meetings = $my_meetings && count($my_meetings) > 0 ? $my_meetings : [];
 
 		$tz = standard_timezone($user->timezone);
-		$offset = timezones($user->timezone);
 
 		$config = [
 			"unique_id" => md5($key . '_' . $user->user_id),
@@ -62,7 +60,6 @@ class Myical extends Front_Controller
 
 			$start_time = $meeting->scheduled_start_time;
 			if (! empty($start_time)) {
-				$start_time = date('Y-m-d H:i:s', strtotime($start_time . (($offset > 0) ? ' + ' . abs($offset) : ' - ' . abs($offset)) . ' hours'));
 				$start_time_components = [
 					'year' => explode('-', explode(' ', $start_time)[0])[0],
 					'month' => explode('-', explode(' ', $start_time)[0])[1],
@@ -72,7 +69,7 @@ class Myical extends Front_Controller
 					'sec' => explode(':', explode(' ', $start_time)[1])[2]
 				];
 
-				$end_time = date('Y-m-d H:i:s', strtotime($start_time . ' + ' . $meeting->in . ' ' . $meeting->in_type));
+				$end_time = date('Y-m-d H:i:s', strtotime($meeting->scheduled_start_time . ' + ' . $meeting->in . ' ' . $meeting->in_type));
 				$end_time_components = [
 					'year' => explode('-', explode(' ', $end_time)[0])[0],
 					'month' => explode('-', explode(' ', $end_time)[0])[1],
@@ -104,8 +101,8 @@ class Myical extends Front_Controller
 				]);
 			}
 
-			$vevent->setProperty("summary", $meeting->meeting_key . ' ' . $meeting->name);
-			$vevent->setProperty("description", site_url('meeting/' . $meeting->meeting_key));
+			$vevent->setProperty("summary", $meeting->meeting_key);
+			$vevent->setProperty("description", $meeting->name);
 			$vevent->setProperty("status", "CONFIRMED");
 
 			$vevent->setProperty("organizer", $meeting->owner_email, [
