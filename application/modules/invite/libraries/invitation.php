@@ -84,7 +84,7 @@ class Invitation
 		Invitation code generator
 		Grabs from http://stackoverflow.com/questions/4356289/php-random-string-generator
 	*/
-	private function generateRandomString($length = 10) {
+	public function generateRandomString($length = 10) {
 		$characters = '0123456789QWERTYUIOPASDFGHJKLZXCVBNM';
 		$charactersLength = strlen($characters);
 		$randomString = '';
