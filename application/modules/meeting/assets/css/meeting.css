@@ -255,24 +255,13 @@
 	cursor:pointer;
 }
 
-.decider-meeting-container .an-component-header + .an-component-body{
-	max-height: 150px;
-	overflow: auto;
-}
-
 .an-helper-block .confirmation-status {
 	margin-bottom: 0;
 }
 
 #note {
-	width: 80%;
-	margin-right: 30px;
-	margin-bottom: 0;
-}
-
-.btn-close-out-meeting {
-	vertical-align: bottom;
-	margin-bottom: 6px;
+	width: 100%;
+	margin-bottom: 10px;
 }
 
 .form-meeting-decider {
@@ -332,4 +321,46 @@
 .meeting-rating > input:checked ~ label:hover ~ label {
 	color:#FFED85 !important;
 	cursor:pointer;
+}
+
+/* Meeting sidebar comment */
+.comment-header {
+	width: 100%;
+	padding: 15px;
+	background: #D8D8D8;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+#comment .chat-container {
+	padding: 0;
+}
+
+#comment .chat-container .an-chat-form {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+#comment .chat-container .list-user-single {
+	padding: 8px;
+}
+
+#comment {
+	transition: top 100ms ease-out;
+}
+
+#comment .list-user-single {
+	background: transparent;
+	transition: background 500ms ease-out;
+}
+
+#comment .list-user-single.unread {
+	background: #fffdec;
+}
+
+#comment .avatar {
+	margin-left: 0;
+}
+
+#comment .badge-comment {
+	cursor: pointer;
 }

@@ -27,6 +27,7 @@ class Meeting extends Authenticated_Controller
 		$this->load->model('meeting_member_model');
 		$this->load->model('meeting_member_rate_model');
 		$this->load->model('meeting_member_invite_model');
+		$this->load->model('meeting_comment_model');
 
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
@@ -458,7 +459,10 @@ class Meeting extends Authenticated_Controller
 		}
 
 		foreach ($agendas as &$agenda) {
-			$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
+			$agenda->members = $this->agenda_member_model
+			->select('avatar, email, first_name, last_name')
+			->join('users u', 'u.user_id = agenda_members.user_id')
+			->where('agenda_id', $agenda->agenda_id)->find_all();
 		}
 
 		$homeworks = $this->homework_model->where('meeting_id', $meeting_id)->find_all();
@@ -542,7 +546,10 @@ class Meeting extends Authenticated_Controller
 		}
 
 		foreach ($agendas as &$agenda) {
-			$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')->join('users u', 'u.user_id = agenda_members.user_id')->where('agenda_id', $agenda->agenda_id)->find_all();
+			$agenda->members = $this->agenda_member_model
+			->select('avatar, email, first_name, last_name')
+			->join('users u', 'u.user_id = agenda_members.user_id')
+			->where('agenda_id', $agenda->agenda_id)->find_all();
 		}
 
 		$homeworks = $this->homework_model->where('meeting_id', $meeting->meeting_id)->find_all();
@@ -553,6 +560,19 @@ class Meeting extends Authenticated_Controller
 			$homework->attachments = $homework->attachments ? $homework->attachments : [];
 		}
 
+		$comments = $this->meeting_comment_model
+		->select('meeting_comment_id, comment, meeting_comments.created_on, avatar, email, 
+		IF(mb_meeting_comments.user_id = m.owner_id, 1, 0) AS is_owner,
+		CONCAT(first_name, " ", last_name) AS full_name,')
+		->join('users u', 'u.user_id = meeting_comments.user_id')
+		->join('meetings m', 'm.meeting_id = meeting_comments.meeting_id')
+		->where('meeting_comments.meeting_id', $meeting_id)
+		->find_all();
+		$comments = $comments ? $comments : [];
+
+		foreach ($comments as &$comment) {
+			$comment->created_on = display_time($comment->created_on, null, 'Y-m-d H:i:s');
+		}
 
 		Assets::add_js($this->load->view('decider_js', [
 			'project_key' => $project_key,
@@ -563,9 +583,89 @@ class Meeting extends Authenticated_Controller
 		Template::set('current_user', $this->current_user);
 		Template::set('agendas', $agendas);
 		Template::set('meeting', $meeting);
+		Template::set('comments', $comments);
 		Template::set('homeworks', $homeworks);
 		Template::set('now', gmdate('Y-m-d H:i:s'));
 		Template::render();
+	}
+
+	// Receive & process imcomming comment
+	public function comment()
+	{
+		// Validation
+		if ( trim($this->input->post('comment')) == '' ) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => 'empty_message'
+			]);
+			return;
+		}
+
+		// User in this meeting?
+		if (! $this->mb_project->has_permission('meeting', $this->input->post('meeting_id'), 'Project.View.All')) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_action')
+			]);
+			return;
+		}
+
+		if ( $id = $this->meeting_comment_model->insert([
+			'comment' => trim($this->input->post('comment')),
+			'user_id' => $this->current_user->user_id,
+			'meeting_id' => $this->input->post('meeting_id')
+		]) ) {
+			echo json_encode([
+				'message_type' => 'success',
+				'data' => ['id' => $id]
+			]);
+			return;
+		}
+
+		echo json_encode([
+			'message_type' => 'danger',
+			'message' => lang('mt_something_went_wrong_please_refresh_and_try_again')
+		]);
+	}
+
+	public function get_decider_data($meeting_id)
+	{
+		// User in this meeting?
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_invalid_action')
+			]);
+			return;
+		}
+
+		// Comments: Take 10 comments starting from $offset and don't take from self
+		$comments = $this->meeting_comment_model
+		->select('meeting_comment_id AS id, comment, meeting_comments.created_on, 
+				CONCAT(first_name, " ", last_name) AS full_name, avatar, email,
+				IF(mb_meeting_comments.user_id = m.owner_id, 1, 0) AS is_owner')
+		->join('users u', 'u.user_id = meeting_comments.user_id')
+		->join('meetings m', 'm.meeting_id = meeting_comments.meeting_id')
+		->where('meeting_comments.meeting_id', $meeting_id)
+		->where('meeting_comment_id >', (int) $this->input->post('commentOffset'))
+		->order_by('meeting_comments.created_on')
+		->limit(10)
+		->find_all();
+
+		$comments = $comments ? $comments : [];
+		
+		foreach ($comments as &$comment) {
+			$comment->avatar_url = avatar_url($comment->avatar, $comment->email);
+			$comment->mark_as_read = false;
+			$comment->created_on = display_time($comment->created_on, null, 'Y-m-d H:i:s');
+		}
+
+		echo json_encode([
+			'message_type' => 'success',
+			'data' => [
+				'comments' => $comments
+			]
+		]);
 	}
 
 	public function update_decider($meeting_key)
