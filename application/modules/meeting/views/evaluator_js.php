@@ -44,4 +44,7 @@ $(document).ready(function() {
 		$(this).parent().find('input[type=radio]').removeAttr('checked');
 		$(this).parent().find('input[type=radio]#' + input_id).attr('checked', '');
 	});
+
+	// Enable jQuery tooltip
+	$('[data-toggle="tooltip"]').tooltip(); 
 })

@@ -1,3 +1,6 @@
+// Enable jQuery tooltip
+$('[data-toggle="tooltip"]').tooltip(); 
+
 // Read more Notes & Goal
 var rm_option = {
 	speed: 300,
@@ -5,7 +8,7 @@ var rm_option = {
 	lessLink: '<a class=\'readmore rm-less\' href="#"><?php e(lang('show_less'))?></a>'
 };
 
-$('.goal, .meeting-notes').readmore(rm_option);
+$('.detail-goal, .meeting-notes').readmore(rm_option);
 
 // Edit meeting
 $('#edit-meeting').click((e) => {
@@ -138,8 +141,8 @@ $(document).on("submit", '.form-ajax', (e) => {
 						$('#meeting-name').text(meeting_name);
 						$('.meeting-detail .status').html('<span class="label label-'+ status +' label-bordered" id="meeting-status" data-status="'+ status +'" data-is-owner="'+ $('#meeting-status').data('is-owner') +'">'+ lang_status +'</span>');
 						$('.meeting-detail .owner').html(owner_html);
-						$('.meeting-detail .goal').html(goal);
-						$('.goal').readmore(rm_option);
+						$('.detail-goal').html(goal);
+						$('.detail-goal').readmore(rm_option);
 						$('#meeting-resource').html(resource_html);
 
 						// Hide\Show Button for Owner

@@ -53,74 +53,139 @@ $confirmation_status = [
 	<?php echo form_open(site_url('meeting/update_decider/' . $meeting->meeting_key), ['class' => 'form-inline form-meeting-decider an-helper-block']) ?>
 		<div class="an-body-topbar">
 			<div class="an-page-title">
-				<div class="an-bootstrap-custom-tab">
-					<h2><?php e($meeting->name)?></h2>
-				</div>
+				<h2><?php e($meeting->name)?></h2>
 			</div>
 			<div class="pull-right">
 			</div>
 		</div> <!-- end AN-BODY-TOPBAR -->
 
-		<div class="decider-meeting-container row">
-			<div class="col-md-5">
-				<div class="an-single-component with-shadow">
-					<div class="an-component-body an-helper-block">
-						<table class="table table-striped table-meeting-time">
-							<thead>
-								<tr>
-									<th></th>
-									<th><?php e(lang('st_scheduled'))?></th>
-									<th><?php e(lang('st_actual'))?></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td><strong><?php e(lang('st_start_time')) ?></strong></td>
-									<td class="text-center"><?php echo display_time($scheduled_start_time) ?></td>
-									<td class="text-center"><?php echo display_time($meeting->actual_start_time) ?></td>
-								</tr>
-								<tr>
-									<td><strong><?php e(lang('st_end_time')) ?></strong></td>
-									<td class="text-center"><?php echo display_time($scheduled_end_time) ?></td>
-									<td class="text-center"><?php echo display_time($meeting->actual_end_time) ?></td>
-								</tr>
-								<tr>
-									<td><strong><?php e(lang('st_elapsed_time')) ?></strong></td>
-									<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
-									<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
-								</tr>
-							</tbody>
-						</table>
-					</div> <!-- end .AN-COMPONENT-BODY -->
-				</div>
-			</div>
-
-			<div class="col-md-4">
-				<div class="an-single-component with-shadow">
-					<div class="an-component-header">
-						<h6><?php e(lang('st_goal'))?></h6>
+		<div class="decider-meeting-container">
+			<div class="row">
+				<div id="meeting-info" class="col-md-8">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="an-single-component with-shadow">
+								<div class="an-component-header">
+									<h6><?php e(lang('st_goal'))?></h6>
+								</div>
+								<div class="an-component-body an-helper-block">
+									<div class="meeting-goal-container readmore-container">
+										<div class="goal">
+											<?php echo $meeting->goal?>
+										</div>
+									</div>
+								</div> <!-- end .AN-COMPONENT-BODY -->
+							</div>
+						</div>
 					</div>
-					<div class="an-component-body an-helper-block">
-						<?php echo nl2br($meeting->goal)?>
-					</div> <!-- end .AN-COMPONENT-BODY -->
-				</div>
-			</div>
-			<div class="col-md-3">
-				<div class="an-single-component with-shadow">
-					<div class="an-component-header">
-						<h6><?php e(lang('st_attendees'))?></h6>
-					</div>
-					<div class="an-component-body an-helper-block">
-						<ul class="list-unstyled list-member">
-							<?php foreach ($meeting->members as $user) { ?>
-							<li>
-								<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
+					<div class="row">
+						<div class="col-md-7">
+							<div class="an-single-component with-shadow">
+								<div class="an-component-body an-helper-block">
+									<table class="table table-striped table-meeting-time">
+										<thead>
+											<tr>
+												<th></th>
+												<th class="text-center"><?php e(lang('st_scheduled'))?></th>
+												<th class="text-center"><?php e(lang('st_actual'))?></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><strong><?php e(lang('st_start_time')) ?></strong></td>
+												<td class="text-center"><?php echo display_time($scheduled_start_time) ?></td>
+												<td class="text-center"><?php echo display_time($meeting->actual_start_time) ?></td>
+											</tr>
+											<tr>
+												<td><strong><?php e(lang('st_end_time')) ?></strong></td>
+												<td class="text-center"><?php echo display_time($scheduled_end_time) ?></td>
+												<td class="text-center"><?php echo display_time($meeting->actual_end_time) ?></td>
+											</tr>
+											<tr>
+												<td><strong><?php e(lang('st_elapsed_time')) ?></strong></td>
+												<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
+												<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
+											</tr>
+										</tbody>
+									</table>
+								</div> <!-- end .AN-COMPONENT-BODY -->
+							</div>
+						</div>
 
-								<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
-							</li>
-							<?php } ?>
-						</ul>
-					</div> <!-- end .AN-COMPONENT-BODY -->
+						<div class="col-md-5">
+							<div class="an-single-component fixed-height with-shadow">
+								<div class="an-component-header">
+									<h6><?php e(lang('st_attendees'))?></h6>
+								</div>
+								<div class="an-component-body an-helper-block">
+									<ul class="list-unstyled list-member">
+										<?php foreach ($meeting->members as $user) { ?>
+										<li>
+											<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
+
+											<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
+										</li>
+										<?php } ?>
+									</ul>
+								</div> <!-- end .AN-COMPONENT-BODY -->
+							</div>
+						</div>
+					</div> <!-- end .row -->
+				</div>
+				<div class="col-md-4">
+					<div id="comment">
+						<div class="an-single-component with-shadow">
+							<div class="an-component-header">
+								<h6><?php e(lang('mt_comments'))?></h6>
+
+								<span class="badge badge-bordered badge-warning badge-comment" style="display: none">
+									<span class="number"></span> <span><?php echo lang('mt_new_message') ?></span>
+								</span>
+							</div>
+							<div class="an-component-body">
+								<div class="an-user-lists chat-container chat-page">
+									<div id="comment-body" class="an-lists-body" >
+										<?php foreach ($comments as $comment): ?>
+										<div data-id="<?php echo $comment->meeting_comment_id ?>" class="list-user-single">
+											<div class="list-name">
+												<span class="avatar" 
+													style="background-image: url('<?php echo avatar_url($comment->avatar, $comment->email) ?>'); width: 30px; height: 30px;">
+												</span>
+												<a href="#" target="_blank">
+													<span class="name"><?php echo $comment->full_name ?></span>
+													<?php if ($comment->is_owner == '1'): ?>
+													<span class="badge badge-bordered badge-owner"><?php echo lang('mt_owner') ?></span>
+													<?php endif; ?>
+													<span class="an-time">
+														<i class="icon-clock"></i>
+														<span class="time" data-created-on="<?php echo $comment->created_on ?>"></span>
+													</span>
+												</a>
+											</div>
+											<p class="comment"><?php e($comment->comment) ?></p>
+										</div> <!-- end .USER-LIST-SINGLE -->
+										<?php endforeach; ?>
+									</div> <!-- end .AN-LISTS-BODY -->
+									<div class="an-chat-form">
+										<form class="an-form" action="#">
+										<div class="an-search-field topbar">
+											<input id="send-comment" class="an-form-control" type="text" placeholder="<?php echo lang('mt_type_a_comment') ?>"
+													autocomplete="off"
+													data-i-am-owner="<?php echo (int) $is_owner ?>"
+													data-my-full-name="<?php echo $current_user->first_name .' '. $current_user->last_name ?>"
+													data-my-avatar-url="<?php echo avatar_url($current_user->avatar, $current_user->email) ?>"
+											>
+											<button class="an-btn an-btn-icon btn-send-comment">
+												<i class="ion-paper-airplane"></i>
+											</button>
+										</div>
+										</form>
+									</div>
+								</div>
+							</div> <!-- end .AN-COMPONENT-BODY -->
+						</div>
+
+					</div> <!-- end .comment-wrapper -->
 				</div>
 			</div>
 		</div>
@@ -145,7 +210,7 @@ $confirmation_status = [
 						<tr id='agenda-<?php e($agenda->agenda_id)?>' data-agenda-id='<?php e($agenda->agenda_id)?>' data-agenda-status='<?php e($agenda->status)?>'>
 							<td><?php echo anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name, ['target' => '_blank'])?></td>
 							<td><?php echo display_time($agenda->started_on) ?></td>
-							<td><?php echo timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) ?></td>
+							<td><?php echo $agenda->started_on ? timespan(strtotime($agenda->started_on), strtotime($agenda->finished_on)) : '0' ?></td>
 							<td>
 								<span class="label label-bordered label-<?php e($agenda->status)?>">
 									<?php e(lang('st_' . $agenda->status))?>
@@ -166,12 +231,71 @@ $confirmation_status = [
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div>
 
-				<label for="note"><?php e(lang('st_notes'))?></label>
+		<div class="an-single-component with-shadow">
+			<div class="an-component-header">
+				<h6><?php e(lang('st_homeworks'))?></h6>
+			</div>
+			<div class="an-component-body an-helper-block">
+				<table class="table table-striped table-agenda">
+					<thead>
+						<tr>
+							<th><?php e(lang('hw_name'))?></th>
+							<th><?php e(lang('hw_description'))?></th>
+							<th class="text-center"><?php echo lang('hw_time_spent') ?></th>
+							<th><?php echo lang('hw_attachment') ?></th>
+							<th class="text-center"><?php e(lang('st_status'))?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php if(is_array($homeworks)): foreach ($homeworks as $homework) : ?>
+						<tr>
+							<td><?php echo $homework->name ?></td>
+							<td><?php echo $homework->description ?></td>
+							<td class='text-center'><?php echo $homework->time_spent ?></td>
+							<td>
+								<?php if ($homework->attachments): ?>
+								<div class="attachment">
+									<?php foreach ($homework->attachments as $att): ?>
+									<a href="<?php echo $att->url ?>" target="_blank">
+										<span class="icon">
+											<?php if ($att->favicon): ?>
+											<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+											<?php else: ?>
+											<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+											<?php endif; ?>
+										</span>
+									</a>
+									<?php endforeach; ?>
+								</div>
+								<?php endif; ?>
+							</td>
+							<td class="text-center agenda-status">
+								<?php if (! empty($homework->status)) : ?>
+								<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('st_' . $homework->status))?></span>
+								<?php endif ?>
+							</td>
+						</tr>
+						<?php endforeach; else : ?>
+						<tr>
+							<td colspan="5" class="text-center"><?php echo lang('st_no_homeworks') ?></td>
+						</tr>
+						<?php endif ?>
+					</tbody>
+				</table>
+			</div> <!-- end .AN-COMPONENT-BODY -->
+		</div>
+
 		<div class="row">
 			<div class="col-md-12">
-				<textarea id="note" name="note" rows="6" class="an-form-control note" placeholder="<?php e(lang('st_write_a_note_here')) ?>"></textarea>
-				<button class="an-btn an-btn-primary btn-close-out-meeting"><?php e(lang('st_close_out_meeting')) ?></button>
+				<div class="an-helper-block">
+					<label for="note"><?php e(lang('st_notes'))?></label>
+					<textarea id="note" name="note" rows="6" class="an-form-control note" placeholder="<?php e(lang('st_write_a_note_here')) ?>"></textarea>
+				</div>
 			</div>
+		</div>
+
+		<div class="modal-footer">
+			<button class="an-btn an-btn-primary btn-close-out-meeting pull-right"><?php e(lang('st_close_out_meeting')) ?></button>
 		</div>
 
 	<?php echo form_close() ?>
@@ -181,7 +305,8 @@ $confirmation_status = [
 	echo '<script type="text/javascript">' . $this->load->view('decider_js', [
 		'project_key' => $project_key,
 		'meeting_key' => $meeting->meeting_key,
-		'meeting_id' => $meeting->meeting_id
+		'meeting_id' => $meeting->meeting_id,
+		'is_owner' => $is_owner,
 	], true) . '</script>';
 }
 ?>
@@ -195,3 +320,22 @@ $confirmation_status = [
 	</div>
 </div>
 <?php endif; ?>
+
+<script id="single-comment" type="ajax/vithd">
+	<div data-id="{{:id}}" class="list-user-single{{if mark_as_read==false}} unread{{/if}}" style="display:none">
+		<div class="list-name">
+			<span class="avatar" 
+				style="background-image: url('{{:avatar_url}}'); width: 30px; height: 30px;">
+			</span>
+			<a href="#" target="_blank">
+				<span class="name">{{:full_name}}</span>
+				{{if is_owner=="1"}}<span class="badge badge-bordered badge-owner"><?php echo lang('mt_owner') ?></span>{{/if}}
+				<span class="an-time">
+					<i class="icon-clock"></i>
+					<span class="time" data-created-on="{{:created_on}}"><?php echo lang('mt_a_few_second_ago') ?></span>
+				</span>
+			</a>
+		</div>
+		<p class="comment">{{:comment}}</p>
+	</div> <!-- end .USER-LIST-SINGLE -->
+</script>

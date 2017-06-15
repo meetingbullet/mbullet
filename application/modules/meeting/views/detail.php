@@ -11,29 +11,6 @@ if ($meeting->scheduled_start_time) {
 	$scheduled_end_time = gmdate('Y-m-d H:i:s', $scheduled_end_time);
 }
 
-$buttons = [
-	'open' => [
-		'icon' => 'ion-ios-play',
-		'label' => lang('st_start_meeting'),
-		'next_status' => 'inprogress',
-	],
-	'inprogress' => [
-		'icon' => 'ion-android-done',
-		'label' => lang('st_ready'),
-		'next_status' => 'ready',
-	],
-	'ready' => [
-		'icon' => 'ion-android-done-all',
-		'label' => lang('st_resolve_meeting'),
-		'next_status' => 'resolved',
-	],
-	'resolved' => [
-		'icon' => 'ion-ios-book',
-		'label' => lang('st_reopen'),
-		'next_status' => 'open',
-	]
-];
-
 $action_key = explode('-', $meeting_key);
 $action_key = $action_key['0'] . '-' . $action_key[1];
 $members = array_column($invited_members, 'user_id');
@@ -41,6 +18,7 @@ $is_member = in_array($current_user->user_id, $members);
 if ($is_member && $is_owner) {
 	$is_member = false;
 }
+
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
@@ -78,7 +56,7 @@ if ($is_member && $is_owner) {
 
 	<?php if ($meeting->manage_state == 'decide' && $is_owner): ?>
 
-	<a href='#' class='an-btn an-btn-primary mb-open-modal'
+	<a href='#' class='an-btn an-btn-danger mb-open-modal'
 		data-modal-id="meeting-decider-modal"
 		data-url="<?php e(site_url('meeting/decider/' . $meeting_key)) ?>" 
 		data-modal-dialog-class="modal-80"
@@ -87,7 +65,7 @@ if ($is_member && $is_owner) {
 	<?php endif; ?>
 
 	<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false && (($is_member /*&& ! empty($owner_evaluated)*/) || $is_owner)) : ?>
-	<a href='#' id="open-meeting-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-primary'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
+	<a href='#' id="open-meeting-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-danger'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
 	<?php endif; ?>
 </div>
 
@@ -95,46 +73,15 @@ if ($is_member && $is_owner) {
 	<div class="col-md-9">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
-				<h6><?php e(lang('st_detail'))?> </h6>
+				<h6><?php e(lang('st_goal'))?> </h6>
 			</div>
 			<div class="an-component-body">
-				<div class="an-helper-block meeting-detail readmore-container">
-					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_owner'))?></div>
-						<div class="col-xs-8 owner"><?php echo display_user($meeting->email, $meeting->first_name, $meeting->last_name, $meeting->avatar); ?></div>
-					</div>
-					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_goal'))?></div>
-						<div class="col-xs-8">
-							<div class="meeting-goal-container">
-								<div class="goal">
-									<?php echo $meeting->goal?></div>
-								</div>
-							</div>
-					</div>
-					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
-						<div class="col-xs-8 status">
-							<span class="label label-bordered label-<?php e($meeting->status)?>" id="meeting-status" data-status="<?php e($meeting->status)?>" data-is-owner="<?php e($is_owner ? 1 : 0)?>"><?php e(lang('st_' . $meeting->status))?></span>
+				<div class="an-helper-block">
+					<div class="meeting-goal-container readmore-container">
+						<div class="detail-goal">
+							<?php echo $meeting->goal?>
 						</div>
-
 					</div>
-					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_point_used')) ?></div>
-						<div class="col-xs-8 point-used"><?php e($point_used) ?></div>
-					</div>
-					<?php if ($meeting->scheduled_start_time): ?>
-					<div class="row">
-						<div class="col-xs-4"><?php e(lang('st_scheduled_duration')) ?></div>
-						<div class="col-xs-8"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time)) ?></div>
-					</div>
-					<?php endif;?>
-					<?php if ($meeting->actual_start_time && $meeting->actual_end_time): ?>
-					<div class="row">
-						<div class="col-xs-4"><?php e(ucfirst(lang('st_actual_duration')))?></div>
-						<div class="col-xs-8"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></div>
-					</div>
-					<?php endif;?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div> <!-- end .AN-SINGLE-COMPONENT  -->
@@ -146,8 +93,8 @@ if ($is_member && $is_owner) {
 			</div>
 			<div class="an-component-body">
 				<div class="an-helper-block readmore-container">
-					<div class="an-input-group meeting-notes">
-						<?php echo nl2br($meeting->notes) ?>
+					<div class="an-input-group meeting-notes readmore-container">
+						<?php echo $meeting->notes ?>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -248,9 +195,9 @@ if ($is_member && $is_owner) {
 											<a href="<?php echo $att->url ?>" target="_blank">
 												<span class="icon">
 													<?php if ($att->favicon): ?>
-													<img src="<?php echo $att->favicon ?>" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+													<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
 													<?php else: ?>
-													<i class="icon-file" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+													<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
 													<?php endif; ?>
 												</span>
 											</a>
@@ -277,6 +224,43 @@ if ($is_member && $is_owner) {
 
 	<!-- Columns right -->
 	<div class="col-md-3">
+		<div class="an-single-component with-shadow">
+			<div class="an-component-header">
+				<h6><?php e(lang('st_detail'))?> </h6>
+			</div>
+			<div class="an-component-body">
+				<div class="an-helper-block meeting-detail">
+					<div class="row">
+						<div class="col-xs-4"><?php e(lang('st_owner'))?></div>
+						<div class="col-xs-8 owner"><?php echo display_user($meeting->email, $meeting->first_name, $meeting->last_name, $meeting->avatar); ?></div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4"><?php e(lang('st_status'))?></div>
+						<div class="col-xs-8 status">
+							<span class="label label-bordered label-<?php e($meeting->status)?>" id="meeting-status" data-status="<?php e($meeting->status)?>" data-is-owner="<?php e($is_owner ? 1 : 0)?>"><?php e(lang('st_' . $meeting->status))?></span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4"><?php e(lang('st_point_used')) ?></div>
+						<div class="col-xs-8 point-used"><?php e($point_used) ?></div>
+					</div>
+					<?php if ($meeting->scheduled_start_time): ?>
+					<div class="row">
+						<div class="col-xs-4"><?php e(lang('st_scheduled_duration')) ?></div>
+						<div class="col-xs-8"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time)) ?></div>
+					</div>
+					<?php endif;?>
+					<?php if ($meeting->actual_start_time && $meeting->actual_end_time): ?>
+					<div class="row">
+						<div class="col-xs-4"><?php e(ucfirst(lang('st_actual_duration')))?></div>
+						<div class="col-xs-8"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></div>
+					</div>
+					<?php endif;?>
+				</div> <!-- end .AN-HELPER-BLOCK -->
+			</div> <!-- end .AN-COMPONENT-BODY -->
+		</div> <!-- end .AN-SINGLE-COMPONENT  -->
+
+		<!-- Resource -->
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_resource'))?></h6>
