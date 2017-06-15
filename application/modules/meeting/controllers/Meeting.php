@@ -1723,7 +1723,7 @@ class Meeting extends Authenticated_Controller
 		return $evaluated;
 	}
 
-	public function invite($meeting_id, $invite_code, $decision)
+	public function invite($meeting_id = null, $invite_code = null, $decision = null)
 	{
 		$decisions = ['accept', 'maybe', 'decline'];
 		$meeting = $this->meeting_model->find($meeting_id);
@@ -1770,10 +1770,5 @@ class Meeting extends Authenticated_Controller
 		}
 
 		redirect('meeting/' . $meeting->meeting_key);
-	}
-
-	public function myical($key)
-	{
-		require_once "iCalcreator/iCalcreator.php";
 	}
 }
