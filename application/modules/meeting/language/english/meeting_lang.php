@@ -190,3 +190,6 @@ $lang['st_unable_evaluate'] = 'You are unable to evaluate this meeting.';
 $lang['st_undone'] = 'Undone';
 $lang['st_done'] = 'Done';
 $lang['st_rate_db_success'] = 'Rated successfully.';
+$lang['st_something_went_wrong'] = 'Something wrong with your provided information.';
+$lang['st_welcome_to_meeting'] = 'Welcome to the meeting! You are a member now.';
+$lang['st_decided'] = 'You have already decided.';

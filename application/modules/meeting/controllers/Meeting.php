@@ -25,6 +25,7 @@ class Meeting extends Authenticated_Controller
 		$this->load->model('meeting_model');
 		$this->load->model('meeting_member_model');
 		$this->load->model('meeting_member_rate_model');
+		$this->load->model('meeting_member_invite_model');
 
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
@@ -111,15 +112,32 @@ class Meeting extends Authenticated_Controller
 				if ($team = $this->input->post('team')) {
 					if ($team = explode(',', $team)) {
 						$member_data = [];
-						foreach ($team as $member) {
-							$member_data[] = [
-								'meeting_id' => $id,
-								'user_id' => $member
-							];
+						$members = $this->user_model->select('email, user_id')->where_in('user_id', $team)->find_all();
+
+						$user_ids = [$data['owner_id']];
+						$this->load->library('invite/invitation');
+						foreach ($members as $member) {
+							if ($member->user_id != $this->current_user->user_id && $member->user_id != $data['owner_id']) {
+								$member_data[] = [
+									'meeting_id' => $id,
+									'invite_email' => $member->email,
+									'invite_code' => $this->invitation->generateRandomString(64),
+								];
+							} elseif ($member->user_id == $this->current_user->user_id && $member->user_id != $data['owner_id']) {
+								$this->meeting_member_model->insert([
+									'meeting_id' => $id,
+									'user_id' => $member->user_id
+								]);
+							}
+
+							if (! in_array($member->user_id, $user_ids)) {
+								$user_ids[] = $member->user_id;
+							}
 						}
 
-						$this->meeting_member_model->insert_batch($member_data);
-						$this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
+						$this->meeting_member_invite_model->insert_batch($member_data);
+						// $this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
+						$this->mb_project->invite_users($id, 'meeting', $this->current_user, $user_ids);
 					}
 				}
 
@@ -1695,5 +1713,59 @@ class Meeting extends Authenticated_Controller
 		}
 
 		return $evaluated;
+	}
+
+	public function invite($meeting_id, $invite_code, $decision)
+	{
+		$decisions = ['accept', 'maybe', 'decline'];
+		$meeting = $this->meeting_model->find($meeting_id);
+		$meeting_invite = $this->meeting_member_invite_model->where('invite_email', $this->current_user->email)
+															->where('invite_code', $invite_code)
+															->find_by('meeting_id', $meeting_id);
+
+		if (empty($meeting) || empty($meeting_invite)) {
+			Template::set_message(lang('st_something_went_wrong'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (empty($meeting_id) || empty($invite_code) || empty($decision) || ! in_array($decision, $decisions)) { echo 2;
+			Template::set_message(lang('st_something_went_wrong'), 'danger');
+		} else {
+			if ($meeting_invite->status != 'NEEDS-ACTION') {
+				Template::set_message(lang('st_decided'), 'warning');
+				redirect('meeting/' . $meeting->meeting_key);
+			} elseif ($decision == 'accept' || $decision == 'maybe') {
+				if ($decision == 'accept') {
+					$status = 'ACCEPTED';
+				} else {
+					$status = 'TENTATIVE';
+				}
+
+				Template::set_message(lang('st_welcome_to_meeting'), 'success');
+
+				$added = $this->meeting_member_model->insert([
+					'meeting_id' => $meeting_id,
+					'user_id' => $this->current_user->user_id
+				]);
+				if ($added === false) {
+					Template::set_message(lang('st_something_went_wrong'), 'danger');
+					redirect('meeting/' . $meeting->meeting_key);
+				}
+			} else {
+				$status = 'DECLINED';
+			}
+
+			$decided = $this->meeting_member_invite_model->set('status', $status)->update($meeting_invite->meeting_member_invite_id);
+			if (! $decided) {
+				Template::set_message(lang('st_something_went_wrong'), 'danger');
+			}
+		}
+
+		redirect('meeting/' . $meeting->meeting_key);
+	}
+
+	public function myical($key)
+	{
+		require_once "iCalcreator/iCalcreator.php";
 	}
 }

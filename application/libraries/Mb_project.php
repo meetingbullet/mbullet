@@ -504,7 +504,7 @@ class Mb_project
 			$object_organization = $this->ci->organization_model->select('name')->organization_model->find($current_user->current_organization_id);
 			$organization = $object_organization->name;
 
-			$data ['OBJECT_OWNER'] = $owner;
+			$data['OBJECT_OWNER'] = $owner;
 			$data['OBJECT_MEMBERS'] = $members;
 			$data['OBJECT_KEY'] = $object_key;
 			$data['OBJECT_ORG'] = $organization;
@@ -516,6 +516,118 @@ class Mb_project
 		return (boolean) $this->send_mail_to_members($object_id, $object_type, $email_template->email_title,
 			html_entity_decode($email_template->email_template_content),
 			[$current_user_id], true, $data, true);
+	}
+	/**
+	 * Send invitation mail to users after create a meeting
+	 *
+	 * @param int $object_id - meeting id
+	 * @param string $object_type - organization/project/meeting
+	 * @param string $current_user - current user info
+	 * @param string $user_ids - receiver ids
+	 * @return boolean - true if sent successfully and vice versa
+	 */
+	public function invite_users($object_id, $object_type, $current_user, $user_ids)
+	{
+		if (empty($object_id) || empty($object_type) || empty($user_ids)) {
+			return false;
+		}
+
+		$user_ids = array_unique($user_ids);
+		$object_type = strtolower($object_type);
+
+		$object_types = ['project', 'meeting'];
+		if (! in_array($object_type, $object_types)) {
+			return false;
+		}
+		$this->ci->load->model('users/user_model');
+		$users = $this->ci->user_model->select('email, CONCAT(first_name, " ", last_name) as full_name, user_id, invite_code, meeting_id')
+									->join($object_type . '_member_invites', $object_type . '_member_invites.invite_email = users.email AND ' . $object_type . '_member_invites.' . $object_type . '_id = "' . $object_id . '"', 'LEFT')
+									->where_in('users.user_id', $user_ids)
+									->find_all();
+
+		if (empty($users)) {
+			return false;
+		}
+
+		$this->ci->load->model($object_type . '/' . $object_type . '_model', 'object_model');
+		$object = $this->ci->object_model->find($object_id);
+		$object_name = $object->name;
+		$object_key = $object->{$object_type == 'project' ? 'cost_code' : $object_type . '_key'};
+
+		$template_key = 'INVITE_USER_TO_' . strtoupper($object_type);
+
+		$email_template = $this->ci->db->where('email_template_key', $template_key)
+								->where('language_code', 'en_US')
+								->get('email_templates')->row();
+		if (empty($email_template)) {
+			return false;
+		}
+
+		$this->ci->load->library('emailer/emailer');
+		$this->ci->load->library('parser');
+
+		$email_template->email_title = $this->ci->parser->parse_string($email_template->email_title, [
+			'OBJECT_TYPE' => ucfirst($object_type)
+		], true);
+
+		$this->ci->load->model($object_type . '/' . $object_type . '_member_model', 'object_member_model');
+		$object_members = $this->ci->object_member_model
+								->select('CONCAT(first_name, " ", last_name) as full_name, email')
+								->join('users u', 'u.user_id = ' . $object_type . '_members.user_id', 'left')
+								->find_all_by($object_type . '_id', $object_id);
+		
+		$members = '';
+		if (! empty($object_members)) {
+			foreach ($object_members as $key => $member) {
+				$members .= $member->full_name . ' (' . $member->email . ')';
+				if ($key < (count($object_members) - 1)) {
+					$members .= ', ';
+				}
+			}
+		}
+
+		$object_owner = $this->ci->user_model->select('CONCAT(first_name, " ", last_name) as full_name, email')->find($object->owner_id);
+		$owner = $object_owner->full_name . ' (' . $object_owner->email . ')';
+
+		$this->ci->load->model('organization/organization_model');
+		$object_organization = $this->ci->organization_model->select('name')->organization_model->find($current_user->current_organization_id);
+		$organization = $object_organization->name;
+
+		$count = 0;
+		foreach ($users as $user) {
+			if ($user->user_id != $current_user->user_id) {
+				$data = [
+					'OBJECT_TYPE' => ucfirst($object_type),
+					'OBJECT_NAME' => $object_name,
+					'USER_NAME' => $user->full_name,
+					'URL' => site_url($object_type . '/' . $object_key),
+					'LABEL' => site_url($object_type . '/' . $object_key),
+					'OBJECT_OWNER' => $owner,
+					'OBJECT_MEMBERS' => $members,
+					'OBJECT_KEY' => $object_key,
+					'OBJECT_ORG' => $organization
+				];
+
+				if ($user->user_id != $object->owner_id) {
+					$data['ADDITIONAL_TEXT'] = "You are invited to this " . $object_type . ". Your decision:<a href=" . site_url($object_type . '/invite/' . $user->meeting_id . '/' . $user->invite_code . '/accept') . " style='margin-left: 10px'>Accept</a><a href=" . site_url($object_type . '/invite/' . $user->meeting_id . '/' . $user->invite_code . '/maybe') . " style='margin-left: 10px'>Maybe</a><a href=" . site_url($object_type . '/invite/' . $user->meeting_id . '/' . $user->invite_code . '/decline') . " style='margin-left: 10px'>Decline</a>";
+				} else {
+					$data['ADDITIONAL_TEXT'] = "You are set to be the owner this " . $object_type . ".";
+				}
+
+				$email_data = [
+					'to' => $user->email,
+					'subject' => $email_template->email_title,
+					'message' => $this->ci->parser->parse_string(html_entity_decode($email_template->email_template_content), $data, true),
+				];
+
+				$sent = $this->ci->emailer->send($email_data, true);
+				if (! empty($sent)) {
+					$count++;
+				}
+			}
+		}
+
+		return (boolean) $count;
 	}
 }
 /**
