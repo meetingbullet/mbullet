@@ -103,8 +103,7 @@ class Dashboard extends Authenticated_Controller
 		->select('CONCAT(meeting_key, " ", name) AS title, 
 		actual_start_time AS start, actual_end_time AS end,
 		CONCAT("'. site_url('meeting/preview/') .'", meeting_key) AS url, 
-		"#999" AS backgroundColor,
-		"mb-open-modal" AS className')
+		"#999" AS backgroundColor')
 		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
 		->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
 		->where('status', 'finished')

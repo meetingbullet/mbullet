@@ -13,7 +13,19 @@ $('#meeting-calendar').fullCalendar({
 	eventLimit: true, // allow "more" link when too many events
 	eventRender: function(event, element) { 
 		if (event.end) {
-			element.attr("data-modal-id", "meeting-preview-modal")
+			if (element.attr('href')) {
+				element.attr("data-modal-id", "meeting-preview-modal");
+				element.addClass("mb-open-modal");
+			} else {
+				element.find('a').attr("data-modal-id", "meeting-preview-modal");
+				element.find('a').addClass("mb-open-modal");
+
+				element.click(function(e) {
+					e.preventDefault();
+					$.mbOpenModalViaUrl('meeting-preview-modal', event.url);
+					return false;
+				})
+			}
 		}
 	},
 	events: <?php echo json_encode($meeting_calendar) ?>,
