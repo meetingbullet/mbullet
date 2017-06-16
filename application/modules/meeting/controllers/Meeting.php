@@ -589,6 +589,65 @@ class Meeting extends Authenticated_Controller
 		Template::render();
 	}
 
+	/*
+		A quick look at Goal & Comments
+	*/
+	public function preview($meeting_key = null)
+	{
+		if (empty($meeting_key)) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$keys = explode('-', $meeting_key);
+		if (empty($keys) || count($keys) < 3) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$project_key = $keys[0];
+
+		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
+
+		if (empty($meeting_id)) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
+			$this->auth->restrict();
+		}
+
+		$meeting = $this->meeting_model->select('owner_id, name, goal, created_on')->find_by('meeting_key', $meeting_key);
+
+		if (! $meeting) {
+			Template::set_message(lang('st_invalid_meeting_key'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$comments = $this->meeting_comment_model
+		->select('meeting_comment_id, comment, meeting_comments.created_on, avatar, email, 
+		IF(mb_meeting_comments.user_id = m.owner_id, 1, 0) AS is_owner,
+		CONCAT(first_name, " ", last_name) AS full_name,')
+		->join('users u', 'u.user_id = meeting_comments.user_id')
+		->join('meetings m', 'm.meeting_id = meeting_comments.meeting_id')
+		->where('meeting_comments.meeting_id', $meeting_id)
+		->find_all();
+		$comments = $comments ? $comments : [];
+
+		foreach ($comments as &$comment) {
+			$comment->created_on = display_time($comment->created_on, null, 'Y-m-d H:i:s');
+		}
+
+		Assets::add_js($this->load->view('preview_js', [
+			'meeting_id' => $meeting_id
+		], true), 'inline');
+		Template::set('close_modal', 0);
+		Template::set('meeting', $meeting);
+		Template::set('meeting_id', $meeting_id);
+		Template::set('meeting_key', $meeting_key);
+		Template::set('comments', $comments);
+		Template::render();
+	}
+
 	// Receive & process imcomming comment
 	public function comment()
 	{
@@ -628,7 +687,7 @@ class Meeting extends Authenticated_Controller
 		]);
 	}
 
-	public function get_decider_data($meeting_id)
+	public function get_comment_data($meeting_id)
 	{
 		// User in this meeting?
 		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {

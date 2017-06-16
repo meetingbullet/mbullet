@@ -144,7 +144,7 @@ $confirmation_status = [
 							</div>
 							<div class="an-component-body">
 								<div class="an-user-lists chat-container chat-page">
-									<div id="comment-body" class="an-lists-body" >
+									<div id="comment-body" class="an-lists-body">
 										<?php foreach ($comments as $comment): ?>
 										<div data-id="<?php echo $comment->meeting_comment_id ?>" class="list-user-single">
 											<div class="list-name">
@@ -185,7 +185,6 @@ $confirmation_status = [
 							</div> <!-- end .AN-COMPONENT-BODY -->
 						</div>
 					</div> <!-- end #comment -->
-					<div style="clear:both"></div>
 				</div>
 			</div>
 		</div>

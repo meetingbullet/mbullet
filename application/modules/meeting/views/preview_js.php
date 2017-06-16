@@ -4,15 +4,12 @@ var updateCommentHumanizedTimeInterval = setInterval(updateCommentHumanizedTime,
 // Update decider every 5 sec
 var updateCommentInterval = setInterval(update_comment_data, 5000);
 
-// Enable jQuery tooltip
-$('[data-toggle="tooltip"]').tooltip(); 
-
 // Prevent duplicate binding function
-$(document).off('.decider');
+$(document).off('.preview');
 
-$(document).on('shown.bs.modal.decider', '#meeting-decider-modal', function(){
+$(document).on('shown.bs.modal.preview', '#meeting-preview-modal', function(){
 	// Read more Goal
-	$('#meeting-decider-modal .goal').readmore({
+	$('#meeting-preview-modal .goal').readmore({
 		speed: 300,
 		moreLink: '<a class=\'readmore rm-more\' href="#"><?php e(lang('show_more'))?></a>',
 		lessLink: '<a class=\'readmore rm-less\' href="#"><?php e(lang('show_less'))?></a>',
@@ -22,12 +19,12 @@ $(document).on('shown.bs.modal.decider', '#meeting-decider-modal', function(){
 	updateCommentHumanizedTime();
 })
 
-$(document).on('hide.bs.modal.decider', '#meeting-decider-modal', function(){
+$(document).on('hide.bs.modal.preview', '#meeting-preview-modal', function(){
 	clearInterval(updateCommentInterval);
 	clearInterval(updateCommentHumanizedTimeInterval);
 })
 
-$(document).on('mouseleave.decider', '#comment .list-user-single.unread', function() {
+$(document).on('mouseleave.preview', '#comment .list-user-single.unread', function() {
 	$(this).removeClass('unread');
 
 	if ($('#comment .list-user-single.unread').length == 0) {
@@ -36,7 +33,7 @@ $(document).on('mouseleave.decider', '#comment .list-user-single.unread', functi
 })
 
 // Click on comment badge will hide it and scroll to first unread message?
-$(document).on('click.decider', '.badge-comment', function() {
+$(document).on('click.preview', '.badge-comment', function() {
 	// Tho we need to scroll to the first unread message, yet I didn't figure out how to do it
 	$('#comment-body').animate({
 		scrollTop: $('#comment-body')[0].scrollHeight
@@ -45,7 +42,7 @@ $(document).on('click.decider', '.badge-comment', function() {
 	$(this).fadeOut();
 });
 
-$(document).on('keypress.decider', '#send-comment', function(e) {
+$(document).on('keypress.preview', '#send-comment', function(e) {
 	var keyCode = e.keyCode || e.which;
 
 	// On Enter
@@ -56,104 +53,17 @@ $(document).on('keypress.decider', '#send-comment', function(e) {
 	}
 });
 
-$(document).on('click.decider', '.btn-send-comment', function(e) {
+$(document).on('click.preview', '.btn-send-comment', function(e) {
 	e.preventDefault();
 	sendComment();
 	return false;
 })
 
-// Scroll #Comment follow Goal column
-$('.form-meeting-decider').on('scroll.decider', function() {
-	var form_padding = parseInt($('.form-meeting-decider').css('padding'), 10);
-	var header_height = $('.form-meeting-decider .an-body-topbar').outerHeight();
-	var offset = form_padding + header_height;
-
-	if ($(this).scrollTop() > offset) {
-		$('#comment').css('position', 'absolute');
-		$('#comment').css('top', $(this).scrollTop() - offset);
-		$('#comment').css('padding-right', 15);
-	} else {
-		$('#comment').css('position', 'relative');
-		$('#comment').css('top', 0);
-		$('#comment').css('padding-right', 0);
-	}
-});
-
-$('.form-meeting-decider').on('submit.decider', function(e) {
-	// Validation
-	var is_valid = true;
-	$('.form-meeting-decider .confirmation-status').each((i, item) => {
-		if ($(item).val() === null) {
-			$(item).addClass('danger');
-			is_valid = false;
-		} else {
-			$(item).removeClass('danger');
-		}
-	});
-
-	if ( ! is_valid) {
-		$.notify({
-			message: '<?php e(lang('st_please_select_all_confirmation_status'))?>'
-		}, {
-			type: 'danger',
-			z_index: 1051
-		});
-		return false;
-	}
-
-	$.post($(this).attr('action'), $(this).serialize(), (result) => {
-		var data = JSON.parse(result);
-
-		if (data.message_type) {
-			$.mbNotify(data.message, data.message_type);
-		}
-
-		if (data.message_type == 'success') {
-			$('#meeting-decider-modal').modal('hide');
-
-			/* 
-				If one of the agendas is marked as Open Parking Lot the meeting owner is redirected to 
-				the Meeting creation screen and prompted to create a new meeting to resolve the Closed Parking Lot agenda.
-			*/
-			if ($('.confirmation-status option[value="open_parking_lot"]:selected').length > 0) {
-				$.post('<?php e(site_url('meeting/create/' . $project_key)) ?>', {from_meeting: '<?php e($meeting_id) ?>'}, (data) => {
-					data = JSON.parse(data);
-					$('#create-meeting .modal-content').html(data.modal_content);
-					$('#create-meeting').modal({backdrop: "static"});
-
-					// Open Evaluator for Owner
-					$('#create-meeting').on('hidden.bs.modal', function () {
-						// @Bao: Open Evaluator for Owner
-						$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-							data = JSON.parse(data);
-							$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
-							$('.modal-monitor-evaluator').modal({
-								backdrop: 'static'
-							});
-						});
-					});
-				});
-			} else {
-				// @Bao: Open Evaluator for Owner
-				$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-					data = JSON.parse(data);
-					$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
-					$('.modal-monitor-evaluator').modal({
-						backdrop: 'static'
-					});
-				});
-			}
-		}
-	})
-
-	return false;
-});
-
 function updateCommentHeight() {
-	$('#meeting-decider-modal #comment .an-lists-body').height(
+	$('#meeting-preview-modal #comment .an-lists-body').height(
 		$('#meeting-info').outerHeight() 
-		- $('#meeting-decider-modal #comment .an-component-header').outerHeight() 
-		- $('#meeting-decider-modal #comment .an-chat-form').outerHeight() 
+		- $('#meeting-preview-modal #comment .an-component-header').outerHeight() 
+		- $('#meeting-preview-modal #comment .an-chat-form').outerHeight() 
 		- 30 // Margin of the left collumn
 	);
 
@@ -185,7 +95,8 @@ function insertComment(comment) {
 	var scrollToBot = false;
 
 	// Scroll is at bottom
-	if ( $('#comment-body').scrollTop() + $('#comment-body').innerHeight()  == $('#comment-body')[0].scrollHeight) {
+	if (	$('#comment-body')[0] && 
+			$('#comment-body').scrollTop() + $('#comment-body').innerHeight() == $('#comment-body')[0].scrollHeight) {
 		scrollToBot = true;
 	} 
 

@@ -640,3 +640,11 @@ body.modal-open .main-wrapper:not(.modal) {
 .chat-container.chat-page .an-lists-body {
 	max-height: none;
 }
+
+.chat-container .an-time i {
+	margin-right: 0;
+}
+
+.chat-container .list-user-single .comment {
+	color: #444;
+}
