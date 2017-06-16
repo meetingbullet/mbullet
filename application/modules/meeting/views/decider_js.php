@@ -62,8 +62,8 @@ $(document).on('click.decider', '.btn-send-comment', function(e) {
 	return false;
 })
 
-// Scroll #Comment follow Goal collumn
-$(document).on('scroll.decider', '.form-meeting-decider', function() {
+// Scroll #Comment follow Goal column
+$('.form-meeting-decider').on('scroll.decider', function() {
 	var form_padding = parseInt($('.form-meeting-decider').css('padding'), 10);
 	var header_height = $('.form-meeting-decider .an-body-topbar').outerHeight();
 	var offset = form_padding + header_height;
@@ -71,9 +71,11 @@ $(document).on('scroll.decider', '.form-meeting-decider', function() {
 	if ($(this).scrollTop() > offset) {
 		$('#comment').css('position', 'absolute');
 		$('#comment').css('top', $(this).scrollTop() - offset);
+		$('#comment').css('padding-right', 15);
 	} else {
 		$('#comment').css('position', 'relative');
 		$('#comment').css('top', 0);
+		$('#comment').css('padding-right', 0);
 	}
 });
 

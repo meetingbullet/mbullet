@@ -184,8 +184,8 @@ $confirmation_status = [
 								</div>
 							</div> <!-- end .AN-COMPONENT-BODY -->
 						</div>
-
-					</div> <!-- end .comment-wrapper -->
+					</div> <!-- end #comment -->
+					<div style="clear:both"></div>
 				</div>
 			</div>
 		</div>
