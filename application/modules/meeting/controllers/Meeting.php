@@ -514,7 +514,10 @@ class Meeting extends Authenticated_Controller
 		}
 
 		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
-			$this->auth->restrict();
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_invalid_action'));
+			Template::render();
+			return;
 		}
 
 		/*
@@ -613,7 +616,10 @@ class Meeting extends Authenticated_Controller
 		}
 
 		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
-			$this->auth->restrict();
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_invalid_action'));
+			Template::render();
+			return;
 		}
 
 		$meeting = $this->meeting_model->select('owner_id, name, goal, created_on')->find_by('meeting_key', $meeting_key);
@@ -661,7 +667,7 @@ class Meeting extends Authenticated_Controller
 		}
 
 		// User in this meeting?
-		if (! $this->mb_project->has_permission('meeting', $this->input->post('meeting_id'), 'Project.View.All')) {
+		if (! $this->mb_project->has_permission('meeting', $this->input->post('meeting_id'), 'Project.View.Al1l')) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('st_invalid_action')
@@ -693,7 +699,8 @@ class Meeting extends Authenticated_Controller
 		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('st_invalid_action')
+				'message' => lang('st_invalid_action'),
+				'data' => $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')
 			]);
 			return;
 		}
