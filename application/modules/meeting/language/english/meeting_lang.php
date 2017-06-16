@@ -199,3 +199,6 @@ $lang['mt_owner'] ='Owner';
 $lang['mt_a_few_second_ago'] = 'Just a few seconds ago';
 $lang['mt_something_went_wrong_please_refresh_and_try_again'] = '😪 Something went wrong please refresh page and try again';
 $lang['mt_new_message'] = 'new message(s)';
+$lang['mt_goal_and_response'] = 'Goal & Responses';
+$lang['mt_go_to_detail'] = 'Go to detail';
+$lang['mt_close'] = 'Close';

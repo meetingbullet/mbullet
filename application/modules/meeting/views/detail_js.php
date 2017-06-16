@@ -46,12 +46,7 @@ if ($('#meeting-status').data('is-owner') == '1' && ($('#meeting-status').data('
 				data = JSON.parse(data);
 
 				if (data.modal_content == '') {
-					$.notify({
-						message: data.message
-					}, {
-						type: data.message_type,
-						z_index: 1051
-					});
+					$.mbNotify(data.message, data.message_type);
 					return;
 				}
 
@@ -84,12 +79,7 @@ $(document).on("submit", '.form-ajax', (e) => {
 			data = JSON.parse(data);
 
 			if (data.message_type) {
-				$.notify({
-					message: data.message
-				}, {
-					type: data.message_type,
-					z_index: 1051
-				});
+				$.mbNotify(data.message, data.message_type);
 
 				if (data.message_type == 'success') {
 

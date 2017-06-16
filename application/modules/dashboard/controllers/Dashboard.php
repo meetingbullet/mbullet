@@ -76,26 +76,44 @@ class Dashboard extends Authenticated_Controller
 		*/
 		$meeting_calendar = [];
 
-		$meeting_calendar_scheduled = $this->meeting_model->select('CONCAT(meeting_key, " ", name) AS title, scheduled_start_time AS start, CONCAT("'. site_url('meeting/') .'", meeting_key) AS url')
-						->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
-						->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
-						->where('status', 'ready')
-						->where('scheduled_start_time IS NOT NULL', null, false)
-						->group_by('meeting_key')
-						->find_all();
+		$meeting_calendar_scheduled = $this->meeting_model
+		->select('CONCAT(meeting_key, " ", name) AS title, scheduled_start_time AS start, 
+		CONCAT("'. site_url('meeting/') .'", meeting_key) AS url')
+		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
+		->where('status', 'ready')
+		->where('scheduled_start_time IS NOT NULL', null, false)
+		->group_by('meeting_key')
+		->find_all();
 
 		$meeting_calendar_scheduled =	$meeting_calendar_scheduled ? $meeting_calendar_scheduled : [];
 
-		$meeting_calendar_started = $this->meeting_model->select('CONCAT(meeting_key, " ", name) AS title, actual_start_time AS start, CONCAT("'. site_url('meeting/') .'", meeting_key) AS url, "#eb547c" AS backgroundColor')
-						->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
-						->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
-						->where('status', 'inprogress')
-						->group_by('meeting_key')
-						->find_all();
+		$meeting_calendar_started = $this->meeting_model
+		->select('CONCAT(meeting_key, " ", name) AS title, actual_start_time AS start, 
+		CONCAT("'. site_url('meeting/') .'", meeting_key) AS url, "#eb547c" AS backgroundColor')
+		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
+		->where('status', 'inprogress')
+		->group_by('meeting_key')
+		->find_all();
 
 		$meeting_calendar_started =	$meeting_calendar_started ? $meeting_calendar_started : [];
 
-		$meeting_calendar = array_merge($meeting_calendar_scheduled, $meeting_calendar_started);
+		$meeting_calendar_ended = $this->meeting_model
+		->select('CONCAT(meeting_key, " ", name) AS title, 
+		actual_start_time AS start, actual_end_time AS end,
+		CONCAT("'. site_url('meeting/preview/') .'", meeting_key) AS url, 
+		"#999" AS backgroundColor')
+		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
+		->where('status', 'finished')
+		->or_where('status', 'resolved')
+		->group_by('meeting_key')
+		->find_all();
+
+		$meeting_calendar_ended =	$meeting_calendar_ended ? $meeting_calendar_ended : [];
+
+		$meeting_calendar = array_merge($meeting_calendar_scheduled, $meeting_calendar_started, $meeting_calendar_ended);
 
 		if (IS_AJAX) {
 			echo json_encode([$user, $projects, $my_todo]); exit;

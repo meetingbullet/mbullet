@@ -50,12 +50,7 @@ $(document).on("submit", '.form-ajax', (e) => {
 			}
 
 			if (data.message_type) {
-				$.notify({
-					message: data.message
-				}, {
-					type: data.message_type,
-					z_index: 1051
-				});
+				$.mbNotify(data.message, data.message_type);
 
 				if (data.message_type == 'success') {
 					// Meeting created

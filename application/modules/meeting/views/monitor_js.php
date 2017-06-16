@@ -122,12 +122,7 @@ $(document).on('click.monitor', '.btn-update-meeting-schedule', (e) => {
 	$.post($('.form-meeting-schedule').attr('action'), $('.form-meeting-schedule').serialize() + time_assigned_data, (result) => {
 		data = JSON.parse(result);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			$('#meeting-monitor-modal').modal('hide');
@@ -167,12 +162,7 @@ $(document).on('click.monitor', '.btn-start-meeting', (e) => {
 	$.post($('.form-meeting-schedule').attr('action'),  $('.form-meeting-schedule').serialize() + '&start=1' + time_assigned_data, (result) => {
 		data = JSON.parse(result);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			$('.btn-finish').toggleClass('hidden');
@@ -209,12 +199,7 @@ $(document).on('click.monitor', '.btn-finish', (e) => {
 	$.post($('.form-meeting-schedule').attr('action'),  $('.form-meeting-schedule').serialize() + '&finish=1', (result) => {
 		data = JSON.parse(result);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			$('#meeting-monitor-modal').modal('hide');
@@ -256,12 +241,7 @@ $(document).on('click.monitor', '.btn-start-agenda', (e) => {
 	}, (result) => {
 		data = JSON.parse(result);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
@@ -299,12 +279,7 @@ $(document).on('click.monitor', '.btn-skip', (e) => {
 	}, (result) => {
 		data = JSON.parse(result);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
@@ -329,12 +304,7 @@ $(document).on('click.monitor', '.btn-jump', (e) => {
 	}, (result) => {
 		data = JSON.parse(result);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			$(e.target).addClass('hidden');
@@ -368,12 +338,7 @@ $(document).on('click.monitor', '.btn-resolve', (e) => {
 	}, (result) => {
 		data = JSON.parse(result);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			$('#resolve-agenda').modal('hide');
@@ -403,12 +368,7 @@ $(document).on('click.monitor', '.btn-parking-lot', (e) => {
 	}, (result) => {
 		data = JSON.parse(result);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			$('#resolve-agenda').modal('hide');
@@ -447,13 +407,7 @@ function homework_editable() {
 			data = JSON.parse(data);
 
 			if (data.message_type == 'danger') {
-				$.notify({
-					message: data.message
-				}, {
-					type: data.message_type,
-					z_index: 1051
-				});
-
+				$.mbNotify(data.message, data.message_type);
 				return;
 			}
 
@@ -477,12 +431,7 @@ $(document).on('click.monitor', 'tr.homework.can-edit .btn-update-homework-statu
 	}, (data) => {
 		data = JSON.parse(data);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 
 		if (data.message_type == 'success') {
 			var btn_status = $(e.target).parents('.btn-group').children('.btn-status');
@@ -502,12 +451,7 @@ $(document).on('click.monitor', 'tr.homework.can-edit .btn-update-homework-statu
 	}).fail((data) => {
 		data = JSON.parse(data.responseText);
 
-		$.notify({
-			message: data.message
-		}, {
-			type: data.message_type,
-			z_index: 1051
-		});
+		$.mbNotify(data.message, data.message_type);
 		console.log(data);
 	});
 });
@@ -622,13 +566,7 @@ function update_monitor()
 		data = JSON.parse(result);
 
 		if (data.message_type == 'danger') {
-			$.notify({
-				message: data.message
-			}, {
-				type: data.message_type,
-				z_index: 1051
-			});
-
+			$.mbNotify(data.message, data.message_type);
 			return;
 		}
 
