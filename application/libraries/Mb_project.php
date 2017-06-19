@@ -651,6 +651,13 @@ class Mb_project
 		if (! in_array($object_type, $object_types)) {
 			return false;
 		}
+
+		return $this->{'invite_emails_to_' . $object_type}($object_id, $current_user, $emails);
+	}
+
+	private function invite_emails_to_meeting($object_id, $current_user, $emails)
+	{
+		$object_type = 'meeting';
 		$this->ci->load->model('users/user_model');
 		$users = $this->ci->user_model->select('email, CONCAT(first_name, " ", last_name) as full_name, user_id, invite_code, meeting_id')
 									->join($object_type . '_member_invites', $object_type . '_member_invites.invite_email = users.email AND ' . $object_type . '_member_invites.' . $object_type . '_id = "' . $object_id . '"', 'LEFT')
@@ -777,6 +784,71 @@ class Mb_project
 				if (! empty($sent)) {
 					$count++;
 				}
+			}
+		}
+
+		return (boolean) $count;
+	}
+
+	private function invite_emails_to_project($project_id, $current_user, $emails)
+	{
+		$email_template = $this->ci->db->where('email_template_key', 'INVITE_USER_TO_PROJECT')
+								->where('language_code', 'en_US')
+								->get('email_templates')->row();
+		if (empty($email_template)) {
+			return false;
+		}
+
+		$this->ci->load->model('project/project_model');
+		$this->ci->load->model('project/project_member_model');
+		$this->ci->load->model('project/project_member_invite_model');
+		$this->ci->load->model('user/user_model');
+		$this->ci->load->helper('mb_general_helper');
+		$project = $this->ci->project_model->join('users u', 'projects.owner_id = u.user_id')->find($project_id);
+		$project_members = $this->ci->project_member_model->join('users u', 'projects.owner_id = u.user_id')->where('project_id', $project_id)->find_all();
+		$invitations = $this->ci->project_member_invite_model->where_in('email', $emails)->find_all_by('project_id', $project_id);
+
+		if (empty($project_members)) {
+			$project_members = [];
+		}
+
+		$members = '<ul>';
+		foreach ($project_members as $member) {
+			$members .= '<li>' . display_user($member->email, $member->first_name, $member->last_name, $member->avatar) . '</li>';
+		}
+		$members .= '</ul>';
+
+		$this->ci->load->library('emailer/emailer');
+		$this->ci->load->library('parser');
+
+		$count = 0;
+		foreach ($invitations as $invitation) {
+			
+			$data = [
+				'SITE_URL' => site_url(),
+				'ACCEPT_INVITATION_URL' => site_url('invite/confirm?response=accept'),
+				'DECLINE_INVITATION_URL' => site_url('invite/confirm?response=decline'),
+				'ORGANIZATION_URL' => site_url(),
+				'INVITER_NAME' => $current_user->first_name . ' ' . $current_user->last_name,
+				'INVITER_AVATAR_URL' => display_user($current_user->email, $current_user->first_name, $current_user->last_name, $current_user->avatar),
+				'INVITER_PROFILE_URL' => '#',
+				'INVITEE_EMAIL' => $invitation->invite_email,
+				'PROJECT_NAME' => $project->name,
+				'PROJECT_CODE' => $project->cost_code,
+				'PROJECT_MEMBERS' => $members,
+				'OWNER_NAME' => $project->first_name . ' ' . $project->last_name,
+				'OWNER_AVATAR_URL' => display_user($project->email, $project->first_name, $project->last_name, $project->avatar)
+			];
+
+			$email_data = [
+				'to' => $invitation->invite_email,
+				'subject' => $email_template->email_title,
+				'message' => $this->ci->parser->parse_string(html_entity_decode($email_template->email_template_content), $data, true),
+			];
+
+			$sent = $this->ci->emailer->send($email_data, true);
+			if (! empty($sent)) {
+				$count++;
 			}
 		}
 
