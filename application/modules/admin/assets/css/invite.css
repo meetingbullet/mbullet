@@ -87,3 +87,7 @@
 	box-shadow: none;
 	font-size: 25px;
 }
+
+.an-tab-control .nav-tabs > li .dropdown-menu ul > li > a:hover{
+	background: #eeeeee !important;
+}

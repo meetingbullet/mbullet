@@ -156,6 +156,7 @@ class Dashboard extends Authenticated_Controller
 										->where('projects.status !=', 'archive')
 										->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
 										->where('organization_id', $this->current_user->current_organization_id)
+										->order_by('projects.modified_on', 'desc')
 										->group_by('projects.project_id')
 										->find_all();
 		if (empty($projects)) {

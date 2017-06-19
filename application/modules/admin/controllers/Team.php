@@ -17,6 +17,7 @@ class Team extends Authenticated_Controller
 		$this->load->model('invite/user_to_organizations_model');
 
 		Assets::add_module_js('admin', 'invite.js');
+		Assets::add_module_css('admin', 'invite.css');
 	}
 
 	public function index()
