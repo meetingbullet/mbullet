@@ -114,7 +114,8 @@ class Authenticated_Controller extends Base_Controller
 							->where('uo.enabled', 1)
 							->get()->row();
 		if ($orgs->total == 0) {
-			if ($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create') {
+			if (($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create')
+			&& ($this->router->fetch_module() != 'meeting' && $this->router->fetch_class() != 'Meeting' && $this->router->fetch_method() !== 'invite')) {
 				redirect('/organization/create');
 			}
 		}
