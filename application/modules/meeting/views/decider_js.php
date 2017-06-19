@@ -79,7 +79,8 @@ $('.form-meeting-decider').on('scroll.decider', function() {
 	}
 });
 
-$('.form-meeting-decider').on('submit.decider', function(e) {
+$(document).on('submit.decider', '.form-meeting-decider', function(e) {
+	console.log('submitted');
 	// Validation
 	var is_valid = true;
 	$('.form-meeting-decider .confirmation-status').each((i, item) => {

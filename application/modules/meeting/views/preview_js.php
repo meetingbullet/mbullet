@@ -22,6 +22,34 @@ $(document).on('shown.bs.modal.preview', '#meeting-preview-modal', function(){
 $(document).on('hide.bs.modal.preview', '#meeting-preview-modal', function(){
 	clearInterval(updateCommentInterval);
 	clearInterval(updateCommentHumanizedTimeInterval);
+
+	<?php if ( isset($_GET['response']) ): ?>
+	// Wait for owner finish decider
+	swal({
+		title: '<?php echo lang('st_waiting') ?>',
+		text: '<?php echo lang('st_waiting_evaluator') ?>',
+		allowEscapeKey: false,
+		imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
+		showConfirmButton: false
+	});
+
+	var check_state_interval = setInterval(function(){
+		$.get('<?php echo site_url('meeting/check_state/' . $meeting_key) ?>').done(function(data) {
+			if (data == 1) {
+				clearInterval(check_state_interval);
+				swal.close();
+
+				$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
+					data = JSON.parse(data);
+					$('#meeting-monitor-modal-evaluator .modal-content').html(data.modal_content);
+					$('#meeting-monitor-modal-evaluator').modal({
+						backdrop: 'static'
+					});
+				});
+			}
+		});
+	}, 3000);
+	<?php endif; ?>
 })
 
 $(document).on('mouseleave.preview', '#comment .list-user-single.unread', function() {

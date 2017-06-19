@@ -5,8 +5,12 @@ $is_owner = $meeting->owner_id == $current_user->user_id;
 	<?php if (IS_AJAX): ?>
 	<div class="modal-header">
 		<h4 class="modal-title" style="display: inline">
+			<?php if ( ! isset( $_GET['response'])): ?>
 			<span class="label label-bordered label-default"><?php e($meeting_key) ?></span>
 			<?php e($meeting->name)?>
+			<?php else: ?>
+			<?php echo lang('mt_response_to_the_goal') ?>
+			<?php endif; ?>
 		</h4>
 
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
@@ -15,7 +19,14 @@ $is_owner = $meeting->owner_id == $current_user->user_id;
 		<div class="modal-body">
 			<div class="an-single-component with-shadow">
 				<div class="an-component-header">
+					<?php if ( ! isset( $_GET['response'])): ?>
 					<h6><?php e(lang('st_goal'))?></h6>
+					<?php else: ?>
+					<h6>
+						<span class="label label-bordered label-default"><?php e($meeting_key) ?></span>
+						<?php e($meeting->name)?>
+					</h6>
+					<?php endif; ?>
 				</div>
 				<div class="an-component-body an-helper-block">
 					<div class="meeting-goal-container readmore-container">
@@ -80,10 +91,19 @@ $is_owner = $meeting->owner_id == $current_user->user_id;
 			</div> <!-- end #comment -->
 		</div>
 		<div class="modal-footer">
+			<?php if ( ! isset( $_GET['response'])): ?>
 			<a href="<?php echo site_url('meeting/' . $meeting_key) ?>" class="an-btn an-btn-primary">
 				<?php echo lang('mt_go_to_detail') ?>
 			</a>
-			<button class="an-btn an-btn-primary-transparent" data-dismiss="modal"><?php e(lang('mt_close')) ?></button>
+			<?php endif; ?>
+			<button class="an-btn an-btn-primary-transparent" data-dismiss="modal">
+				<?php if ( ! isset( $_GET['response'])) {
+					e(lang('mt_close'));
+				} else {
+					e(lang('mt_continue'));
+				}
+				?>
+			</button>
 		</div>
 </div>
 

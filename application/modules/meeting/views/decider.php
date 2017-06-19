@@ -50,7 +50,6 @@ $confirmation_status = [
 	</div> <!-- end MODAL-HEADER -->
 	<?php endif; ?>
 
-	<?php echo form_open(site_url('meeting/update_decider/' . $meeting->meeting_key), ['class' => 'form-inline form-meeting-decider an-helper-block']) ?>
 		<div class="an-body-topbar">
 			<div class="an-page-title">
 				<h2><?php e($meeting->name)?></h2>
@@ -187,8 +186,8 @@ $confirmation_status = [
 					</div> <!-- end #comment -->
 				</div>
 			</div>
-		</div>
-
+		</div> <!-- / .meeting-decider-container -->
+	<?php echo form_open(site_url('meeting/update_decider/' . $meeting->meeting_key), ['class' => 'form-inline form-meeting-decider an-helper-block']) ?>
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_agendas'))?></h6>

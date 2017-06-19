@@ -1576,14 +1576,14 @@ class Meeting extends Authenticated_Controller
 		}
 
 		if (empty($meeting_key)) {
-			echo 0;
+			echo -1;
 			exit;
 		}
 
 		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
 		if (empty($meeting_id)) {
-			echo 0;
+			echo -2;
 			exit;
 		}
 
