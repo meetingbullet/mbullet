@@ -1932,6 +1932,35 @@ class Meeting extends Authenticated_Controller
 
 				Template::set_message(lang('st_welcome_to_meeting'), 'success');
 
+				$this->load->model('organization/organization_model');
+				$organization = $this->meeting_model->select('s.*')
+									->join('actions a', 'a.action_id = meetings.action_id')
+									->join('projects p', 'p.project_id = a.project_id')
+									->join('organizations s', 's.organization_id = p.organization_id')
+									->find_by('meetings.meeting_id', $meeting_id);
+				if (empty($organization)) {
+					Template::set_message(lang('st_something_went_wrong'), 'danger');
+					redirect('meeting/' . $meeting->meeting_key);
+				}
+				$in_organization = $this->user_model->join('user_to_organizations uto', 'uto.user_id = users.user_id')
+													->where('organization_id', $organization->organization_id)
+													->where('email', $this->current_user->email)
+													->count_all() > 0;
+
+				if (! $in_organization) {
+					$this->load->model('roles/role_model');
+					$default_role = $this->role_model->where('join_default', 1)->find_by('organization_id', $organization->organization_id);
+					$added = $this->db->insert('user_to_organizations', [
+						'user_id' => $this->current_user->user_id,
+						'organization_id' => $organization->organization_id,
+						'role_id' => $default_role->role_id
+					]);
+					if ($added === false) {
+						Template::set_message(lang('st_something_went_wrong'), 'danger');
+						redirect('meeting/' . $meeting->meeting_key);
+					}
+				}
+
 				$added = $this->meeting_member_model->insert([
 					'meeting_id' => $meeting_id,
 					'user_id' => $this->current_user->user_id
