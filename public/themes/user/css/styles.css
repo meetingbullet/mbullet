@@ -2789,10 +2789,6 @@ input[type="button"].btn-block {
 .an-profile-settings .btn-group .an-user-name {
 	line-height: 40px;
 }
-
-.an-header {
-	z-index: 999;
-}
 /* new notification reminder */
 
 .btn-group .js-has-new-messages i:after,
