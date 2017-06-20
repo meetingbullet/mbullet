@@ -7,6 +7,7 @@ class Tool extends Front_Controller
 		parent::__construct();
 		$this->load->helper('form');
 		$this->load->library('users/Auth');
+		Assets::add_module_css('tool', 'tool.css');
 	}
 
 	public function index()
@@ -47,9 +48,13 @@ class Tool extends Front_Controller
 			}
 
 			if ($this->input->post()) {
-				$day = trim($this->input->post('no_of_days'));
-				if ($day == '') {
-					$day = 0;
+				$next_days = trim($this->input->post('no_of_next_days'));
+				if ($next_days == '') {
+					$next_days = 0;
+				}
+				$prev_days = trim($this->input->post('no_of_prev_days'));
+				if ($prev_days == '') {
+					$prev_days = 0;
 				}
 				$calendarId = $this->input->post('calendar_id');
 
@@ -57,8 +62,8 @@ class Tool extends Front_Controller
 					// 'maxResults' => 10,
 					// 'orderBy' => 'startTime',
 					// 'singleEvents' => TRUE,
-					'timeMin' => date('c', strtotime('now -' . $day . ' days')),
-					'timeMax' => date('c')
+					'timeMin' => date('c', strtotime('now -' . $prev_days . ' days')),
+					'timeMax' => date('c', strtotime('now +' . $next_days . ' days'))
 				);
 
 				$event_list = [];
@@ -86,7 +91,7 @@ class Tool extends Front_Controller
 		} catch (Exception $e) {
 			// $total_time = 0;
 		}
-
+//dump($event_list);
 		// Template::set('total_time', isset($total_time) ? $total_time : null);
 		Template::set('user', $user);
 		Template::set('calendar_list', $calendar_list);
