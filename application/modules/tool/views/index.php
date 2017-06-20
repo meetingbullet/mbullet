@@ -48,7 +48,7 @@
 					<?php foreach ($event->attendees as $attendee) : ?>
 						<li style="<?php echo $attendee->organizer == 1 ? 'color: #025d83;' : '' ?> <?php echo ($user->email == $attendee->email || $attendee->self == 1) ? 'font-style: italic; font-weight: bold;' : ''; ?>"><?php echo "{$attendee->email} - {$meeting_time} hour(s) - " . ($attendee->organizer == 1 ? 'Owner' : 'Participant') . " - {$attendee->responseStatus}" ?></li>
 						<?php
-						if ($attendee->responseStatus != 'declined') {
+						if ($attendee->responseStatus == 'accepted' || $attendee->responseStatus == 'tentative') {
 							if (isset($total[$attendee->email])) {
 								$total[$attendee->email]['time'] += $meeting_time;
 							} else {
