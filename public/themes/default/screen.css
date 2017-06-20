@@ -208,10 +208,8 @@ label .required {
 body {
 	background: url('./images/mb-bg.png');
 	background-repeat: no-repeat;
-	background-position-x: 0%;
-	background-position-y: 0%;
 	background-attachment: fixed;
-	background-size: cover;
+	background-size: 100% 100%;
 }
 
 
