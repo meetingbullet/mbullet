@@ -113,9 +113,9 @@ class Myical extends Front_Controller
 			]);
 
 			foreach($meeting_members as $member) {
-				$vevent->setProperty( "attendee", $member->email, [
-					"cutype" => "INDIVIDUAL",
-					"role" => "REQ-PARTICIPANT",
+				$vevent->setProperty("attendee", $member->email, [
+					"CUTYPE" => "INDIVIDUAL",
+					"ROLE" => "REQ-PARTICIPANT",
 					"PARTSTAT" => $member->status,
 					"CN" => $member->member_full_name,
 				]);
