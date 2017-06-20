@@ -25,41 +25,43 @@
 	<table class="table">
 		<thead>
 			<tr>
-			<th>#</th>
-			<th>Meeting name</th>
-			<th>Attendee - Meeting time</th>
+				<th>#</th>
+				<th>Meeting name</th>
+				<th>Attendee - Meeting time - Role - Decision</th>
 			</tr>
 		</thead>
 		<tbody>
 		<?php foreach ($event_list as $key => $event) : ?>
 			<tr>
-			<th scope="row"><?php echo ($key + 1) ?></th>
-			<td><?php echo $event->summary ?></td>
-			<td>
-			<?php if (! empty($event->attendees)) : ?>
-				<?php
-				$start = strtotime(empty($event->start->dateTime) ? $event->start->date : $event->start->dateTime);
-				$end = strtotime(empty($event->end->dateTime) ? $event->end->date : $event->end->dateTime);
-
-				$meeting_time = $end - $start;
-				$meeting_time /= 3600;
-				?>
-				<ul>
-				<?php foreach ($event->attendees as $attendee) : ?>
-					<li style="<?php echo ($user->email == $attendee->email || $attendee->self == 1) ? 'font-style: italic; font-weight: bold;' : ''; ?>"><?php echo "{$attendee->email} - {$meeting_time} hour(s)" ?></li>
+				<th scope="row"><?php echo ($key + 1) ?></th>
+				<td><?php echo $event->summary ?></td>
+				<td>
+				<?php if (! empty($event->attendees)) : ?>
 					<?php
-					if (isset($total[$attendee->email])) {
-						$total[$attendee->email]['time'] += $meeting_time;
-					} else {
-						$total[$attendee->email]['email'] = $attendee->email;
-						$total[$attendee->email]['time'] = $meeting_time;
-						$total[$attendee->email]['self'] = ($user->email == $attendee->email || $attendee->self == 1);
-					}
+					$start = strtotime(empty($event->start->dateTime) ? $event->start->date : $event->start->dateTime);
+					$end = strtotime(empty($event->end->dateTime) ? $event->end->date : $event->end->dateTime);
+
+					$meeting_time = $end - $start;
+					$meeting_time /= 3600;
 					?>
-				<?php endforeach ?>
-				</ul>
-			<?php endif ?>
-			</td>
+					<ul>
+					<?php foreach ($event->attendees as $attendee) : ?>
+						<li style="<?php echo $attendee->organizer == 1 ? 'color: #025d83;' : '' ?> <?php echo ($user->email == $attendee->email || $attendee->self == 1) ? 'font-style: italic; font-weight: bold;' : ''; ?>"><?php echo "{$attendee->email} - {$meeting_time} hour(s) - " . ($attendee->organizer == 1 ? 'Owner' : 'Participant') . " - {$attendee->responseStatus}" ?></li>
+						<?php
+						if ($attendee->responseStatus != 'declined') {
+							if (isset($total[$attendee->email])) {
+								$total[$attendee->email]['time'] += $meeting_time;
+							} else {
+								$total[$attendee->email]['email'] = $attendee->email;
+								$total[$attendee->email]['time'] = $meeting_time;
+								$total[$attendee->email]['self'] = ($user->email == $attendee->email || $attendee->self == 1);
+							}
+						}
+						?>
+					<?php endforeach ?>
+					</ul>
+				<?php endif ?>
+				</td>
 			</tr>
 		<?php endforeach ?>
 		</tbody>

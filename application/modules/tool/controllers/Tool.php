@@ -7,6 +7,7 @@ class Tool extends Front_Controller
 		parent::__construct();
 		$this->load->helper('form');
 		$this->load->library('users/Auth');
+		Assets::add_module_css('tool', 'tool.css');
 	}
 
 	public function index()
