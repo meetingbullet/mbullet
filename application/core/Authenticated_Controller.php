@@ -94,10 +94,12 @@ class Authenticated_Controller extends Base_Controller
 	private function goto_create_organization()
 	{
 		// Invitation game
-		if ($invite_code = $this->session->userdata('invite_code')) {
-			$this->session->set_userdata('invite_code', NULL);
-			redirect('/invite/confirm/' . $invite_code);
-			return;
+		if ($invite_code = $this->session->userdata('invite_code') && $invite_type = $this->session->userdata('invite_type')) {
+			if ( in_array($invite_type, ['organization', 'project', 'meeting']) ) {
+				$this->session->set_userdata('invite_code', NULL);
+				redirect('/invite/confirm/' . $invite_type . '/' . $invite_code);
+				return;
+			}
 		}
 
 		// Stay in the invite confirm page

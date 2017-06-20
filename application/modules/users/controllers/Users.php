@@ -64,13 +64,14 @@ class Users extends Front_Controller
 		Invitation game
 		Save invite code and redirect to login page
 	*/
-	public function invitation($invite_code = '')
+	public function invitation($type = '', $invite_code = '')
 	{
 		if (empty($invite_code)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$this->session->set_userdata('invite_code', $this->uri->segment(3));
+		$this->session->set_userdata('invite_code', $this->uri->segment(4));
+		$this->session->set_userdata('invite_type', $this->uri->segment(3));
 		Template::set_message(lang('us_view_your_invitation'), 'info');
 		redirect(LOGIN_URL);
 	}
