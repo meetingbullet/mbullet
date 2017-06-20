@@ -2781,7 +2781,18 @@ input[type="button"].btn-block {
     transition: all 0.3s ease;
 }
 
+.an-profile-settings .btn-group .an-arrow-nav {
+	display: inline-table;
+	padding: 7px 0;
+}
 
+.an-profile-settings .btn-group .an-user-name {
+	line-height: 40px;
+}
+
+.an-header {
+	z-index: 999;
+}
 /* new notification reminder */
 
 .btn-group .js-has-new-messages i:after,
