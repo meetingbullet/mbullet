@@ -43,11 +43,13 @@ class Project extends Authenticated_Controller
 		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
 
 		if (isset($_POST['save'])) {
-			if ($project = $this->save_project()) {
+			$res = $this->save_project();
+
+			if (is_object($res)) {
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
 				Template::set('message', lang('pj_project_successfully_created'));
-				Template::set('data', $project);
+				Template::set('data', $res);
 
 				// Just to reduce AJAX request size
 				if (IS_AJAX) {
@@ -59,6 +61,7 @@ class Project extends Authenticated_Controller
 			} else {
 				Template::set('close_modal', 0);
 				Template::set('message_type', 'danger');
+				Template::set('message', $res);
 				Template::render();
 				return;
 			}
@@ -178,12 +181,6 @@ class Project extends Authenticated_Controller
 				return false;
 			}
 
-			$data['constraints']['project_id'] = $project_id;
-			$data['expectations']['project_id'] = $project_id;
-
-			$this->project_constraint_model->insert($data['constraints']);
-			$this->project_expectation_model->insert($data['expectations']);
-
 			/*
 				For now, we're going to add invited members immediately into project members
 				because all of their account is already created and is in inviter's organization
@@ -206,34 +203,68 @@ class Project extends Authenticated_Controller
 									->find_all();
 
 			if ($invited_team) {
+				$new_invite_emails = [];
+
 				foreach ($invited_team as $email) {
 					if (! $registered_users) {
-						// $this->invitation->generate($email, $this->current_user);
-						continue;
+						$new_invite_emails = $invited_team;
+						break;
 					}
 
-					foreach ($registered_users as $user) {
-						$is_found = false;
+					$is_found = false;
 
+					foreach ($registered_users as $user) {
 						if ($user->email == $email) {
+							$is_found = true;
 							$project_members[$user->user_id] = [
 								'project_id' => $project_id,
 								'user_id' => $user->user_id
 							];
+							break;
+						}
+					}
 
+					// Invite to the party
+					if ( ! $is_found) {
+						$new_invite_emails[] = $email;
+					}
+				}
+
+				$this->project_member_model->insert_batch($project_members);
+
+				foreach ($invited_team as $email) {
+					if (! $registered_users) {
+						$message = $this->invitation->send_invitation('project', $project_id, $email, $new_invite_emails);
+						continue;
+					}
+
+					$is_found = false;
+					foreach ($registered_users as $user) {
+
+						if ($user->email == $email) {
 							$is_found = true;
 							break;
 						}
 
-						// Invite to the party
-						if ( ! $is_found) {
-							// $this->invitation->generate($email, $this->current_user);
-						}
+					}
+
+					// Invite to the party
+					if ( ! $is_found) {
+						$message = $this->invitation->send_invitation('project', $project_id, $email, $new_invite_emails);
 					}
 				}
 			}
 
-			$this->project_member_model->insert_batch($project_members);
+			if (isset($message) && $message !== 1) {
+				return $message;
+			}
+
+
+			$data['constraints']['project_id'] = $project_id;
+			$data['expectations']['project_id'] = $project_id;
+
+			$this->project_constraint_model->insert($data['constraints']);
+			$this->project_expectation_model->insert($data['expectations']);
 
 			/*
 				Temporary disable Action functionality, auto create an Action after creating Project 
@@ -338,7 +369,7 @@ class Project extends Authenticated_Controller
 			}
 		}
 
-		return true;
+		return isset($message) && $message != 1 ? $message : true;
 	}
 
 	public function detail($project_key = null)

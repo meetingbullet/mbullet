@@ -133,7 +133,11 @@ class Team extends Authenticated_Controller
 		
 
 		if (isset($_POST['add'])) {
-			$message = $this->invitation->generate($this->input->post('email'), $this->input->post('invite_role'), $this->current_user);
+			$message = $this->invitation->send_invitation(
+				'organization', 
+				$this->input->post('email'), 
+				$this->input->post('invite_role')
+			);
 
 			if ($message === 1) {
 				Template::set('close_modal', 1);
