@@ -39,35 +39,26 @@ class Project extends Authenticated_Controller
 
 	public function create()
 	{
+		Template::set('close_modal', 0);
 		// Get invite emails
 		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
 
 		if (isset($_POST['save'])) {
-			$res = $this->save_project();
+			;
 
-			if (is_object($res)) {
+			if ($project = $this->save_project()) {
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
 				Template::set('message', lang('pj_project_successfully_created'));
-				Template::set('data', $res);
-
-				// Just to reduce AJAX request size
-				if (IS_AJAX) {
-					Template::set('content', '');
-				}
-				
-				Template::render();
-				return;
+				Template::set('data', $project);
+				Template::set('content', '');
 			} else {
-				Template::set('close_modal', 0);
 				Template::set('message_type', 'danger');
-				Template::set('message', $res);
-				Template::render();
-				return;
 			}
+			Template::render();
+			return;
 		}
 
-		Template::set('close_modal', 0);
 		Template::set('message_type', null);
 		Template::set('message', '');
 		Template::render();

@@ -19,3 +19,6 @@ $lang['iv_project_not_found'] = 'Project not found';
 $lang['iv_pending'] = 'Pending';
 $lang['iv_accept'] = 'Accept';
 $lang['iv_decline'] = 'Decline';
+$lang['iv_unknown_error'] = 'Unknown error';
+$lang['iv_invitation_accepted'] = 'Invitation accepted';
+$lang['iv_invitation_declined'] = 'Invitation declined';
