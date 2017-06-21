@@ -62,18 +62,35 @@ class Users extends Front_Controller
 
 	/*
 		Invitation game
-		Save invite code and redirect to login page
+		Save invite code in session for after register or login One Direction
 	*/
-	public function invitation($type = '', $invite_code = '')
+	public function invitation($type = '', $invite_code = '', $action = '')
 	{
-		if (empty($invite_code)) {
+		if (empty($type) ||  empty($invite_code)) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$this->session->set_userdata('invite_code', $this->uri->segment(4));
-		$this->session->set_userdata('invite_type', $this->uri->segment(3));
-		Template::set_message(lang('us_view_your_invitation'), 'info');
-		redirect(LOGIN_URL);
+		$this->session->set_userdata('invite_code', $invite_code);
+		$this->session->set_userdata('invite_type', $type);
+		$this->session->set_userdata('invite_action', $action);
+
+		switch ($type) {
+			case 'organization': 
+				Template::set_message(lang('us_view_your_invitation'), 'info');
+				redirect(LOGIN_URL);
+				break;
+			case 'project': 
+				if ($this->auth->is_logged_in()) { // echo site_url('invite/confirm_project/' . $invite_code . '/' . $action); die;
+					redirect(site_url('invite/confirm_project/' . $invite_code . '/' . $action));
+				} else {
+					Template::set_message(lang('us_view_your_invitation'), 'info');
+					redirect(LOGIN_URL);
+				}
+			case 'meeting':
+				redirect(DEFAULT_LOGIN_LOCATION);
+			default:
+				redirect(DEFAULT_LOGIN_LOCATION);
+		}
 	}
 
 	// -------------------------------------------------------------------------

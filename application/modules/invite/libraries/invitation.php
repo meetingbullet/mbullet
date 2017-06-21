@@ -168,7 +168,7 @@ class Invitation
 		// Save invitation
 		$query = $this->ci->project_member_invite_model->insert([
 			'invite_email' => $email,
-			'project_id' => $this->current_user->current_organization_id,
+			'project_id' => $project_id,
 			'invite_code' => $invite_code,
 			'invited_by' => $this->current_user->user_id
 		]);
