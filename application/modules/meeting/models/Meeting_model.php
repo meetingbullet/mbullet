@@ -52,6 +52,11 @@ class Meeting_model extends BF_Model
 			'field' => 'owner_id',
 			'label' => 'lang:st_project_id',
 			'rules' => 'trim|numeric',
+		),
+		array(
+			'field' => 'team',
+			'label' => 'lang:st_team_member',
+			'rules' => 'trim|required',
 		)
 	);
 	protected $insert_validation_rules  = array();
