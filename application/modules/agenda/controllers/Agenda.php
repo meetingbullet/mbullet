@@ -70,6 +70,7 @@ class Agenda extends Authenticated_Controller
 
 					$agenda_id = $this->agenda_model->insert($data);
 					if ($agenda_id) {
+						$this->mb_project->update_parent_objects('agenda', $agenda_id);
 						$assignees = $this->input->post('assignee');
 						$assignees = explode(',', $assignees);
 						if (! empty($assignees)) {
@@ -169,6 +170,7 @@ class Agenda extends Authenticated_Controller
 			]);
 			return;
 		}
+		$this->mb_project->update_parent_objects('agenda', $this->input->post('pk'));
 
 		if ($this->input->post('name') == 'confirm_status') {
 			// Switch meeting_state after every confirm_status is filled

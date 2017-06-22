@@ -112,6 +112,7 @@ class Meeting extends Authenticated_Controller
 			$data['meeting_key'] = $this->mb_project->get_next_key($action->action_key);
 
 			if ($id = $this->meeting_model->insert($data)) {
+				$this->mb_project->update_parent_objects('meeting', $id);
 				if ($team = $this->input->post('team')) {
 					if ($team = explode(',', $team)) {
 						$member_data = [];
@@ -251,6 +252,7 @@ class Meeting extends Authenticated_Controller
 
 			if ($this->meeting_model->update($meeting->meeting_id, $data)) {
 				$this->meeting_member_model->delete_where(['meeting_id' => $meeting->meeting_id]);
+				$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
 
 				if ($team = $this->input->post('team')) {
 					if ($team = explode(',', $team)) {
@@ -680,6 +682,7 @@ class Meeting extends Authenticated_Controller
 			'user_id' => $this->current_user->user_id,
 			'meeting_id' => $this->input->post('meeting_id')
 		]) ) {
+			$this->mb_project->update_parent_objects('meeting', $this->input->post('meeting_id'));
 			echo json_encode([
 				'message_type' => 'success',
 				'data' => ['id' => $id]
@@ -799,6 +802,8 @@ class Meeting extends Authenticated_Controller
 				'notes' => $notes
 			]);
 
+			$this->mb_project->update_parent_objects('meeting', $meeting_id);
+
 			echo json_encode([
 				'message_type' => 'success',
 				'message' => lang('st_all_agenda_confirmed_meeting_closed_out')
@@ -872,7 +877,7 @@ class Meeting extends Authenticated_Controller
 													->where('meeting_members.meeting_id', $meeting_id)
 													->order_by('u.user_id')
 													->find_all();
-
+		$this->mb_project->update_parent_objects('meeting', $meeting_id);
 		echo json_encode([
 			'message_type' => 'success',
 			'agendas' => $agendas,
@@ -948,6 +953,7 @@ class Meeting extends Authenticated_Controller
 			]);
 
 			if ($query) {
+				$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
 				if ( is_array($this->input->post('time_assigned')) ) {
 					$agenda_data = [];
 					foreach ($this->input->post('time_assigned') as $agenda_id => $time_assigned) {
@@ -1006,6 +1012,7 @@ class Meeting extends Authenticated_Controller
 			]);
 			
 			if ($query) {
+				$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
 				$this->mb_project->notify_members($meeting->meeting_id, 'meeting', $this->current_user, 'update_status');
 				echo json_encode([
 					'message_type' => 'success',
@@ -1040,6 +1047,7 @@ class Meeting extends Authenticated_Controller
 		]);
 
 		if ($query) {
+			$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
 			if ( is_array($this->input->post('time_assigned')) ) {
 				$agenda_data = [];
 				foreach ($this->input->post('time_assigned') as $agenda_id => $time_assigned) {
@@ -1127,6 +1135,7 @@ class Meeting extends Authenticated_Controller
 					'modified_by' => $this->current_user->user_id
 				]);
 				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
+				$this->mb_project->update_parent_objects('agenda', $agenda->agenda_id);
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_agenda_started'),
@@ -1151,6 +1160,7 @@ class Meeting extends Authenticated_Controller
 					'modified_by' => $this->current_user->user_id
 				]);
 				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
+				$this->mb_project->update_parent_objects('agenda', $agenda->agenda_id);
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_agenda_jumped')
@@ -1173,6 +1183,7 @@ class Meeting extends Authenticated_Controller
 					'modified_by' => $this->current_user->user_id
 				]);
 				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
+				$this->mb_project->update_parent_objects('agenda', $agenda->agenda_id);
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_agenda_skipped')
@@ -1197,6 +1208,7 @@ class Meeting extends Authenticated_Controller
 					'modified_by' => $this->current_user->user_id
 				]);
 				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
+				$this->mb_project->update_parent_objects('agenda', $agenda->agenda_id);
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_agenda_resolved')
@@ -1221,6 +1233,7 @@ class Meeting extends Authenticated_Controller
 					'modified_by' => $this->current_user->user_id
 				]);
 				$this->mb_project->notify_members($agenda->agenda_id, 'agenda', $this->current_user, 'update_status');
+				$this->mb_project->update_parent_objects('agenda', $agenda->agenda_id);
 				echo json_encode([
 					'message_type' => 'success',
 					'message' => lang('st_agenda_placed')
@@ -1294,6 +1307,7 @@ class Meeting extends Authenticated_Controller
 			exit;
 		}
 		$this->mb_project->notify_members($meeting_id, 'meeting', $this->current_user, 'update_status');
+		$this->mb_project->update_parent_objects('meeting', $meeting_id);
 		echo json_encode([
 			'message_type' => 'success',
 			'message' => lang('st_update_status_success')
@@ -1679,12 +1693,16 @@ class Meeting extends Authenticated_Controller
 					'attendee_id' => $user_id,
 					'rate' => $rate
 				]);
+
+				$this->mb_project->update_parent_objects('meeting', $meeting_id);
 			}
 
 			if ($mode == 'meeting') {
 				$rated = $this->meeting_member_model->skip_validation(true)
 													->where('meeting_id', $meeting_id)
 													->update_where('user_id', $this->current_user->user_id, ['rate' => $rate]);
+
+				$this->mb_project->update_parent_objects('meeting', $meeting_id);
 			}
 
 			if ($mode == 'agenda') {
@@ -1693,6 +1711,8 @@ class Meeting extends Authenticated_Controller
 					'user_id' => $this->current_user->user_id,
 					'rate' => $rate
 				]);
+
+				$this->mb_project->update_parent_objects('agenda', $agenda_id);
 			}
 
 			if ($mode == 'homework') {
@@ -1701,6 +1721,8 @@ class Meeting extends Authenticated_Controller
 					'user_id' => $this->current_user->user_id,
 					'rate' => $rate
 				]);
+
+				$this->mb_project->update_parent_objects('homework', $homework_id);
 			}
 		} else {
 			echo json_encode([
@@ -1822,6 +1844,7 @@ class Meeting extends Authenticated_Controller
 
 		if ($owner_evaluated && $members_evaluated) {
 			$this->meeting_model->skip_validation(true)->update($meeting->meeting_id, ['manage_state' => 'done']);
+			$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
 		}
 	}
 
@@ -1969,6 +1992,7 @@ class Meeting extends Authenticated_Controller
 					Template::set_message(lang('st_something_went_wrong'), 'danger');
 					redirect('meeting/' . $meeting->meeting_key);
 				}
+				$this->mb_project->update_parent_objects('meeting', $meeting_id);
 			} else {
 				$status = 'DECLINED';
 			}
