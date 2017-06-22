@@ -69,6 +69,7 @@ class Homework extends Authenticated_Controller
 				$homework_id = $this->homework_model->insert($data);
 
 				if ($homework_id) {
+					$this->mb_project->update_parent_objects('homework', $homework_id);
 					$members = $this->input->post('member');
 					$members = explode(',', $members);
 					if (! empty($members)) {
@@ -186,6 +187,8 @@ class Homework extends Authenticated_Controller
 			]);
 			return;
 		}
+
+		$this->mb_project->update_parent_objects('homework', $this->input->post('pk'));
 
 		if ($this->input->post('name') == 'description') {
 			echo json_encode([

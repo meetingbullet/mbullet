@@ -854,6 +854,49 @@ class Mb_project
 
 		return (boolean) $count;
 	}
+
+	public function update_parent_objects($object_type, $object_id)
+	{
+		$types = ['agenda', 'homework', 'meeting', 'action', 'project'];
+
+		if (empty($object_type) || empty($object_id) || ! in_array($object_type, $types)) {
+			return false;
+		}
+
+		if ($object_type == 'homework') {
+			unset($types[0]);
+		}
+
+		if ($object_type == 'agenda') {
+			unset($types[1]);
+		}
+
+		$types = array_values($types);
+
+		$count = 0;
+		foreach ($types as $index => $type) {
+			$this->ci->load->model($type . '/' . $type . '_model');
+			$object = $this->ci->{$type . '_model'}->find($object_id);
+
+			if (empty($object)) {
+				return false;
+			}
+
+			if ($index != 0) {
+				$updated = $this->ci->{$type . '_model'}->skip_validation(true)->update($object_id, ['modified_on' => date('Y-m-d H:i:s')]);
+				if ($updated !== false) {
+					$count++;
+				}
+				// echo "update {$type} id: {$object_id} <br>";
+			}
+
+			if ($index != (count($types) - 1)) {
+				$object_id = $object->{$types[$index + 1] . '_id'};
+			}
+		}
+
+		return (boolean) $count;
+	}
 }
 /**
  * Similar to function array_unique() but apply for multidimensional array
