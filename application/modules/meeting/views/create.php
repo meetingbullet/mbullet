@@ -1,3 +1,19 @@
+<?php 
+$times = [
+	'1' => '1 minute',
+	'5' => '5 minutes',
+	'10' => '10 minutes',
+	'15' => '15 minutes',
+	'30' => '30 minutes',
+	'60' => '1 hour',
+	'120' => '2 hours',
+	'180' => '3 hours',
+	'300' => '5 hours',
+	'480' => '8 hours',
+	'other' => 'Input manually',
+]
+?>
+
 	<div class="<?php echo $this->input->is_ajax_request() ? '' : 'an-content-body'?>">
 
 		<?php if ($this->input->is_ajax_request()): ?>
@@ -39,7 +55,7 @@
 				<?php endif; ?>
 				<?php echo mb_form_input('text', 'name', lang('st_name'), true) ?>
 				<?php echo mb_form_input('text', 'owner_id', lang('st_owner'), true, '', 'owner-id an-tags-input', '', lang('st_select_team_member')) ?>
-				<?php echo mb_form_input('text', 'team', lang('st_resource'), false, '', 'team select-member an-tags-input', '', lang('st_add_team_member')) ?>
+				<?php echo mb_form_input('text', 'team', lang('st_resource'), true, '', 'team select-member an-tags-input', '', lang('st_add_team_member')) ?>
 
 				<div class="row">
 					<div class="col-md-3 col-sm-12">
@@ -56,21 +72,6 @@
 					<div class="col-md-9 col-sm-12">
 						<div class="row">
 							<div class="col-md-5">
-								<?php
-								$times = [
-									'1' => '1 minute',
-									'5' => '5 minutes',
-									'10' => '10 minutes',
-									'15' => '15 minutes',
-									'30' => '30 minutes',
-									'60' => '1 hour',
-									'120' => '2 hours',
-									'180' => '3 hours',
-									'300' => '5 hours',
-									'480' => '8 hours',
-									'other' => 'Input manually',
-								]
-								?>
 								<select id="meeting-in" class="an-form-control" name="meeting_in">
 								<?php foreach ($times as $in => $label) : ?>
 									<option value="<?php echo $in ?>"
@@ -82,7 +83,7 @@
 							<div class="col-md-5">
 								<input type="number" style="display: none;" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in')) ?>" meeting="0.1">
 							</div>
-							<div class="col-md-2" style="display: none;" id="in-unit">
+							<div class="col-md-2" style="display: none; vertical-align: middle" id="in-unit">
 								<?php e(lang('st_minutes'))?>
 							</div>
 						</div>
@@ -98,105 +99,9 @@
 		<?php echo form_close(); ?>
 	</div>
 
-	<?php if ($this->input->is_ajax_request()): ?>
-		<script>
-			Selectize.define('select-member', function(options) {
-				var self = this;
-
-				// Override updatePlaceholder method to keep the placeholder
-				this.updatePlaceholder = (function() {
-					var original = self.updatePlaceholder;
-					return function() {
-						// do your logic
-						return false;
-						// return original.apply(this, arguments);
-					};
-				})();
-			});
-
-			$('.owner-id').selectize({
-				plugins: ['select-member'],
-				persist: false,
-				maxItems: 1,
-				valueField: 'id',
-				labelField: 'name',
-				searchField: ['name'],
-				options: [
-					<?php foreach($project_members as $user): 
-						if (strstr($user->avatar, 'http') === false) {
-							$user->avatar = avatar_url($user->avatar, $user->email);
-						}
-					?>
-					{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
-					<?php endforeach; ?>
-				],
-				render: {
-					item: function(item, escape) {
-						return '<div>' +
-							'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
-							(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
-						'</div>';
-					},
-					option: function(item, escape) {
-						return '<div>' +
-							'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
-							(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
-						'</div>';
-					}
-				},
-				create: false
-			});
-
-			$('.team').selectize({
-				plugins: ['remove_button', 'select-member'],
-				persist: false,
-				maxItems: null,
-				valueField: 'id',
-				labelField: 'name',
-				searchField: ['name'],
-				options: [
-					<?php foreach($project_members as $user): 
-						if (strstr($user->avatar, 'http') === false) {
-							$user->avatar = avatar_url($user->avatar, $user->email);
-						}
-					?>
-					{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
-					<?php endforeach; ?>
-				],
-				render: {
-					item: function(item, escape) {
-						return '<div>' +
-							'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
-							(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
-						'</div>';
-					},
-					option: function(item, escape) {
-						return '<div>' +
-							'<img' + (item.avatar ? ' src="' + item.avatar + '"' : '')  + ' class="avatar" />' +
-							(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
-						'</div>';
-					}
-				},
-				create: false
-			});
-
-			$('#meeting-in').change(function() {
-				var val = $('#meeting-in option:selected').val();
-				if (val != 'other') {
-					if ($('input#in').css('display') != 'none') {
-						$('input#in, div#in-unit').fadeOut({
-							done: function() {
-								$('input#in').val(val);
-							}
-						});
-					} else {
-						$('input#in').val(val);
-					}
-				} else {
-					$('input#in, div#in-unit').fadeIn();
-				}
-			});
-
-			$('#meeting-in').change();
-		</script>
-	<?php endif; ?>
+<?php if (IS_AJAX) {
+	echo '<script type="text/javascript">' . $this->load->view('create_js', [
+		'project_members ' => $project_members 
+	], true) . '</script>';
+}
+?>

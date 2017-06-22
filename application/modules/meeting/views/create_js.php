@@ -1,19 +1,3 @@
-var project_members = [
-	<?php foreach($project_members as $user): 
-		if (strstr($user->avatar, 'http') === false) {
-			$user->avatar = avatar_url($user->avatar, $user->email);
-		}
-	?>
-	{
-		id: '<?php e($user->user_id)?>', 
-		name: '<?php e($user->first_name . ' ' . $user->last_name)?>', 
-		avatar: '<?php echo $user->avatar?>', 
-		cost_of_time: <?php e($user->cost_of_time)?>,
-		cost_of_time_name: '<?php e($user->cost_of_time_name)?>'
-	},
-	<?php endforeach; ?>
-];
-
 Selectize.define('select-member', function(options) {
 	var self = this;
 
@@ -35,7 +19,15 @@ $('.owner-id').selectize({
 	valueField: 'id',
 	labelField: 'name',
 	searchField: ['name'],
-	options: project_members,
+	options: [
+		<?php foreach($project_members as $user): 
+			if (strstr($user->avatar, 'http') === false) {
+				$user->avatar = avatar_url($user->avatar, $user->email);
+			}
+		?>
+		{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
+		<?php endforeach; ?>
+	],
 	render: {
 		item: function(item, escape) {
 			return '<div>' +
@@ -60,7 +52,15 @@ $('.team').selectize({
 	valueField: 'id',
 	labelField: 'name',
 	searchField: ['name'],
-	options: project_members,
+	options: [
+		<?php foreach($project_members as $user): 
+			if (strstr($user->avatar, 'http') === false) {
+				$user->avatar = avatar_url($user->avatar, $user->email);
+			}
+		?>
+		{id: '<?php e($user->user_id)?>', name: '<?php e($user->first_name . ' ' . $user->last_name)?>', avatar: '<?php echo $user->avatar?>'},
+		<?php endforeach; ?>
+	],
 	render: {
 		item: function(item, escape) {
 			return '<div>' +
@@ -77,3 +77,24 @@ $('.team').selectize({
 	},
 	create: false
 });
+
+// Input manually handler
+$(document).on('change.meeting.create', '#meeting-in', function() {
+	if ($(this).val() != 'other') {
+		if ($('input#in').css('display') != 'none') {
+			$('input#in, div#in-unit').fadeOut({
+				done: function() {
+					$('input#in').val(val);
+				}
+			});
+		} else {
+			$('input#in').val(val);
+		}
+	} else {
+		$('input#in, div#in-unit').fadeIn();
+	}
+});
+
+if ($('#meeting-in option:selected').val() == 'other') {
+	$('input#in, div#in-unit').show();
+}
