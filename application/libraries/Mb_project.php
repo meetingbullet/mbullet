@@ -248,6 +248,114 @@ class Mb_project
 
 		return 0;
 	}
+	/**
+	 * Calculate total time used of an object
+	 *
+	 * @param string $object_type One of following values: project, action, meeting, agenda
+	 * @param int $object_id
+	 * @param int $organization_id If this value is NULL, it will get current organization ID
+	 * @return double
+	 */
+	public function total_time_used($object_type, $object_id, $organization_id = null)
+	{
+		return $this->total_agenda_time_used($object_type, $object_id, $organization_id) + $this->total_homework_time_used($object_type, $object_id, $organization_id);
+	}
+
+	/**
+	 * Calculate total agenda time used of an object
+	 *
+	 * @param string $object_type One of following values: project, action, meeting, agenda
+	 * @param int $object_id
+	 * @param int $organization_id If this value is NULL, it will get current organization ID
+	 * @return double
+	 */
+	private function total_agenda_time_used($object_type, $object_id, $organization_id = null)
+	{
+		if (! isset($this->ci->auth->user()->current_organization_id) && is_null($organization_id)) return false;
+		elseif (is_null($organization_id)) $organization_id = $this->ci->auth->user()->current_organization_id;
+
+		$agenda_time = $this->ci->db->select('IFNULL(SUM((t.finished_on - t.started_on) / 60), 0) AS total')
+			->from('agendas t')
+			->join('agenda_members tm', 'tm.agenda_id = t.agenda_id')
+			->join('user_to_organizations uo', 'uo.user_id = tm.user_id')
+			->where('uo.organization_id', $organization_id)
+			->having('NOT(total IS NULL)');
+
+		switch ($object_type) {
+			case 'agenda':
+				$agenda_time = $agenda_time->where('t.agenda_id', $object_id)->get();
+				if ($agenda_time->num_rows() > 0) return doubleval($agenda_time->row()->total);
+				break;
+			case 'meeting':
+				$agenda_time = $agenda_time->where('t.meeting_id', $object_id)->get();
+				if ($agenda_time->num_rows() > 0) return doubleval($agenda_time->row()->total);
+				break;
+			case 'action':
+				$agenda_time = $agenda_time->join('meetings s', 's.meeting_id = t.meeting_id')->where('s.action_id', $object_id)->get();
+				if ($agenda_time->num_rows() > 0) return doubleval($agenda_time->row()->total);
+				break;
+			case 'project':
+				$agenda_time = $agenda_time->join('meetings s', 's.meeting_id = t.meeting_id')->join('actions a', 'a.action_id = s.action_id')->where('a.project_id', $object_id)->get();
+				if ($agenda_time->num_rows() > 0) return doubleval($agenda_time->row()->total);
+				break;
+			case 'user':
+				$agenda_time = $agenda_time->where('tm.user_id', $object_id)->get();
+				if ($agenda_time->num_rows() > 0) return doubleval($agenda_time->row()->total);
+				break;
+			default:
+				return 0;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Calculate total homework time used of an object
+	 *
+	 * @param string $object_type One of following values: project, action, meeting, agenda
+	 * @param int $object_id
+	 * @param int $organization_id If this value is NULL, it will get current organization ID
+	 * @return double
+	 */
+	private function total_homework_time_used($object_type, $object_id, $organization_id = null)
+	{
+		if (! isset($this->ci->auth->user()->current_organization_id) && is_null($organization_id)) return false;
+		elseif (is_null($organization_id)) $organization_id = $this->ci->auth->user()->current_organization_id;
+
+		$homework_time = $this->ci->db->select('IFNULL(SUM(hw.time_spent), 0) AS total')
+			->from('homework hw')
+			->join('homework_members hwm', 'hwm.homework_id = hw.homework_id')
+			->join('user_to_organizations uo', 'uo.user_id = hwm.user_id')
+			->where('uo.organization_id', $organization_id)
+			->having('NOT(total IS NULL)');
+
+		switch ($object_type) {
+			case 'homework':
+				$homework_time = $homework_time->where('hw.homework_id', $object_id)->get();
+				if ($homework_time->num_rows() > 0) return doubleval($homework_time->row()->total);
+				break;
+			case 'meeting':
+				$homework_time = $homework_time->where('hw.meeting_id', $object_id)->get();
+				if ($homework_time->num_rows() > 0) return doubleval($homework_time->row()->total);
+				break;
+			case 'action':
+				$homework_time = $homework_time->join('meetings s', 's.meeting_id = hw.meeting_id')->where('s.action_id', $object_id)->get();
+				if ($homework_time->num_rows() > 0) return doubleval($homework_time->row()->total);
+				break;
+			case 'project':
+				$homework_time = $homework_time->join('meetings s', 's.meeting_id = hw.meeting_id')->join('actions a', 'a.action_id = s.action_id')->where('a.project_id', $object_id)->get();
+				if ($homework_time->num_rows() > 0) return doubleval($homework_time->row()->total);
+				break;
+			case 'user':
+				$homework_time = $homework_time->where('hwm.user_id', $object_id)->get();
+				if ($homework_time->num_rows() > 0) return doubleval($homework_time->row()->total);
+				break;
+			default:
+				return 0;
+		}
+
+		return 0;
+	}
 
 	/**
 	 * Send email to project/action/meeting/agenda members

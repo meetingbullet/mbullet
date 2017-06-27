@@ -2986,7 +2986,7 @@ input[type="button"].btn-block {
     display: none;
 }
 
-.an-nav-item .an-child-nav li a {
+.an-nav-item .an-child-nav > li > a {
     display: block;
     padding: 5px;
     padding-left: 50px;
@@ -2994,7 +2994,7 @@ input[type="button"].btn-block {
     font-size: 14px;
 }
 
-.an-nav-item .an-child-nav li a:hover {
+.an-nav-item .an-child-nav > li > a:hover {
     color: #ffffff;
 }
 
@@ -3014,7 +3014,7 @@ input[type="button"].btn-block {
     z-index: 10;
 }
 
-.an-sidebar-nav.collapse .an-child-nav li a {
+.an-sidebar-nav.collapse .an-child-nav > li > a {
     padding-left: 15px;
 }
 

@@ -387,7 +387,7 @@ class Meeting extends Authenticated_Controller
 			Template::set('owner_evaluated', $owner_evaluated);
 		}
 
-		if ($this->input->is_ajax_request()) {
+		if (IS_AJAX) {
 			echo json_encode([$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks]); exit;
 		}
 
@@ -1388,7 +1388,7 @@ class Meeting extends Authenticated_Controller
 
 	public function evaluator($meeting_key)
 	{
-		if (! $this->input->is_ajax_request()) {
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -1585,7 +1585,7 @@ class Meeting extends Authenticated_Controller
 
 	public function check_state($meeting_key)
 	{
-		if (! $this->input->is_ajax_request()) {
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -1613,7 +1613,7 @@ class Meeting extends Authenticated_Controller
 
 	public function dashboard_evaluate($mode = 'user')
 	{
-		if (! $this->input->is_ajax_request()) {
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 

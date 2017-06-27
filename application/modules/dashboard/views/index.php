@@ -1,420 +1,457 @@
 <?php
-$meeting_status_labels = [
-	'open' => 'label label-default label-bordered',
-	'inprogress' => 'label label-warning label-bordered',
-	'resolved' => 'label label-success label-bordered',
-	'finished' => 'label label-success label-bordered',
-	'ready' => 'label label-info label-bordered',
-];
-
-$project_status_labels = [
-	'open' => 'label label-default label-bordered',
-	'inactive' => 'label label-warning label-bordered',
-	'archive' => 'label label-success label-bordered',
-];
-$confirmation_status = [
-	'closed', 'skipped', 'resolved', 'open_parking_lot', 'closed_parking_lot'
-];
+dump($projects);
 ?>
-<div style="display: none;" class="todo-rating">
-	<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
-	<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
-	<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
-	<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
-	<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
-</div>
-<div class="row">
-	<!-- Welcome Professor -->
-	<div id="mb-user-info" class="col-md-4 col-sm-6 col-xs-12">
-		<div class="welcome-panel">
-			<div class="user-info">
-				<div class="avatar" style="background-image: url('<?php echo avatar_url($user->avatar, $user->email, 128) ?>')"></div>
-				<div class="text-center">
-					<h3><?php echo sprintf(lang('db_welcome_x'), $user->first_name)?></h3>
+<div class="main-container">
+	<div class="an-sidebar-nav js-sidebar-toggle-with-click">
+		<h3 class="an-sidebar-logo">
+			<a class="an-logo-link" href="<?php echo site_url(DEFAULT_LOGIN_LOCATION); ?>">
+				<img src="<?php echo base_url('assets/images/logo-black.svg'); ?>" 
+						alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="120"></a>
+		</h3>
 
-					<div class="rate">
-						<span class="average-star">
-							<?php 
-								$counting_stars = $user->avarage_rate;
-								$all_star = 5;
-								while ($all_star --) {
+		<ul class="an-main-nav">
+			<li class="an-nav-item">
+				<a id="my-todo" class="js-show-child-nav" href="#">
+					<i class="ion-ios-copy-outline"></i>
+					<span class="nav-title">My To Do
+					<span class="count"><?php echo $my_todo['homeworks_count'] + count($my_todo['evaluates']) + count($my_todo['decides']) ?></span>
+					</span>
+				</a>
 
-									if ($counting_stars-- > 0) {
-										echo '<i class="ion-android-star"></i>';
-									} else {
-										echo '<i class="ion-android-star-outline"></i>';
-									}
-								}
-							?>
-						</span>
+				<ul class="an-child-nav js-open-nav" style="display: none;">
+					<li>
+						<a href="#" class="js-show-child-nav" 
+							data-toggle="popover" 
+							data-placement="right" 
+							title="<?php echo lang('db_homework') ?>" 
+							id="homework">
 
-						<?php if ($user->meeting_count !== null): ?>
-						<span class="meeting-count">
-							<?php e(
-								sprintf($user->meeting_count > 1 
-										? lang('db_x_meetings') 
-										: lang('db_x_meeting')
-								, $user->meeting_count)
-							) ?>
-						</span>
-						<?php endif; ?>
-					</div>
-					<div class="total-points"><?php e(sprintf(lang('db_total_xp'), empty($user->total_xp) ? 0 : $user->total_xp)) ?></div>
-				</div> <!-- end .user-info -->
-
-				<!--div class="action-panel an-helper-block">
-					<span class="text-muted"><?php e(lang('db_what_do_you_want_to_do'))?></span>
-					<hr>
-					<div class="btn-group">
-						<button type="button" class="an-btn an-btn-primary block-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<i class="ion-ios-plus-outline"></i>
-							<?php e(lang('db_create_work')) ?> <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li><a href="#">Action</a></li>
-							<li><a href="#">Another action</a></li>
-							<li><a href="#">Something else here</a></li>
-							<li role="separator" class="divider"></li>
-							<li><a href="#">Separated link</a></li>
-						</ul>
-					</div>
-
-					<button class="an-btn an-btn-primary block-icon"><i class="ion-ios-play-outline"></i><?php e(lang('db_do_work')) ?></button><br>
-					<button class="an-btn an-btn-default block-icon"><i class="ion-ios-speedometer-outline"></i><?php e(lang('db_review_work')) ?></button><br>
-				</div-->
-				<div class="my-todo">
-					<h1 class="db-h1">
-						<span class="an-settings-button">
-							<?php echo lang('db_my_todo') ?>&nbsp
-							<!--a href="#" class="setting"><i class="ion-plus"></i></a-->
-						</span>
-					</h1>
-					<div class="todo-list">
-					<?php if (! empty($my_todo)) : ?>
-						<?php foreach ($my_todo as $todo) : if (! ($todo->todo_type == 'evaluate' && $todo->evaluate_mode == 'user' && $todo->user_id == $current_user->user_id)) : ?>
-						<div class="item <?php echo $todo->todo_type ?>">
-							<?php if ($todo->todo_type == 'homework') :
-									$homework = $todo;
-							?>
-							<div class="todo-left homework-info" 
-								data-title="<?php echo $homework->name ?>"
-								data-description="<?php echo $homework->description ?>"
-								data-members="<?php if ($homework->members) {
-									foreach ($homework->members as $member) {
-										echo htmlentities(display_user($member->email, $member->first_name, $member->last_name, $member->avatar, true));
-									}
-								} ?>"
-								data-status="<?php echo $homework->status ?>"
-								data-lang-status="<?php echo lang("st_" . $homework->status) ?>"
+							<i class="ion-ios-book-outline"></i>
+							<?php echo lang('db_homework') ?>
+							<span class="badge badge-primary pull-right homework-counter"><?php echo $my_todo['homeworks_count'] ?></span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="js-show-child-nav" data-toggle="popover" data-placement="right" 
+							title="<?php echo lang('db_rate') ?> (<?php echo count($my_todo['evaluates']) + count($my_todo['decides']) ?>)" 
 							>
-								<span class="msg-tag label label-bordered label-inprogress">
-									<?php echo lang('db_homework') ?>
-								</span>&nbsp;
-								<?php echo ucfirst($todo->name) ?>
+							<i class="ion-ios-star-outline"></i>
+							<?php echo lang('db_rate') ?>
+							<span class="badge badge-primary pull-right"><?php echo count($my_todo['evaluates']) + count($my_todo['decides']) ?></span>
+						</a>
+					</li>
+				</ul>
+			</li>
 
-								<?php echo ucfirst($todo->description) ?>
-							</div>
-							<div class="todo-right" data-url="<?php echo site_url('homework/ajax_edit') ?>" data-homework-id="<?php echo $todo->homework_id ?>">
-								<?php if ($homework->attachments): ?>
-								<div class="attachment input inline">
-									<?php foreach ($homework->attachments as $att): ?>
-									<a href="<?php echo $att->url ?>" target="_blank">
-										<span class="icon">
-											<?php if ($att->favicon): ?>
-											<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
-											<?php else: ?>
-											<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
-											<?php endif; ?>
-										</span>
-									</a>
-									<?php endforeach; ?>
-								</div>
-								<?php endif; ?>
+			<li class="an-nav-item">
+				<a id="my-project" class="js-show-child-nav" href="#">
+					<i class="ion-ios-briefcase-outline"></i>
+					<span class="nav-title">My Projects
+					<?php if (count($projects) > 0): ?>
+					<span class="count"><?php e(count($projects)) ?></span>
+					<?php endif; ?>
+					</span>
+				</a>
 
-								<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>" data-status="done"><i class="ion-checkmark"></i></a>
-								<a href="#" class="setting action an-btn-danger submit <?php echo $todo->todo_type ?>" data-status="undone"><i class="ion-close"></i></a>
-							</div>
-							<?php elseif ($todo->todo_type == 'evaluate') : ?>
-								<?php if ($todo->evaluate_mode == 'meeting') : ?>
-								<div class="todo-label">
-									<span class="msg-tag label label-bordered label-skipped">
-										<?php echo lang('db_evaluate_' . $todo->evaluate_mode) ?>
-									</span>&nbsp;
-									<span class="msg-tag label label-bordered label-undone">
-										<?php echo $todo->meeting_key ?>
-									</span>
-								</div>
-								<div class="todo-left">
-									<?php echo ucfirst($todo->meeting_name) ?>
-								</div>
-								<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>">
-									<div class="todo-rating-wraper">
-										<div class="todo-rating">
-											<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
-											<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
-											<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
-											<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
-											<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
-										</div>
-									</div>
-									<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
-								</div>
-								<?php elseif ($todo->evaluate_mode == 'user') : ?>
-								<div class="todo-label">
-									<span class="msg-tag label label-bordered label-skipped">
-										<?php echo lang('db_evaluate_' . $todo->evaluate_mode) ?>
-									</span>&nbsp;
-									<span class="msg-tag label label-bordered label-undone">
-										<?php echo $todo->meeting_key ?>
-									</span>
-								</div>
-								<div class="todo-left">
-									<?php echo display_user($todo->email, $todo->first_name, $todo->last_name, $todo->avatar) ?>
-								</div>
-								<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" data-user-id="<?php echo $todo->user_id ?>">
-									<div class="todo-rating-wraper">
-										<div class="todo-rating">
-											<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
-											<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
-											<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
-											<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
-											<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
-										</div>
-									</div>
-									<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
-								</div>
-								<?php elseif ($todo->evaluate_mode == 'agenda') : ?>
-								<div class="todo-label">
-									<span class="msg-tag label label-bordered label-skipped">
-										<?php echo lang('db_evaluate_' . $todo->evaluate_mode) ?>
-									</span>&nbsp;
-									<span class="msg-tag label label-bordered label-undone">
-										<?php echo $todo->meeting_key ?>
-									</span>
-								</div>
-								<div class="todo-left">
-									<?php echo ucfirst($todo->name) ?>
-								</div>
-								<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" data-agenda-id="<?php echo $todo->agenda_id ?>">
-									<div class="todo-rating-wraper">
-										<div class="todo-rating">
-											<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
-											<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
-											<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
-											<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
-											<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
-										</div>
-									</div>
-									<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
-								</div>
-								<?php else : ?>
-								<div class="todo-label">
-									<span class="msg-tag label label-bordered label-skipped">
-										<?php echo lang('db_evaluate_' . $todo->evaluate_mode) ?>
-									</span>&nbsp;
-									<span class="msg-tag label label-bordered label-undone">
-										<?php echo $todo->meeting_key ?>
-									</span>
-								</div>
-								<div class="todo-left">
-									<?php echo ucfirst($todo->name) ?>
-								</div>
-								<div class="todo-right <?php echo $todo->evaluate_mode ?>" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $todo->evaluate_mode) ?>" data-meeting-id="<?php echo $todo->meeting_id ?>" data-homework-id="<?php echo $todo->homework_id ?>">
-									<div class="todo-rating-wraper">
-										<div class="todo-rating">
-											<input type="radio" id="star5" value="5" /><label class="full" for="star5" title="5 stars"></label>
-											<input type="radio" id="star4" value="4" /><label class="full" for="star4" title="4 stars"></label>
-											<input type="radio" id="star3" value="3" /><label class="full" for="star3" title="3 stars"></label>
-											<input type="radio" id="star2" value="2" /><label class="full" for="star2" title="2 stars"></label>
-											<input type="radio" id="star1" value="1" /><label class="full" for="star1" title="1 star"></label>
-										</div>
-									</div>
-									<a href="#" class="setting action an-btn-success submit <?php echo $todo->todo_type ?>"><i class="ion-checkmark"></i></a>
-								</div>
-								<?php endif ?>
-							<?php else : ?>
-							<div class="todo-left">
-								<span class="msg-tag label label-bordered label-ready">
-									<?php echo lang('db_decide') ?>
-								</span>&nbsp;
-								<span class="msg-tag label label-bordered label-done">
-									<?php echo $todo->agenda_key ?>
-								</span>&nbsp;
-								<?php echo ucfirst($todo->agenda_name) . ' ' . $todo->agenda_id ?>
+				<ul class="an-child-nav js-open-nav" style="display: none;">
+					<?php foreach ($projects AS $project): ?>
+					<li>
+						<a href="<?php echo site_url('project/' . $project->cost_code) ?>" class='mb-popover-project' 
+							data-project-id="<?php echo $project->project_id ?>" 
+							data-toggle="popover" 
+							data-placement="right">
+							<?php echo ($project->name . " <b>[{$project->cost_code}]</b>") ?>
+						</a>
+					</li>
+					<?php endforeach; ?>
+				</ul>
+			</li>
+		</ul> <!-- end .AN-MAIN-NAV -->
+	</div> <!-- /.an-sidebar-nav -->
 
-								<?php echo word_limiter(ucfirst($todo->agenda_description), 20) ?>
-							</div>
-							<div class="todo-right">
-								<select name="confirm-status" data-pk="<?php e($todo->agenda_id)?>" class="an-form-control">
-									<option disabled selected value><?php e(lang('st_select_an_option')) ?></option>
-									<?php foreach ($confirmation_status as $status) : ?>
-										<option value="<?php echo $status ?>"><?php echo lang('db_' . $status) ?></option>
-									<?php endforeach ?>
-								</select>
-								<a href="#" class="setting action an-btn-success submit-confirm-status"><i class="ion-checkmark"></i></a>
-							</div>
-							<?php endif ?>
-						</div>
-						<?php endif; endforeach; ?>
-					<?php endif ?>
+	<div class="an-dashboard-content">
+		<header class="an-header wow fadeInDown">
+			<div class="an-topbar-left-part">
+			</div> <!-- end .AN-TOPBAR-LEFT-PART -->
+
+			<div class="an-topbar-right-part">
+				<div class="an-notifications">
+					<div class="btn-group an-notifications-dropown notifications">
+					<button type="button" class="an-btn an-btn-icon dropdown-toggle js-has-new-notification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="ion-ios-bell-outline"></i>
+					</button>
 					</div>
-				</div>
-			</div> <!-- end .welcome-panel -->
-		</div>
-	</div> <!-- end Welcome Professor -->
+				</div> <!-- end .AN-NOTIFICATION -->
 
-	<!-- my projects -->
-	<div id="mb-my-projects" class="col-md-4 col-sm-6 col-xs-12 my-projects" data-my-projects-url="<?php echo site_url('dashboard/my_projects') ?>">
-		<h1 class="db-h1">
-			<span class="an-settings-button">
-				<?php echo lang('db_my_projects') ?>&nbsp
-				<a href="#" id="create" class="setting"><i class="ion-plus"></i></a>
-			</span>
-		</h1>
-		<div class="project-list" style="">
-		<?php if (! empty($projects)) : ?>
-			<?php foreach ($projects as $project) : ?>
-			<div class="item">
-				<div class="general-info">
-					<h3><a href="<?php echo site_url('project/' . $project->cost_code) ?>"><?php echo "{$project->name} [{$project->cost_code}]" ?></a></h3>
-					<div class="project-info">
-						<div class="col-xs-4">
-							<label><?php echo lang('db_project_pts') ?></label>
-							<?php echo (empty($project->point_used) ? 0 : number_format($project->point_used, 2 )) . "/" . ( empty($project->project_no_of_point) ? 0 : $project->project_no_of_point ) ?>
-						</div>
-						<div class="col-xs-3">
-							<label><?php echo lang('db_meetings') ?></label>
-							<p><?php echo (empty($project->no_of_unfinished_step) ? '0' : $project->no_of_unfinished_step) . "/" . (empty($project->no_of_step) ? '0' : $project->no_of_step) ?></p>
-						</div>
-						<div class="col-xs-3">
-							<i class="ion-android-star" style="color: orange; font-size: 25px;"></i>
-							<p><?php echo (empty($project->total_rate) ? '0' : $project->total_rate) . "/" . (empty($project->max_rate) ? '0' : $project->max_rate) ?></p>
-						</div>
-						<div class="col-xs-2">
-							<i class="ion-ios-people" style="font-size: 25px;"></i>
-							<p><?php echo $project->member_number ?></p>
+				<div class="an-messages">
+					<div class="btn-group an-notifications-dropown messages">
+					<button type="button" class="an-btn an-btn-icon dropdown-toggle js-has-new-messages" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="ion-ios-email-outline"></i>
+					</button>
+					</div>
+				</div> <!-- end .AN-MESSAGE -->
+
+				<div class="an-settings">
+					<div class="btn-group an-notifications-dropown settings">
+						<button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<i class="ion-ios-gear-outline"></i>
+						</button>
+						<div class="dropdown-menu">
+							<p class="an-info-count">Settings</p>
+							<ul class="an-settings-list">
+								<li><a href="<?php echo site_url('admin/settings'); ?>"><i class="ion-ios-settings"></i>Preferences</a></li>
+								<li><a href="<?php echo site_url('admin/team'); ?>"><i class="ion-ios-people-outline"></i>Team</a></li>
+								<li><a href="<?php echo site_url('admin/invites'); ?>"><i class="ion-ios-personadd-outline"></i>Invitations</a></li>
+								<li><a href="<?php echo site_url('admin/billing'); ?>"><i class="ion-social-usd-outline"></i>Billing</a></li>
+								<li><a href="<?php echo site_url('admin/auth'); ?>"><i class="ion-ios-locked-outline"></i>Authentication</a></li>
+							</ul>
 						</div>
 					</div>
 				</div>
-				<div class="owners">
-					<?php foreach ($project->step_owners as $owner) : ?>
-					<div class="item">
-						<div class="owner-info">
-							<?php echo display_user($owner['info']['email'], $owner['info']['first_name'], $owner['info']['last_name'], $owner['info']['avatar']) . ' <span style="text-transform: uppercase; color: #025d83; vertical-align: middle;">' . lang('db_has_the_ball') . '!</span>' ?>
-						</div>
-						<div class="steps">
-							<?php foreach($owner['items'] as $step) : ?>
-							<div class="item">
-								<a href="<?php echo site_url('meeting/' . $step->meeting_key) ?>"><?php echo "<span class='msg-tag label label-bordered label-inactive'>{$step->meeting_key}</span> {$step->name}" ?></a>
+
+				<div class="an-profile-settings">
+					<div class="btn-group an-notifications-dropown profile">
+						<button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span class="an-profile-img" style="background-image: url('<?php
+							if (empty($current_user->avatar)) echo gravatar_url($current_user->email, 40);
+							elseif (!filter_var($current_user->avatar, FILTER_VALIDATE_URL) === false)	echo $current_user->avatar;
+							else echo $current_user->avatar ? img_path() . 'users/' . $current_user->avatar : img_path() . 'default_avatar.png'; 
+							?>');"></span>
+							<div class="user-info">
+								<span class="an-user-name"><?php echo $current_user->first_name . ' ' . $current_user->last_name ?></span>
+								<div class="rate">
+									<span class="average-star">
+										<?php 
+											$counting_stars = $user->avarage_rate;
+											$all_star = 5;
+											while ($all_star --) {
+
+												if ($counting_stars-- > 0) {
+													echo '<i class="ion-android-star"></i>';
+												} else {
+													echo '<i class="ion-android-star-outline"></i>';
+												}
+											}
+										?>
+									</span>
+								</div>
+								<div class="total-points"><?php e(sprintf(lang('db_total_xp'), empty($user->total_xp) ? 0 : $user->total_xp)) ?></div>
 							</div>
-							<?php endforeach ?>
+							<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
+						</button>
+						<div class="dropdown-menu">
+							<p class="an-info-count">Profile</p>
+							<ul class="an-profile-list">
+								<li><a href="<?php e(site_url() . 'users/profile')?>"><i class="icon-user"></i>My profile</a></li>
+								<li><a href="<?php e(site_url() . 'logout')?>"><i class="icon-download-left"></i><?php e(lang('us_logout'))?></a></li>
+							</ul>
 						</div>
 					</div>
-					<?php endforeach ?>
-				</div>
+				</div> <!-- end .AN-PROFILE-SETTINGS -->
+			</div> <!-- end .AN-TOPBAR-RIGHT-PART -->
+		</header> <!-- end .AN-HEADER -->
+
+		<div class="an-page-content">
+			<?php // @ BaoDG : Add Calendar here ?>
+			<div id="fullcalendar">
 			</div>
-			<?php endforeach ?>
-		<?php endif ?>
-		</div>
-	</div>
-	<!-- end my projects -->
+		</div> <!-- end .AN-PAGE-CONTENT -->
 
-	<!-- Calendar -->
-	<div id="mb-calendar" class="col-md-4 col-sm-12 col-xs-12">
-		<h1 class="db-h1">
-			<span class="an-settings-button">
-				<?php echo lang('db_meetings') ?>&nbsp
-				<a href="#" id="create_meeting" class="setting hidden"><i class="ion-plus"></i></a>
-			</span>
-		</h1>
-		
-		<div class="calendar-container">
-			<div id="meeting-calendar"></div>
-		</div>
-	</div>
-	<!-- end Calendar -->
-</div>
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="bigModal" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-		</div>
 	</div>
 </div>
 
-<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-		</div>
+<div id="homework-popover" style="display: none">
+	<div id="homework-content" class="mb-popover-content">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Project</th>
+					<th>ID</th>
+					<th>Meeting</th>
+					<th class="text-center">Date</th>
+					<th class="text-center">Time</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php 
+				$i = 1; 
+				foreach ($my_todo['homeworks'] as $meeting_key => $homework): 
+					$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $homework[0]->scheduled_start_time);
+					$scheduled_end_time->modify('+' . $homework[0]->in . ' ' . $homework[0]->in_type);
+
+					$scheduled_start_date = display_time($homework[0]->scheduled_start_time, null, 'l jS F');
+
+					$scheduled_start_time = display_time($homework[0]->scheduled_start_time, null, 'H:ia');
+					$scheduled_end_time = display_time($scheduled_end_time->format('Y-m-d H:i:s'), null, 'H:ia');
+				?>
+				<tr data-homework-id="<?php echo $homework[0]->homework_id ?>" class='parent'>
+					<td><?php echo $meeting_key ?></td>
+					<td><?php echo $i ?></td>
+					<td><?php echo $homework[0]->meeting_name ?></td>
+					<td class="text-center"><?php echo $scheduled_start_date ?></td>
+					<td class="text-center"><?php echo $scheduled_start_time . ' - ' . $scheduled_end_time ?></td>
+					<td><!--<i class="indicator glyphicon glyphicon-chevron-up pull-right"></i>--></td>
+				</tr>
+				<tr data-homework-id="<?php echo $homework[0]->homework_id ?>" class='child-head'>
+					<th></th>
+					<th></th>
+					<th>To Do</th>
+					<th></th>
+					<th class="text-center">Attachments</th>
+					<th class="text-center">Confirm</th>
+				</tr>
+				<?php $j = 1; foreach ($homework as $hw):?>
+				<tr data-homework-id="<?php echo $hw->homework_id ?>" class='child'>
+					<td></td>
+					<td><?php echo $i .'.'. $j++ ?></td>
+					<td colspan="2"><?php echo $hw->name ?></td>
+					<td class="text-center">
+						<?php if ($hw->attachments): ?>
+						<div class="attachment">
+							<?php foreach ($hw->attachments as $att): ?>
+							<a href="<?php echo $att->url ?>" target="_blank">
+								<span class="icon">
+									<?php if ($att->favicon): ?>
+									<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+									<?php else: ?>
+									<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+									<?php endif; ?>
+								</span>
+							</a>
+							<?php endforeach; ?>
+						</div>
+						<?php endif; ?>
+					</td>
+					<td class="text-center">
+						<i class="ion-android-checkbox btn-confirm-homework" data-homework-id="<?php echo $hw->homework_id ?>"></i>
+					</td>
+				</tr>
+				<?php endforeach; $i++;
+				endforeach; ?>
+			</tbody>
+		</table>
 	</div>
 </div>
 
-<div class="modal modal-monitor fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-80" role="document">
-		<div class="modal-content">
+<?php foreach ($projects as $project): ?>
+<div id="popover-project-<?php echo $project->project_id ?>" style="display: none">
+	<div class="mb-popover-content">
+		<div class="project-header">
+			<a href="<?php echo site_url('project/' . $project->cost_code)?>">
+				<h4>
+					<a href="#" class='mb-editable'
+					data-title="<?php echo lang('pj_edit_project_name') ?>"
+					data-pk="<?php echo $project->project_id ?>" 
+					data-name="name"
+					data-mode="inline"
+					data-inputclass="edit-title"
+					data-url="<?php echo site_url('project/ajax_edit') ?>" >
+						<?php echo $project->name ?>
+					</a> 
+					<span>[<?php echo $project->cost_code ?>]</span>
+				</h4>
+			</a>
+			<?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?>
+		</div>
+
+		<div class="project-body">
+			<div class="panel panel-default panel-overview">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#overview-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_overview') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="overview-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="panel-body">
+						<div class="row number-container">
+							<div class="col-md-3">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_meeting') ?><br/>
+								<b class='number'><?php echo $project->no_of_meeting ?></b>
+							</div>
+							<div class="col-md-3">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_team') ?><br/>
+								<b class='number'><?php echo $project->member_number ?></b>
+							</div>
+							<div class="col-md-3 time-wrapper">
+								<i class="ion-ios-alarm-outline"></i>
+								<?php echo lang('db_time') ?><br/>
+								<button class="btn btn-default btn-time dropdown-toggle" data-toggle="dropdown" style="padding: 2px">
+									<b class='number'><?php echo round($project->time_used, 2) ?></b>
+									<span class='text'><?php echo lang('db_minutes') ?></span>
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu" data-minute="<?php echo round($project->time_used, 2) ?>">
+									<li><a href="#" data-option="minute"><?php echo lang('db_minutes') ?></a></li>
+									<li><a href="#" data-option="hour"><?php echo lang('db_hours') ?></a></li>
+									<li><a href="#" data-option="day"><?php echo lang('db_days') ?></a></li>
+								</ul>
+							</div>
+							<div class="col-md-3">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_points') ?><br/>
+								<b class='number'><?php echo round($project->point_used, 2) ?></b>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!-- Overview -->
+
+			<div class="panel panel-default panel-next-meeting">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#next-meeting-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_next_meeting') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="next-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="an-user-lists">
+						<div class="list-title">
+							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+							<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
+							<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+						</div>
+
+						<div class="an-lists-body">
+						<?php if ($project->next_meeting) : $item = $project->next_meeting; ?>
+							<div class="list-user-single">
+								<div class="list-date number basis-30">
+									<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
+								</div>
+								<div class="list-name basis-50">
+									<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
+								</div>
+								<div class="list-date number basis-30">
+									<?php echo display_time($item->scheduled_start_time) ?>
+								</div>
+								<div class="list-action basis-20">
+									<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
+								</div>
+							</div> <!-- end .USER-LIST-SINGLE -->
+						<?php else : ?>
+							<div id="no-meeting" class="list-user-single">
+								<div class="list-text basis-30">
+								</div>
+								<div class="list-date email approve basis-40">
+									<?php e(lang('pj_no_meeting')) ?>
+								</div>
+								<div class="list-text basis-30">
+								</div>
+							</div>
+						<?php endif ?>
+						</div> <!-- end .AN-LISTS-BODY -->
+					</div>
+				</div>
+			</div> <!-- Next Meeting -->
+
+			<div class="panel panel-default panel-scheduled-meeting">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#scheduled-meeting-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_scheduled_meeting') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="scheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="an-user-lists">
+						<div class="list-title">
+							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+							<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
+							<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+						</div>
+
+						<div class="an-lists-body">
+						<?php if ($project->scheduled_meetings && count($project->scheduled_meetings)) : 
+								foreach ($project->scheduled_meetings as $item) : ?>
+								<div class="list-user-single">
+									<div class="list-date number basis-30">
+										<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
+									</div>
+									<div class="list-name basis-50">
+										<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
+									</div>
+									<div class="list-date number basis-30">
+										<?php echo display_time($item->scheduled_start_time) ?>
+									</div>
+									<div class="list-action basis-20">
+										<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
+									</div>
+								</div> <!-- end .USER-LIST-SINGLE -->
+							<?php endforeach; 
+						else : ?>
+							<div id="no-meeting" class="list-user-single">
+								<div class="list-text basis-30">
+								</div>
+								<div class="list-date email approve basis-40">
+									<?php e(lang('pj_no_meeting')) ?>
+								</div>
+								<div class="list-text basis-30">
+								</div>
+							</div>
+						<?php endif ?>
+						</div>
+					</div>
+				</div>
+			</div> <!-- Scheduled Meeting -->
+
+			<div class="panel panel-default panel-completed-meeting">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#completed-meeting-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_completed_meeting') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="completed-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="an-user-lists">
+						<div class="list-title">
+							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+							<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
+							<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+						</div>
+
+						<div class="an-lists-body">
+						<?php if ($project->completed_meetings && count($project->completed_meetings)) : 
+								foreach ($project->completed_meetings as $item) : ?>
+								<div class="list-user-single">
+									<div class="list-date number basis-30">
+										<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
+									</div>
+									<div class="list-name basis-50">
+										<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
+									</div>
+									<div class="list-date number basis-30">
+										<?php echo display_time($item->scheduled_start_time) ?>
+									</div>
+									<div class="list-action basis-20">
+										<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
+									</div>
+								</div> <!-- end .USER-LIST-SINGLE -->
+							<?php endforeach; 
+						else : ?>
+							<div id="no-meeting" class="list-user-single">
+								<div class="list-text basis-30">
+								</div>
+								<div class="list-date email approve basis-40">
+									<?php e(lang('pj_no_meeting')) ?>
+								</div>
+								<div class="list-text basis-30">
+								</div>
+							</div>
+						<?php endif ?>
+						</div>
+					</div>
+				</div>
+			</div> <!-- Completed Meeting -->
 		</div>
 	</div>
 </div>
-
-<div id="resolve-agenda" class="modal fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
-</div>
-
-<div id="meeting-decider" class="modal fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-80" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
-</div>
-
-<div id="create-meeting" class="modal fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
-</div>
-
-<div class="modal modal-monitor-evaluator fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-80" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
-</div>
-
-<div class="modal waiting-modal fade" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-sm" role="document">
-		<div class="modal-content">
-			<?php echo '<p class="text-center">' . lang('st_waiting_evaluator') . '</p>' ?>
-		</div>
-	</div>
-</div>
-
-<div id="current-data" style="display: none;"><?php echo json_encode([$user, $projects, $my_todo]); ?></div>
-
-<div class="refresh-asking" style="display: none;">
-	<?php echo lang('refresh_asking') ?>
-</div>
-
-<script>
-	var CREATE_PROJECT_URL = '<?php echo site_url('project/create')?>';
-	var INVITE_USER_URL = '<?php echo site_url('admin/team/invite')?>';
-</script>
-
-<script id="project-row" type="text">
-	<div class="list-user-single">
-		<div class="list-date basis-10">{{:project_id}}</div>
-		<div class="list-name basis-30"><a href="<?php echo site_url('project')?>/{{:cost_code}}">{{:name}}</a></div>
-		<div class="list-date basis-20">{{:cost_code}}</div>
-		<div class="list-text basis-30">{{:display_user}}</div>
-		<div class="list-state basis-10">
-			<span class="msg-tag label label-bordered label-{{:status}}">{{:lang_status}}</span>
-		</div>
-		<div class="list-action basis-20">{{:created_on}}</div>
-	</div>
-</script>
+<?php endforeach; ?>
