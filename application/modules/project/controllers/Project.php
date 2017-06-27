@@ -730,6 +730,61 @@ class Project extends Authenticated_Controller
 
 	}
 
+	/**
+		X-Editable AJAX request to edit project fields
+		pk: primary key
+		name: column name
+		value: new value
+	*/
+	public function ajax_edit()
+	{
+		// Validation
+		if ( ! in_array($this->input->post('name'), ['name'])) {
+				header('HTTP/1.0 403 Forbidden City', true, 403);
+				echo lang('hw_unknown_error');
+				return;
+		}
+
+		// Only member of PJ or Creator can edit
+		$test = $this->project_model
+		->select($this->input->post('name'))
+		->where('owner_id', $this->current_user->user_id)
+		->find($this->input->post('pk'));
+
+		if ($test === false) {
+			header('HTTP/1.0 401 Unauthorized 💔', true, 401);
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('hw_no_permission_to_edit')
+			]);
+			return;
+		}
+
+		// Update the field
+		$update = $this->project_model->update(
+			$this->input->post('pk'), [
+			$this->input->post('name') => $this->input->post('value')
+		]);
+
+		if ($update === false) {
+			header('HTTP/1.0 500 Server error 💔', true, 500);
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('hw_unknown_error')
+			]);
+			return;
+		}
+
+		$this->mb_project->update_parent_objects('project', $this->input->post('pk'));
+
+		if ($this->input->post('name') == 'name') {
+			echo json_encode([
+				'message_type' => 'success',
+				'message' => lang('pj_project_name_updated')
+			]);
+		}
+	}
+
 	private function get_actions($project_id)
 	{
 		// get all project actions, sort by sort order

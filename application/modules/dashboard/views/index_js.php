@@ -69,7 +69,5 @@ $(document).on('click', '.btn-time + ul > li > a', function(e) {
 			$(parent).find('.btn-time > .number').text(Math.round(time / 60 / 24 * 10) / 10);
 	}
 
-	console.log($(parent).find('.btn-time > .number'));
-
 	$(parent).find('.btn-time > .text').text($(this).text());
 })

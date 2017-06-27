@@ -134,7 +134,7 @@ $lang['pj_value_of_time_legend'] = 'Value/Unit of Time: measured in Stars, can b
 $lang['pj_scheduled_start_time'] = 'Scheduled start time';
 $lang['pj_no_permission_to_access'] = 'You have no permission to access this page';
 $lang['pj_edit_project_name'] = 'Edit Project name';
-
+$lang['pj_project_name_updated'] = 'Project name updated';
 // Agendas
 $lang['pj_inprogress'] = 'In Progress';
 $lang['pj_skipped'] = 'Skipped';
