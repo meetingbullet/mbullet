@@ -62,4 +62,10 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	$('[data-toggle="popover]').data("bs.popover", {inState: { click: false, hover: false, focus: false }});
+});
+
+$(document).on('hidden.bs.popover', function (e) {
+	$(e.target).data("bs.popover").inState.click = false;
 });

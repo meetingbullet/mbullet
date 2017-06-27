@@ -1,5 +1,4 @@
 <?php
-dump($projects);
 ?>
 <div class="main-container">
 	<div class="an-sidebar-nav js-sidebar-toggle-with-click">
@@ -11,14 +10,14 @@ dump($projects);
 
 		<ul class="an-main-nav">
 			<li class="an-nav-item">
-				<a id="my-todo" class="js-show-child-nav" href="#">
+				<a id="my-todo" class="js-show-child-nav nav-open" href="#">
 					<i class="ion-ios-copy-outline"></i>
 					<span class="nav-title">My To Do
 					<span class="count"><?php echo $my_todo['homeworks_count'] + count($my_todo['evaluates']) + count($my_todo['decides']) ?></span>
 					</span>
 				</a>
 
-				<ul class="an-child-nav js-open-nav" style="display: none;">
+				<ul class="an-child-nav js-open-nav" style="display: block;">
 					<li>
 						<a href="#" class="js-show-child-nav" 
 							data-toggle="popover" 
@@ -56,7 +55,7 @@ dump($projects);
 				<ul class="an-child-nav js-open-nav" style="display: none;">
 					<?php foreach ($projects AS $project): ?>
 					<li>
-						<a href="<?php echo site_url('project/' . $project->cost_code) ?>" class='mb-popover-project' 
+						<a href="javascript:void(0)" class='mb-popover-project' 
 							data-project-id="<?php echo $project->project_id ?>" 
 							data-toggle="popover" 
 							data-placement="right">
@@ -160,6 +159,7 @@ dump($projects);
 	</div>
 </div>
 
+<div id="template">
 <div id="homework-popover" style="display: none">
 	<div id="homework-content" class="mb-popover-content">
 		<table class="table">
@@ -236,25 +236,25 @@ dump($projects);
 
 <?php foreach ($projects as $project): ?>
 <div id="popover-project-<?php echo $project->project_id ?>" style="display: none">
-	<div class="mb-popover-content">
-		<div class="project-header">
-			<a href="<?php echo site_url('project/' . $project->cost_code)?>">
-				<h4>
-					<a href="#" class='mb-editable'
-					data-title="<?php echo lang('pj_edit_project_name') ?>"
-					data-pk="<?php echo $project->project_id ?>" 
-					data-name="name"
-					data-mode="inline"
-					data-inputclass="edit-title"
-					data-url="<?php echo site_url('project/ajax_edit') ?>" >
-						<?php echo $project->name ?>
-					</a> 
-					<span>[<?php echo $project->cost_code ?>]</span>
-				</h4>
-			</a>
-			<?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?>
-		</div>
+	<div class="project-header">
+		<a href="<?php echo site_url('project/' . $project->cost_code)?>">
+			<h4>
+				<a href="#" class='mb-editable'
+				data-title="<?php echo lang('pj_edit_project_name') ?>"
+				data-pk="<?php echo $project->project_id ?>" 
+				data-name="name"
+				data-mode="inline"
+				data-inputclass="edit-title"
+				data-url="<?php echo site_url('project/ajax_edit') ?>" >
+					<?php echo $project->name ?>
+				</a> 
+				<span>[<?php echo $project->cost_code ?>]</span>
+			</h4>
+		</a>
+		<?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?>
+	</div>
 
+	<div class="mb-popover-content">
 		<div class="project-body">
 			<div class="panel panel-default panel-overview">
 				<div class="panel-heading" role="tab">
@@ -455,3 +455,4 @@ dump($projects);
 	</div>
 </div>
 <?php endforeach; ?>
+</div> <!-- #template -->

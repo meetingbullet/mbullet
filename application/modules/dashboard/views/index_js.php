@@ -1,6 +1,5 @@
 $('.mb-popover-project').on('shown.bs.popover', function() {
 	$('.mb-editable').editable();
-	console.log('ok');
 })
 
 $('#homework').click(function(e) {
@@ -10,22 +9,18 @@ $('#homework').click(function(e) {
 		content: function() {
 			return $('#homework-popover').html();
 		}
-	});
+	}).popover('show');
 
 	$('[data-toggle="popover"]').not(this).popover('hide');
 })
 
-$('.mb-popover-project').click(function(e) {
-	e.preventDefault();
-	$(this).popover({
-		html: true, 
-		content: function() {
-			return $('#popover-project-' + $(this).data('project-id')).html();
-		}
-	});
-
-	$('[data-toggle="popover"]').not(this).popover('hide');
-})
+$('.mb-popover-project').popover({
+	html: true, 
+	content: function() {
+		$('[data-toggle="popover"]').not(this).popover('hide');
+		return $('#popover-project-' + $(this).data('project-id')).html();
+	}
+});
 
 $(document).on('click', '.btn-confirm-homework', function() {
 	var hw_id = $(this).data('homework-id');

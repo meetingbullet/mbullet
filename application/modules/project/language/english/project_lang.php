@@ -135,6 +135,9 @@ $lang['pj_scheduled_start_time'] = 'Scheduled start time';
 $lang['pj_no_permission_to_access'] = 'You have no permission to access this page';
 $lang['pj_edit_project_name'] = 'Edit Project name';
 $lang['pj_project_name_updated'] = 'Project name updated';
+$lang['pj_no_permission_to_edit'] = 'You have no permission to edit';
+$lang['pj_unknown_error'] = 'Unknown error';
+
 // Agendas
 $lang['pj_inprogress'] = 'In Progress';
 $lang['pj_skipped'] = 'Skipped';
