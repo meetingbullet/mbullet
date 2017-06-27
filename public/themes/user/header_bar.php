@@ -231,7 +231,26 @@
 						elseif (!filter_var($current_user->avatar, FILTER_VALIDATE_URL) === false)	echo $current_user->avatar;
 						else echo $current_user->avatar ? img_path() . 'users/' . $current_user->avatar : img_path() . 'default_avatar.png'; 
 						?>');"></span>
-						<span class="an-user-name"><?php echo $current_user->first_name . ' ' . $current_user->last_name ?></span>
+						<div class="user-info">
+							<span class="an-user-name"><?php echo $current_user->first_name . ' ' . $current_user->last_name ?></span>
+							<div class="rate">
+								<span class="average-star">
+									<?php 
+										$counting_stars = $current_user->star;
+										$all_star = 5;
+										while ($all_star --) {
+
+											if ($counting_stars-- > 0) {
+												echo '<i class="ion-android-star"></i>';
+											} else {
+												echo '<i class="ion-android-star-outline"></i>';
+											}
+										}
+									?>
+								</span>
+							</div>
+							<div class="total-points"><?php e(sprintf(lang('xp_x'), empty($current_user->exp) ? 0 : $current_user->exp)) ?></div>
+						</div>
 						<span class="an-arrow-nav"><i class="icon-arrow-down"></i></span>
 					</button>
 					<div class="dropdown-menu">

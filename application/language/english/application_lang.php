@@ -336,3 +336,4 @@ $lang['user_is_disabled_from_organization'] = 'Unfortunately, You are no longer 
 $lang['use_is_out_of_organization'] = 'Sorry, your requested URL does not exist or you have not been a member of that organization yet.';
 
 $lang['refresh_asking'] = 'Something has changed on your page. <a href="" style="color: #025d83">Refresh</a> or <a style="color: #025d83; cursor: pointer" onclick="$(this).parent().fadeOut();">Ignore</a>.';
+$lang['xp_x'] = 'XP %d';

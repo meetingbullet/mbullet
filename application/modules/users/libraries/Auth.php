@@ -308,16 +308,23 @@ class Auth
 			}
 		}
 
+		// Additional fields in Organization
+		$user->exp = 0;
+		$user->star = 0;
 		$user->current_organization_id = null;
 		if (isset($this->ci->current_organization_url) && ! is_null($this->ci->current_organization_url)) {
-			$org = $this->ci->db->select('o.organization_id')
+			$org = $this->ci->db->select('o.organization_id, uo.experience_point, ROUND(SUM(smr.rate) / COUNT(smr.rate)) AS avarage_rate')
 								->from('organizations o')
 								->join('user_to_organizations uo', 'o.organization_id = uo.organization_id', 'left')
+								->join('meeting_member_rates smr', "smr.attendee_id = {$user->user_id}")
 								->where('o.url', $this->ci->current_organization_url)
 								->where('uo.user_id', $user->user_id)
 								->get()->row();
 			if (isset($org)) {
 				$user->current_organization_id = $org->organization_id;
+				$user->exp = $org->experience_point;
+				$user->star = $org->avarage_rate;
+				$user->avarage_rate = $org->avarage_rate;
 			}
 		}
 

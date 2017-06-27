@@ -1,48 +1,3 @@
-.welcome-panel .avatar {
-	width: 128px;
-	height: 128px;
-	margin: 0 auto 20px;
-	display: block;
-}
-
-.welcome-panel .name {
-	color: #0080b5;
-}
-
-.welcome-panel h3 {
-	margin-bottom: 0;
-}
-
-.average-star {
-	font-size: 35px;
-	vertical-align: middle;
-}
-
-.average-star .ion-android-star {
-	color: orange;
-}
-
-.average-star .ion-android-star-outline {
-	color: orange;
-}
-
-.total-points {
-	font-size: 20px;
-	color: #025d83;
-}
-
-.action-panel {
-	margin: 30px 20%;
-}
-
-.action-panel hr {
-	margin-top: 5px;
-}
-
-.an-breadcrumb {
-	display: none;
-}
-
 .db-h1 {
 	color: #025d83;
 }
@@ -286,4 +241,185 @@
 
 .homework-info {
 	cursor: pointer;
+}
+
+/* New Dashboard */
+.main-container {
+	display: flex;
+}
+
+.an-header {
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+.an-dashboard-content {
+	position: relative;
+	width: 100%;
+	min-height: 100vh;
+	display: flex;
+	align-items: stretch;
+	flex-direction: column;
+}
+
+.an-sidebar-nav {
+	min-width: 300px;
+	transition: width 0.3s ease-out;
+	background-color: #ffffff;
+	box-shadow: #98c2d4 1px 0px 20px;
+}
+
+.an-sidebar-logo {
+	margin: 0 0px 20px 15px;
+}
+
+.an-nav-item > a , .an-nav-item .an-child-nav > li > a {
+	color: #004f71;
+}
+
+.an-nav-item > a:hover, .an-nav-item .an-child-nav > li > a:hover {
+	color: #00415d;
+}
+
+.an-nav-item>a.nav-open {
+	background: #004f71;
+}
+
+.an-nav-item > a.nav-open:hover {
+	color: white;
+}
+
+.an-nav-item>a .nav-title .count {
+	position: absolute;
+	top: 7px;
+	text-align: center;
+	right: 14px;
+	width: 27px;
+	height: 27px;
+	line-height: 27px;
+	background-color: #70c1b3;
+	font-size: 12px;
+	color: #ffffff;
+	border-radius: 50%;
+}
+
+.an-nav-item:first-child {
+	border-top: 1px solid #efefef;
+}
+
+.an-nav-item {
+	position: relative;
+	font-size: 15px;
+	border-bottom: 1px solid #efefef;
+}
+
+.an-child-nav > li {
+	border-bottom: 1px solid #efefef;
+	margin-left: 20px;
+}
+
+.an-child-nav > li:last-child {
+	border-bottom: none;
+}
+
+.an-nav-item .an-child-nav > li > a {
+	padding: 10px 10px 10px 25px;
+}
+
+.an-child-nav > li > .popover {
+	min-width: 800px;
+	max-width: none;
+}
+
+.mb-popover-content .table {
+	margin-bottom: 0;
+}
+
+.mb-popover-content .table > thead > tr > th {
+	border-bottom: none;
+	color: #aaa;
+	font-size: 12px;
+}
+
+.mb-popover-content tr.parent > td {
+	background: #f3f3f3;
+	font-weight: bold;
+}
+
+.mb-popover-content tr.child-head > th {
+	font-size: 12px;
+	color: #aaa;
+}
+
+.mb-popover-content tr.child:nth-child(3) > td {
+	border-top: none;
+}
+.mb-popover-content tr.child > td {
+	padding: 0px 5px;
+}
+.mb-popover-content tr.child > td:first-child {
+	border-top: none;
+}
+
+.attachment {
+	padding: 0 !important;
+}
+
+.attachment a {
+	display: inline-block !important;
+	padding: 3px !important;
+}
+
+.btn-confirm-homework {
+	font-size: 30px;
+	color: #70c1b3;
+	cursor: pointer;
+	line-height: 1;
+}
+
+.btn-confirm-homework:hover {
+	color: #6ab3a6;
+}
+
+.an-child-nav > li > .popover > .popover-content {
+	padding: 2px 0;
+	max-height: 800px;
+	overflow: auto;
+}
+
+.an-child-nav > li > .popover > .popover-title {
+	font-size: 22px;
+}
+
+.project-header {
+	padding: 10px;
+	background: #f7f7f7;
+}
+
+.project-header h4 {
+	margin: 0 0 5px;
+
+}
+
+.project-body {
+	padding: 10px;
+}
+
+#overview-body .number-container {
+	font-size: 17px;
+	text-align: center;
+}
+
+#overview-body .number-container .number {
+	font-size: 22px;
+}
+
+.btn-time {
+	border: none;
+	padding: 0;
+}
+
+.edit-title {
+	width: 500px !important;
+	font-size: 18px;
 }

@@ -678,3 +678,20 @@ body.modal-open .main-wrapper:not(.modal) {
 	background-color: #5eb9aa;
 	border-color: #5eb9aa;
 }
+
+.user-info .average-star i {
+	font-size: 16px;
+}
+
+.user-info .average-star .ion-android-star-outline,
+.user-info .average-star .ion-android-star {
+	color: orange;
+}
+
+.user-info .total-points {
+	font-size: 12px;
+}
+
+.an-profile-settings .btn-group .an-user-name {
+	line-height: 16px;
+}

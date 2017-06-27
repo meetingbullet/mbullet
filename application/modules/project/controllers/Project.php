@@ -32,11 +32,6 @@ class Project extends Authenticated_Controller
 		}
 	}
 
-	public function index()
-	{
-		Template::render();
-	}
-
 	public function create()
 	{
 		Template::set('close_modal', 0);
@@ -373,21 +368,16 @@ class Project extends Authenticated_Controller
 		$project_id = $this->mb_project->get_object_id('project', $project_key);
 
 		if (! $this->mb_project->has_permission('project', $project_id, 'Project.View.All')) {
+			Template::set_message(lang('pj_no_permission_to_access'), 'danger');
 			$this->auth->restrict();
 		}
 
 		$project = $this->project_model->get_project_by_key($project_key, $this->current_user->current_organization_id, 'projects.*, u.email, u.avatar, u.first_name, u.last_name');
 		if ($project === false) {
+			Template::set_message(lang('pj_no_permission_to_access'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$project_id = $project->project_id;
-
-		if ($this->project_model->is_project_owner($project_id, $this->current_user->user_id) === false
-		&& $this->project_member_model->is_project_member($project_id, $this->current_user->user_id) === false
-		&& $this->auth->has_permission('Project.View.All') === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
 		/***************** PROJECT DETAIL *****************/
 		$constraint = $this->project_constraint_model->find($project_id);
 		$expectation = $this->project_expectation_model->find($project_id);
