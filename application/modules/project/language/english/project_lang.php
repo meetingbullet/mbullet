@@ -90,9 +90,9 @@ $lang['pj_detail_tab_info_table_label_name'] = 'Name';
 $lang['pj_detail_tab_info_table_label_status'] = 'Status';
 $lang['pj_info_pager_first'] = 'First';
 $lang['pj_info_pager_last'] = 'Last';
-$lang['pj_no_action'] = 'There are no actions at the moment.';
-$lang['pj_no_meeting'] = 'There are no meetings at the moment.';
-$lang['pj_no_agenda'] = 'There are no agendas at the moment.';
+$lang['pj_no_action'] = 'There are no action at the moment.';
+$lang['pj_no_meeting'] = 'There are no meeting at the moment.';
+$lang['pj_no_agenda'] = 'There are no agenda at the moment.';
 
 // project settings
 $lang['pj_settings'] = 'Project settings';

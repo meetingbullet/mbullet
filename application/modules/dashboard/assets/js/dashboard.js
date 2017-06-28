@@ -82,6 +82,22 @@ $('#homework').click(function(e) {
 	$('[data-toggle="popover"]').not(this).popover('hide');
 })
 
+$('#open-rate').click(function(e) {
+	e.preventDefault();
+	$(this).popover({
+		html: true, 
+		content: function() {
+			return $('#popover-rate').html();
+		}
+	}).popover('show');
+
+	$('[data-toggle="popover"]').not(this).popover('hide');
+})
+
+$('.mb-popover-project').click(function(e){
+	e.preventDefault();
+});
+
 $('.mb-popover-project').popover({
 	html: true, 
 	content: function() {

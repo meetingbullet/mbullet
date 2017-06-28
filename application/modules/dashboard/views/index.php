@@ -13,7 +13,7 @@
 				<a id="my-todo" class="js-show-child-nav nav-open" href="#">
 					<i class="ion-ios-copy-outline"></i>
 					<span class="nav-title">My To Do
-					<span class="count"><?php echo $my_todo['homeworks_count'] + count($my_todo['evaluates']) + count($my_todo['decides']) ?></span>
+					<span class="count"><?php echo $my_todo['homeworks_count'] + count($my_todo['evaluates']) ?></span>
 					</span>
 				</a>
 
@@ -31,12 +31,14 @@
 						</a>
 					</li>
 					<li>
-						<a href="#" class="js-show-child-nav" data-toggle="popover" data-placement="right" 
-							title="<?php echo lang('db_rate') ?> (<?php echo count($my_todo['evaluates']) + count($my_todo['decides']) ?>)" 
-							>
+						<a href="#" class="js-show-child-nav" 
+							data-toggle="popover" 
+							data-placement="right" 
+							title="<?php echo lang('db_rate') ?>" 
+							id="open-rate">
 							<i class="ion-ios-star-outline"></i>
 							<?php echo lang('db_rate') ?>
-							<span class="badge badge-primary pull-right"><?php echo count($my_todo['evaluates']) + count($my_todo['decides']) ?></span>
+							<span class="badge badge-primary pull-right"><?php echo count($my_todo['evaluates']) ?></span>
 						</a>
 					</li>
 				</ul>
@@ -55,7 +57,7 @@
 				<ul class="an-child-nav js-open-nav" style="display: none;">
 					<?php foreach ($projects AS $project): ?>
 					<li>
-						<a href="javascript:void(0)" class='mb-popover-project' 
+						<a href="<?php echo site_url('project/' . $project->cost_code)?>" class='mb-popover-project' 
 							data-project-id="<?php echo $project->project_id ?>" 
 							data-toggle="popover" 
 							data-placement="right">
@@ -234,10 +236,83 @@
 	</div>
 </div>
 
+<div id="popover-rate" style="display: none">
+	<div id="rate-content" class="mb-popover-content">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Project</th>
+					<th>ID</th>
+					<th>Meeting</th>
+					<th class="text-center">Date</th>
+					<th class="text-center">Time</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php 
+				$i = 1; 
+				foreach ($my_todo['homeworks'] as $meeting_key => $homework): 
+					$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $homework[0]->scheduled_start_time);
+					$scheduled_end_time->modify('+' . $homework[0]->in . ' ' . $homework[0]->in_type);
+
+					$scheduled_start_date = display_time($homework[0]->scheduled_start_time, null, 'l jS F');
+
+					$scheduled_start_time = display_time($homework[0]->scheduled_start_time, null, 'H:ia');
+					$scheduled_end_time = display_time($scheduled_end_time->format('Y-m-d H:i:s'), null, 'H:ia');
+				?>
+				<tr data-homework-id="<?php echo $homework[0]->homework_id ?>" class='parent'>
+					<td><?php echo $meeting_key ?></td>
+					<td><?php echo $i ?></td>
+					<td><?php echo $homework[0]->meeting_name ?></td>
+					<td class="text-center"><?php echo $scheduled_start_date ?></td>
+					<td class="text-center"><?php echo $scheduled_start_time . ' - ' . $scheduled_end_time ?></td>
+					<td><!--<i class="indicator glyphicon glyphicon-chevron-up pull-right"></i>--></td>
+				</tr>
+				<tr data-homework-id="<?php echo $homework[0]->homework_id ?>" class='child-head'>
+					<th></th>
+					<th></th>
+					<th>To Do</th>
+					<th></th>
+					<th></th>
+					<th class="text-center">Confirm</th>
+				</tr>
+				<?php $j = 1; foreach ($homework as $hw):?>
+				<tr data-homework-id="<?php echo $hw->homework_id ?>" class='child'>
+					<td></td>
+					<td><?php echo $i .'.'. $j++ ?></td>
+					<td colspan="2"><?php echo $hw->name ?></td>
+					<td class="text-center">
+						<?php if ($hw->attachments): ?>
+						<div class="attachment">
+							<?php foreach ($hw->attachments as $att): ?>
+							<a href="<?php echo $att->url ?>" target="_blank">
+								<span class="icon">
+									<?php if ($att->favicon): ?>
+									<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
+									<?php else: ?>
+									<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
+									<?php endif; ?>
+								</span>
+							</a>
+							<?php endforeach; ?>
+						</div>
+						<?php endif; ?>
+					</td>
+					<td class="text-center">
+						<i class="ion-android-checkbox btn-confirm-homework" data-homework-id="<?php echo $hw->homework_id ?>"></i>
+					</td>
+				</tr>
+				<?php endforeach; $i++;
+				endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+</div> <!-- #popover-rate -->
+
 <?php foreach ($projects as $project): ?>
 <div id="popover-project-<?php echo $project->project_id ?>" style="display: none">
 	<div class="project-header">
-		<a href="<?php echo site_url('project/' . $project->cost_code)?>">
 			<h4>
 				<a href="#" class='mb-editable'
 				data-title="<?php echo lang('pj_edit_project_name') ?>"
@@ -248,9 +323,10 @@
 				data-url="<?php echo site_url('project/ajax_edit') ?>" >
 					<?php echo $project->name ?>
 				</a> 
+				<a href="<?php echo site_url('project/' . $project->cost_code)?>">
 				<span>[<?php echo $project->cost_code ?>]</span>
+				</a>
 			</h4>
-		</a>
 		<?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?>
 	</div>
 
@@ -281,11 +357,11 @@
 								<i class="ion-ios-alarm-outline"></i>
 								<?php echo lang('db_time') ?><br/>
 								<button class="btn btn-default btn-time dropdown-toggle" data-toggle="dropdown" style="padding: 2px">
-									<b class='number'><?php echo round($project->time_used, 2) ?></b>
+									<b class='number'><?php echo round($project->total_used['time'], 2) ?></b>
 									<span class='text'><?php echo lang('db_minutes') ?></span>
 									<span class="caret"></span>
 								</button>
-								<ul class="dropdown-menu" data-minute="<?php echo round($project->time_used, 2) ?>">
+								<ul class="dropdown-menu" data-minute="<?php echo round($project->total_used['time'], 2) ?>">
 									<li><a href="#" data-option="minute"><?php echo lang('db_minutes') ?></a></li>
 									<li><a href="#" data-option="hour"><?php echo lang('db_hours') ?></a></li>
 									<li><a href="#" data-option="day"><?php echo lang('db_days') ?></a></li>
@@ -294,7 +370,7 @@
 							<div class="col-md-3">
 								<i class="ion-android-people"></i>
 								<?php echo lang('db_points') ?><br/>
-								<b class='number'><?php echo round($project->point_used, 2) ?></b>
+								<b class='number'><?php echo round($project->total_used['point'], 2) ?></b>
 							</div>
 						</div>
 					</div>
