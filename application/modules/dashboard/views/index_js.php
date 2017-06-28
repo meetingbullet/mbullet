@@ -1,68 +1,18 @@
+<?php if (has_permission('Project.Edit.All')): ?>
 $('.mb-popover-project').on('shown.bs.popover', function() {
-	$('.mb-editable').editable();
-})
+	$('.mb-editable').editable({
+		success: function(data) {
+			data = JSON.parse(data);
 
-$('#homework').click(function(e) {
-	e.preventDefault();
-	$(this).popover({
-		html: true, 
-		content: function() {
-			return $('#homework-popover').html();
+			$.mbNotify(data.message, data.message_type);
+			
+			if (data.message_type == 'danger') {
+				return;
+			}
+
+			$(this).data('value', data.value);
+			$(this).html(data.value);
 		}
-	}).popover('show');
-
-	$('[data-toggle="popover"]').not(this).popover('hide');
+	});
 })
-
-$('.mb-popover-project').popover({
-	html: true, 
-	content: function() {
-		$('[data-toggle="popover"]').not(this).popover('hide');
-		return $('#popover-project-' + $(this).data('project-id')).html();
-	}
-});
-
-$(document).on('click', '.btn-confirm-homework', function() {
-	var hw_id = $(this).data('homework-id');
-
-	$.post("<?php echo site_url('homework/ajax_edit') ?>", {
-		pk: hw_id,
-		name: 'status',
-		value: 'done'
-	}, (data) => {
-		data = JSON.parse(data);
-		$.mbNotify(data.message, data.message_type);
-
-		$(this)
-		.parents('.child')
-		.find('td')
-		.wrapInner('<div style="display: block;" />')
-		.parent()
-		.find('td > div')
-		.slideUp('fast', function(){
-			$(this).parent().parent().remove();
-		});
-
-		$('#homework-popover tr.child[data-homework-id="'+ hw_id +'"]').remove();
-		$('.homework-counter').text($('.homework-counter').text() - 1);
-	})
-})
-
-$(document).on('click', '.btn-time + ul > li > a', function(e) {
-	e.preventDefault();
-	var time = parseFloat( $(this).parent().parent().data('minute') );
-	var parent = $(this).parents('.time-wrapper');
-
-	switch ($(this).data('option')) {
-		case 'minute':
-			$(parent).find('.btn-time > .number').text(Math.round(time * 100) / 100);
-			break;
-		case 'hour':
-			$(parent).find('.btn-time > .number').text(Math.round(time / 60 * 100) / 100);
-			break;
-		case 'day':
-			$(parent).find('.btn-time > .number').text(Math.round(time / 60 / 24 * 10) / 10);
-	}
-
-	$(parent).find('.btn-time > .text').text($(this).text());
-})
+<?php endif; ?>

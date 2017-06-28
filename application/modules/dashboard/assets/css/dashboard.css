@@ -386,7 +386,7 @@
 }
 
 .an-child-nav > li > .popover > .popover-content {
-	padding-top: 2px;
+	padding: 2px 0 0;
 }
 
 .an-child-nav > li > .popover .mb-popover-content {

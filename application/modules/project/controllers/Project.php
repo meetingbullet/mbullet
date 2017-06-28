@@ -746,12 +746,7 @@ class Project extends Authenticated_Controller
 		}
 
 		// Only member of PJ or Creator can edit
-		$test = $this->project_model
-		->select($this->input->post('name'))
-		->where('owner_id', $this->current_user->user_id)
-		->find($this->input->post('pk'));
-
-		if ($test === false) {
+		if (! $this->mb_project->has_permission('project', $this->input->post('pk'), 'Project.Edit.All')) {
 			header('HTTP/1.0 401 Unauthorized 💔', true, 401);
 			echo json_encode([
 				'message_type' => 'danger',
@@ -774,8 +769,6 @@ class Project extends Authenticated_Controller
 			]);
 			return;
 		}
-
-		$this->mb_project->update_parent_objects('project', $this->input->post('pk'));
 
 		if ($this->input->post('name') == 'name') {
 			echo json_encode([
