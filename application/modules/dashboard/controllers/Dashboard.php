@@ -120,6 +120,27 @@ class Dashboard extends Authenticated_Controller
 			echo json_encode([$user, $projects, $my_todo]); exit;
 		}
 
+		$event_sources = [
+			[
+				'id' => 'mbc',
+				'url' => site_url('meeting/get_events/mbc'),
+				'color' => '#70c1b3',
+				'textColor' => 'white',
+				'className' => 'mbc-event'
+			],
+			[
+				'id' => 'ggc',
+				'url' => site_url('meeting/get_events/ggc'),
+				'color' => '#999',
+				'textColor' => 'white',
+				'className' => 'ggc-event'
+			]
+		];
+
+		Assets::add_js($this->load->view('calendar_js', [
+			'event_sources' => $event_sources
+		], true), 'inline');
+
 		Assets::add_js($this->load->view('index_js', [
 			'now' => gmdate('Y-m-d H:i:s'),
 			'meeting_calendar' => $meeting_calendar

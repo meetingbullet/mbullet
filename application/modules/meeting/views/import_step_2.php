@@ -36,7 +36,8 @@ if (! in_array($current_user->email, $event->attendees)) {
 				</select>
 			</div>
 		</div>
-		<?php foreach ($event->attendees as $attendee) : ?>
+		<?php $showed = []; ?>
+		<?php foreach ($event->attendees as $attendee) : if (! in_array($attendee->email ,$showed)) : ?>
 		<div class="item <?php echo ! empty($attendee->in_mb_system) ? 'in-system' : '' ?>">
 			<p>
 				<i class="ion-close-circled dismiss-user"></i>
@@ -47,10 +48,11 @@ if (! in_array($current_user->email, $event->attendees)) {
 				} else {
 					$user_emails[] = $attendee->email;
 				}
+				$showed[] = $attendee->email; 
 				?>
 			</p>
 		</div>
-		<?php endforeach ?>
+		<?php endif; endforeach; ?>
 	</div>
 
 	<div class="modal-footer">

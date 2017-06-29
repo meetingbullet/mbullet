@@ -995,7 +995,7 @@ class Mb_project
 				if ($updated !== false) {
 					$count++;
 				}
-				// echo "update {$type} id: {$object_id} <br>";
+				echo "update {$type} id: {$object_id} <br>";
 			}
 
 			if ($index != (count($types) - 1)) {

@@ -1,5 +1,5 @@
 <?php
-dump($projects);
+//dump($projects);
 ?>
 <div class="main-container">
 	<div class="an-sidebar-nav js-sidebar-toggle-with-click">
@@ -153,7 +153,8 @@ dump($projects);
 
 		<div class="an-page-content">
 			<?php // @ BaoDG : Add Calendar here ?>
-			<div id="fullcalendar">
+			<div class="calendar-wrapper">
+				<div id="calendar"></div>
 			</div>
 		</div> <!-- end .AN-PAGE-CONTENT -->
 
