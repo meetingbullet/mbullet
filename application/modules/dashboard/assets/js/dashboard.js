@@ -94,10 +94,6 @@ $('#open-rate').click(function(e) {
 	$('[data-toggle="popover"]').not(this).popover('hide');
 })
 
-$('.mb-popover-project').click(function(e){
-	e.preventDefault();
-});
-
 $('.mb-popover-project').popover({
 	html: true, 
 	content: function() {

@@ -293,7 +293,7 @@
 	color: white;
 }
 
-.an-nav-item>a .nav-title .count {
+span.count {
 	position: absolute;
 	top: 7px;
 	text-align: center;

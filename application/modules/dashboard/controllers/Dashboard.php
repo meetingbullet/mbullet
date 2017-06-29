@@ -146,15 +146,60 @@ class Dashboard extends Authenticated_Controller
 		Template::render();
 	}
 
+	public function mark_as_read($object_type, $object_id)
+	{
+		if ( empty($object_type) || empty($object_id) ) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('db_unknown_error')
+			]);
+			return;
+		}
+
+		if ( !in_array($object_type, ['project', 'meeting', 'meeting_member', 'agenda', 'homework']) ) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('db_unknown_error')
+			]);
+			return;
+		}
+
+		$object_pk = $object_type == 'meeting_member' 
+		? 'meeting' 
+		: $object_type;
+
+		// Prevent duplicate row by MySQL Insert Ignore
+		$query = $this->db->insert_string($object_type . '_reads', [
+			$object_pk . '_id' => $object_id,
+			'user_id' => $this->current_user->user_id
+		]);
+
+		$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+
+		if ($this->db->query($query)) {
+			echo json_encode([
+				'message_type' => 'success'
+			]);
+			return;
+		}
+
+		echo json_encode([
+			'message_type' => 'danger',
+			'message' => lang('db_unknown_error')
+		]);
+	}
+
 	private function get_my_projects()
 	{
 		$projects = $this->project_model
 		->select('projects.name, projects.project_id, projects.cost_code, u.email, u.avatar, u.first_name, u.last_name, 
 		(SELECT COUNT(*) FROM ' . $this->db->dbprefix('project_members') . ' WHERE ' . 
 		$this->db->dbprefix('project_members') . '.project_id = ' . 
-		$this->db->dbprefix('projects') . '.project_id) as member_number')
+		$this->db->dbprefix('projects') . '.project_id) as member_number,
+		pr.user_id IS NOT NULL as is_read', false)
 		->join('users u', 'u.user_id = projects.owner_id')
 		->join('project_members pm', 'projects.project_id = pm.project_id AND pm.user_id =' . $this->current_user->user_id, 'LEFT')
+		->join('project_reads pr', 'projects.project_id = pr.project_id AND pr.user_id =' . $this->current_user->user_id, 'LEFT')
 		->where('projects.status !=', 'archive')
 		->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
 		->where('organization_id', $this->current_user->current_organization_id)
@@ -224,11 +269,13 @@ class Dashboard extends Authenticated_Controller
 	{
 		$homeworks_query = $this->homework_model
 		->select('homework.homework_id, homework.name, s.meeting_key, 
-		s.name AS meeting_name, s.scheduled_start_time, s.in, s.in_type')
+		s.name AS meeting_name, s.scheduled_start_time, s.in, s.in_type,
+		hr.user_id IS NOT NULL AS is_read', false)
 		->join('meetings s', 's.meeting_id = homework.meeting_id')
 		->join('actions a', 'a.action_id = s.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
 		->join('homework_members hm', 'hm.homework_id = homework.homework_id AND hm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->join('homework_reads hr', 'homework.homework_id = hr.homework_id AND hr.user_id =' . $this->current_user->user_id, 'LEFT')
 		->where('homework.status', 'open')
 		->where('organization_id', $this->current_user->current_organization_id)
 		->where('(homework.created_by = \'' . $this->current_user->user_id . '\' OR hm.user_id = \'' . $this->current_user->user_id . '\' )')

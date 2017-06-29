@@ -731,10 +731,10 @@ class Project extends Authenticated_Controller
 	}
 
 	/**
-		X-Editable AJAX request to edit project fields
-		pk: primary key
-		name: column name
-		value: new value
+	*	X-Editable AJAX request to edit project fields
+	*	pk: primary key
+	*	name: column name
+	*	value: new value
 	*/
 	public function ajax_edit()
 	{

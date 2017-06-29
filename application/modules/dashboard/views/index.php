@@ -1,4 +1,23 @@
 <?php
+$has_new_homework = false;
+foreach ($my_todo['homeworks'] as $meeting_key => $homeworks) {
+	foreach ($homeworks as $homework) {
+		if ($homework->is_read == 0) {
+			$has_new_homework = true;
+			break;
+		}
+	}
+
+	if ($has_new_homework) break;
+}
+
+$has_new_project = false;
+foreach ($projects as $project) {
+	if ($project->is_read == 0) {
+		$has_new_project = true;
+		break;
+	}
+}
 ?>
 <div class="main-container">
 	<div class="an-sidebar-nav js-sidebar-toggle-with-click">
@@ -13,6 +32,9 @@
 				<a id="my-todo" class="js-show-child-nav nav-open" href="#">
 					<i class="ion-ios-copy-outline"></i>
 					<span class="nav-title">My To Do
+					<?php if ($has_new_homework):?>
+					<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
+					<?php endif; ?>
 					<span class="count"><?php echo $my_todo['homeworks_count'] + count($my_todo['evaluates']) ?></span>
 					</span>
 				</a>
@@ -27,6 +49,9 @@
 
 							<i class="ion-ios-book-outline"></i>
 							<?php echo lang('db_homework') ?>
+							<?php if ($has_new_homework):?>
+							<span class="badge badge-warning badge-bordered badge-homework-new">new</span>
+							<?php endif; ?>
 							<span class="badge badge-primary pull-right homework-counter"><?php echo $my_todo['homeworks_count'] ?></span>
 						</a>
 					</li>
@@ -48,6 +73,10 @@
 				<a id="my-project" class="js-show-child-nav" href="#">
 					<i class="ion-ios-briefcase-outline"></i>
 					<span class="nav-title">My Projects
+
+					<?php if ($has_new_project):?>
+					<span class="badge badge-warning badge-bordered badge-new">new</span>
+					<?php endif; ?>
 					<?php if (count($projects) > 0): ?>
 					<span class="count"><?php e(count($projects)) ?></span>
 					<?php endif; ?>
@@ -57,11 +86,15 @@
 				<ul class="an-child-nav js-open-nav" style="display: none;">
 					<?php foreach ($projects AS $project): ?>
 					<li>
-						<a href="<?php echo site_url('project/' . $project->cost_code)?>" class='mb-popover-project' 
+						<a href="<?php echo site_url('project/' . $project->cost_code)?>" class='mb-popover-project <?php if ( !$project->is_read) echo 'new' ?>' 
 							data-project-id="<?php echo $project->project_id ?>" 
 							data-toggle="popover" 
 							data-placement="right">
 							<?php echo ($project->name . " <b>[{$project->cost_code}]</b>") ?>
+
+							<?php if ( ! $project->is_read): ?>
+							<span class="badge badge-warning badge-bordered badge-new">new</span>
+							<?php endif; ?>
 						</a>
 					</li>
 					<?php endforeach; ?>
@@ -204,8 +237,12 @@
 					<th class="text-center">Confirm</th>
 				</tr>
 				<?php $j = 1; foreach ($homework as $hw):?>
-				<tr data-homework-id="<?php echo $hw->homework_id ?>" class='child'>
-					<td></td>
+				<tr data-homework-id="<?php echo $hw->homework_id ?>" class='child<?php echo iif ( ! $hw->is_read, ' new') ?>'>
+					<td>
+						<?php if ( ! $hw->is_read): ?>
+						<span class="badge badge-warning badge-bordered badge-homework-new">new</span>
+						<?php endif; ?>
+					</td>
 					<td><?php echo $i .'.'. $j++ ?></td>
 					<td colspan="2"><?php echo $hw->name ?></td>
 					<td class="text-center">
