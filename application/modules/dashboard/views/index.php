@@ -103,7 +103,7 @@ foreach ($projects as $project) {
 		</ul> <!-- end .AN-MAIN-NAV -->
 	</div> <!-- /.an-sidebar-nav -->
 
-	<div class="an-dashboard-content">
+	<div class="an-page-content">
 		<header class="an-header wow fadeInDown">
 			<div class="an-topbar-left-part">
 			</div> <!-- end .AN-TOPBAR-LEFT-PART -->
@@ -185,13 +185,18 @@ foreach ($projects as $project) {
 			</div> <!-- end .AN-TOPBAR-RIGHT-PART -->
 		</header> <!-- end .AN-HEADER -->
 
-		<div class="an-page-content">
+		<div class="an-content-body">
 			<?php // @ BaoDG : Add Calendar here ?>
 			<div id="fullcalendar">
 			</div>
-		</div> <!-- end .AN-PAGE-CONTENT -->
 
-	</div>
+
+		</div> <!-- end .AN-CONTENT-BODY -->
+
+		<footer class="an-footer">
+			<p>COPYRIGHT 2017 © GEAR INC. ALL RIGHTS RESERVED</p>
+		</footer> <!-- end an-footer -->
+	</div> <!-- .an-page-content -->
 </div>
 
 <div id="template">
