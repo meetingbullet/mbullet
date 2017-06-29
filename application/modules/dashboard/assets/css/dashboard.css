@@ -253,17 +253,20 @@
 	-webkit-box-shadow: none;
 }
 
-.an-dashboard-content {
-	position: relative;
-	width: 100%;
-	min-height: 96vh;
-	display: flex;
-	align-items: stretch;
+.an-page-content {
 	flex-direction: column;
 }
 
-.an-dashboard-content .an-page-content {
-	min-height: 88vh;
+.an-content-body {
+	padding: 20px;
+	padding-bottom: 58px;
+}
+
+.an-footer {
+	position: absolute;
+	width: 100%;
+	height: 38px;
+	bottom: 0;
 }
 
 .an-sidebar-nav {
