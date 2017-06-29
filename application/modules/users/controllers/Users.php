@@ -145,11 +145,12 @@ class Users extends Front_Controller
 				$token = $client->getAccessToken();
 				$google_user = $service->userinfo->get();
 
-				$user = $this->user_model->find_by('email', $google_user->email);
+				$user = $this->user_model->find_by('google_id', $google_user->id);
 				if (! $user) {
 					// add google user to db
 					$added = $this->user_model->insert([
 						'email' => $google_user->email,
+						'google_id' => $google_user->id,
 						'google_refresh_token' => $token['refresh_token'],
 						'google_id_token' => $token['id_token'],
 						'first_name' => $google_user->given_name,
@@ -164,6 +165,7 @@ class Users extends Front_Controller
 					}
 				} else {
 					$update_data = [
+						'email' => $google_user->email,
 						'google_id_token' => $token['id_token'],
 						'first_name' => $google_user->given_name,
 						'last_name' => $google_user->family_name,
