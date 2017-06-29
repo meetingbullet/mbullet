@@ -992,28 +992,30 @@ class Mb_project
 		}
 
 		$types = array_values($types);
-
+		$index = array_search($object_type, $types);
 		$count = 0;
-		foreach ($types as $index => $type) {
-			$this->ci->load->model($type . '/' . $type . '_model');
-			$object = $this->ci->{$type . '_model'}->find($object_id);
+
+		for ($i = $index; $i < count($types) - 1; $i++) {
+			$this->ci->load->model($types[$i] . '/' . $types[$i] . '_model');
+			$object = $this->ci->{$types[$i] . '_model'}->find($object_id);
 
 			if (empty($object)) {
 				return false;
 			}
 
-			if ($index != 0) {
-				$updated = $this->ci->{$type . '_model'}->skip_validation(true)->update($object_id, ['modified_on' => date('Y-m-d H:i:s')]);
-				if ($updated !== false) {
-					$count++;
-				}
-				//echo "update {$type} id: {$object_id} <br>";
+			if ($i > 0) {
+				$count += $this->ci->{$types[$i] . '_model'}
+				->skip_validation(true)
+				->update($object_id, ['modified_on' => date('Y-m-d H:i:s')]);
 			}
 
-			if ($index != (count($types) - 1)) {
-				$object_id = $object->{$types[$index + 1] . '_id'};
-			}
+			$object_id = $object->{$types[$i + 1] . '_id'};
+		
 		}
+		
+		$count += $this->ci->{$types[$i] . '_model'}
+		->skip_validation(true)
+		->update($object_id, ['modified_on' => date('Y-m-d H:i:s')]);
 
 		return (boolean) $count;
 	}

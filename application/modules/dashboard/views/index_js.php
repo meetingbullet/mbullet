@@ -135,8 +135,8 @@ $(document).on("click", "#rate-content .submit", function(e) {
 		var error = '<?php echo lang("db_rate_needed") ?>';
 	}
 
-	if (typeof(error) == 'undefined') {console.log(data, url);
-		/*$.post({
+	if (typeof(error) == 'undefined') {
+		$.post({
 			url: url,
 			data: data,
 		}).done(function(data) {console.log(data);
@@ -159,7 +159,7 @@ $(document).on("click", "#rate-content .submit", function(e) {
 				type: data.message_type,
 				z_index: 1051
 			});
-		});*/
+		});
 	} else {
 		$.notify({
 			message: error
