@@ -72,3 +72,101 @@ $(document).on('click', '#homework-content .child.new', function(e){
 		}
 	})
 });
+
+$(document).on('click', '.btn-confirm-homework:not(.submit)', function() {
+	var hw_id = $(this).data('homework-id');
+
+	$.post("<?php echo site_url('homework/ajax_edit') ?>", {
+		pk: hw_id,
+		name: 'status',
+		value: 'done'
+	}, (data) => {
+		data = JSON.parse(data);
+		$.mbNotify(data.message, data.message_type);
+
+		$(this)
+		.parents('.child')
+		.find('td')
+		.wrapInner('<div style="display: block;" />')
+		.parent()
+		.find('td > div')
+		.slideUp('fast', function(){
+			$(this).parent().parent().remove();
+		});
+
+		$('#homework-popover tr.child[data-homework-id="'+ hw_id +'"]').remove();
+		$('.homework-counter').text($('.homework-counter').text() - 1);
+	})
+})
+
+// rating
+$(document).on('click', '.todo-rating label', function(){
+	$(this).parent().find("label").css({"color": "#D8D8D8"});
+	$(this).css({"color": "#FFED85"});
+	$(this).nextAll().css({"color": "#FFED85"});
+	var input_id = $(this).attr('for');
+	$(this).parent().find('input[type=radio]').removeAttr('checked');
+	$(this).parent().find('input[type=radio]#' + input_id).attr('checked', '');
+});
+
+// evaluate
+$(document).on("click", "#rate-content .submit", function(e) {
+	e.preventDefault();
+	var submit_btn = $(this);
+
+	var todo_type = 'evaluate';
+
+	var url = submit_btn.closest('.child').find('.data').data('url');
+
+	var data = {};
+	data.rate = submit_btn.closest('.child').find('.data').find('input[type=radio]:checked').val();
+
+	if (typeof(data.rate) != 'undefined') {
+		data.meeting_id = submit_btn.closest('.child').find('.data').data('meeting-id');
+
+		if (submit_btn.closest('.child').hasClass('user')) {
+			data.user_id = submit_btn.closest('.child').find('.data').data('user-id');
+		}
+
+		if (submit_btn.closest('.child').hasClass('agenda')) {
+			data.agenda_id = submit_btn.closest('.child').find('.data').data('agenda-id');
+		}
+	} else {
+		var error = '<?php echo lang("db_rate_needed") ?>';
+	}
+
+	if (typeof(error) == 'undefined') {console.log(data, url);
+		/*$.post({
+			url: url,
+			data: data,
+		}).done(function(data) {console.log(data);
+			data = JSON.parse(data);
+			if (data.message_type == 'success') {
+				submit_btn.parent().parent().slideUp();
+			}
+
+			$.notify({
+				message: data.message
+			}, {
+				type: data.message_type,
+				z_index: 1051
+			});
+		}).fail(function(xhr, statusText) {
+			console.log(xhr.status);
+			$.notify({
+				message: data.message
+			}, {
+				type: data.message_type,
+				z_index: 1051
+			});
+		});*/
+	} else {
+		$.notify({
+			message: error
+		}, {
+			type: 'danger',
+			z_index: 1051
+		});
+	}
+
+});

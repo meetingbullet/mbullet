@@ -102,32 +102,6 @@ $('.mb-popover-project').popover({
 	}
 });
 
-$(document).on('click', '.btn-confirm-homework', function() {
-	var hw_id = $(this).data('homework-id');
-
-	$.post("<?php echo site_url('homework/ajax_edit') ?>", {
-		pk: hw_id,
-		name: 'status',
-		value: 'done'
-	}, (data) => {
-		data = JSON.parse(data);
-		$.mbNotify(data.message, data.message_type);
-
-		$(this)
-		.parents('.child')
-		.find('td')
-		.wrapInner('<div style="display: block;" />')
-		.parent()
-		.find('td > div')
-		.slideUp('fast', function(){
-			$(this).parent().parent().remove();
-		});
-
-		$('#homework-popover tr.child[data-homework-id="'+ hw_id +'"]').remove();
-		$('.homework-counter').text($('.homework-counter').text() - 1);
-	})
-})
-
 $(document).on('click', '.btn-time + ul > li > a', function(e) {
 	e.preventDefault();
 	var time = parseFloat( $(this).parent().parent().data('minute') );

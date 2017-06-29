@@ -18,6 +18,7 @@ foreach ($projects as $project) {
 		break;
 	}
 }
+//dump($my_todo['evaluates']);
 ?>
 <div class="main-container">
 	<div class="an-sidebar-nav js-sidebar-toggle-with-click">
@@ -287,11 +288,18 @@ foreach ($projects as $project) {
 </div>
 
 <div id="popover-rate" style="display: none">
+	<div style="display: none;" class="todo-rating">
+		<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+		<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+		<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+		<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+		<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+	</div>
 	<div id="rate-content" class="mb-popover-content">
 		<table class="table">
 			<thead>
 				<tr>
-					<th>Project</th>
+					<th>Key</th>
 					<th>ID</th>
 					<th>Meeting</th>
 					<th class="text-center">Date</th>
@@ -302,55 +310,62 @@ foreach ($projects as $project) {
 			<tbody>
 				<?php 
 				$i = 1; 
-				foreach ($my_todo['homeworks'] as $meeting_key => $homework): 
-					$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $homework[0]->scheduled_start_time);
-					$scheduled_end_time->modify('+' . $homework[0]->in . ' ' . $homework[0]->in_type);
+				foreach ($my_todo['evaluates'] as $meeting_id => $meeting): 
+					$scheduled_end_time = date_create_from_format('Y-m-d H:i:s', $meeting->scheduled_start_time);
+					$scheduled_end_time->modify('+' . $meeting->in . ' ' . $meeting->in_type);
 
-					$scheduled_start_date = display_time($homework[0]->scheduled_start_time, null, 'l jS F');
+					$scheduled_start_date = display_time($meeting->scheduled_start_time, null, 'l jS F');
 
-					$scheduled_start_time = display_time($homework[0]->scheduled_start_time, null, 'H:ia');
+					$scheduled_start_time = display_time($meeting->scheduled_start_time, null, 'H:ia');
 					$scheduled_end_time = display_time($scheduled_end_time->format('Y-m-d H:i:s'), null, 'H:ia');
 				?>
-				<tr data-homework-id="<?php echo $homework[0]->homework_id ?>" class='parent'>
-					<td><?php echo $meeting_key ?></td>
+				<tr class='parent'>
+					<td><?php echo $meeting->meeting_key ?></td>
 					<td><?php echo $i ?></td>
-					<td><?php echo $homework[0]->meeting_name ?></td>
+					<td><?php echo $meeting->name ?></td>
 					<td class="text-center"><?php echo $scheduled_start_date ?></td>
 					<td class="text-center"><?php echo $scheduled_start_time . ' - ' . $scheduled_end_time ?></td>
 					<td><!--<i class="indicator glyphicon glyphicon-chevron-up pull-right"></i>--></td>
 				</tr>
-				<tr data-homework-id="<?php echo $homework[0]->homework_id ?>" class='child-head'>
+				<tr class='child-head'>
 					<th></th>
 					<th></th>
-					<th>To Do</th>
-					<th></th>
-					<th></th>
+					<th>Evaluate</th>
+					<th class="text-center">Type</th>
+					<th class="text-center">Rate</th>
 					<th class="text-center">Confirm</th>
 				</tr>
-				<?php $j = 1; foreach ($homework as $hw):?>
-				<tr data-homework-id="<?php echo $hw->homework_id ?>" class='child'>
+				<?php $j = 1; foreach ($meeting->evaluates as $evaluate):?>
+				<tr class='child <?php echo $evaluate->evaluate_mode ?>'>
 					<td></td>
 					<td><?php echo $i .'.'. $j++ ?></td>
-					<td colspan="2"><?php echo $hw->name ?></td>
-					<td class="text-center">
-						<?php if ($hw->attachments): ?>
-						<div class="attachment">
-							<?php foreach ($hw->attachments as $att): ?>
-							<a href="<?php echo $att->url ?>" target="_blank">
-								<span class="icon">
-									<?php if ($att->favicon): ?>
-									<img src="<?php echo $att->favicon ?>" data-toggle="tooltip" alt="[A]" title="<?php echo $att->title ? $att->title : $att->url ?>">
-									<?php else: ?>
-									<i class="icon-file" data-toggle="tooltip" title="<?php echo $att->title ? $att->title : $att->url ?>"></i>
-									<?php endif; ?>
-								</span>
-							</a>
-							<?php endforeach; ?>
+					<td>
+						<?php
+						if ($evaluate->evaluate_mode == 'user') {
+							echo '<div class="user-wrapper">' . display_user($evaluate->email, $evaluate->first_name, $evaluate->last_name, $evaluate->avatar) . '</div>';
+						} elseif ($evaluate->evaluate_mode == 'homework') {
+							echo $evaluate->name;
+						} elseif ($evaluate->evaluate_mode == 'agenda') {
+							echo $evaluate->name;
+						} else {
+							echo $meeting->name;
+						}
+						?>
+					</td>
+					<td class="text-center"><?php echo $evaluate->evaluate_mode ?></td>
+					<td class="text-center data" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $evaluate->evaluate_mode) ?>" data-meeting-id="<?php echo $evaluate->meeting_id ?>" <?php echo $evaluate->evaluate_mode != 'agenda' ? 'data-user-id="' . $evaluate->user_id . '"' : 'data-agenda-id="' . $evaluate->agenda_id . '"' ?>>
+						<div class="todo-rating-wrapper">
+							<div class="todo-rating">
+								<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+								<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+								<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+								<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+								<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+							</div>
 						</div>
-						<?php endif; ?>
 					</td>
 					<td class="text-center">
-						<i class="ion-android-checkbox btn-confirm-homework" data-homework-id="<?php echo $hw->homework_id ?>"></i>
+						<i class="ion-android-checkbox btn-confirm-homework submit"></i>
 					</td>
 				</tr>
 				<?php endforeach; $i++;

@@ -34,6 +34,17 @@ class Dashboard extends Authenticated_Controller
 	{
 		$projects = $this->get_my_projects();
 		$my_todo = $this->get_my_todo();
+		$evaluates = [];
+		foreach ($my_todo['meetings'] as $meeting) {
+			foreach ($my_todo['evaluates'] as $todo) {
+				if ($todo->meeting_id == $meeting->meeting_id) {
+					$meeting->evaluates[] = $todo;
+					$evaluates[$meeting->meeting_id] = $meeting;
+				}
+			}
+		}
+		unset($my_todo['meetings']);
+		$my_todo['evaluates'] = $evaluates;
 
 		$my_meetings = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
 									->join('users u', 'u.user_id = meetings.owner_id')
@@ -329,6 +340,8 @@ class Dashboard extends Authenticated_Controller
 			$evaluate_meetings = [];
 		}
 
+		$meetings = $evaluate_meetings;
+
 		$owner_meeting_ids = [];
 		$member_meeting_ids = [];
 
@@ -407,7 +420,8 @@ class Dashboard extends Authenticated_Controller
 			'homeworks_count' => count($homeworks_query),
 			'homeworks' => $homeworks,
 			'evaluates' => $evaluates,
-			'decides' => $decides
+			'decides' => $decides,
+			'meetings' => $meetings
 		];
 	}
 
