@@ -1,73 +1,74 @@
+<?php if (has_permission('Project.Edit.All')): ?>
 $('.mb-popover-project').on('shown.bs.popover', function() {
-	$('.mb-editable').editable();
-	console.log('ok');
-})
+	$('.mb-editable').editable({
+		success: function(data) {
+			data = JSON.parse(data);
 
-$('#homework').click(function(e) {
-	e.preventDefault();
-	$(this).popover({
-		html: true, 
-		content: function() {
-			return $('#homework-popover').html();
+			$.mbNotify(data.message, data.message_type);
+			
+			if (data.message_type == 'danger') {
+				return;
+			}
+
+			$(this).data('value', data.value);
+			$(this).html(data.value);
 		}
 	});
-
-	$('[data-toggle="popover"]').not(this).popover('hide');
 })
+<?php endif; ?>
 
-$('.mb-popover-project').click(function(e) {
+$('.mb-popover-project').click(function(e){
 	e.preventDefault();
-	$(this).popover({
-		html: true, 
-		content: function() {
-			return $('#popover-project-' + $(this).data('project-id')).html();
-		}
-	});
-
-	$('[data-toggle="popover"]').not(this).popover('hide');
 })
 
-$(document).on('click', '.btn-confirm-homework', function() {
-	var hw_id = $(this).data('homework-id');
 
-	$.post("<?php echo site_url('homework/ajax_edit') ?>", {
-		pk: hw_id,
-		name: 'status',
-		value: 'done'
-	}, (data) => {
+$('.mb-popover-project.new').click(function(e){
+	var that = this;
+
+	$.get('<?php echo site_url('dashboard/mark_as_read/project/') ?>' + $(this).data('project-id'), (data) => {
 		data = JSON.parse(data);
-		$.mbNotify(data.message, data.message_type);
 
-		$(this)
-		.parents('.child')
-		.find('td')
-		.wrapInner('<div style="display: block;" />')
-		.parent()
-		.find('td > div')
-		.slideUp('fast', function(){
-			$(this).parent().parent().remove();
-		});
+		if (data.message_type == 'success') {
+			$(that).removeClass('new');
 
-		$('#homework-popover tr.child[data-homework-id="'+ hw_id +'"]').remove();
-		$('.homework-counter').text($('.homework-counter').text() - 1);
+			// Remove remaining My Project [new]
+			if ($('.badge-new').length == 2) {
+				$('.badge-new').fadeOut('fast', function(){
+					$(this).remove();
+				});
+			} else {
+				$(that).find('.badge-new').fadeOut('fast', function(){
+					$(this).remove();
+				});
+			}
+		}
 	})
-})
+});
 
-$(document).on('click', '.btn-time + ul > li > a', function(e) {
-	e.preventDefault();
-	var time = parseFloat( $(this).parent().parent().data('minute') );
-	var parent = $(this).parents('.time-wrapper');
+$(document).on('click', '#homework-content .child.new', function(e){
+	var that = this;
 
-	switch ($(this).data('option')) {
-		case 'minute':
-			$(parent).find('.btn-time > .number').text(Math.round(time * 100) / 100);
-			break;
-		case 'hour':
-			$(parent).find('.btn-time > .number').text(Math.round(time / 60 * 100) / 100);
-			break;
-		case 'day':
-			$(parent).find('.btn-time > .number').text(Math.round(time / 60 / 24 * 10) / 10);
-	}
+	$.get('<?php echo site_url('dashboard/mark_as_read/homework/') ?>' + $(this).data('homework-id'), (data) => {
+		data = JSON.parse(data);
 
-	$(parent).find('.btn-time > .text').text($(this).text());
-})
+		if (data.message_type == 'success') {
+			var tr = 'tr[data-homework-id="'+ $(that).data('homework-id') +'"].child';
+			$(tr).removeClass('new');
+
+			// Remove remaining menu Homework [new] & My Todo new if all Rates has been read
+			if ($('.badge-homework-new').length == 3) {
+				$('.badge-homework-new').fadeOut('fast', function(){
+					$(this).remove();
+				});
+
+				if ($('.badge-rate-new').length == 0) {
+					$('.badge-todo-new').remove(); 
+				}
+			} else {
+				$(tr + ' .badge-homework-new').fadeOut('fast', function(){
+					$(this).remove();
+				});
+			}
+		}
+	})
+});

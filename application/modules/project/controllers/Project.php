@@ -731,10 +731,10 @@ class Project extends Authenticated_Controller
 	}
 
 	/**
-		X-Editable AJAX request to edit project fields
-		pk: primary key
-		name: column name
-		value: new value
+	*	X-Editable AJAX request to edit project fields
+	*	pk: primary key
+	*	name: column name
+	*	value: new value
 	*/
 	public function ajax_edit()
 	{
@@ -746,16 +746,11 @@ class Project extends Authenticated_Controller
 		}
 
 		// Only member of PJ or Creator can edit
-		$test = $this->project_model
-		->select($this->input->post('name'))
-		->where('owner_id', $this->current_user->user_id)
-		->find($this->input->post('pk'));
-
-		if ($test === false) {
+		if (! $this->mb_project->has_permission('project', $this->input->post('pk'), 'Project.Edit.All')) {
 			header('HTTP/1.0 401 Unauthorized 💔', true, 401);
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('hw_no_permission_to_edit')
+				'message' => lang('pj_no_permission_to_edit')
 			]);
 			return;
 		}
@@ -770,12 +765,10 @@ class Project extends Authenticated_Controller
 			header('HTTP/1.0 500 Server error 💔', true, 500);
 			echo json_encode([
 				'message_type' => 'danger',
-				'message' => lang('hw_unknown_error')
+				'message' => lang('pj_unknown_error')
 			]);
 			return;
 		}
-
-		$this->mb_project->update_parent_objects('project', $this->input->post('pk'));
 
 		if ($this->input->post('name') == 'name') {
 			echo json_encode([
