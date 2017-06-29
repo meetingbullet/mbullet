@@ -121,7 +121,7 @@ class Users extends Front_Controller
 		$client->setClientSecret($client_secret);
 		$client->setRedirectUri($redirect_uri);
 		//$client->setIncludeGrantedScopes(true);
-		$client->addScope(Google_Service_Calendar::CALENDAR_READONLY);
+		$client->addScope(Google_Service_Calendar::CALENDAR);
 		$client->addScope("email");
 		$client->addScope("profile");
 

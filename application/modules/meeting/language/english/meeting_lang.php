@@ -204,3 +204,7 @@ $lang['mt_go_to_detail'] = 'Go to detail';
 $lang['mt_close'] = 'Close';
 $lang['mt_continue'] = 'Continue';
 $lang['mt_response_to_the_goal'] = 'Response to the goal';
+$lang['st_convert_to_mb'] = 'Convert to MB meeting';
+$lang['st_confirm'] = 'Confirm';
+$lang['st_wrong_provided_data'] = 'There is something wrong with the provided data.';
+$lang['st_import_success'] = 'Event imported successfully.';

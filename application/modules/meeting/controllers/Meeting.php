@@ -2005,4 +2005,365 @@ class Meeting extends Authenticated_Controller
 
 		redirect('meeting/' . $meeting->meeting_key);
 	}
+
+	public function import()
+	{
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if ($this->input->get('save_step_1') === '') {
+			$step = 2;
+		}
+
+		if ($this->input->get('save_step_2') === '') {
+			$step = 3;
+		}
+
+		if (empty($step)) {
+			$step = 1;
+		}
+
+		Template::set('close_modal', 0);
+
+		$calendar_id = $this->input->get('calendarId');
+		$event_id = $this->input->get('eventId');
+		$start = $this->input->get('start');
+		$end = $this->input->get('end');
+		if (empty($calendar_id) || empty($event_id) || empty($start) || empty($end)) {
+			Template::set('message', lang('st_wrong_provided_data'));
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 1);
+		}
+
+		$this->config->load('users/google_api');
+
+		require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
+		$client_id = $this->config->item('client_id');
+		$client_secret = $this->config->item('client_secret');
+
+		$client = new Google_Client();
+		$client->setAccessType("offline");
+		$client->setClientId($client_id);
+		$client->setClientSecret($client_secret);
+		$client->refreshToken($this->current_user->google_refresh_token);
+		$token = $client->getAccessToken();
+
+		$service = new Google_Service_Calendar($client);
+
+		$event = $service->events->get($calendar_id, $event_id);
+
+		if (! empty($event->recurrence)) {
+			require_once APPPATH . 'modules/meeting/libraries/rrule/RRuleInterface.php';
+			require_once APPPATH . 'modules/meeting/libraries/rrule/RfcParser.php';
+			require_once APPPATH . 'modules/meeting/libraries/rrule/RSet.php';
+			require_once APPPATH . 'modules/meeting/libraries/rrule/RRule.php';
+
+			$rule = RRule\RfcParser::parseRRule($event->recurrence[0]);
+			$rule['DTSTART'] = empty($event->start->date) ? $event->start->dateTime : $event->start->date;
+
+			$rrule = new RRule\RRule($rule);
+			$event->recurringHumanReadable = $rrule->humanReadable([
+				'date_formatter' => function($date) {
+					return $date->format('F j, Y - H:i:s');
+				},
+				'explicit_infinite' => false
+			]);
+		}
+
+		// if ($step == 1) {
+		// 	Template::set('close_modal', 0);
+		// }
+
+		if ($step == 2) {
+			$import_mode = $this->input->get('import_mode');
+			if (trim($import_mode) == '') {
+				Template::set('message', lang('st_wrong_provided_data'));
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 0);
+			}
+
+			foreach ($event->attendees as &$attendee) {
+				if ($this->user_model->where('email', $attendee->email)->count_all() > 0) {
+					$attendee->in_mb_system = true;
+				}
+			}
+
+			if (has_permission('Project.Edit.All')) {
+				$projects = $this->project_model->select('projects.project_id, projects.name')
+												->where('projects.organization_id', $this->current_user->current_organization_id)
+												->order_by('projects.modified_on', 'desc')
+												->find_all();
+			} else {
+				$projects = $this->project_model->select('projects.project_id, projects.name')
+												->join('users u', 'u.user_id = projects.owner_id')
+												->join('project_members pm', 'projects.project_id = pm.project_id')
+												->where('projects.status !=', 'archive')
+												->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
+												->where('organization_id', $this->current_user->current_organization_id)
+												->order_by('projects.modified_on', 'desc')
+												->group_by('projects.project_id')
+												->find_all();
+			}
+		}
+
+		if ($step == 3) {
+			$step = 2;
+			$project_id = $this->input->get('project_id');
+			$owner_email = $this->input->get('owner_email');
+			$user_emails = $this->input->get('user_emails');
+			$import_mode = $this->input->get('import_mode');
+
+			if (empty($project_id) || empty($owner_email) || empty($user_emails)) {
+				Template::set('message', lang('st_wrong_provided_data'));
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 1);
+			}
+
+			$user_emails = explode(',', $user_emails);
+			$project_key = $this->project_model->get_field($project_id, 'cost_code');
+			$owner = $this->user_model->select('user_id')->find_by('email', $owner_email);
+
+			if (empty($owner) || empty($project_key)) {
+				$error = true;
+			} else {
+				$action_id = $this->mb_project->get_object_id('action', $project_key . '-1');
+				$owner_id = $owner->user_id;
+
+				$owner_in_organization = $this->db->select('COUNT(*) as count')
+												->from('user_to_organizations uto')
+												->where('user_id', $owner_id)
+												->where('organization_id', $this->current_user->current_organization_id)
+												->get()->row()->count > 0;
+
+				if (! $owner_in_organization) {
+					$this->load->model('roles/role_model');
+					$default_role = $this->role_model->where('join_default', 1)->find_by('organization_id', $this->current_user->current_organization_id);
+					$added = $this->db->insert('user_to_organizations', [
+						'user_id' => $this->current_user->user_id,
+						'organization_id' => $organization->organization_id,
+						'role_id' => $default_role->role_id
+					]);
+				}
+
+				$this->load->library('invite/invitation');
+				if (empty($event->recurrence) || $import_mode == 0) {
+					$meeting_data = [
+						'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
+						'action_id' => $action_id,
+						'scheduled_start_time' => $start,
+						'in' => (strtotime($end) - strtotime($start)) / 60,
+						'in_type' => 'minutes',
+						'name' => $event->summary,
+						'owner_id' => $owner_id
+					];
+
+					$meeting_id = $this->meeting_model->skip_validation(true)->insert($meeting_data);
+					if ($meeting_id === false) {
+						$error = true;
+					} else {
+						foreach ($user_emails as $email) {
+							if ($email != $this->current_user->email) {
+								$member_data[] = [
+									'meeting_id' => $meeting_id,
+									'invite_email' => $email,
+									'invite_code' => $this->invitation->generateRandomString(64),
+								];
+							} else {
+								$this->meeting_member_model->insert([
+									'meeting_id' => $meeting_id,
+									'user_id' => $this->current_user->user_id
+								]);
+							}
+						}
+
+						$this->meeting_member_invite_model->insert_batch($member_data);
+						$this->mb_project->invite_emails($meeting_id, 'meeting', $this->current_user, $user_emails);
+
+						Template::set('message', lang('st_import_success'));
+						Template::set('message_type', 'success');
+						Template::set('close_modal', 1);
+					}
+				} else {
+					if ($rrule->isInfinite()) {
+						$occurrences = $rrule->getOccurrencesBetween(null , date('Y-m-d', strtotime($rule['DTSTART'] . ' + 6 months')));
+					} else {
+						$occurrences = $rrule->getOccurrences();
+					}
+
+					foreach ($occurrences as $occurrence) {
+						$meeting_data = [
+							'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
+							'action_id' => $action_id,
+							'scheduled_start_time' => $occurrence->format('Y-m-d H:i:s'),
+							'in' => (strtotime($end) - strtotime($start)) / 60,
+							'in_type' => 'minutes',
+							'name' => $event->summary,
+							'owner_id' => $owner_id
+						];
+
+						$meeting_id = $this->meeting_model->skip_validation(true)->insert($meeting_data);
+						if ($meeting_id === false) {
+							$error = true; break;
+						} else {
+							foreach ($user_emails as $email) {
+								if ($email != $this->current_user->email) {
+									$member_data[] = [
+										'meeting_id' => $meeting_id,
+										'invite_email' => $email,
+										'invite_code' => $this->invitation->generateRandomString(64),
+									];
+								} else {
+									$this->meeting_member_model->insert([
+										'meeting_id' => $meeting_id,
+										'user_id' => $this->current_user->user_id
+									]);
+								}
+							}
+
+							$this->mb_project->invite_emails($meeting_id, 'meeting', $this->current_user, $user_emails);
+						}
+					}
+
+					$this->meeting_member_invite_model->insert_batch($member_data);
+				}
+
+				if (! empty($error)) {
+					Template::set('message', lang('st_wrong_provided_data'));
+					Template::set('message_type', 'danger');
+					Template::set('close_modal', 1);
+				} else {
+					Template::set('message', lang('st_import_success'));
+					Template::set('message_type', 'success');
+					Template::set('close_modal', 1);
+
+					$service->events->delete($calendar_id, $event_id);
+				}
+			}
+		}
+
+		if (empty($projects)) {
+			$projects = [];
+		}
+
+		Template::set('projects', $projects);
+		Template::set('step', $step);
+		Template::set('event', $event);
+		Template::render();
+	}
+
+	public function get_events($type)
+	{
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$types = ['ggc', 'mbc'];
+		$event_list = [];
+
+		if (empty($type) || empty($this->input->get('start')) || empty($this->input->get('end')) || ! in_array($type, $types)) {
+			echo json_encode([]);exit;
+		}
+
+		if ($type == 'ggc') {
+			if (empty($this->current_user->google_refresh_token)) {
+				echo json_encode([]);exit;
+			}
+
+			$this->config->load('users/google_api');
+
+			require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
+			$client_id = $this->config->item('client_id');
+			$client_secret = $this->config->item('client_secret');
+
+			$client = new Google_Client();
+			$client->setAccessType("offline");
+			$client->setClientId($client_id);
+			$client->setClientSecret($client_secret);
+			$client->refreshToken($this->current_user->google_refresh_token);
+			$token = $client->getAccessToken();
+
+			$service = new Google_Service_Calendar($client);
+
+			$calendars = $service->calendarList->listCalendarList();
+			$calendar_list = [];
+			if (! isset($calendars->error)) {
+				while (true) {
+					foreach ($calendars->getItems() as $calendar) {
+						$calendar_list[$calendar->id] = $calendar->summary;
+					}
+					$pageToken = $calendars->getNextPageToken();
+					if ($pageToken) {
+						$calOptParams['pageToken'] = $pageToken;
+						$calendars = $service->calendarList->listCalendarList($calOptParams);
+					} else {
+						break;
+					}
+				}
+			}
+
+			foreach ($calendar_list as $calendar_id => $calendar) {
+				$event_options = [
+					'timeMin' => date('c', strtotime($this->input->get('start'))),
+					'timeMax' => date('c', strtotime($this->input->get('end'))),
+					'singleEvents' => true
+				];
+
+				$events = $service->events->listEvents($calendar_id, $event_options);
+				if (! isset($events->error)) {
+					$total_time = 0;
+					while (true) {
+						$items = $events->getItems();
+						foreach ($items as $item) {
+							$temp = [
+								'start' => ! empty($item->start->date) ? $item->start->date : $item->start->dateTime,
+								'end' => ! empty($item->end->date) ? $item->end->date : $item->end->dateTime,
+								'title' => $item->summary,
+								'url' => $item->htmlLink,
+								'calendarId' => $calendar_id,
+								'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
+							];
+
+							if (! empty($item->start->date)) {
+								$temp['allDay'] = true;
+							}
+
+							$event_list[] = $temp;
+						}
+						$pageToken = $events->getNextPageToken();
+						if ($pageToken) {
+							$event_options['pageToken'] = $pageToken;
+							$events = $service->events->listEvents($calendar_id, $event_options);
+						} else {
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		if ($type == 'mbc') {
+			$events = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email')
+												->join('actions a', 'a.action_id = meetings.action_id')
+												->join('projects p', 'p.project_id = a.project_id')
+												->join('users u', 'u.user_id = meetings.owner_id')
+												->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = "' . $this->current_user->user_id . '"', 'LEFT')
+												->where('organization_id', $this->current_user->current_organization_id)
+												->where('(sm.user_id = "' . $this->current_user->user_id . '" OR meetings.owner_id = "' . $this->current_user->user_id . '")')
+												->group_by('meetings.meeting_id')
+												->find_all();
+			$events = $events && count($events) > 0 ? $events : [];
+
+			foreach ($events as $event) {
+				$event_list[] = [
+					'start' => $event->scheduled_start_time,
+					'end' => date('Y-m-d H:i:s', strtotime($event->scheduled_start_time . ' + ' . $event->in . ' ' . $event->in_type)),
+					'title' => "{$event->meeting_key}: {$event->name}",
+					'url' => site_url('/meeting/' . $event->meeting_key)
+				];
+			}
+		}
+
+		echo json_encode($event_list); exit;
+	}
 }

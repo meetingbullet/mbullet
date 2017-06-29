@@ -752,7 +752,7 @@ class Mb_project
 		}
 
 		if (! empty($emails)) {
-			$this->ci->model($object_type . '/' . $object_type . '_member_invite_model', 'object_member_invite_model');
+			$this->ci->load->model($object_type . '/' . $object_type . '_member_invite_model', 'object_member_invite_model');
 
 			$guests = $this->ci->object_member_invite_model->where($object_type . '_id', $object_id)->where_in('invite_email', $emails)->find_all();
 			if (empty($guests)) {
