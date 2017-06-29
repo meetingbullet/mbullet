@@ -38,6 +38,7 @@ class Users extends Front_Controller
 		parent::__construct();
 
 		$this->load->helper('form');
+		$this->load->helper('mb_general');
 		$this->load->library('form_validation');
 
 		$this->load->model('user_model');
