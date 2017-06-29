@@ -136,7 +136,7 @@ $(document).on("click", "#rate-content .submit", function(e) {
 	}
 
 	if (typeof(error) == 'undefined') {console.log(data, url);
-		/*$.post({
+		$.post({
 			url: url,
 			data: data,
 		}).done(function(data) {console.log(data);
@@ -159,7 +159,7 @@ $(document).on("click", "#rate-content .submit", function(e) {
 				type: data.message_type,
 				z_index: 1051
 			});
-		});*/
+		});
 	} else {
 		$.notify({
 			message: error
