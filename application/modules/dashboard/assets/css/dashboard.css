@@ -173,14 +173,9 @@
 }
 
 /****** Style Star Rating Widget *****/
-.my-todo > .todo-list > .item .todo-right .todo-rating-wraper {
-	text-align: center;
-	display: inline-block;
-	vertical-align: middle;
-}
-
-.my-todo > .todo-list > .item .todo-right .todo-rating-wraper .todo-rating {
-	display: inline-block
+#rate-content .todo-rating-wrapper {
+	overflow: hidden;
+	display: inline-table;
 }
 
 .todo-rating > input {
@@ -460,4 +455,8 @@ span.count {
 
 .mb-popover-content .an-user-lists .an-lists-body {
 	max-height: none;
+}
+
+.child .user-wrapper {
+	padding: 10px 0;
 }
