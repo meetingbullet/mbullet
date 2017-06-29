@@ -80,18 +80,19 @@ $('.team').selectize({
 
 // Input manually handler
 $(document).on('change.meeting.create', '#meeting-in', function() {
-	if ($(this).val() != 'other') {
+	var in_val = $(this).val();
+	if ($(this).val() == 'other') {
+		$('input#in, div#in-unit').fadeIn('fast');
+	} else {
 		if ($('input#in').css('display') != 'none') {
 			$('input#in, div#in-unit').fadeOut({
 				done: function() {
-					$('input#in').val(val);
+					$('input#in').attr('value', in_val);
 				}
 			});
 		} else {
-			$('input#in').val(val);
+			$('input#in').attr('value', in_val);
 		}
-	} else {
-		$('input#in, div#in-unit').fadeIn();
 	}
 });
 

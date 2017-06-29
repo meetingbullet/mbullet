@@ -256,10 +256,14 @@
 .an-dashboard-content {
 	position: relative;
 	width: 100%;
-	min-height: 100vh;
+	min-height: 96vh;
 	display: flex;
 	align-items: stretch;
 	flex-direction: column;
+}
+
+.an-dashboard-content .an-page-content {
+	min-height: 88vh;
 }
 
 .an-sidebar-nav {
@@ -289,7 +293,7 @@
 	color: white;
 }
 
-.an-nav-item>a .nav-title .count {
+span.count {
 	position: absolute;
 	top: 7px;
 	text-align: center;
@@ -382,6 +386,10 @@
 }
 
 .an-child-nav > li > .popover > .popover-content {
+	padding: 2px 0 0;
+}
+
+.an-child-nav > li > .popover .mb-popover-content {
 	padding: 2px 0;
 	max-height: 800px;
 	overflow: auto;
@@ -422,4 +430,8 @@
 .edit-title {
 	width: 500px !important;
 	font-size: 18px;
+}
+
+.mb-popover-content .an-user-lists .an-lists-body {
+	max-height: none;
 }

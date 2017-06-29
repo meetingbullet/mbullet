@@ -56,15 +56,15 @@ class Dashboard extends Authenticated_Controller
 
 		$member_meetings = $member_meetings && count($member_meetings) > 0 ? $member_meetings : [];
 
-		$user = $this->user_model->select('users.user_id, avatar, email, first_name, CONCAT(first_name, " ", last_name) AS full_name, ROUND(SUM(smr.rate) / COUNT(smr.rate)) AS avarage_rate, uto.experience_point as total_xp')
-									->join('meeting_member_rates smr', 'smr.attendee_id = users.user_id')
+		$user = $this->user_model->select('users.user_id, avatar, email, first_name, CONCAT(first_name, " ", last_name) AS full_name, ROUND(SUM(mmr.rate) / COUNT(mmr.rate)) AS avarage_rate, uto.experience_point as total_xp')
+									->join('meeting_member_rates mmr', 'mmr.attendee_id = users.user_id')
 									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND uto.organization_id = "' . $this->current_user->current_organization_id . '"')
 									->find($this->current_user->user_id);
 
 		$user->meeting_count = $this->meeting_model->select('COUNT(*) AS meeting_count')
-									->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id')
+									->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id')
 									->where('owner_id', $this->current_user->user_id)
-									->or_where('sm.user_id', $this->current_user->user_id)
+									->or_where('mm.user_id', $this->current_user->user_id)
 									->find_all();
 		$user->meeting_count = $user->meeting_count && count($user->meeting_count) ? $user->meeting_count[0]->meeting_count : 0;
 
@@ -80,39 +80,39 @@ class Dashboard extends Authenticated_Controller
 		$meeting_calendar_scheduled = $this->meeting_model
 		->select('CONCAT(meeting_key, " ", name) AS title, scheduled_start_time AS start, 
 		CONCAT("'. site_url('meeting/') .'", meeting_key) AS url')
-		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
-		->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
+		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where("(owner_id = {$this->current_user->user_id} OR mm.user_id = {$this->current_user->user_id})", null, false)
 		->where('status', 'ready')
 		->where('scheduled_start_time IS NOT NULL', null, false)
 		->group_by('meeting_key')
 		->find_all();
 
-		$meeting_calendar_scheduled =	$meeting_calendar_scheduled ? $meeting_calendar_scheduled : [];
+		$meeting_calendar_scheduled || $meeting_calendar_scheduled = [];
 
 		$meeting_calendar_started = $this->meeting_model
 		->select('CONCAT(meeting_key, " ", name) AS title, actual_start_time AS start, 
 		CONCAT("'. site_url('meeting/') .'", meeting_key) AS url, "#eb547c" AS backgroundColor')
-		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
-		->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
+		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where("(owner_id = {$this->current_user->user_id} OR mm.user_id = {$this->current_user->user_id})", null, false)
 		->where('status', 'inprogress')
 		->group_by('meeting_key')
 		->find_all();
 
-		$meeting_calendar_started =	$meeting_calendar_started ? $meeting_calendar_started : [];
+		$meeting_calendar_started || $meeting_calendar_started = [];
 
 		$meeting_calendar_ended = $this->meeting_model
 		->select('CONCAT(meeting_key, " ", name) AS title, 
 		actual_start_time AS start, actual_end_time AS end,
 		CONCAT("'. site_url('meeting/preview/') .'", meeting_key) AS url, 
 		"#999" AS backgroundColor')
-		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = ' . $this->current_user->user_id, 'LEFT')
-		->where("(owner_id = {$this->current_user->user_id} OR sm.user_id = {$this->current_user->user_id})", null, false)
+		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where("(owner_id = {$this->current_user->user_id} OR mm.user_id = {$this->current_user->user_id})", null, false)
 		->where('status', 'finished')
 		->or_where('status', 'resolved')
 		->group_by('meeting_key')
 		->find_all();
 
-		$meeting_calendar_ended =	$meeting_calendar_ended ? $meeting_calendar_ended : [];
+		$meeting_calendar_ended || $meeting_calendar_ended = [];
 
 		$meeting_calendar = array_merge($meeting_calendar_scheduled, $meeting_calendar_started, $meeting_calendar_ended);
 
@@ -146,15 +146,60 @@ class Dashboard extends Authenticated_Controller
 		Template::render();
 	}
 
+	public function mark_as_read($object_type, $object_id)
+	{
+		if ( empty($object_type) || empty($object_id) ) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('db_unknown_error')
+			]);
+			return;
+		}
+
+		if ( !in_array($object_type, ['project', 'meeting', 'meeting_member', 'agenda', 'homework']) ) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('db_unknown_error')
+			]);
+			return;
+		}
+
+		$object_pk = $object_type == 'meeting_member' 
+		? 'meeting' 
+		: $object_type;
+
+		// Prevent duplicate row by MySQL Insert Ignore
+		$query = $this->db->insert_string($object_type . '_reads', [
+			$object_pk . '_id' => $object_id,
+			'user_id' => $this->current_user->user_id
+		]);
+
+		$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+
+		if ($this->db->query($query)) {
+			echo json_encode([
+				'message_type' => 'success'
+			]);
+			return;
+		}
+
+		echo json_encode([
+			'message_type' => 'danger',
+			'message' => lang('db_unknown_error')
+		]);
+	}
+
 	private function get_my_projects()
 	{
 		$projects = $this->project_model
 		->select('projects.name, projects.project_id, projects.cost_code, u.email, u.avatar, u.first_name, u.last_name, 
 		(SELECT COUNT(*) FROM ' . $this->db->dbprefix('project_members') . ' WHERE ' . 
 		$this->db->dbprefix('project_members') . '.project_id = ' . 
-		$this->db->dbprefix('projects') . '.project_id) as member_number')
+		$this->db->dbprefix('projects') . '.project_id) as member_number,
+		pr.user_id IS NOT NULL as is_read', false)
 		->join('users u', 'u.user_id = projects.owner_id')
 		->join('project_members pm', 'projects.project_id = pm.project_id AND pm.user_id =' . $this->current_user->user_id, 'LEFT')
+		->join('project_reads pr', 'projects.project_id = pr.project_id AND pr.user_id =' . $this->current_user->user_id, 'LEFT')
 		->where('projects.status !=', 'archive')
 		->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
 		->where('organization_id', $this->current_user->current_organization_id)
@@ -165,11 +210,12 @@ class Dashboard extends Authenticated_Controller
 		}
 
 		foreach ($projects as &$project) {
-			$project->point_used = $this->mb_project->total_point_used('project', $project->project_id, $this->current_user->current_organization_id);
-			$project->no_of_meeting = $this->meeting_model->join('actions a', 'a.action_id = meetings.action_id')
-													->join('projects p', 'p.project_id = a.project_id')
-													->where('organization_id', $this->current_user->current_organization_id)
-													->where('p.project_id', $project->project_id)->count_all();
+			$project->total_used = $this->mb_project->total_used('project', $project->project_id);
+			$project->no_of_meeting = $this->meeting_model
+			->join('actions a', 'a.action_id = meetings.action_id')
+			->join('projects p', 'p.project_id = a.project_id')
+			->where('organization_id', $this->current_user->current_organization_id)
+			->where('p.project_id', $project->project_id)->count_all();
 
 			$project->next_meeting = $this->meeting_model->
 			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
@@ -214,7 +260,6 @@ class Dashboard extends Authenticated_Controller
 			->find_all();
 
 			$project->completed_meetings || $project->completed_meetings = [];
-			$project->time_used = $this->mb_project->total_time_used('project', $project->project_id);
 		}
 
 		return $projects;
@@ -224,30 +269,28 @@ class Dashboard extends Authenticated_Controller
 	{
 		$homeworks_query = $this->homework_model
 		->select('homework.homework_id, homework.name, s.meeting_key, 
-		s.name AS meeting_name, s.scheduled_start_time, s.in, s.in_type, p.cost_code')
+		s.name AS meeting_name, s.scheduled_start_time, s.in, s.in_type,
+		hr.user_id IS NOT NULL AS is_read', false)
 		->join('meetings s', 's.meeting_id = homework.meeting_id')
 		->join('actions a', 'a.action_id = s.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
-		->join('homework_members hm', 'hm.homework_id = homework.homework_id', 'LEFT')
+		->join('homework_members hm', 'hm.homework_id = homework.homework_id AND hm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->join('homework_reads hr', 'homework.homework_id = hr.homework_id AND hr.user_id =' . $this->current_user->user_id, 'LEFT')
 		->where('homework.status', 'open')
 		->where('organization_id', $this->current_user->current_organization_id)
 		->where('(homework.created_by = \'' . $this->current_user->user_id . '\' OR hm.user_id = \'' . $this->current_user->user_id . '\' )')
-		->group_by('homework.homework_id')
-		->order_by('homework.name')
+		->order_by('s.meeting_key')
 		->find_all();
 
-		if (empty($homeworks_query)) {
-			$homeworks_query = [];
-		}
-
+		$homeworks_query || $homeworks_query = [];
 		$homeworks = [];
+
 		foreach ($homeworks_query as &$item) {
 			$item->attachments = $this->homework_attachment_model->where('homework_id', $item->homework_id)->find_all();
 			$item->attachments = $item->attachments ? $item->attachments : [];
 
-			if ( !isset($homeworks[$item->meeting_key]) ) {
-				$homeworks[$item->meeting_key] = [];
-			}
+			isset($homeworks[$item->meeting_key]) || $homeworks[$item->meeting_key] = [];
+
 			$homeworks[$item->meeting_key][] = $item;
 		}
 

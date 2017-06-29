@@ -90,9 +90,9 @@ $lang['pj_detail_tab_info_table_label_name'] = 'Name';
 $lang['pj_detail_tab_info_table_label_status'] = 'Status';
 $lang['pj_info_pager_first'] = 'First';
 $lang['pj_info_pager_last'] = 'Last';
-$lang['pj_no_action'] = 'There are no actions at the moment.';
-$lang['pj_no_meeting'] = 'There are no meetings at the moment.';
-$lang['pj_no_agenda'] = 'There are no agendas at the moment.';
+$lang['pj_no_action'] = 'There are no action at the moment.';
+$lang['pj_no_meeting'] = 'There are no meeting at the moment.';
+$lang['pj_no_agenda'] = 'There are no agenda at the moment.';
 
 // project settings
 $lang['pj_settings'] = 'Project settings';
@@ -135,6 +135,9 @@ $lang['pj_scheduled_start_time'] = 'Scheduled start time';
 $lang['pj_no_permission_to_access'] = 'You have no permission to access this page';
 $lang['pj_edit_project_name'] = 'Edit Project name';
 $lang['pj_project_name_updated'] = 'Project name updated';
+$lang['pj_no_permission_to_edit'] = 'You have no permission to edit';
+$lang['pj_unknown_error'] = 'Unknown error';
+
 // Agendas
 $lang['pj_inprogress'] = 'In Progress';
 $lang['pj_skipped'] = 'Skipped';
