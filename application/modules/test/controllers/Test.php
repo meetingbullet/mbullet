@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Test extends Front_Controller
+class Test extends Authenticated_Controller
 {
 	public function __construct()
 	{
@@ -35,5 +35,31 @@ class Test extends Front_Controller
 		for($i=1; $i<30; $i++) {
 			dump($this->project_model->get_agendas($i), $this->db->last_query());
 		}
+	}
+
+	public function calendar()
+	{
+		$this->lang->load('meeting/meeting');
+		$event_sources = [
+			[
+				'id' => 'mbc',
+				'url' => site_url('meeting/get_events/mbc'),
+				'color' => '#70c1b3',
+				'textColor' => 'white',
+				'className' => 'mbc-event'
+			],
+			[
+				'id' => 'ggc',
+				'url' => site_url('meeting/get_events/ggc'),
+				'color' => '#999',
+				'textColor' => 'white',
+				'className' => 'ggc-event'
+			]
+		];
+
+		Assets::add_js($this->load->view('calendar_js', [
+			'event_sources' => $event_sources
+		], true), 'inline');
+		Template::render();
 	}
 }
