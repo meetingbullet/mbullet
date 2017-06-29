@@ -65,10 +65,12 @@ $(document).ready(function() {
 		firstDay: 1, // Monday
 		// aspectRatio: 1, // content Width-to-Height
 		editable: false,
-		contentHeight: $('.an-dashboard-content .an-page-content').height(),
+		height: ($('.an-dashboard-content .an-page-content').height() - $('.an-dashboard-content .heading-wrapper').height() - 30),
 		eventLimit: true, // allow "more" link when too many events
 		eventSources: <?php echo json_encode($event_sources) ?>
 	});
+
+	$('#calendar .fc-ggcToggle-button, #calendar .fc-mbcToggle-button').addClass('fc-state-active');
 
 	// import modal handler
 	$(document).on('click', '#event-import-modal .dismiss-user', function() {

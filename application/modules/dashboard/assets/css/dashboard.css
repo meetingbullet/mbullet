@@ -1,5 +1,6 @@
 .db-h1 {
 	color: #025d83;
+	margin-bottom: 20px;
 }
 
 .db-h1 > span {
@@ -426,4 +427,22 @@
 
 .calendar-wrapper {
 	padding: 15px;
+}
+
+#calendar .fc-ggcToggle-button {
+	color: white;
+	background: #999;
+}
+
+#calendar .fc-mbcToggle-button {
+	color: white;
+	background: #70c1b3;
+}
+
+#calendar .fc-ggcToggle-button.fc-state-active {
+	background: #6c6767;
+}
+
+#calendar .fc-mbcToggle-button.fc-state-active {
+	background: #3fb4a0;
 }

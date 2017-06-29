@@ -154,6 +154,13 @@
 		<div class="an-page-content">
 			<?php // @ BaoDG : Add Calendar here ?>
 			<div class="calendar-wrapper">
+				<div class="heading-wrapper">
+					<h1 class="db-h1">
+						<span class="an-settings-button">
+							<?php echo lang('st_meetings') ?>
+						</span>
+					</h1>
+				</div>
 				<div id="calendar"></div>
 			</div>
 		</div> <!-- end .AN-PAGE-CONTENT -->
