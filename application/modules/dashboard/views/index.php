@@ -187,7 +187,15 @@ foreach ($projects as $project) {
 
 		<div class="an-content-body">
 			<?php // @ BaoDG : Add Calendar here ?>
-			<div id="fullcalendar">
+			<div class="calendar-wrapper">
+				<div class="heading-wrapper">
+					<h1 class="db-h1">
+						<span class="an-settings-button">
+							<?php echo lang('st_meetings') ?>
+						</span>
+					</h1>
+				</div>
+				<div id="calendar"></div>
 			</div>
 
 
