@@ -138,7 +138,7 @@ class Meeting extends Authenticated_Controller
 								$user_ids[] = $member->user_id;
 							}
 						}
-
+						
 						$this->meeting_member_invite_model->insert_batch($member_data);
 						// $this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
 						$this->mb_project->invite_users($id, 'meeting', $this->current_user, $user_ids);
