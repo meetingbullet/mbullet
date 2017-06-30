@@ -81,7 +81,7 @@ $times = [
 								</select>
 							</div>
 							<div class="col-md-5">
-								<input type="number" style="display: none;" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in')) ?>" meeting="0.1">
+								<input type="number" style="display: none;" name="in" id="in" class="an-form-control<?php e(iif( form_error('in') , ' danger')) ?>" value="<?php e(set_value('in')) ?>" step="0.1">
 							</div>
 							<div class="col-md-2" style="display: none; vertical-align: middle" id="in-unit">
 								<?php e(lang('st_minutes'))?>

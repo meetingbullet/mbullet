@@ -18,9 +18,11 @@ $lang['hw_add_team_member'] = 'Add team member';
 $lang['hw_name'] = 'Name';
 $lang['hw_status'] = 'Status';
 $lang['hw_time_spent'] = 'Time spent';
+$lang['hw_time_spend'] = 'Time spend';
 $lang['hw_description'] = 'Description';
 $lang['hw_member'] = 'Member';
 $lang['hw_attachment'] = 'Attachment';
+$lang['hw_minutes'] = 'minutes';
 
 // Messages
 $lang['hw_meeting_key_does_not_exist'] = 'Meeting key does not exist';

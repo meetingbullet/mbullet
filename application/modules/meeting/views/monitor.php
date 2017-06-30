@@ -12,7 +12,6 @@ if ($meeting->scheduled_start_time) {
 }
 
 $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $scheduled_end_time : null;
-
 ?>
 <div data-meeting-id="<?php e($meeting->meeting_id)?>" class="meeting-monitor" data-status="<?php e($meeting->status) ?>" data-is-owner="<?php echo $is_owner ? 1 : 0 ?>">
 	<?php if (IS_AJAX): ?>
@@ -23,7 +22,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 	<?php endif; ?>
 
 	<?php echo form_open(site_url('meeting/update_meeting_schedule'), ['class' => 'form-inline form-meeting-schedule']) ?>
-		<input type="hidden" name="scheduled_start_time"/>
+		<input type="hidden" name="scheduled_start_time" value="<?php echo display_time($meeting->scheduled_start_time, null, 'Y-m-d H:i:s') ?>" />
 
 		<div class="topbar">
 			<div class="an-page-title">

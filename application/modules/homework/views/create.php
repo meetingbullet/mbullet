@@ -10,7 +10,22 @@
 <div class="container-fluid modal-body">
 	<?php echo mb_form_input('text', 'name', lang('hw_name'), true, null) ?>
 	<?php echo mb_form_input('text', 'description', lang('hw_description'), false, null) ?>
-	<?php echo mb_form_input('number', 'time_spent', lang('hw_time_spent'), true, null, 'an-form-control', null, null, null, 'meeting=".01"') ?>
+
+	<div class="row">
+		<div class="col-md-3 col-sm-12">
+			<label for="time_spent" class="pull-right"><?php e(lang('hw_time_spend')) ?><span class="required">*</span></label>
+		</div>
+		<div class="col-md-9 col-sm-12">
+			<div class="row">
+				<div class="col-md-5">
+					<input type="number" name="time_spent" time_spent="in" class="an-form-control<?php e(iif( form_error('time_spent') , ' danger')) ?>" value="<?php e(set_value('time_spent')) ?>" step="0.1">
+				</div>
+				<div class="col-md-2" style="vertical-align: middle">
+					<?php e(lang('hw_minutes'))?>
+				</div>
+			</div>
+		</div>
+	</div>
 	<?php echo mb_form_input('text', 'member', lang('hw_member'), true, null, 'team select-member an-tags-input', '', lang('hw_add_team_member')) ?>
 
 	<div class="row">

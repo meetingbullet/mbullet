@@ -1013,6 +1013,7 @@ class Mb_project
 		
 		}
 		
+		$this->ci->load->model($types[$i] . '/' . $types[$i] . '_model');
 		$count += $this->ci->{$types[$i] . '_model'}
 		->skip_validation(true)
 		->update($object_id, ['modified_on' => date('Y-m-d H:i:s')]);
