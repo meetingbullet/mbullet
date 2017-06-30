@@ -88,7 +88,7 @@ $(document).on('click', '#rate-content .child.new', function(e){
 		data = JSON.parse(data);
 
 		if (data.message_type == 'success') {
-			var tr = 'tr[data-id="'+ $(that).data('id') +'"].child';
+			var tr = 'tr[data-id="'+ $(that).data('id') +'"].child.' + type;
 			$(tr).removeClass('new');
 
 			// Remove remaining menu Homework [new] & My Todo new if all Rates has been read
