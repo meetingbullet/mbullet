@@ -375,14 +375,14 @@ span.count {
 	padding: 3px !important;
 }
 
-.btn-confirm-homework {
+.btn-confirm {
 	font-size: 30px;
 	color: #70c1b3;
 	cursor: pointer;
 	line-height: 1;
 }
 
-.btn-confirm-homework:hover {
+.btn-confirm:hover {
 	color: #6ab3a6;
 }
 
