@@ -270,7 +270,7 @@
 	transition: width 0.3s ease-out;
 	background-color: #ffffff;
 	box-shadow: #98c2d4 1px 0px 20px;
-	z-index: 2;
+	z-index: 5;
 }
 
 
