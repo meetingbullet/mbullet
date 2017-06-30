@@ -60,7 +60,7 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 										id="datetimepicker1"
 										name="scheduled_time" 
 										class="form-control an-form-control schedule-time" 
-										value="<?php echo $scheduled_start_time ?>" 
+										value="<?php echo display_time($meeting->scheduled_start_time) ?>" 
 										placeholder="<?php e(lang('st_scheduled_start_time'))?>" <?php echo $meeting->status == 'open' ? '' : 'disabled' ?>/>
 								<span class="input-group-btn">
 									<button type="submit" 
