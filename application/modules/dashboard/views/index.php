@@ -18,7 +18,21 @@ foreach ($projects as $project) {
 		break;
 	}
 }
-//dump($my_todo['evaluates']);
+
+$evaluates_count = 0;
+$has_new_rating = false;
+foreach ($my_todo['evaluates'] as $evaluate) {
+	$evaluates_count += count($evaluate->evaluates);
+
+	foreach ($evaluate->evaluates as $rating) {
+		if ( !$rating->is_read) {
+			$has_new_rating = true;
+			break;
+		}
+	}
+	dump($evaluate->evaluates); 
+}
+
 ?>
 <div class="main-container">
 	<div class="an-sidebar-nav js-sidebar-toggle-with-click">
@@ -36,7 +50,7 @@ foreach ($projects as $project) {
 					<?php if ($has_new_homework):?>
 					<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
 					<?php endif; ?>
-					<span class="count"><?php echo $my_todo['homeworks_count'] + count($my_todo['evaluates']) ?></span>
+					<span class="count"><?php echo $my_todo['homeworks_count'] + $evaluates_count ?></span>
 					</span>
 				</a>
 
@@ -64,7 +78,10 @@ foreach ($projects as $project) {
 							id="open-rate">
 							<i class="ion-ios-star-outline"></i>
 							<?php echo lang('db_rate') ?>
-							<span class="badge badge-primary pull-right"><?php echo count($my_todo['evaluates']) ?></span>
+							<?php if ($has_new_rating):?>
+							<span class="badge badge-warning badge-bordered badge-rate-new">new</span>
+							<?php endif; ?>
+							<span class="badge badge-primary pull-right"><?php echo $evaluates_count ?></span>
 						</a>
 					</li>
 				</ul>
@@ -277,7 +294,7 @@ foreach ($projects as $project) {
 						<?php endif; ?>
 					</td>
 					<td class="text-center">
-						<i class="ion-android-checkbox btn-confirm-homework" data-homework-id="<?php echo $hw->homework_id ?>"></i>
+						<i class="ion-android-checkbox btn-confirm btn-confirm-homework" data-homework-id="<?php echo $hw->homework_id ?>"></i>
 					</td>
 				</tr>
 				<?php endforeach; $i++;
@@ -336,8 +353,25 @@ foreach ($projects as $project) {
 					<th class="text-center">Confirm</th>
 				</tr>
 				<?php $j = 1; foreach ($meeting->evaluates as $evaluate):?>
-				<tr class='child <?php echo $evaluate->evaluate_mode ?>'>
-					<td></td>
+				<tr class='child <?php echo $evaluate->evaluate_mode; echo iif ( ! $evaluate->is_read, ' new') ?>' 
+				data-mode="<?php echo $evaluate->evaluate_mode ?>"
+				<?php
+					if ($evaluate->evaluate_mode == 'agenda') {
+						echo 'data-id="' . $evaluate->agenda_id . '"';
+					}
+					if ($evaluate->evaluate_mode == 'user') {
+						echo 'data-id="' . $evaluate->user_id . '" data-meeting-id="'. $evaluate->meeting_id .'"';
+					}
+					if ($evaluate->evaluate_mode == 'homework') {
+						echo 'data-id="' . $evaluate->homework_id . '"';
+					}
+				?>
+				>
+					<td>
+						<?php if ( ! $evaluate->is_read): ?>
+						<span class="badge badge-warning badge-bordered badge-rate-new">new</span>
+						<?php endif; ?>
+					</td>
 					<td><?php echo $i .'.'. $j++ ?></td>
 					<td>
 						<?php
@@ -356,13 +390,13 @@ foreach ($projects as $project) {
 					<td class="text-center data" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $evaluate->evaluate_mode) ?>" data-meeting-id="<?php echo $evaluate->meeting_id ?>"
 					<?php
 					if ($evaluate->evaluate_mode == 'agenda') {
-						echo 'data-agenda-id="' . $evaluate->agenda_id . '"';
+						echo 'data-id="' . $evaluate->agenda_id . '"';
 					}
 					if ($evaluate->evaluate_mode == 'user') {
-						echo 'data-user-id="' . $evaluate->user_id . '"';
+						echo 'data-id="' . $evaluate->user_id . '"';
 					}
 					if ($evaluate->evaluate_mode == 'homework') {
-						echo 'data-homework-id="' . $evaluate->homework_id . '"';
+						echo 'data-id="' . $evaluate->homework_id . '"';
 					}
 					?>>
 						<div class="todo-rating-wrapper">
@@ -376,7 +410,7 @@ foreach ($projects as $project) {
 						</div>
 					</td>
 					<td class="text-center">
-						<i class="ion-android-checkbox btn-confirm-homework submit"></i>
+						<i class="ion-android-checkbox btn-confirm submit"></i>
 					</td>
 				</tr>
 				<?php endforeach; $i++;

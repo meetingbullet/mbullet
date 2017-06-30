@@ -73,7 +73,43 @@ $(document).on('click', '#homework-content .child.new', function(e){
 	})
 });
 
-$(document).on('click', '.btn-confirm-homework:not(.submit)', function() {
+$(document).on('click', '#rate-content .child.new', function(e){
+	var that = this;
+	var type = $(this).data('mode');
+	var object_id = $(this).data('id');
+	var user_id = "";
+
+	if (type == 'user') {
+		object_id = $(this).data('meeting-id');
+		user_id += "/" + $(this).data('id');
+	}
+
+	$.get("<?php echo site_url('dashboard/mark_as_read/') ?>"+ type + "/" + object_id + user_id, (data) => {
+		data = JSON.parse(data);
+
+		if (data.message_type == 'success') {
+			var tr = 'tr[data-id="'+ $(that).data('id') +'"].child';
+			$(tr).removeClass('new');
+
+			// Remove remaining menu Homework [new] & My Todo new if all Rates has been read
+			if ($('.badge-rate-new').length == 3) {
+				$('.badge-rate-new').fadeOut('fast', function(){
+					$(this).remove();
+				});
+
+				if ($('.badge-homework-new').length == 0) {
+					$('.badge-todo-new').remove(); 
+				}
+			} else {
+				$(tr + ' .badge-rate-new').fadeOut('fast', function(){
+					$(this).remove();
+				});
+			}
+		}
+	})
+});
+
+$(document).on('click', '.btn-confirm-homework', function() {
 	var hw_id = $(this).data('homework-id');
 
 	$.post("<?php echo site_url('homework/ajax_edit') ?>", {
@@ -122,31 +158,39 @@ $(document).on("click", "#rate-content .submit", function(e) {
 	data.rate = submit_btn.closest('.child').find('.data').find('input[type=radio]:checked').val();
 
 	if (typeof(data.rate) != 'undefined') {
-		data.meeting_id = submit_btn.closest('.child').find('.data').data('meeting-id');
+		data.meeting_id = submit_btn.closest('.child').find('.data').data('id');
 
 		if (submit_btn.closest('.child').hasClass('user')) {
-			data.user_id = submit_btn.closest('.child').find('.data').data('user-id');
+			data.user_id = submit_btn.closest('.child').find('.data').data('id');
 		}
 
 		if (submit_btn.closest('.child').hasClass('agenda')) {
-			data.agenda_id = submit_btn.closest('.child').find('.data').data('agenda-id');
+			data.agenda_id = submit_btn.closest('.child').find('.data').data('id');
 		}
 
 		if (submit_btn.closest('.child').hasClass('homework')) {
-			data.homework_id = submit_btn.closest('.child').find('.data').data('homework-id');
+			data.homework_id = submit_btn.closest('.child').find('.data').data('id');
 		}
 	} else {
 		var error = '<?php echo lang("db_rate_needed") ?>';
 	}
 
-	if (typeof(error) == 'undefined') {console.log(data, url);
+	if (typeof(error) == 'undefined') {
 		$.post({
 			url: url,
 			data: data,
 		}).done(function(data) {console.log(data);
 			data = JSON.parse(data);
 			if (data.message_type == 'success') {
-				submit_btn.parent().parent().slideUp();
+				$(submit_btn)
+				.parents('.child')
+				.find('td')
+				.wrapInner('<div style="display: block;" />')
+				.parent()
+				.find('td > div')
+				.slideUp('fast', function(){
+					$(this).parent().parent().remove();
+				});
 			}
 
 			$.notify({
