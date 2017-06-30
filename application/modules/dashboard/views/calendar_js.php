@@ -2,7 +2,7 @@ $(document).ready(function() {
 	$('#calendar').fullCalendar({
 		customButtons: {
 			ggcToggle: {
-				text: 'Google Calendar',
+				text: 'Regular event',
 				click: function() {
 					var that = $(this);
 					that.toggleClass('fc-state-active');
@@ -23,7 +23,7 @@ $(document).ready(function() {
 				}
 			},
 			mbcToggle: {
-				text: 'MB Calendar',
+				text: 'MB meeting',
 				click: function() {
 					var that = $(this);
 					that.toggleClass('fc-state-active');
