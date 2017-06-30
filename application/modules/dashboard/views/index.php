@@ -365,6 +365,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					if ($evaluate->evaluate_mode == 'homework') {
 						echo 'data-id="' . $evaluate->homework_id . '"';
 					}
+					if ($evaluate->evaluate_mode == 'meeting') {
+						echo 'data-id="' . $evaluate->meeting_id . '"';
+					}
 				?>
 				>
 					<td>
@@ -397,6 +400,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					}
 					if ($evaluate->evaluate_mode == 'homework') {
 						echo 'data-id="' . $evaluate->homework_id . '"';
+					}
+					if ($evaluate->evaluate_mode == 'meeting') {
+						echo 'data-id="' . $evaluate->meeting_id . '"';
 					}
 					?>>
 						<div class="todo-rating-wrapper">
