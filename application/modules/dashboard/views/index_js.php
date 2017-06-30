@@ -131,11 +131,15 @@ $(document).on("click", "#rate-content .submit", function(e) {
 		if (submit_btn.closest('.child').hasClass('agenda')) {
 			data.agenda_id = submit_btn.closest('.child').find('.data').data('agenda-id');
 		}
+
+		if (submit_btn.closest('.child').hasClass('homework')) {
+			data.homework_id = submit_btn.closest('.child').find('.data').data('homework-id');
+		}
 	} else {
 		var error = '<?php echo lang("db_rate_needed") ?>';
 	}
 
-	if (typeof(error) == 'undefined') {
+	if (typeof(error) == 'undefined') {console.log(data, url);
 		$.post({
 			url: url,
 			data: data,

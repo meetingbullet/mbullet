@@ -353,7 +353,18 @@ foreach ($projects as $project) {
 						?>
 					</td>
 					<td class="text-center"><?php echo $evaluate->evaluate_mode ?></td>
-					<td class="text-center data" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $evaluate->evaluate_mode) ?>" data-meeting-id="<?php echo $evaluate->meeting_id ?>" <?php echo $evaluate->evaluate_mode != 'agenda' ? 'data-user-id="' . $evaluate->user_id . '"' : 'data-agenda-id="' . $evaluate->agenda_id . '"' ?>>
+					<td class="text-center data" data-url="<?php echo site_url('meeting/dashboard_evaluate/' . $evaluate->evaluate_mode) ?>" data-meeting-id="<?php echo $evaluate->meeting_id ?>"
+					<?php
+					if ($evaluate->evaluate_mode == 'agenda') {
+						echo 'data-agenda-id="' . $evaluate->agenda_id . '"';
+					}
+					if ($evaluate->evaluate_mode == 'user') {
+						echo 'data-user-id="' . $evaluate->user_id . '"';
+					}
+					if ($evaluate->evaluate_mode == 'homework') {
+						echo 'data-homework-id="' . $evaluate->homework_id . '"';
+					}
+					?>>
 						<div class="todo-rating-wrapper">
 							<div class="todo-rating">
 								<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>

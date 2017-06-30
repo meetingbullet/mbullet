@@ -2350,6 +2350,7 @@ class Meeting extends Authenticated_Controller
 												->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = "' . $this->current_user->user_id . '"', 'LEFT')
 												->where('organization_id', $this->current_user->current_organization_id)
 												->where('(sm.user_id = "' . $this->current_user->user_id . '" OR meetings.owner_id = "' . $this->current_user->user_id . '")')
+												->where('meetings.scheduled_start_time IS NOT NULL')
 												->group_by('meetings.meeting_id')
 												->find_all();
 			$events = $events && count($events) > 0 ? $events : [];
