@@ -30,7 +30,6 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 			break;
 		}
 	}
-	dump($evaluate->evaluates); 
 }
 
 ?>

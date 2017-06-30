@@ -269,7 +269,7 @@
 	min-width: 300px;
 	transition: width 0.3s ease-out;
 	background-color: #ffffff;
-	box-shadow: #98c2d4 1px 0px 20px;
+	box-shadow: #AAA 0 0 10px;
 	z-index: 5;
 }
 
