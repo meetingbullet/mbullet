@@ -2315,20 +2315,44 @@ class Meeting extends Authenticated_Controller
 					while (true) {
 						$items = $events->getItems();
 						foreach ($items as $item) {
-							$temp = [
-								'start' => ! empty($item->start->date) ? $item->start->date : $item->start->dateTime,
-								'end' => ! empty($item->end->date) ? $item->end->date : $item->end->dateTime,
-								'title' => $item->summary,
-								'url' => $item->htmlLink,
-								'calendarId' => $calendar_id,
-								'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
-							];
+							if (! empty($item->attendees)) {
+								foreach ($item->attendees as $attendee) {
+									if ($attendee->self == true) {
+										if ($attendee->responseStatus !== 'declined') {
+											$temp = [
+												'start' => ! empty($item->start->date) ? $item->start->date : $item->start->dateTime,
+												'end' => ! empty($item->end->date) ? $item->end->date : $item->end->dateTime,
+												'title' => $item->summary,
+												'url' => $item->htmlLink,
+												'calendarId' => $calendar_id,
+												'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
+											];
 
-							if (! empty($item->start->date)) {
-								$temp['allDay'] = true;
+											if (! empty($item->start->date)) {
+												$temp['allDay'] = true;
+											}
+
+											$event_list[] = $temp;
+										}
+										break;
+									}
+								}
+							} else {
+								$temp = [
+									'start' => ! empty($item->start->date) ? $item->start->date : $item->start->dateTime,
+									'end' => ! empty($item->end->date) ? $item->end->date : $item->end->dateTime,
+									'title' => $item->summary,
+									'url' => $item->htmlLink,
+									'calendarId' => $calendar_id,
+									'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
+								];
+
+								if (! empty($item->start->date)) {
+									$temp['allDay'] = true;
+								}
+
+								$event_list[] = $temp;
 							}
-
-							$event_list[] = $temp;
 						}
 						$pageToken = $events->getNextPageToken();
 						if ($pageToken) {
