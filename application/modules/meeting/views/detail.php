@@ -271,7 +271,17 @@ if ($is_member && $is_owner) {
 						<ul id="meeting-resource" class="list-unstyled list-member">
 							<?php if ($invited_members) { foreach ($invited_members as $user) { ?>
 							<li>
-								<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
+								<?php echo display_user($user['invite_email'], $user['first_name'] ? $user['first_name'] : $user['invite_email'], $user['last_name'] ? $user['last_name'] : null, $user['avatar'] ? $user['avatar'] : null); ?>
+
+								<?php if ($user['status'] == 'ACCEPTED') : ?>
+								<i class="decision ion-checkmark-circled"></i>
+								<?php elseif ($user['status'] == 'DECLINED') : ?>
+								<i class="decision ion-close-circled"></i>
+								<?php elseif ($user['status'] == 'TENTATIVE') : ?>
+								<i class="decision ion-help-circled"></i>
+								<?php elseif ($user['status'] == 'NEEDS-ACTION') : ?>
+								<i class="decision ion-help-circled"></i>
+								<?php endif ?>
 
 								<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
 							</li>
