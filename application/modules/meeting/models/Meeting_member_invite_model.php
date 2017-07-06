@@ -53,4 +53,39 @@ class Meeting_member_invite_model extends BF_Model
 	{
 		parent::__construct();
 	}
+
+	public function get_meeting_invited_members($meeting_id)
+	{
+		$query = $this->select('meeting_member_invites.invite_email, meeting_member_invites.status, uto.user_id, first_name, last_name, avatar, cost_of_time,
+							CONCAT(first_name, " ", last_name) AS full_name,
+							IF(
+								uto.cost_of_time = 1, 
+								p.cost_of_time_1,
+								IF(
+									uto.cost_of_time = 2, 
+									p.cost_of_time_2,
+									IF(
+										uto.cost_of_time = 3, 
+										p.cost_of_time_3,
+										IF(
+											uto.cost_of_time = 4, 
+											p.cost_of_time_4,
+											p.cost_of_time_5
+										)
+									)
+								)
+							) AS cost_of_time_name', false)
+							->join('users u', 'u.email = meeting_member_invites.invite_email', 'left')
+							->join('meetings s', 'meeting_member_invites.meeting_id = s.meeting_id')
+							->join('actions a', 's.action_id = a.action_id')
+							->join('projects p', 'p.project_id = a.project_id')
+							->join('user_to_organizations uto', 'u.user_id = uto.user_id AND enabled = 1 AND uto.organization_id = ' . $this->auth->user()->current_organization_id, 'left')
+							->where('meeting_member_invites.meeting_id', $meeting_id)
+							->order_by('full_name')
+							->order_by('uto.cost_of_time', 'DESC')
+							->as_array()
+							->find_all();
+
+		return $query ? $query : [];
+	}
 }

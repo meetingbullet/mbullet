@@ -364,3 +364,8 @@
 #comment .badge-comment {
 	cursor: pointer;
 }
+
+#meeting-resource .decision {
+	padding-top: 3px;
+	display: inline-block;
+}

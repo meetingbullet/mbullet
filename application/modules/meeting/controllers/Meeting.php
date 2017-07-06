@@ -373,8 +373,8 @@ class Meeting extends Authenticated_Controller
 			}
 		}
 
-		$invited_members = $this->meeting_member_model->get_meeting_member($meeting_id);
-									
+		// $invited_members = $this->meeting_member_model->get_meeting_member($meeting_id);
+		$invited_members = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
 		$point_used = number_format($this->mb_project->total_point_used('meeting', $meeting->meeting_id), 2);
 
 		$evaluated = $this->is_evaluated($meeting_id);
