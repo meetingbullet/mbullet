@@ -61,6 +61,19 @@ $(document).ready(function() {
 				});
 			}
 		},
+		loading: function (isLoading) {
+			if (isLoading) {
+				swal({
+					title: 'Loading events...',
+					allowEscapeKey: false,
+					imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
+					showConfirmButton: false
+				});
+			} else {
+				swal.close();
+				//Possibly call you feed loader to add the next feed in line
+			}
+		},
 		navLinks: true,
 		firstDay: 1, // Monday
 		// aspectRatio: 1, // content Width-to-Height
@@ -76,8 +89,10 @@ $(document).ready(function() {
 	$(document).on('click', '#event-import-modal .dismiss-user', function() {
 		var that = $(this);
 
-		if ($('.email').length > 2 && ((that.parent().find('.owner').length && $('.in-system').length > 1) || (! that.parent().find('.owner').length && $('.in-system .owner').length > 0))) {
-			user_emails = $('input[name=user_emails]').val();
+		if ($('#event-import-modal .email').length > 2 && ((that.parent().find('.owner').length && $('.in-system').length > 1) || (! that.parent().find('.owner').length && $('.in-system .owner').length > 0))) {
+			var user_emails = $('input[name=user_emails]').val();
+			var owner_email = $('input[name=owner_email]').val();
+
 			if (user_emails == '') {
 				user_emails = [];
 			} else {
@@ -111,7 +126,7 @@ $(document).ready(function() {
 		var that = $(this);
 
 		if (that.closest('.item').hasClass('in-system')) {
-			user_emails = $('input[name=user_emails]').val();
+			var user_emails = $('input[name=user_emails]').val();
 			if (user_emails == '') {
 				user_emails = [];
 			} else {

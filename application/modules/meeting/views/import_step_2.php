@@ -37,7 +37,7 @@ if (! in_array($current_user->email, $event->attendees)) {
 			</div>
 		</div>
 		<?php $showed = []; ?>
-		<?php foreach ($event->attendees as $attendee) : if (! in_array($attendee->email ,$showed)) : ?>
+		<?php foreach ($event->attendees as $attendee) : if (! in_array($attendee->email ,$showed) && (empty($attendee->responseStatus) || $attendee->responseStatus != 'declined')) : ?>
 		<div class="item <?php echo ! empty($attendee->in_mb_system) ? 'in-system' : '' ?>">
 			<p>
 				<i class="ion-close-circled dismiss-user"></i>
