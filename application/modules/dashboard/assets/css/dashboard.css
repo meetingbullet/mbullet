@@ -462,3 +462,113 @@ span.count {
 .child .user-wrapper {
 	padding: 10px 0;
 }
+
+/* Init modal */
+#init .modal-content {
+	background: transparent;
+}
+
+#init .calendar {
+	float: left;
+	width: 70%;
+}
+
+#init .summary {
+	float: left;
+	width: calc(30% - 20px);
+	margin-left: 20px;
+}
+
+.init-nav {
+	display: flex;
+	align-items: center;
+	padding: 0 30px;
+	height: 80px;
+	background: white;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-bottom: 1px solid #ececec;
+}
+
+.init-nav * {
+	-webkit-transition: all 0.5s ease-out;
+	-moz-transition: all 0.5s ease-out;
+	transition: all 0.5s ease-out;
+}
+
+.init-nav > .step {
+	display: flex;
+	font-size: 16px;
+	flex: 1;
+	color: #bdbdbd;
+}
+
+.init-nav > .step:last-child {
+	flex: 0;
+}
+
+.init-nav > .step > .transitor {
+	background: #76d2c1;
+	height: 2px;
+	flex: 0;
+	align-self: center;
+}
+
+.init-nav > .step.passed {
+	color: #76d2c1;
+}
+
+.init-nav > .step.passed > .transitor {
+	flex: 1;
+}
+
+.init-nav > .step.passed + .step:not(.passed) {
+	color: #2795c3;
+	font-size: 20px;
+}
+
+.init-nav > .step .sub-step {
+	margin: 0;
+	display: flex;
+	justify-content: center;
+}
+
+.init-nav > .step.passed .sub-step > .dot {
+	height: 0px;
+	background: transparent;
+}
+
+.init-nav > .step .sub-step > .dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #d0d0d0;
+	margin-left: 6px;
+}
+
+.step .sub-step > .dot.passed {
+	background: #76d2c1;
+}
+
+.step .sub-step > .dot.passed + .dot:not(.passed) {
+	background: #2795c3;
+}
+
+.init-body {
+	display: flex;
+	flex-flow: row nowrap;
+}
+
+.init-body > div {
+	background: white;
+}
+
+.init-footer {
+	padding: 0 30px;
+	height: 80px;
+	background: white;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-top: 1px solid #ececec;
+}

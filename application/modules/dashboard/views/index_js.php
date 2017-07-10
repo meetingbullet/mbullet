@@ -1,3 +1,6 @@
+// VietHD: DEBUGING
+$('#test').click();
+
 <?php if (has_permission('Project.Edit.All')): ?>
 $('.mb-popover-project').on('shown.bs.popover', function() {
 	$('.mb-editable').editable({

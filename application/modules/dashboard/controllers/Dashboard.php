@@ -526,6 +526,11 @@ class Dashboard extends Authenticated_Controller
 		return $evaluated;
 	}
 
+	public function init()
+	{
+		Template::render();
+	}
+
 	public function test() {
 		$meeting = $this->meeting_model->find(72);
 		$meeting->members = $this->meeting_member_model->where('meeting_id', 72)->find_all();
