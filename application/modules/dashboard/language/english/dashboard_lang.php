@@ -39,3 +39,4 @@ $lang['db_points'] = 'Points';
 $lang['db_minutes'] = 'Minutes';
 $lang['db_hours'] = 'Hours';
 $lang['db_days'] = 'Days';
+$lang['db_create_project'] = 'Create Project';

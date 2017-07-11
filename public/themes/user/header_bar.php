@@ -18,9 +18,12 @@
 								<a href="<?php echo site_url('project/' . $project->cost_code) ?>"><?php e($project->name)?></a>
 							</li>
 							<?php endforeach; ?>
-							<li role="separator" class="divider"></li>
 							<?php endif; ?>
 
+							<?php if (has_permission('Project.Create')) : ?>
+							<?php if ($current_user->projects && count($current_user->projects)): ?>
+							<li role="separator" class="divider"></li>
+							<?php endif; ?>
 							<li>
 								<a	href="#" 
 									class='mb-open-modal' 
@@ -30,6 +33,7 @@
 									<i class="ion-ios-plus-outline"></i> <?php e(lang('create_project'))?>
 								</a>
 							</li>
+							<?php endif; ?>
 						</ul>
 					</div>
 

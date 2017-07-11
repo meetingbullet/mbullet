@@ -119,13 +119,15 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 			</li>
 		</ul> <!-- end .AN-MAIN-NAV -->
 
+		<?php if (has_permission('Project.Create')) : ?>
 		<ul class="an-main-nav bottom">
 			<li class="an-nav-item">
 				<a href="#" class="mb-open-modal" data-modal-id="create-project-modal" data-url="http://sixthgearstudios.mb.vn/project/create">
-					<i class="ion-ios-plus-outline"></i> Create Project
+					<i class="ion-ios-plus-outline"></i> <?php echo lang('db_create_project') ?>
 				</a>
 			</li>
-		</ul> <!-- end .AN-MAIN-NAV -->
+		</ul> <!-- end .AN-MAIN-NAV.BOTTOM -->
+		<?php endif; ?>
 	</div> <!-- /.an-sidebar-nav -->
 
 	<div class="an-page-content">
