@@ -41,7 +41,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="120"></a>
 		</h3>
 
-		<a href="<?php echo site_url('dashboard/init') ?>" class="mb-open-modal" data-modal-id="init" data-modal-dialog-class="modal-80" id="test">INIT</a>
+		<a href="<?php echo site_url('dashboard/init') ?>" class="mb-open-modal" data-modal-id="init" data-modal-dialog-class="modal-95" id="test">INIT</a>
 
 		<ul class="an-main-nav">
 			<li class="an-nav-item">
