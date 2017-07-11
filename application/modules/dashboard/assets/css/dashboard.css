@@ -271,6 +271,9 @@
 	background-color: #ffffff;
 	box-shadow: #AAA 0 0 10px;
 	z-index: 5;
+	display: flex;
+	flex-flow: column;
+	padding: 20px 0 0 0;
 }
 
 
@@ -284,6 +287,10 @@
 
 .an-nav-item > a:hover, .an-nav-item .an-child-nav > li > a:hover {
 	color: #00415d;
+}
+
+.an-nav-item > a > i {
+	top: 6px;
 }
 
 .an-nav-item>a.nav-open {
@@ -461,4 +468,12 @@ span.count {
 
 .child .user-wrapper {
 	padding: 10px 0;
+}
+
+.an-main-nav.bottom {
+	margin-top: auto;
+}
+
+.an-main-nav.bottom {
+	margin-top: auto;
 }

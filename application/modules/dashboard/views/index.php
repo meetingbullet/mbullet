@@ -118,6 +118,14 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</ul>
 			</li>
 		</ul> <!-- end .AN-MAIN-NAV -->
+
+		<ul class="an-main-nav bottom">
+			<li class="an-nav-item">
+				<a href="#" class="mb-open-modal" data-modal-id="create-project-modal" data-url="http://sixthgearstudios.mb.vn/project/create">
+					<i class="ion-ios-plus-outline"></i> Create Project
+				</a>
+			</li>
+		</ul> <!-- end .AN-MAIN-NAV -->
 	</div> <!-- /.an-sidebar-nav -->
 
 	<div class="an-page-content">
