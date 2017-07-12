@@ -477,3 +477,15 @@ span.count {
 .an-main-nav.bottom {
 	margin-top: auto;
 }
+
+div.popover .project-header {
+	position: relative;
+}
+
+div.popover .project-header .db-create-meeting {
+	cursor: pointer;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	font-size: 20px;
+}

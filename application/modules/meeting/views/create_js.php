@@ -96,6 +96,8 @@ $(document).on('change.meeting.create', '#meeting-in', function() {
 	}
 });
 
+$('#meeting-in').change();
+
 if ($('#meeting-in option:selected').val() == 'other') {
 	$('input#in, div#in-unit').show();
 }
