@@ -222,6 +222,14 @@ $(document).on("click", "#rate-content .submit", function(e) {
 
 });
 
+<?php if ( ! $current_user->inited): ?>
+var INIT_DATA = {
+	currentStep: 10,
+	meetings: []
+};
+$.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');
+<?php endif; ?>
+
 // ------- baodg: start test ------- //
 // setTimeout(function(){
 // 	$.get({url : '<?php echo site_url('/test/init_project?data=') ?>' + JSON.stringify(INIT_DATA)}).done(function(data) {

@@ -545,6 +545,10 @@ span.count {
 	justify-content: center;
 }
 
+.init-nav > .step.passed + .step.my-meeting .sub-step .dot:first-child {
+	background: #2795c3;
+}
+
 .init-nav > .step.passed .sub-step > .dot {
 	height: 0px;
 	background: transparent;
@@ -563,11 +567,11 @@ span.count {
 	margin: 0;
 }
 
-.step .sub-step > .dot.passed {
+.init-nav > .step.passed + .step.my-meeting .sub-step .dot.passed{
 	background: #76d2c1;
 }
 
-.step .sub-step > .dot.passed + .dot:not(.passed) {
+.init-nav > .step .sub-step > .dot.passed + .dot:not(.passed) {
 	background: #2795c3;
 }
 

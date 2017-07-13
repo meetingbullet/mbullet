@@ -154,7 +154,8 @@ class Dashboard extends Authenticated_Controller
 
 		Assets::add_js($this->load->view('index_js', [
 			'now' => gmdate('Y-m-d H:i:s'),
-			'meeting_calendar' => $meeting_calendar
+			'meeting_calendar' => $meeting_calendar,
+			'current_user' => $this->current_user
 		], true), 'inline');
 
 		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);

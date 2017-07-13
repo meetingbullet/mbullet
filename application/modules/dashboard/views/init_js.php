@@ -16,6 +16,7 @@ $('#calendar-init').fullCalendar({
 
 		// Step 1: Passed
 		if (! isLoading && ! $('#init .step.setup').hasClass('passed')) {
+			INIT_DATA.currentStep = 20;
 			$('#init .step.setup').addClass('passed');
 		}
 
@@ -165,5 +166,28 @@ $('.btn-convert-time + ul > li > a').click(function() {
 				$(item).text(Math.round($(item).data('minute') * 100 / 60 / 24) / 100)
 			});
 			break;
+	}
+});
+
+$('.btn-next-step').click(function() {
+	if (INIT_DATA.currentStep > 60) return;
+
+	if (INIT_DATA.currentStep >= 30 && INIT_DATA.currentStep <= 31) {
+		INIT_DATA.currentStep ++;
+		if ($('#init .sub-step .dot.passed').length === 0) {
+			$('#init .sub-step .dot:first-child').addClass('passed');
+		} else {
+			$('#init .sub-step .dot.passed + .dot').addClass('passed');
+		}
+
+
+	} else {
+		INIT_DATA.currentStep += 10;
+
+		if (INIT_DATA.currentStep == 42) {
+			INIT_DATA.currentStep = 40;
+		}
+
+		$('#init .step.passed + .step').addClass('passed');
 	}
 });
