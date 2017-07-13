@@ -2326,6 +2326,7 @@ class Meeting extends Authenticated_Controller
 												'url' => $item->htmlLink,
 												'calendarId' => $calendar_id,
 												'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
+												'isOwner' => ! empty($item->organizer->self)
 											];
 
 											if (! empty($item->start->date)) {
@@ -2345,6 +2346,7 @@ class Meeting extends Authenticated_Controller
 									'url' => $item->htmlLink,
 									'calendarId' => $calendar_id,
 									'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
+									'isOwner' => ! empty($item->organizer->self)
 								];
 
 								if (! empty($item->start->date)) {
