@@ -122,6 +122,10 @@
 	</div> <!-- .init-footer.summary -->
 </div> <!-- .init -->
 
+<script>
+var INIT_DATA = JSON.parse('{"current_step":4,"meetings":{"ggc123456789":{"owner":{"email":"baodg@gearinc.com","self":true},"members":["tungnt@gearinc.com","viethd@gearinc.com","datls@gearinc.com"],"name":"Scopely meeting 1 - WWE Champions seminar","description":"WWE Champions seminar","scheduled_start_time":"2017-07-15 10:30:00","in":"90"},"ggc987654321":{"owner":{"email":"datls@gearinc.com","self":false},"members":["tungnt@gearinc.com","viethd@gearinc.com","baodg@gearinc.com"],"name":"Scopely meeting 2 - Coding email tool","description":"Coding email tool","scheduled_start_time":"2017-07-18 11:30:00","in":"180"},"ggc192837465":{"owner":{"email":"baodg@gearinc.com","self":true},"members":["tungnt@gearinc.com","viethd@gearinc.com","datls@gearinc.com"],"name":"Scopely meeting 3 - Review code","description":"Review code","scheduled_start_time":"2017-08-15 10:26:00","in":"60"},"ggc101010101":{"owner":{"email":"tungnt@gearinc.com","self":false},"members":["baodg@gearinc.com","viethd@gearinc.com","datls@gearinc.com"],"name":"Scopely meeting 4 - Finish project","description":"Finish project","scheduled_start_time":"2017-10-15 11:30:00","in":"30"}}}');  
+</script>
+
 <?php
 	echo '<script type="text/javascript">' . $this->load->view('init_js', [
 	], true) . '</script>';
