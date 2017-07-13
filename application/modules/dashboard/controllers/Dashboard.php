@@ -531,6 +531,24 @@ class Dashboard extends Authenticated_Controller
 		Template::render();
 	}
 
+	public function check_meeting_by_google_event_id()
+	{
+		$eventIDs = $this->input->post('eventIDs');
+
+		if (empty($eventIDs)) echo "{}";
+
+		$meeting = $this->meeting_model
+		->select('google_event_id')
+		->where_in('google_event_id', $eventIDs)
+		->limit(count($eventIDs))
+		->as_array()
+		->find_all();
+
+		echo $meeting 
+		? json_encode(array_column($meeting, 'google_event_id')) 
+		: "{}";
+	}
+
 	public function test() {
 		$meeting = $this->meeting_model->find(72);
 		$meeting->members = $this->meeting_member_model->where('meeting_id', 72)->find_all();

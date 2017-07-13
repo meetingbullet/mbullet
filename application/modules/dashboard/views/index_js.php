@@ -223,14 +223,14 @@ $(document).on("click", "#rate-content .submit", function(e) {
 });
 
 // ------- baodg: start test ------- //
-setTimeout(function(){
-	$.get({url : '<?php echo site_url('/test/init_project?data=') ?>' + JSON.stringify(INIT_DATA)}).done(function(data) {
-		data = JSON.parse(data);
-		console.log(data);
+// setTimeout(function(){
+// 	$.get({url : '<?php echo site_url('/test/init_project?data=') ?>' + JSON.stringify(INIT_DATA)}).done(function(data) {
+// 		data = JSON.parse(data);
+// 		console.log(data);
 
-		$('#init .init-body .calendar').html(data.modal_content);
-	});
-}, 3000);
+// 		$('#init .init-body .calendar').html(data.modal_content);
+// 	});
+// }, 3000);
 
 $(document).on('click', '#init .init-body .calendar .init-project .action .delete-meeting', function() {
 	var that = $(this);

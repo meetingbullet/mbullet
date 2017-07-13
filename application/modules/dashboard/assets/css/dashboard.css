@@ -470,13 +470,13 @@ span.count {
 
 #init .calendar {
 	float: left;
-	width: 70%;
+	width: 65%;
 }
 
 #init .summary {
 	position: relative;
 	float: left;
-	width: calc(30% - 20px);
+	width: calc(35% - 20px);
 	margin-left: 20px;
 }
 
@@ -559,6 +559,10 @@ span.count {
 	margin-left: 6px;
 }
 
+.init-nav > .title {
+	margin: 0;
+}
+
 .step .sub-step > .dot.passed {
 	background: #76d2c1;
 }
@@ -578,28 +582,31 @@ span.count {
 
 .calendar-info {
 	display: flex;
+	align-items: center;
 	justify-content: space-between;
 	width: 100%;
 	background: #f9f9f9;
 }
 
-.calendar-info > .wrapper:not(:first-child) {
+.calendar-info > .wrapper:nth-child(2) {
 	border-left: 1px solid #e0e0e0;
+	border-right: 1px solid #e0e0e0;
 }
 
 .calendar-info > .wrapper {
-	padding: 0px 15px 5px 15px;
+	padding: 15px;
 	flex: 1;
 	font-size: 12px;
 }
 
-.calendar-info > .wrapper:nth-child(2) {
-	flex: 1.3;
-}
-
 .calendar-info > .wrapper > .title {
+	margin-top: 0;
 	color: #afafaf;
 	text-transform: uppercase;
+}
+
+.calendar-info .user .avatar {
+	margin-left: 0;
 }
 
 .calendar-info .user .name {
@@ -640,6 +647,7 @@ span.count {
 
 .calendar-info .fc-toolbar {
 	text-align: center;
+	margin-bottom: 0;
 }
 
 .calendar-info .fc-button {
@@ -653,6 +661,11 @@ span.count {
 
 .calendar-init-wrapper {
 	position: relative;
+}
+
+#calendar-init-title {
+	margin: 0;
+	text-align: center;
 }
 
 #calendar-init {
@@ -671,6 +684,7 @@ span.count {
 	padding: 8px 15px;
 	color: white;
 	transition: opacity 0.5s ease-out;
+	z-index: 2;
 }
 
 .calendar-init-wrapper.loading .loading-indicator {
@@ -692,11 +706,93 @@ span.count {
 	border-bottom: 20px solid transparent;
 }
 
+.summary .content {
+	padding: 20px;
+}
+
+.summary .content p {
+	margin: 0 0 6px;
+}
+
+.summary .section {
+	width: 100%;
+	border-bottom: 1px solid #2795c3;
+}
+
+.summary .an-small-doc-block .section {
+	margin-top: 0;
+}
+
+.summary .content > .title {
+	margin-top: 0;
+}
+
+.summary .content p .number {
+	font-size: 18px;
+	color: #2795c3;
+}
+
+.overview-table {
+	font-size: 13px;
+	overflow: hidden;
+}
+
+.overview-table .number {
+	font-size: 15px;
+}
+
+.overview-table .vertical-align {
+	display: flex;
+	flex-direction: row;
+}
+
+.overview-table .vertical-align > [class^="col-"],
+.overview-table .vertical-align > [class*=" col-"] {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center; 
+}
+
+.overview-table hr {
+	margin: 4px 0;
+}
+
+.overview-table .btn-convert-time {
+	padding: 0 2px;
+	font-size: 12px;
+}
+
+.overview-table .row.bold {
+	font-weight: bold;
+}
+
+.overview-table .row > div:not(:first-child) {
+	text-align: center;
+}
+
+.overview-table .vertical-align > div:first-child {
+	justify-content: flex-start;
+}
+
+.overview-table .row:nth-child(even) > div {
+    background: #f9f9f9;
+}
+
+.overview-table .time-wrapper {
+	min-width: 100px;
+}
+
 .init-footer {
-	padding: 0 10px;
+	display: table;
+	padding: 12px 20px;
 	min-height: 60px;
 	background: white;
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 	border-top: 1px solid #e0e0e0;
+}
+
+.btn-skip-init {
+	display: table-cell;
+	vertical-align: middle;
 }

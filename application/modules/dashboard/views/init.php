@@ -1,10 +1,10 @@
 <div class="init">
 	<div class="init-nav calendar">
-		<div class="step passed">
+		<div class="step setup">
 			Setup
 			<div class="transitor"></div>
 		</div>
-		<div class="step passed">
+		<div class="step import">
 			Import
 			<div class="transitor"></div>
 		</div>
@@ -12,18 +12,18 @@
 			<span class="text-center">
 				My Meeting
 				<p class="sub-step">
-					<span class="dot passed"></span>
+					<span class="dot"></span>
 					<span class="dot"></span>
 					<span class="dot"></span>
 				</p>
 			</span> 
 			<div class="transitor"></div>
 		</div>
-		<div class="step">
+		<div class="step projects">
 			Projects
 			<div class="transitor"></div>
 		</div>
-		<div class="step">
+		<div class="step team">
 			Team
 			<div class="transitor"></div>
 		</div>
@@ -33,7 +33,7 @@
 	<div class="init-nav summary">
 		<h4>
 			<i class="ion-ios-cloud-download-outline"></i> 
-			<span class="title">Import Summary</span>
+			<h3 class="title">Import Summary</h3>
 		</h4>
 	</div>
 
@@ -43,7 +43,6 @@
 		<div class="calendar">
 			<div class="calendar-info">
 				<div class="wrapper">
-					<h6 class="title">Showing Calendar for user</h6>
 					<div class="user">
 						<div class="avatar" style="float:left; background-image:url('<?php echo avatar_url($current_user->avatar, $current_user->email) ?>')"></div>
 						<div class="info">
@@ -54,32 +53,11 @@
 				</div>
 
 				<div class="wrapper">
-					<h6 class="title">Import your Calendar Events</h6>
-
-					<div class="an-input-group group-range" title="Select events from before and after Today's date" data-toggle="tooltip">
-						<div class="an-input-group-addon text">Before</div>
-						<input type="number" min="0" step="1" value="90" name="before" class="an-form-control event-range text-right">
-						<div class="an-input-group-addon text">after</div>
-						<input type="number" min="0" step="1" value="90" name="after" class="an-form-control event-range text-right">
-						<div class="an-input-group-addon text">days</div>
-					</div>
-
-					<button class="an-btn an-btn-primary btn-reload-calendar">
-						<i class="ion-loop"></i>
-					</button>
-
-					<p>Showing results for 
-						<strong class="text-range">
-							<?php echo display_time( date('Y-m-d H:i:s', strtotime('-90 days') ), null, 'M j, Y') ?> - 
-							<?php echo display_time( date('Y-m-d H:i:s', strtotime('+90 days') ), null, 'M j, Y') ?>
-						</strong>
-					</p>
+					<h2 id="calendar-init-title"></h2>
 				</div>
 
 				<div class="wrapper">
 					<div class="fc-toolbar fc-header-toolbar">
-						<h3 id="calendar-init-title"></h3>
-
 						<div class="fc-button-group">
 							<button type="button" class="fc-prev-button fc-button fc-state-default fc-corner-left">
 								<span class="fc-icon fc-icon-left-single-arrow"></span>
@@ -110,7 +88,89 @@
 		</div> <!-- .calendar -->
 		<div class="summary">
 			<div class="bubba-tea"></div>
-			S<br/>o<br/>m<br/>e<br/> <br/>o<br/>t<br/>h<br/>e<br/>r<br/> <br/>a<br/>m<br/>a<br/>z<br/>i<br/>n<br/>g<br/> <br/>c<br/>o<br/>n<br/>t<br/>e<br/>n<br/>t<br/>
+			
+			<div class="content-wrapper">
+				<div class="content">
+					<h3 class='title'>Hey <?php echo $current_user->first_name ?></h3>
+					<p>From <b>May 1, 2017 - May 31, 2017</b></p>
+					<p>You're in <b class='number totalMeeting'>0</b> meetings for <b class='number totalTime'>0</b> hours</p>
+					<p>That's <b class='number'><span class="percentOfWorkingHour">0</span>%</b> of your total working hours! <span class="text-muted">(based on 40hr work weeks)</span></p>
+
+					<h3 class="section">Overview</h3>
+					<div class="overview-table">
+						<div class="row vertical-align">
+							<div class="col-md-6 text-center">
+								Your events
+							</div>
+							<div class="col-md-3 text-center">
+								<div>
+									<div class='time-wrapper'>
+										<i class="ion-easel"></i>
+										Meeting
+									</div>
+									<b class='totalMeeting'>0</b>
+								</div>
+							</div>
+							<div class="col-md-3 text-center">
+								<div>
+									<div class='time-wrapper'>
+									<i class="ion-android-alarm-clock"></i>
+									<?php echo lang('db_time') ?>
+									<button class="btn btn-default btn-convert-time dropdown-toggle" data-toggle="dropdown">
+										<span class='text'><?php echo lang('db_hours') ?></span>
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										<li><a href="#" data-option="minute"><?php echo lang('db_minutes') ?></a></li>
+										<li><a href="#" data-option="hour"><?php echo lang('db_hours') ?></a></li>
+										<li><a href="#" data-option="day"><?php echo lang('db_days') ?></a></li>
+									</ul>
+									</div>
+									<b class='target-time totalTime'>0</b>
+								</div>
+							</div>
+						</div>
+						<hr>
+
+						<div class="row bold">
+							<div class="col-md-6">As an Owner</div>
+							<div class="col-md-3 ownerMeeting">0</div>
+							<div class="col-md-3 ownerTime target-time">0</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">&nbsp; Meeting Bullet</div>
+							<div class="col-md-3 ownerMBMeeting">0</div>
+							<div class="col-md-3 ownerMBTime target-time">0</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">&nbsp; Non-Meeting Bullet</div>
+							<div class="col-md-3 ownerNonMBMeeting">0</div>
+							<div class="col-md-3 ownerNonMBTime target-time">0</div>
+						</div>
+						<br>
+						<div class="row bold">
+							<div class="col-md-6">As a Guest</div>
+							<div class="col-md-3 guestMeeting">10</div>
+							<div class="col-md-3 guestTime target-time">12</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">&nbsp; Meeting Bullet</div>
+							<div class="col-md-3 guestMBMeeting">0</div>
+							<div class="col-md-3 guestMBTime target-time">0</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">&nbsp; Non-Meeting Bullet</div>
+							<div class="col-md-3 guestNonMBMeeting">0</div>
+							<div class="col-md-3 guestNonMBTime target-time">0</div>
+						</div>
+					</div>
+				</div> <!-- .content -->
+
+				<div class="an-small-doc-block primary">
+					<h3 class="section primary">Next Step</h3>
+					Let us help you start getting the most out of your investment in meetings! We'll start with your meeting as the Owner.
+				</div>
+			</div> <!-- .content-wrapper -->
 		</div> <!-- .summary -->
 	</div>
 
@@ -118,7 +178,8 @@
 	</div> <!-- .init-footer.calendar -->
 
 	<div class="init-footer summary">
-
+		<a href="#" class="btn-skip-init text-muted" data-dismiss="modal">SKIP</a>
+		<button class="an-btn an-btn-primary btn-next-step pull-right">NEXT</button>
 	</div> <!-- .init-footer.summary -->
 </div> <!-- .init -->
 

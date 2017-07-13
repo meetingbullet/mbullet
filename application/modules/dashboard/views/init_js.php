@@ -6,15 +6,22 @@ $('#calendar-init').fullCalendar({
 	eventLimit: true, // allow "more" link when too many events
 	firstDay: 1, // Monday
 	height: 500,
+	cache: true,
 	viewRender: function(view) {
 		var title = view.title;
 		$("#calendar-init-title").html(title);
 	},
 	loading: function (isLoading) {
-		if (isLoading) {
-			$('.calendar-init-wrapper').addClass('loading');
-		} else {
-			$('.calendar-init-wrapper').removeClass('loading');
+		$('.calendar-init-wrapper').toggleClass('loading');
+
+		// Step 1: Passed
+		if (! isLoading && ! $('#init .step.setup').hasClass('passed')) {
+			$('#init .step.setup').addClass('passed');
+		}
+
+		// Update overview after switchs to new month
+		if (! isLoading) {
+			updateOverview();
 		}
 	},
 	events: {
@@ -66,3 +73,97 @@ $('.calendar-info .fc-change-view').click(function() {
 	$('.calendar-info .fc-change-view').removeClass('fc-state-active')
 	$(this).addClass('fc-state-active')
 })
+
+function updateOverview()
+{
+	var savedEvents = [];
+	var events = $('#calendar-init').fullCalendar('clientEvents');
+
+	var oData = {
+		totalMeeting : 0,
+		totalTime : 0,
+		ownerMeeting : 0,
+		ownerTime : 0,
+		guestMeeting : 0,
+		guestTime : 0,
+		ownerMBMeeting : 0,
+		ownerMBTime : 0,
+		guestMBMeeting : 0,
+		guestMBTime : 0
+	};
+
+	// Check event imported into MB
+	var eventIDs = [];
+	var MBEvents = [];
+	events.forEach((e) => {
+		if ( ! eventIDs[e.eventId]) {
+			eventIDs.push(e.eventId);
+		}
+	});
+
+	$.post("<?php echo site_url('dashboard/check_meeting_by_google_event_id') ?>", {eventIDs}, (data) => {
+		MBEvents = JSON.parse(data);
+		events.forEach(function(e, i) {
+			var increaseTime = e.allDay ? 24 * 60 : (e.end - e.start) / 1000 / 60;
+			oData.totalMeeting ++;
+			oData.totalTime += increaseTime;
+
+			if (e.isOwner === true) {
+				oData.ownerMeeting ++;
+				oData.ownerTime += increaseTime;
+
+				if (MBEvents[e.eventId]) {
+					oData.ownerMBMeeting ++;
+					oData.ownerMBTime += increaseTime;
+				}
+			} else {
+				oData.guestMeeting ++;
+				oData.guestTime += increaseTime;
+
+				if (MBEvents.indexOf(e.eventId) >= 0) {
+					oData.guestMBMeeting ++;
+					oData.guestMBTime += increaseTime;
+				}
+			}
+		});
+
+		oData.ownerNonMBMeeting = oData.ownerMeeting - oData.ownerMBMeeting;
+		oData.guestNonMBMeeting = oData.guestMeeting - oData.guestMBMeeting;
+		oData.ownerNonMBTime = oData.ownerTime - oData.ownerMBTime;
+		oData.guestNonMBTime = oData.guestTime - oData.guestMBTime;
+		oData.percentOfWorkingHour =  Math.ceil(oData.totalTime / 60 / 40 * 100);
+
+		for (var key in oData) {
+			// Convert Time to Hour
+			if (key.indexOf('Time') >= 0) {
+				$('#init .' + key).data('minute', oData[key]);
+				$('#init .' + key).text(Math.round(oData[key] * 10 / 60) / 10);
+			} else {
+				$('#init .' + key).text(oData[key]);
+			}
+		}
+	});
+
+}
+
+$('.btn-convert-time + ul > li > a').click(function() {
+	$('.btn-convert-time .text').text($(this).text());
+
+	switch ($(this).data('option')) {
+		case 'minute':
+			$('#init .target-time').each((i, item) => {
+				$(item).text($(item).data('minute'))
+			});
+			break;
+		case 'hour':
+			$('#init .target-time').each((i, item) => {
+				$(item).text(Math.round($(item).data('minute') * 10 / 60) / 10)
+			});
+			break;
+		case 'day':
+			$('#init .target-time').each((i, item) => {
+				$(item).text(Math.round($(item).data('minute') * 100 / 60 / 24) / 100)
+			});
+			break;
+	}
+});
