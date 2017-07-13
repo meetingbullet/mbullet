@@ -2373,7 +2373,7 @@ class Meeting extends Authenticated_Controller
 					}
 
 					if (! empty($event_list)) {
-						$imported_events = $this->$this->meeting_model->select('meetings.google_event_id')
+						$imported_events = $this->meeting_model->select('meetings.google_event_id')
 																	->join('actions a', 'a.action_id = meetings.action_id')
 																	->join('projects p', 'p.project_id = a.project_id')
 																	->join('users u', 'u.user_id = meetings.owner_id')
