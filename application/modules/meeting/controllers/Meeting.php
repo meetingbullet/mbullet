@@ -2338,11 +2338,11 @@ class Meeting extends Authenticated_Controller
 											// for first time itnit only
 											if (! empty($this->input->get('init'))) {
 												$temp['isOwner'] = ! empty($item->organizer->self);
-												$temp['ownerEmail'] = $event->organizer->email;
+												$temp['ownerEmail'] = $item->organizer->email;
 
 												$attendees_list = $item->attendees;
 												foreach ($attendees_list as $key => $attendee) {
-													if ($event->organizer->email == $attendee->email) {
+													if ($item->organizer->email == $attendee->email) {
 														unset($attendee_list[$key]);
 														break;
 													}
@@ -2372,7 +2372,7 @@ class Meeting extends Authenticated_Controller
 								// for first time itnit only
 								if (! empty($this->input->get('init'))) {
 									$temp['isOwner'] = ! empty($item->organizer->self);
-									$temp['ownerEmail'] = $event->organizer->email;
+									$temp['ownerEmail'] = $item->organizer->email;
 									$temp['attendees'] = [];
 								}
 
