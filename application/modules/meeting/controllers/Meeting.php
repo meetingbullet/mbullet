@@ -2339,15 +2339,7 @@ class Meeting extends Authenticated_Controller
 											if (! empty($this->input->get('init'))) {
 												$temp['isOwner'] = ! empty($item->organizer->self);
 												$temp['ownerEmail'] = $item->organizer->email;
-
-												$attendees_list = $item->attendees;
-												foreach ($attendees_list as $key => $attendee) {
-													if ($item->organizer->email == $attendee->email) {
-														unset($attendees_list[$key]);
-														break;
-													}
-												}
-												$temp['attendees'] = $attendees_list;
+												$temp['attendees'] = $item->attendees;
 											}
 
 											if (! empty($item->start->date)) {
