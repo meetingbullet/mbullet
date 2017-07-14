@@ -21,6 +21,7 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('agenda/agenda_model');
 		$this->load->model('agenda/agenda_member_model');
 		$this->load->model('agenda/agenda_rate_model');
+		$this->load->model('invite/user_to_organizations_model');
 		$this->load->helper('date');
 		$this->load->helper('text');
 
@@ -177,6 +178,31 @@ class Dashboard extends Authenticated_Controller
 		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
 		Template::set('current_user', $this->current_user);
 		Template::render();
+	}
+
+	public function skip_setup()
+	{
+		if ($this->current_user->inited) {
+			echo json_encode([
+				'message' => lang('db_setup_skipped'),
+				'message_type' => 'success'
+			]);
+			return;
+		}
+
+		if ( $this->user_to_organizations_model->update(
+			$this->current_user->user_id, ['inited' => 1]) ) {
+			echo json_encode([
+				'message' => lang('db_setup_skipped'),
+				'message_type' => 'success'
+			]);
+			return;
+		}
+
+		echo json_encode([
+			'message' => lang('db_something_went_wrong'),
+			'message_type' => 'danger'
+		]);
 	}
 
 	public function mark_as_read($object_type, $object_id, $user_id = null)

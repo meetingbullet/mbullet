@@ -799,4 +799,5 @@ span.count {
 .btn-skip-init {
 	display: table-cell;
 	vertical-align: middle;
+	width: 35px;
 }

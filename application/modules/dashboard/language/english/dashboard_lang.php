@@ -40,3 +40,5 @@ $lang['db_minutes'] = 'Minutes';
 $lang['db_hours'] = 'Hours';
 $lang['db_days'] = 'Days';
 $lang['db_unable_to_fetch_event_from_google_calendar'] = 'Unable to fetch event from Google Calendar';
+$lang['db_something_went_wrong'] = 'Something went wrong, please try again later';
+$lang['db_setup_skipped'] = 'Setup skipped';

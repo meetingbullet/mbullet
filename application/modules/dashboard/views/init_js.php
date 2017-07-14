@@ -191,3 +191,10 @@ $('.btn-next-step').click(function() {
 		$('#init .step.passed + .step').addClass('passed');
 	}
 });
+
+$('.btn-skip-init').click(function() {
+	$.get("<?php echo site_url('dashboard/skip_setup') ?>", (data) => {
+		data = JSON.parse(data);
+		$.mbNotify(data.message, data.message_type);
+	})
+});
