@@ -2343,7 +2343,7 @@ class Meeting extends Authenticated_Controller
 												$attendees_list = $item->attendees;
 												foreach ($attendees_list as $key => $attendee) {
 													if ($item->organizer->email == $attendee->email) {
-														unset($attendee_list[$key]);
+														unset($attendees_list[$key]);
 														break;
 													}
 												}
