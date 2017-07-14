@@ -2332,9 +2332,23 @@ class Meeting extends Authenticated_Controller
 												'title' => $item->summary,
 												'url' => $item->htmlLink,
 												'calendarId' => $calendar_id,
-												'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
-												'isOwner' => ! empty($item->organizer->self)
+												'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId
 											];
+
+											// for first time itnit only
+											if (! empty($this->input->get('init'))) {
+												$temp['isOwner'] = ! empty($item->organizer->self);
+												$temp['ownerEmail'] = $event->organizer->email;
+
+												$attendees_list = $item->attendees;
+												foreach ($attendees_list as $key => $attendee) {
+													if ($event->organizer->email == $attendee->email) {
+														unset($attendee_list[$key]);
+														break;
+													}
+												}
+												$temp['attendees'] = $attendees_list;
+											}
 
 											if (! empty($item->start->date)) {
 												$temp['allDay'] = true;
@@ -2352,9 +2366,15 @@ class Meeting extends Authenticated_Controller
 									'title' => $item->summary,
 									'url' => $item->htmlLink,
 									'calendarId' => $calendar_id,
-									'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
-									'isOwner' => ! empty($item->organizer->self)
+									'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId
 								];
+
+								// for first time itnit only
+								if (! empty($this->input->get('init'))) {
+									$temp['isOwner'] = ! empty($item->organizer->self);
+									$temp['ownerEmail'] = $event->organizer->email;
+									$temp['attendees'] = [];
+								}
 
 								if (! empty($item->start->date)) {
 									$temp['allDay'] = true;
