@@ -1,29 +1,14 @@
-// VietHD: DEBUGING
-$('#test').click();
-
 <?php if (has_permission('Project.Edit.All')): ?>
-$('.mb-popover-project').on('shown.bs.popover', function() {
-	$('.mb-editable').editable({
-		success: function(data) {
-			data = JSON.parse(data);
-
-			$.mbNotify(data.message, data.message_type);
-			
-			if (data.message_type == 'danger') {
-				return;
-			}
-
-			$(this).data('value', data.value);
-			$(this).html(data.value);
-		}
-	});
+$(document).on('click', '.enable-edit-title', function(e){
+	e.preventDefault();
+	e.stopPropagation();
+	$('.an-sidebar-nav .project-title').editable('toggle');
 })
 <?php endif; ?>
 
 $('.mb-popover-project').click(function(e){
 	e.preventDefault();
 })
-
 
 $('.mb-popover-project.new').click(function(e){
 	var that = this;
