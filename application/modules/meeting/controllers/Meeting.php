@@ -2155,7 +2155,8 @@ class Meeting extends Authenticated_Controller
 						'in' => (strtotime($end) - strtotime($start)) / 60,
 						'in_type' => 'minutes',
 						'name' => $event->summary,
-						'owner_id' => $owner_id
+						'owner_id' => $owner_id,
+						'google_event_id' => $event_id
 					];
 
 					$meeting_id = $this->meeting_model->skip_validation(true)->insert($meeting_data);
@@ -2199,7 +2200,8 @@ class Meeting extends Authenticated_Controller
 							'in' => (strtotime($end) - strtotime($start)) / 60,
 							'in_type' => 'minutes',
 							'name' => $event->summary,
-							'owner_id' => $owner_id
+							'owner_id' => $owner_id,
+							'google_event_id' => $event_id
 						];
 
 						$meeting_id = $this->meeting_model->skip_validation(true)->insert($meeting_data);
@@ -2285,22 +2287,27 @@ class Meeting extends Authenticated_Controller
 
 			$service = new Google_Service_Calendar($client);
 
-			$calendars = $service->calendarList->listCalendarList();
-			$calendar_list = [];
-			if (! isset($calendars->error)) {
-				while (true) {
-					foreach ($calendars->getItems() as $calendar) {
-						$calendar_list[$calendar->id] = $calendar->summary;
-					}
-					$pageToken = $calendars->getNextPageToken();
-					if ($pageToken) {
-						$calOptParams['pageToken'] = $pageToken;
-						$calendars = $service->calendarList->listCalendarList($calOptParams);
-					} else {
-						break;
-					}
-				}
-			}
+			// $calendars = $service->calendarList->listCalendarList();
+			// $calendar_list = [];
+			// if (! isset($calendars->error)) {
+			// 	while (true) {
+			// 		foreach ($calendars->getItems() as $calendar) {
+			// 			$calendar_list[$calendar->id] = $calendar->summary;
+			// 		}
+			// 		$pageToken = $calendars->getNextPageToken();
+			// 		if ($pageToken) {
+			// 			$calOptParams['pageToken'] = $pageToken;
+			// 			$calendars = $service->calendarList->listCalendarList($calOptParams);
+			// 		} else {
+			// 			break;
+			// 		}
+			// 	}
+			// }
+
+			// At this time we only get the events from the primary calendar
+			$calendar_list = [
+				$this->current_user->email => 'primary'
+			];
 
 			foreach ($calendar_list as $calendar_id => $calendar) {
 				$event_options = [
@@ -2325,8 +2332,15 @@ class Meeting extends Authenticated_Controller
 												'title' => $item->summary,
 												'url' => $item->htmlLink,
 												'calendarId' => $calendar_id,
-												'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
+												'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId
 											];
+
+											// for first time itnit only
+											if (! empty($this->input->get('init'))) {
+												$temp['isOwner'] = ! empty($item->organizer->self);
+												$temp['ownerEmail'] = $item->organizer->email;
+												$temp['attendees'] = $item->attendees;
+											}
 
 											if (! empty($item->start->date)) {
 												$temp['allDay'] = true;
@@ -2344,8 +2358,15 @@ class Meeting extends Authenticated_Controller
 									'title' => $item->summary,
 									'url' => $item->htmlLink,
 									'calendarId' => $calendar_id,
-									'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId,
+									'eventId' => empty($item->recurringEventId) ? $item->id : $item->recurringEventId
 								];
+
+								// for first time itnit only
+								if (! empty($this->input->get('init'))) {
+									$temp['isOwner'] = ! empty($item->organizer->self);
+									$temp['ownerEmail'] = $item->organizer->email;
+									$temp['attendees'] = [];
+								}
 
 								if (! empty($item->start->date)) {
 									$temp['allDay'] = true;
@@ -2361,6 +2382,31 @@ class Meeting extends Authenticated_Controller
 						} else {
 							break;
 						}
+					}
+
+					if (! empty($event_list)) {
+						$imported_events = $this->meeting_model->select('meetings.google_event_id')
+																	->join('actions a', 'a.action_id = meetings.action_id')
+																	->join('projects p', 'p.project_id = a.project_id')
+																	->join('users u', 'u.user_id = meetings.owner_id')
+																	->where('organization_id', $this->current_user->current_organization_id)
+																	->where('google_event_id IS NOT NULL')
+																	->group_by('meetings.google_event_id')
+																	->as_array()
+																	->find_all();
+						if (empty($imported_events)) {
+							$imported_events = [];
+						} else {
+							$imported_events = array_column($imported_events, 'google_event_id');
+						}
+
+						foreach ($event_list as $index => $event) {
+							if (in_array($event['eventId'], $imported_events)) {
+								unset($event_list[$index]);
+							}
+						}
+
+						$event_list = array_values($event_list);
 					}
 				}
 			}

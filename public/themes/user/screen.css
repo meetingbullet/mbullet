@@ -158,8 +158,16 @@ label>.required {
 	margin-bottom: 0;
 }
 
-.modal-80 {
+.mb-modal {
+	padding-left: 0 !important;
+}
+
+.modal-dialog.modal-80 {
 	width: 80%;
+}
+
+.modal-dialog.modal-95 {
+	width: 95%;
 }
 
 .input-group-btn .an-btn {
@@ -694,4 +702,63 @@ body.modal-open .main-wrapper:not(.modal) {
 
 .an-profile-settings .btn-group .an-user-name {
 	line-height: 16px;
+}
+
+.clear {
+	clear: both;
+}
+
+/* Input group */
+.input-group .form-control:first-child, .input-group-addon:first-child, .input-group-btn:first-child>.btn, .input-group-btn:first-child>.btn-group>.btn, .input-group-btn:first-child>.dropdown-toggle, .input-group-btn:last-child>.btn-group:not(:last-child)>.btn, .input-group-btn:last-child>.btn:not(:last-child):not(.dropdown-toggle) {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.input-group .form-control:last-child, .input-group-addon:last-child, .input-group-btn:first-child>.btn-group:not(:first-child)>.btn, .input-group-btn:first-child>.btn:not(:first-child), .input-group-btn:last-child>.btn, .input-group-btn:last-child>.btn-group>.btn, .input-group-btn:last-child>.dropdown-toggle {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+.input-group .form-control:not(:first-child):not(:last-child), .input-group-addon:not(:first-child):not(:last-child), .input-group-btn:not(:first-child):not(:last-child) {
+	border-radius: 0;
+}
+
+.input-group-addon, .input-group-btn {
+	width: 1%;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.an-input-group .an-input-group-addon.text {
+	position: relative;
+	width: auto;
+	font-size: inherit;
+	float: left;
+	border: 1px solid #999;
+	border-radius: 3px;
+	padding: 0 5px;
+}
+
+.an-input-group .an-input-group-addon.text:first-child {
+	border-right: 0;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.an-input-group .an-input-group-addon.text:not(:first-child):not(:last-child) {
+	border-right: 0;
+	border-left: 0;
+	border-radius: 0;
+}
+
+.an-input-group .an-form-control:not(:first-child):not(:last-child) {
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #ddd;
+	border-radius: 0;
+}
+
+.an-input-group .an-input-group-addon.text:last-child {
+	border-left: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }

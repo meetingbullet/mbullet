@@ -8,10 +8,10 @@ class User_to_organizations_model extends BF_Model
 
 	protected $log_user	= false;
 	protected $set_created	= false;
-	protected $set_modified = false;
+	protected $set_modified = true;
 	protected $soft_deletes	= false;
 
-	protected $created_field	 = 'created_on';
+	protected $modified_by_field = 'modified_by';
 
 	// Customize the operations of the model without recreating the insert,
 	// update, etc. methods by adding the method names to act as callbacks here.

@@ -440,10 +440,6 @@ span.count {
 	font-size: 18px;
 }
 
-.calendar-wrapper {
-	padding: 15px;
-}
-
 #calendar .fc-ggcToggle-button {
 	color: white;
 	background: #999;
@@ -468,6 +464,589 @@ span.count {
 
 .child .user-wrapper {
 	padding: 10px 0;
+}
+
+<<<<<<< application/modules/dashboard/assets/css/dashboard.css
+/* Init modal */
+#init .modal-content {
+	background: transparent;
+}
+
+.init {
+	transition: filter 0.5s ease-out;
+}
+
+.init .calendar {
+	position: relative;
+	float: left;
+	width: 65%;
+}
+
+.init .summary {
+	position: relative;
+	float: left;
+	width: calc(35% - 20px);
+	margin-left: 20px;
+}
+
+.init-nav {
+	display: flex;
+	align-items: center;
+	padding: 0 30px;
+	height: 70px;
+	background: white;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.init-nav * {
+	-webkit-transition: all 0.5s ease-out;
+	-moz-transition: all 0.5s ease-out;
+	transition: all 0.5s ease-out;
+}
+
+.init-nav > h4 > i {
+	font-size: 33px;
+	vertical-align: text-top;
+	line-height: 28px;
+	margin-right: 10px;
+}
+
+.init-nav > .step {
+	display: flex;
+	font-size: 16px;
+	flex: 1;
+	color: #bdbdbd;
+}
+
+.init-nav > .step.my-meeting {
+	flex: 1.3;
+}
+
+.init-nav > .step:last-child {
+	flex: 0;
+}
+
+.init-nav > .step > .transitor {
+	background: #76d2c1;
+	height: 2px;
+	flex: 0;
+	align-self: center;
+}
+
+.init-nav > .step.passed {
+	color: #76d2c1;
+}
+
+.init-nav > .step.passed > .transitor {
+	flex: 1;
+}
+
+.init-nav > .step.passed + .step:not(.passed) {
+	color: #2795c3;
+	font-size: 20px;
+}
+
+.init-nav > .step .sub-step {
+	margin: 0;
+	display: flex;
+	justify-content: center;
+}
+
+.init-nav > .step.passed + .step.my-meeting .sub-step .dot:first-child {
+	background: #2795c3;
+}
+
+.init-nav > .step.passed .sub-step > .dot {
+	height: 0px;
+	background: transparent;
+}
+
+.init-nav > .step .sub-step > .dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #d0d0d0;
+	margin-left: 6px;
+}
+
+.init-nav > .title {
+	margin: 0;
+}
+
+.init-nav > .step.passed + .step.my-meeting .sub-step .dot.passed{
+	background: #76d2c1;
+}
+
+.init-nav > .step .sub-step > .dot.passed + .dot:not(.passed) {
+	background: #2795c3;
+}
+
+.init-body {
+	display: flex;
+	flex-flow: row nowrap;
+	position: relative;
+}
+
+.init-body > div {
+	background: white;
+}
+
+.calendar-info {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	background: #f9f9f9;
+}
+
+.calendar-info > .wrapper:nth-child(2) {
+	border-left: 1px solid #e0e0e0;
+	border-right: 1px solid #e0e0e0;
+}
+
+.calendar-info > .wrapper {
+	padding: 15px;
+	flex: 1;
+	font-size: 12px;
+}
+
+.calendar-info > .wrapper > .title {
+	margin-top: 0;
+	color: #afafaf;
+	text-transform: uppercase;
+}
+
+.calendar-info .user .avatar {
+	margin-left: 0;
+}
+
+.calendar-info .user .name {
+	font-size: 15px;
+}
+
+.calendar-info .group-range {
+	display: inline-block;
+	width: auto;
+	vertical-align: middle;
+	margin-bottom: 10px;
+}
+
+.calendar-info .event-range {
+	float: left;
+	width: 56px;
+	padding: 5px;
+	font-size: 15px;
+	margin: 0;
+}
+
+.calendar-info .btn-reload-calendar {
+	height: 34px;
+	padding: 2px 11px;
+	font-size: 22px;
+	margin-left: 5px;
+	margin-bottom: 10px;
+}
+
+.calendar-info .fc-button-group {
+	margin-right: 8px;
+	margin-bottom: 8px;
+}
+
+.calendar-info .fc-button-group:last-child {
+	margin-right: 0;
+}
+
+.calendar-info .fc-toolbar {
+	text-align: center;
+	margin-bottom: 0;
+}
+
+.calendar-info .fc-button {
+	padding: 4px 6px;
+	margin-left: -5px;
+}
+
+.calendar-info .fc-button-top {
+	margin-bottom: 8px;
+}
+
+.calendar-init-wrapper {
+	position: relative;
+}
+
+#calendar-init-title {
+	margin: 0;
+	text-align: center;
+}
+
+#calendar-init {
+	transition: filter 0.5s ease-out;
+}
+
+.calendar-init-wrapper .loading-indicator {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	opacity: 0;
+	transition: 0.5s ease-out;
+	background: rgba(0, 0, 0, 0.4);
+	border-radius: 5px;
+	padding: 8px 15px;
+	color: white;
+	transition: opacity 0.5s ease-out;
+	z-index: 2;
+}
+
+.calendar-init-wrapper.loading .loading-indicator {
+	display: block;
+	opacity: 1;
+}
+
+.calendar-init-wrapper.loading #calendar-init {
+	filter: blur(10px);
+}
+
+.bubba-tea {
+	position: absolute;
+	width: 0;
+	height: 0;
+	left: -20px;
+	border-right: 20px solid white;
+	border-top: 20px solid transparent;
+	border-bottom: 20px solid transparent;
+}
+
+.init .content {
+	padding: 20px;
+}
+
+.init .content p {
+	margin: 0 0 6px;
+}
+
+.init .section {
+	width: 100%;
+	border-bottom: 1px solid #a0b9c3;
+	color: #2795c3;
+}
+
+.init .an-small-doc-block .section {
+	margin-top: 0;
+}
+
+.init .content > .title {
+	margin-top: 0;
+}
+
+.summary .content p .number {
+	font-size: 18px;
+	color: #2795c3;
+}
+
+.overview-table {
+	font-size: 13px;
+	overflow: hidden;
+}
+
+.overview-table .number {
+	font-size: 15px;
+}
+
+.overview-table .vertical-align {
+	display: flex;
+	flex-direction: row;
+}
+
+.overview-table .vertical-align > [class^="col-"],
+.overview-table .vertical-align > [class*=" col-"] {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center; 
+}
+
+.overview-table hr {
+	margin: 4px 0;
+}
+
+.overview-table .btn-convert-time {
+	padding: 0 2px;
+	font-size: 12px;
+}
+
+.overview-table .row.bold {
+	font-weight: bold;
+}
+
+.overview-table .row > div:not(:first-child) {
+	text-align: center;
+}
+
+.overview-table .vertical-align > div:first-child {
+	justify-content: flex-start;
+}
+
+.overview-table .row:nth-child(even) > div {
+    background: #f9f9f9;
+}
+
+.overview-table .time-wrapper {
+	min-width: 100px;
+}
+
+.init-footer {
+	display: table;
+	padding: 12px 20px;
+	min-height: 60px;
+	background: white;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.btn-skip-init {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+/* Step Two */
+.init.blur {
+	filter: blur(2px) brightness(90%);
+	transition: filter 0.5s ease-out;
+}
+
+.step-20 {
+	max-height: 0;
+	opacity: 0;
+	position: absolute;
+	top: -9999px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	transition: opacity 0.3s ease-out;
+}
+
+.step-20.in {
+	max-height: none;
+	top: 0;
+	opacity: 1;
+}
+
+.step-20 .block {
+	display: inline-block;
+	vertical-align: top;
+	background: white;
+	border-radius: 10px;
+	font-size: 17px;
+}
+
+.step-20 > .block-wrapper {
+	text-align: center;
+	margin: 20px;
+}
+
+.step-20 .block > .content {
+	padding: 8px;
+	max-width: 426px;
+	text-align: left;
+}
+
+.step-20 .path {
+	margin: 0 20px;
+	min-height: 500px;
+	border: 1px solid #e0e0e0;
+}
+
+.step-20 .choose-your-path {
+	overflow: hidden;
+}
+
+.step-20 .choose-your-path .title {
+	margin: 0;
+	padding: 8px;
+	background: #2795c3;
+	color: white;
+}
+
+.step-20 .choose-your-path > p {
+	padding: 8px 20px;
+	margin: 0;
+}
+
+.step-20 .path .title {
+	margin: 10px 0 15px;
+}
+
+.step-20 .title > i {
+	font-size: 35px;
+	vertical-align: middle;
+}
+
+
+.step-20 .path p {
+	text-transform: uppercase;
+}
+
+.step-20 .center {
+	text-align: center;
+}
+
+.step-20 .path .subtitle {
+	font-size: 15px;
+	text-transform: none;
+}
+
+.step-20 .an-btn {
+	text-transform: uppercase;
+}
+
+.step-20 .thumbnail {
+	margin-bottom: 10px;
+}
+
+.step-20 .emoji {
+	width: 32px;
+}
+
+/* Step three */
+.step-30 > div {
+	display: none;
+}
+
+.step-30 .instruction {
+	position: relative;
+	padding-left: 25px;
+	padding-bottom: 0;
+	background: rgba(2, 93, 131, 0.1);
+	transition: all .5s ease-out;
+}
+
+.step-30 .instruction::before {
+	background: #025d83;
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 4px;
+	height: 100%;
+	transition: all .5s ease-out;
+}
+
+.step-30 .instruction.passed {
+	background: transparent;
+	padding: 0 20px;
+}
+
+.step-30 .instruction.passed::before {
+	width: 0px;
+}
+
+.step-30 .instruction .section {
+	margin-top: 0;
+}
+
+.step-30 .instruction .section-sub {
+	margin-bottom: 0;
+}
+
+.step-30 .instruction.passed .section-sub {
+	display: none;
+}
+
+.step-30 .instruction .section-sub i {
+	font-size: 30px;
+	vertical-align: middle;
+	margin-right: 10px;
+}
+
+.step-30 .table-improve-meeting {
+	padding-top: 0;
+}
+
+.step-30 .table-improve-meeting th {
+	color: #b1b1b1;
+	font-weight: normal;
+	border-bottom: 1px solid #ddd;
+}
+
+.step-30 .table-improve-meeting .table {
+	border-bottom: 1px solid #ddd;
+	    margin-bottom: 5px;
+}
+
+.init .fc-event.selected {
+	border: 2px dashed #006d36;
+}
+
+.step-30 .meeting-cost > .mic {
+	color: #2795c3;
+	padding-right: 10px;
+}
+
+.step-30 .bigest-challenge {
+	margin-top: 20px;
+}
+
+.step-30 .bigest-challenge .section {
+	margin-top: 5px;
+}
+
+.step-30 .answers {
+	list-style: none;
+	padding-left: 0;
+	font-size: 16px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.step-30 .answer {
+	padding: 5px 10px;
+	border-bottom: 1px solid #ddd;
+	transition: .2s ease-out;
+	cursor: pointer;
+}
+
+.step-30 .answer:last-child {
+	border-bottom: none;
+}
+
+.step-30 .answer > i {
+	font-size: 28px;
+	vertical-align: middle;
+}
+
+.step-30 .answer:hover {
+	background: #4eacd4;
+	color: white;
+}
+
+.step-30 .answer.selected {
+	background: #2795c3;
+	color: white;
+}
+
+.step-32 {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 50%;
+	height: calc(100% - 10px); /* margin-top * 2 */
+	margin: 5px 0;
+	background: white;
+	overflow-y: auto;
+	z-index: 6;
+	border-radius: 5px;
+}
+
+.step-32-shadow {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.15);
+	z-index: 5;
 }
 
 .an-main-nav.bottom {

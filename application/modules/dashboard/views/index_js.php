@@ -1,3 +1,6 @@
+// VietHD: DEBUGING
+$('#test').click();
+
 <?php if (has_permission('Project.Edit.All')): ?>
 $('.mb-popover-project').on('shown.bs.popover', function() {
 	$('.mb-editable').editable({
@@ -218,3 +221,93 @@ $(document).on("click", "#rate-content .submit", function(e) {
 	}
 
 });
+
+<?php if ( ! $current_user->inited): ?>
+$.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');
+<?php endif; ?>
+
+// ------- baodg: start test ------- //
+// setTimeout(function(){
+// 	$.get({url : '<?php echo site_url('/test/init_project?data=') ?>' + JSON.stringify(INIT_DATA)}).done(function(data) {
+// 		data = JSON.parse(data);
+// 		console.log(data);
+
+// 		$('#init .init-body .calendar').html(data.modal_content);
+// 	});
+// }, 3000);
+
+$(document).on('click', '#init .init-body .calendar .init-project .action .delete-meeting', function() {
+	var that = $(this);
+	if ($('#init .init-body .calendar .init-project .action .delete-meeting').length <= 1) {
+		swal("Warning", "We need at least 1 meeting to import", "warning");
+		return;
+	}
+
+	var event_id = that.closest('tr').data('event-id');
+	delete INIT_DATA.meetings[event_id];
+
+	console.log(INIT_DATA);
+	that.closest('tr')
+		.find('td')
+		.wrapInner('<div style="display: block;" />')
+		.parent()
+		.find('td > div')
+		.slideUp('fast', function(){
+			$(this).parent().parent().remove();
+		});
+});
+
+$(document).on('change', '#init .init-body .calendar .init-project select', function() {
+	var that = $(this);
+	var project_id = that.val();
+	var event_id = that.closest('tr').data('event-id');
+	INIT_DATA.meetings[event_id].project_id = project_id;
+	console.log(INIT_DATA);
+});
+
+$(document).on("click", '#init-create-project-modal form button[type=submit]', function(e) {
+	e.preventDefault();
+
+	var method = $(this).closest('form').attr('method') ? $(this).closest('form').attr('method') : 'post';
+	var data = $(this).closest('form').serialize();
+
+	// Since serialize does not include form's action button, 
+	// we need to add it on our own.
+	data += '&' + $(this).attr('name') + '=';
+
+	if (typeof(INIT_DATA.new_projects_count) == 'undefined') {
+		INIT_DATA.new_projects_count = 0;
+	}
+
+	$.ajax({
+		type: "POST",
+		url: $(this).closest('form').attr('action'),
+		data: data,
+		success: (data) => {
+			data = JSON.parse(data);
+
+			if (data.close_modal === 0) {
+				$('#init-create-project-modal .modal-content').html(data.modal_content);
+			} else {
+				$('#init-create-project-modal').modal('hide');
+			}
+
+			if (data.message_type) {
+				$.mbNotify(data.message, data.message_type);
+
+				if (data.message_type == 'success') {
+					// New meeting created, refresh modal;
+					INIT_DATA.new_projects_count += 1;
+
+					$.get({url : '<?php echo site_url('/test/init_project?data=') ?>' + JSON.stringify(INIT_DATA)}).done(function(refresh_data) {
+						refresh_data = JSON.parse(refresh_data);
+						console.log(refresh_data);
+
+						$('#init .init-body .calendar').html(refresh_data.modal_content);
+					});
+				}
+			}
+		}
+	});
+});
+// ------- baodg: end test ------- //
