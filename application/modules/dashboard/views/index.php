@@ -439,7 +439,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 <div id="popover-project-<?php echo $project->project_id ?>" style="display: none">
 	<div class="project-header">
 			<h4>
-				<a href="#" class='mb-editable'
+				<a href="<?php echo site_url('project/' . $project->cost_code)?>"
+				class="project-title"
+				data-toggle="manual"
 				data-title="<?php echo lang('pj_edit_project_name') ?>"
 				data-pk="<?php echo $project->project_id ?>" 
 				data-name="name"
@@ -450,6 +452,10 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</a> 
 				<a href="<?php echo site_url('project/' . $project->cost_code)?>">
 				<span>[<?php echo $project->cost_code ?>]</span>
+				</a>
+
+				<a href="#" class="enable-edit-title" data-target="#project-<?php echo $project->project_id ?>">
+					<i class="ion-edit"></i>
 				</a>
 			</h4>
 		<?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?>
