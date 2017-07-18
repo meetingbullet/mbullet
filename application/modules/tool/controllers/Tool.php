@@ -14,7 +14,7 @@ class Tool extends Front_Controller
 	{
 
 		$user = $this->auth->user();
-		$this->config->load('users/google_api');
+		$this->config->load('google_api');
 
 		require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
 		$client_id = $this->config->item('client_id');

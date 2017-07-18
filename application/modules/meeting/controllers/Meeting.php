@@ -2036,7 +2036,7 @@ class Meeting extends Authenticated_Controller
 			Template::set('close_modal', 1);
 		}
 
-		$this->config->load('users/google_api');
+		$this->config->load('google_api');
 
 		require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
 		$client_id = $this->config->item('client_id');
@@ -2272,7 +2272,7 @@ class Meeting extends Authenticated_Controller
 				echo json_encode([]);exit;
 			}
 
-			$this->config->load('users/google_api');
+			$this->config->load('google_api');
 
 			require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
 			$client_id = $this->config->item('client_id');

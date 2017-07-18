@@ -118,6 +118,16 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</ul>
 			</li>
 		</ul> <!-- end .AN-MAIN-NAV -->
+
+		<?php if (has_permission('Project.Create')) : ?>
+		<ul class="an-main-nav bottom">
+			<li class="an-nav-item">
+				<a href="#" class="mb-open-modal" data-modal-id="create-project-modal" data-url="<?php echo site_url('project/create') ?>">
+					<i class="ion-ios-plus-outline"></i> <?php echo lang('db_create_project') ?>
+				</a>
+			</li>
+		</ul> <!-- end .AN-MAIN-NAV.BOTTOM -->
+		<?php endif; ?>
 	</div> <!-- /.an-sidebar-nav -->
 
 	<div class="an-page-content">
@@ -443,6 +453,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</a>
 			</h4>
 		<?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?>
+		<i class="mb-open-modal ion-ios-plus-outline db-create-meeting" data-modal-id="db-create-meeting" data-url="<?php echo site_url('meeting/create/' . $project->cost_code) ?>"></i>
 	</div>
 
 	<div class="mb-popover-content">
