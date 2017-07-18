@@ -709,6 +709,13 @@ span.count {
 	filter: blur(10px);
 }
 
+.calendar-wrapper {
+	transition: blur 0.5s ease-out;
+}
+.calendar-wrapper.blur {
+	filter: blur(10px);
+}
+
 .bubba-tea {
 	position: absolute;
 	width: 0;
@@ -731,6 +738,10 @@ span.count {
 	width: 100%;
 	border-bottom: 1px solid #a0b9c3;
 	color: #2795c3;
+}
+
+.init .section.no-margin-top {
+	margin-top: 0;
 }
 
 .init .an-small-doc-block .section {
@@ -945,6 +956,7 @@ span.count {
 
 .step-30 .instruction .section {
 	margin-top: 0;
+	padding-top: 15px;
 }
 
 .step-30 .instruction .section-sub {
@@ -961,28 +973,46 @@ span.count {
 	margin-right: 10px;
 }
 
-.step-30 .table-improve-meeting {
+.init .table-improve-meeting {
 	padding-top: 0;
 }
 
-.step-30 .table-improve-meeting th {
+.init .table th {
 	color: #b1b1b1;
 	font-weight: normal;
 	border-bottom: 1px solid #ddd;
 }
 
-.step-30 .table-improve-meeting .table {
+.init .table .table {
 	border-bottom: 1px solid #ddd;
-	    margin-bottom: 5px;
+	margin-bottom: 5px;
 }
 
 .init .fc-event.selected {
 	border: 2px dashed #006d36;
 }
 
-.step-30 .meeting-cost > .mic {
+.init .meeting-cost > .mic {
 	color: #2795c3;
 	padding-right: 10px;
+}
+
+.init .section i.btn {
+	color: #2795c3;
+	cursor: pointer;
+	font-size: 20px;
+	vertical-align: middle;
+	padding: 0;
+	float: right;
+}
+
+.init .btn {
+	color: #2795c3;
+	cursor: pointer;
+}
+
+.init .btn:hover {
+	color: #0b83b5;
 }
 
 .step-30 .bigest-challenge {
@@ -1028,6 +1058,7 @@ span.count {
 }
 
 .step-32 {
+	display: none;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -1040,12 +1071,34 @@ span.count {
 	border-radius: 5px;
 }
 
-.step-32-shadow {
+.step-32.in + .calendar-of-shadow {
+	top: 0;
+	opacity: 1;
+}
+
+.step-32-sub {
+	display: none;
+}
+
+.calendar-of-shadow {
 	position: absolute;
 	width: 100%;
 	height: 100%;
 	background: rgba(0, 0, 0, 0.15);
 	z-index: 5;
+	top: -9999px;
+	opacity: 0;
+	transition: opacity 0.5s ease-out;
+}
+
+.step-32-sub form {
+	padding: 10px;
+	border: 1px solid #dcdcdc;
+	border-radius: 5px;
+}
+
+strong.primary {
+	color: #2795c3;
 }
 
 .an-main-nav.bottom {

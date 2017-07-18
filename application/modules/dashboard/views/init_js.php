@@ -2,12 +2,13 @@ var INIT_DATA = {
 	currentStep: 10,
 	currentStepIndex: 0,
 	path: null,
-	bigest_challenge: null,
+	bigestChallenge: null,
 	meetings: [],
 	events: []
 };
 
-var STEPS = [10, 20, 30, 31, 32, 33, 40, 50, 60]
+var STEPS = [10, 20, 30, 31, 32, 33, 40, 50, 60];
+var currentEvent = null;
 
 // Enable jQuery tooltip
 $('[data-toggle="tooltip"]').tooltip();
@@ -91,7 +92,7 @@ $('.calendar-info .fc-change-view').click(function() {
 })
 
 $('.bigest-challenge .answer').click(function() {
-	INIT_DATA.bigest_challenge = $(this).data('answer');
+	INIT_DATA.bigestChallenge = $(this).data('answer');
 	$('.bigest-challenge .answer').removeClass('selected');
 	$(this).addClass('selected');
 	$('.btn-next-step').prop('disabled', false);
@@ -142,9 +143,39 @@ $('.btn-next-step').click(function() {
 			$('#init .step-20').addClass('in');
 			break;
 		case 32:
-			// Path: Owner
-			if (INIT_DATA.path == 'owner') {
+			$('.bigest-challenge').slideDown();
+			$('.btn-next-step').prop('disabled', true);
+			break;
+		case 33:
+			INIT_DATA.meetings[currentEvent.eventId] = {
+				name: currentEvent.title,
+				scheduled_start_time: currentEvent.start.format("YYYY-MM-DD HH:mm:ss"),
+				in: (currentEvent.end - currentEvent.start) / 1000 / 60,
+				owner: currentEvent.ownerEmail,
+				members: [],
+				goal: [],
+				homework: [],
+				agenda: [],
+				team: []
+			};
+
+			currentEvent.attendees.forEach((person) => {
+				INIT_DATA.meetings[currentEvent.eventId].members.push(person.email);
+			})
+
+			if (INIT_DATA.path == 'owner') { // Path: Owner
 				
+				$('.step-30').slideUp();
+				$('.step-32-sub').slideDown(() => {
+					$('.step-32')
+					.addClass('in')
+					.show("slide", { 
+						direction: "right", 
+						easing: "easeOutQuint" 
+					}, 400);
+				});
+
+				$('.calendar-wrapper').addClass('blur');
 			} else { // Path: Guest
 			
 
@@ -202,18 +233,73 @@ $('.btn-skip-init').click(function() {
 	})
 });
 
+$('.btn-create-goal').click(function(e) {
+	e.preventDefault();
+	$('#goal-name').removeClass('danger');
+	$('#goal-type').removeClass('danger');
+	$('#goal-importance').removeClass('danger');
+	var error = false;
+
+	// Validation
+	if ($('#goal-name').val().trim() == '') {
+		$('#goal-name').addClass('danger');
+		error = true;
+	}
+
+	if ($('#goal-type').val() === null) {
+		$('#goal-type').addClass('danger');
+		error = true;
+	}
+
+	if ($('#goal-importance').val() === null) {
+		$('#goal-importance').addClass('danger');
+		error = true;
+	}
+
+	if (error) return;
+
+	var name = $('#goal-name').val().trim(),
+	type = $('#goal-type').val(),
+	type_lang = $('#goal-type option:selected').text(),
+	importance = $('#goal-importance').val(),
+	importance_lang = $('#goal-importance option:selected').text(),
+	index = INIT_DATA.meetings[currentEvent.eventId].goal.length;
+
+	$(`
+		<tr data-index="${index}">
+			<td><strong>${name}</strong></td>
+			<td class="text-center ${type}">${type_lang}</td>
+			<td class="text-center ${importance}">${importance_lang}</td>
+		</tr>
+	`).appendTo('.table-goal tbody').effect('highlight', {}, 500);
+
+	INIT_DATA.meetings[currentEvent.eventId].goal[index] = {
+		name,
+		type,
+		importance
+	}
+
+	$('#goal-name').val('');
+	$('#goal-type').prop('selectedIndex', 0);
+	$('#goal-importance').prop('selectedIndex', 0);
+
+	$('.btn-define-goal > span').text(index);
+})
+
 $(document).on('click', '.init .fc-event', function(e){
 	e.preventDefault();
 	var event = INIT_DATA.events[$(this).data('index')];
 
 	if ( $('#init .step-30 .owner:visible').length ) {
-		var date = event.start.format('ddd MMM D') == event.end.format('ddd MMM D') 
-					? event.start.format('ddd MMM D') 
-					: event.start.format('ddd MMM D') + ' - ' + event.end.format('ddd MMM D');
+		currentEvent = event;
+		console.log('event', event);
+		var date = event.start.format('ddd MMM D') == event.end.format('ddd MMM D') ?
+					event.start.format('ddd MMM D') :
+					event.start.format('ddd MMM D') + ' - ' + event.end.format('ddd MMM D');
 
 		var hour = (event.end - event.start) / 1000 / 60 / 60;
 		$('#init .table-improve-meeting .name').text(event.title);
-		$('#init .table-improve-meeting .date').text(hour);
+		$('#init .table-improve-meeting .date').text(date);
 		$('#init .table-improve-meeting .time').text(event.start.format('hh:mma') + ' - ' + event.end.format('hh:mma'));
 		$('#init .table-improve-meeting .team').text(event.attendees.length);
 
@@ -227,6 +313,7 @@ $(document).on('click', '.init .fc-event', function(e){
 
 		$('.init .fc-event').removeClass('selected');
 		$(this).addClass('selected');
+		$('.btn-next-step').prop('disabled', false);
 
 	} else if ( $('#init .step-30 .guest:visible').length ) {
 

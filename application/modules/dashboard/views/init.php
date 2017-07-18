@@ -44,10 +44,40 @@
 		<div class="calendar">
 			<div class="step-32">
 				<div class="content">
-					<h3 class="section">Setup Meeting</h3>
+					<h3 class="section no-margin-top">Setup Meeting</h3>
+
+					<div class="table-improve-meeting">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Meeting</th>
+									<th class="text-center">Date</th>
+									<th class="text-center">Time</th>
+									<th class="text-center">Team</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="name"></td>
+									<td class="date text-center"></td>
+									<td class="time text-center"></td>
+									<td class="team text-center"></td>
+								</tr>
+							</tbody>
+						</table>
+						<strong class="meeting-cost">
+							<span class="mic">Meeting Investment Cost</span> <span class="hour">x hrs</span> x <span class="total-participant">x participants</span> = <span class="total-hour">x hrs</span>
+						</strong>
+					</div>
 				</div>
+
+				<a href="#" class='btn-wide btn-define-goal'>Goal (<span>0</span>)</a>
+				<a href="#" class='btn-wide btn-define-todo'>Todo (<span>0</span>)</a>
+				<a href="#" class='btn-wide btn-define-agenda'>Agenda (<span>0</span>)</a>
+				<a href="#" class='btn-wide btn-define-team'>Team (<span>0</span>)</a>
+
 			</div>
-			<div class="step-32-shadow"></div>
+			<div class="calendar-of-shadow"></div>
 			<div class="calendar-wrapper">
 				<div class="calendar-info">
 					<div class="wrapper">
@@ -214,7 +244,7 @@
 							<span class="mic">Meeting Investment Cost</span> <span class="hour">x hrs</span> x <span class="total-participant">x participants</span> = <span class="total-hour">x hrs</span>
 						</strong>
 
-						<div class="bigest-challenge">
+						<div class="bigest-challenge" style="display: none">
 							<p>To help us, help your meeting improve, tell us:</p>
 							<h3 class="section">What are the biggest challenges you typically have as a meeting organizer?</h3>
 							<p>Select the response that best suites your feeling</p>
@@ -240,6 +270,71 @@
 					</div>
 				</div>
 				<div class="guest">Hello Step 30 guest</div>
+			</div> <!-- .step-30 -->
+
+			<div class="step-32-sub content">
+				<h3 class="section no-margin-top">Define a Goal</h3>
+				<p style="text-align: justify">Having a <strong class="primary">Goal/Objective</strong> for
+				a meeting is priority 1 for defining the purpose of a meeting, 
+				other-wise the meeting is a meeting for the sake of a meeting...
+				which is boring and expensive.</p>
+
+				<h3 class="section">
+					<i class="ion-ios-flag-outline"></i>
+					Goals
+				</h3>
+				<table class="table table-goal">
+					<thead>
+						<tr>
+							<th>Goal</th>
+							<th class="text-center">Importance</th>
+							<th class="text-center">Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Daily update video cats to Sprint</td>
+							<td class="text-center">Urgent</td>
+							<td class="text-center">Review</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<form>
+					<label for="goal-name">Add new Goal</label>
+					<input id="goal-name" name="name" class="an-form-control" type="text" placeholder="Define your Goal/Objective">
+
+					<div class="row">
+						<div class="col-md-6 col-xs-12">
+							<label for="goal-type">Type</label>
+							<select id="goal-type" name="type" class="an-form-control">
+								<option disabled selected>(Select)</option>
+								<option value="decide">Decide</option>
+								<option value="plan">Plan</option>
+								<option value="prioritize">Prioritize</option>
+								<option value="assess">Assess</option>
+								<option value="review">Review</option>
+							</select>
+						</div>
+						<div class="col-md-6 col-xs-12">
+							<label for="goal-importance">Importance</label>
+							<select id="goal-importance" name="importance" class="an-form-control">
+								<option disabled selected>(Select)</option>
+								<option value="urgent">Urgent/Critical</option>
+								<option value="required">Requried for [Sprint]</option>
+								<option value="requested">Requested for [Sprint]</option>
+								<option value="backlog">Backlog for [Project]</option>
+								<option value="other">Other [Fill in Blank]</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="pull-right">
+						<button type="submit" class="an-btn an-btn-primary btn-create-goal">Create</button>
+					</div>
+
+					<div class="clear"></div>
+				</form>
 			</div>
 		</div> <!-- .summary -->
 	</div>
