@@ -1,3 +1,14 @@
+var INIT_DATA = {
+	currentStep: 10,
+	currentStepIndex: 0,
+	path: null,
+	bigest_challenge: null,
+	meetings: [],
+	events: []
+};
+
+var STEPS = [10, 20, 30, 31, 32, 33, 40, 50, 60]
+
 // Enable jQuery tooltip
 $('[data-toggle="tooltip"]').tooltip();
 
@@ -7,6 +18,11 @@ $('#calendar-init').fullCalendar({
 	firstDay: 1, // Monday
 	height: 500,
 	cache: true,
+	eventRender: function(event, element) {
+		i = INIT_DATA.events.length;
+		INIT_DATA.events[i] = event;
+		element.data('index', i);
+	},
 	viewRender: function(view) {
 		var title = view.title;
 		$("#calendar-init-title").html(title);
@@ -16,23 +32,22 @@ $('#calendar-init').fullCalendar({
 
 		// Step 1: Passed
 		if (! isLoading && ! $('#init .step.setup').hasClass('passed')) {
-			INIT_DATA.currentStep = 20;
+			INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
 			$('#init .step.setup').addClass('passed');
 		}
 
 		// Update overview after switchs to new month
 		if (! isLoading) {
 			updateOverview();
+			$('.btn-next-step').prop('disabled', false);
 		}
 	},
 	events: {
-		url: "<?php echo site_url('meeting/get_events/ggc') ?>",
+		url: "<?php echo site_url('meeting/get_events/ggc?init=vit') ?>",
 		error: function() {
 			$.mbNotify("<?php echo lang('db_unable_to_fetch_event_from_google_calendar') ?>", 'danger');
-		},
-		color: 'yellow',   // a non-ajax option
-		textColor: 'black' // a non-ajax option
-    }
+		}
+	}
 });
 
 // Fix bug FullCalendar vs BS.Modal
@@ -75,10 +90,158 @@ $('.calendar-info .fc-change-view').click(function() {
 	$(this).addClass('fc-state-active')
 })
 
+$('.bigest-challenge .answer').click(function() {
+	INIT_DATA.bigest_challenge = $(this).data('answer');
+	$('.bigest-challenge .answer').removeClass('selected');
+	$(this).addClass('selected');
+	$('.btn-next-step').prop('disabled', false);
+})
+
+$('.btn-convert-time + ul > li > a').click(function() {
+	$('.btn-convert-time .text').text($(this).text());
+
+	switch ($(this).data('option')) {
+		case 'minute':
+			$('#init .target-time').each((i, item) => {
+				$(item).text($(item).data('minute'))
+			});
+			break;
+		case 'hour':
+			$('#init .target-time').each((i, item) => {
+				$(item).text(Math.round($(item).data('minute') * 10 / 60) / 10)
+			});
+			break;
+		case 'day':
+			$('#init .target-time').each((i, item) => {
+				$(item).text(Math.round($(item).data('minute') * 100 / 60 / 24) / 100)
+			});
+			break;
+	}
+});
+
+$('.btn-next-step').click(function() {
+	if (INIT_DATA.currentStepIndex + 1 >= STEPS.length) return;
+
+	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
+	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
+
+	if (INIT_DATA.currentStep >= 31 && INIT_DATA.currentStep <= 33) {
+		if ($('#init .sub-step .dot.passed').length === 0) {
+			$('#init .sub-step .dot:first-child').addClass('passed');
+		} else {
+			$('#init .sub-step .dot.passed + .dot').addClass('passed');
+		}
+	} else {
+
+		$('#init .step.passed + .step').addClass('passed');
+	}
+
+	switch (INIT_DATA.currentStep) {
+		case 30:
+			$('#init .init').addClass('blur');
+			$('#init .step-20').addClass('in');
+			break;
+		case 32:
+			// Path: Owner
+			if (INIT_DATA.path == 'owner') {
+				
+			} else { // Path: Guest
+			
+
+			}
+			break;
+	}
+
+	$('.btn-next-step').prop('disabled', true);
+});
+
+$('.btn-underdog').click(function() {
+	$('#init .step-20').removeClass('in');
+	$('#init .init').removeClass('blur');
+	$('.init-nav.summary .title').text("<?php echo lang('db_my_meetings_guest') ?>");
+	
+	INIT_DATA.path = 'guest';
+	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
+	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
+
+	// Remove all Owner meeting
+	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
+		if (item.isOwner == true) {
+			$('#calendar-init').fullCalendar('removeEvents', item._id);
+		}
+	});
+
+	$('#init .step-10').slideUp();
+	$('#init .step-30 .guest').slideDown();
+});
+
+$('.btn-like-a-boss').click(function() {
+	$('#init .step-20').removeClass('in');
+	$('.init').removeClass('blur');
+	$('.init-nav.summary .title').text("<?php echo lang('db_my_meetings_owner') ?>");
+	
+	INIT_DATA.path = 'owner';
+	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
+	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
+
+	// Remove all Guest meeting
+	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
+		if (item.isOwner == false) {
+			$('#calendar-init').fullCalendar('removeEvents', item._id);
+		}
+	});
+
+	$('#init .step-10').slideUp();
+	$('#init .step-30 .owner').slideDown();
+});
+
+$('.btn-skip-init').click(function() {
+	$.get("<?php echo site_url('dashboard/skip_setup') ?>", (data) => {
+		data = JSON.parse(data);
+		$.mbNotify(data.message, data.message_type);
+	})
+});
+
+$(document).on('click', '.init .fc-event', function(e){
+	e.preventDefault();
+	var event = INIT_DATA.events[$(this).data('index')];
+
+	if ( $('#init .step-30 .owner:visible').length ) {
+		var date = event.start.format('ddd MMM D') == event.end.format('ddd MMM D') 
+					? event.start.format('ddd MMM D') 
+					: event.start.format('ddd MMM D') + ' - ' + event.end.format('ddd MMM D');
+
+		var hour = (event.end - event.start) / 1000 / 60 / 60;
+		$('#init .table-improve-meeting .name').text(event.title);
+		$('#init .table-improve-meeting .date').text(hour);
+		$('#init .table-improve-meeting .time').text(event.start.format('hh:mma') + ' - ' + event.end.format('hh:mma'));
+		$('#init .table-improve-meeting .team').text(event.attendees.length);
+
+		$('#init .meeting-cost .hour').text("<?php echo lang('db_x_hrs') ?>".format(hour))
+		$('#init .meeting-cost .total-participant').text("<?php echo lang('db_x_participants') ?>".format(event.attendees.length))
+		$('#init .meeting-cost .total-hour').text("<?php echo lang('db_x_hrs') ?>".format(hour * event.attendees.length))
+
+		$('#init .step-30 .owner .instruction').addClass('passed');
+		$('#init .step-30 .owner .table-improve-meeting').slideDown();
+		$('#init .step-30 .owner .table-improve-meeting tbody').effect('highlight', {}, 500);
+
+		$('.init .fc-event').removeClass('selected');
+		$(this).addClass('selected');
+
+	} else if ( $('#init .step-30 .guest:visible').length ) {
+
+		$('.init .fc-event').removeClass('selected');
+		$(this).addClass('selected');
+	}
+});
+
+/*
+	Step 31: Update overview data onclick Event
+*/
 function updateOverview()
 {
-	var savedEvents = [];
 	var events = $('#calendar-init').fullCalendar('clientEvents');
+	var savedEvents = [];
 
 	var oData = {
 		totalMeeting : 0,
@@ -147,54 +310,19 @@ function updateOverview()
 
 }
 
-$('.btn-convert-time + ul > li > a').click(function() {
-	$('.btn-convert-time .text').text($(this).text());
-
-	switch ($(this).data('option')) {
-		case 'minute':
-			$('#init .target-time').each((i, item) => {
-				$(item).text($(item).data('minute'))
-			});
-			break;
-		case 'hour':
-			$('#init .target-time').each((i, item) => {
-				$(item).text(Math.round($(item).data('minute') * 10 / 60) / 10)
-			});
-			break;
-		case 'day':
-			$('#init .target-time').each((i, item) => {
-				$(item).text(Math.round($(item).data('minute') * 100 / 60 / 24) / 100)
-			});
-			break;
-	}
-});
-
-$('.btn-next-step').click(function() {
-	if (INIT_DATA.currentStep > 60) return;
-
-	if (INIT_DATA.currentStep >= 30 && INIT_DATA.currentStep <= 31) {
-		INIT_DATA.currentStep ++;
-		if ($('#init .sub-step .dot.passed').length === 0) {
-			$('#init .sub-step .dot:first-child').addClass('passed');
-		} else {
-			$('#init .sub-step .dot.passed + .dot').addClass('passed');
-		}
-
-
-	} else {
-		INIT_DATA.currentStep += 10;
-
-		if (INIT_DATA.currentStep == 42) {
-			INIT_DATA.currentStep = 40;
-		}
-
-		$('#init .step.passed + .step').addClass('passed');
-	}
-});
-
-$('.btn-skip-init').click(function() {
-	$.get("<?php echo site_url('dashboard/skip_setup') ?>", (data) => {
-		data = JSON.parse(data);
-		$.mbNotify(data.message, data.message_type);
-	})
-});
+/*
+	sprintf() for JavaScript.
+	Grabs from https://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+	Usage: "{0} is dead, but {1} is alive! {0} {2}".format("ASP", "ASP.NET")
+*/
+if (!String.prototype.format) {
+	String.prototype.format = function() {
+		var args = arguments;
+		return this.replace(/{(\d+)}/g, function(match, number) { 
+		return typeof args[number] != 'undefined'
+			? args[number]
+			: match
+		;
+		});
+	};
+}

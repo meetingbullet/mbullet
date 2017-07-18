@@ -562,7 +562,7 @@ class Dashboard extends Authenticated_Controller
 	{
 		$eventIDs = $this->input->post('eventIDs');
 
-		if (empty($eventIDs)) echo "{}";
+		if (empty($eventIDs)) echo "[]";
 
 		$meeting = $this->meeting_model
 		->select('google_event_id')
@@ -573,7 +573,7 @@ class Dashboard extends Authenticated_Controller
 
 		echo $meeting 
 		? json_encode(array_column($meeting, 'google_event_id')) 
-		: "{}";
+		: "[]";
 	}
 
 	public function test() {

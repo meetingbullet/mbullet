@@ -433,10 +433,6 @@ span.count {
 	font-size: 18px;
 }
 
-.calendar-wrapper {
-	padding: 15px;
-}
-
 #calendar .fc-ggcToggle-button {
 	color: white;
 	background: #999;
@@ -468,12 +464,17 @@ span.count {
 	background: transparent;
 }
 
-#init .calendar {
+.init {
+	transition: filter 0.5s ease-out;
+}
+
+.init .calendar {
+	position: relative;
 	float: left;
 	width: 65%;
 }
 
-#init .summary {
+.init .summary {
 	position: relative;
 	float: left;
 	width: calc(35% - 20px);
@@ -578,6 +579,7 @@ span.count {
 .init-body {
 	display: flex;
 	flex-flow: row nowrap;
+	position: relative;
 }
 
 .init-body > div {
@@ -710,24 +712,25 @@ span.count {
 	border-bottom: 20px solid transparent;
 }
 
-.summary .content {
+.init .content {
 	padding: 20px;
 }
 
-.summary .content p {
+.init .content p {
 	margin: 0 0 6px;
 }
 
-.summary .section {
+.init .section {
 	width: 100%;
-	border-bottom: 1px solid #2795c3;
+	border-bottom: 1px solid #a0b9c3;
+	color: #2795c3;
 }
 
-.summary .an-small-doc-block .section {
+.init .an-small-doc-block .section {
 	margin-top: 0;
 }
 
-.summary .content > .title {
+.init .content > .title {
 	margin-top: 0;
 }
 
@@ -799,5 +802,241 @@ span.count {
 .btn-skip-init {
 	display: table-cell;
 	vertical-align: middle;
-	width: 35px;
+}
+
+/* Step Two */
+.init.blur {
+	filter: blur(2px) brightness(90%);
+	transition: filter 0.5s ease-out;
+}
+
+.step-20 {
+	max-height: 0;
+	opacity: 0;
+	position: absolute;
+	top: -9999px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	transition: opacity 0.3s ease-out;
+}
+
+.step-20.in {
+	max-height: none;
+	top: 0;
+	opacity: 1;
+}
+
+.step-20 .block {
+	display: inline-block;
+	vertical-align: top;
+	background: white;
+	border-radius: 10px;
+	font-size: 17px;
+}
+
+.step-20 > .block-wrapper {
+	text-align: center;
+	margin: 20px;
+}
+
+.step-20 .block > .content {
+	padding: 8px;
+	max-width: 426px;
+	text-align: left;
+}
+
+.step-20 .path {
+	margin: 0 20px;
+	min-height: 500px;
+	border: 1px solid #e0e0e0;
+}
+
+.step-20 .choose-your-path {
+	overflow: hidden;
+}
+
+.step-20 .choose-your-path .title {
+	margin: 0;
+	padding: 8px;
+	background: #2795c3;
+	color: white;
+}
+
+.step-20 .choose-your-path > p {
+	padding: 8px 20px;
+	margin: 0;
+}
+
+.step-20 .path .title {
+	margin: 10px 0 15px;
+}
+
+.step-20 .title > i {
+	font-size: 35px;
+	vertical-align: middle;
+}
+
+
+.step-20 .path p {
+	text-transform: uppercase;
+}
+
+.step-20 .center {
+	text-align: center;
+}
+
+.step-20 .path .subtitle {
+	font-size: 15px;
+	text-transform: none;
+}
+
+.step-20 .an-btn {
+	text-transform: uppercase;
+}
+
+.step-20 .thumbnail {
+	margin-bottom: 10px;
+}
+
+.step-20 .emoji {
+	width: 32px;
+}
+
+/* Step three */
+.step-30 > div {
+	display: none;
+}
+
+.step-30 .instruction {
+	position: relative;
+	padding-left: 25px;
+	padding-bottom: 0;
+	background: rgba(2, 93, 131, 0.1);
+	transition: all .5s ease-out;
+}
+
+.step-30 .instruction::before {
+	background: #025d83;
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 4px;
+	height: 100%;
+	transition: all .5s ease-out;
+}
+
+.step-30 .instruction.passed {
+	background: transparent;
+	padding: 0 20px;
+}
+
+.step-30 .instruction.passed::before {
+	width: 0px;
+}
+
+.step-30 .instruction .section {
+	margin-top: 0;
+}
+
+.step-30 .instruction .section-sub {
+	margin-bottom: 0;
+}
+
+.step-30 .instruction.passed .section-sub {
+	display: none;
+}
+
+.step-30 .instruction .section-sub i {
+	font-size: 30px;
+	vertical-align: middle;
+	margin-right: 10px;
+}
+
+.step-30 .table-improve-meeting {
+	padding-top: 0;
+}
+
+.step-30 .table-improve-meeting th {
+	color: #b1b1b1;
+	font-weight: normal;
+	border-bottom: 1px solid #ddd;
+}
+
+.step-30 .table-improve-meeting .table {
+	border-bottom: 1px solid #ddd;
+	    margin-bottom: 5px;
+}
+
+.init .fc-event.selected {
+	border: 2px dashed #006d36;
+}
+
+.step-30 .meeting-cost > .mic {
+	color: #2795c3;
+	padding-right: 10px;
+}
+
+.step-30 .bigest-challenge {
+	margin-top: 20px;
+}
+
+.step-30 .bigest-challenge .section {
+	margin-top: 5px;
+}
+
+.step-30 .answers {
+	list-style: none;
+	padding-left: 0;
+	font-size: 16px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.step-30 .answer {
+	padding: 5px 10px;
+	border-bottom: 1px solid #ddd;
+	transition: .2s ease-out;
+	cursor: pointer;
+}
+
+.step-30 .answer:last-child {
+	border-bottom: none;
+}
+
+.step-30 .answer > i {
+	font-size: 28px;
+	vertical-align: middle;
+}
+
+.step-30 .answer:hover {
+	background: #4eacd4;
+	color: white;
+}
+
+.step-30 .answer.selected {
+	background: #2795c3;
+	color: white;
+}
+
+.step-32 {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 50%;
+	height: calc(100% - 10px); /* margin-top * 2 */
+	margin: 5px 0;
+	background: white;
+	overflow-y: auto;
+	z-index: 6;
+	border-radius: 5px;
+}
+
+.step-32-shadow {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.15);
+	z-index: 5;
 }
