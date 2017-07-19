@@ -1097,6 +1097,92 @@ span.count {
 	border-radius: 5px;
 }
 
+.step-32 .btn-wide {
+	width: 100%;
+	display: block;
+	padding: 20px;
+	font-size: large;
+	border-bottom: 1px solid #ececec;
+	transition: all 0.3s ease-out;
+}
+
+.step-32 .btn-wide:hover {
+	background: #4eacd4;
+	color: white;
+}
+
+.step-32 .btn-wide.selected {
+	background: #2795c3;
+	color: white;
+}
+
+.step-32-sub .time-spent {
+	text-align: right;
+	border: 1px solid #999;
+	border-right: 0;
+	width: 50%;
+}
+
+.step-32-sub .time-spent.danger {
+	background-color: rgba(235, 84, 124, 0.1);
+	border: 1px solid rgba(235, 84, 124, 0.2);
+}
+
+.step-32-sub .time-spent + .input-group-btn > .btn {
+	border-color: #999;
+	height: 34px;
+	color: #333;
+}
+
+.init-attachment-container {
+	border: 1px solid #999;
+	border-radius: 2px;
+	margin-bottom: 20px;
+}
+
+.init-attachment-container .input-attachment{
+	padding: 5px;
+	border: none;
+	margin-bottom: 3px;
+}
+
+.init .table .th > i {
+	font-size: 20px;
+	line-height: 20px;
+}
+
+.init .td-attachment > i {
+	font-size: 20px;
+	padding: 0 1px;
+}
+
+.init-attachment {
+	padding: 6px 10px;
+}
+
+.init-attachment > i {
+	font-size: 18px;
+	vertical-align: middle;
+}
+
+.init-attachment .delete {
+	cursor: pointer;
+}
+
+.init input[name="assignee"] + .selectize-control {
+	padding: 0;
+	border: 0;
+	margin-bottom: 15px;
+}
+.init input[name="assignee"] + .selectize-control > .selectize-input {
+	border: 1px solid #999;
+	box-shadow: none;
+}
+.init input[name="assignee"].danger + .selectize-control > .selectize-input {
+	background-color: rgba(235, 84, 124, 0.1);
+	border: 1px solid rgba(235, 84, 124, 0.2);
+}
+
 strong.primary {
 	color: #2795c3;
 }

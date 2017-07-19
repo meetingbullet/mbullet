@@ -71,11 +71,10 @@
 					</div>
 				</div>
 
-				<a href="#" class='btn-wide btn-define-goal'>Goal (<span>0</span>)</a>
-				<a href="#" class='btn-wide btn-define-todo'>Todo (<span>0</span>)</a>
-				<a href="#" class='btn-wide btn-define-agenda'>Agenda (<span>0</span>)</a>
-				<a href="#" class='btn-wide btn-define-team'>Team (<span>0</span>)</a>
-
+				<a href="#" class='btn-wide selected' data-type='goal'><i class="ion-ios-flag-outline"></i> Goal (<span>0</span>) <i class="pull-right ion-ios-arrow-forward"></i></a>
+				<a href="#" class='btn-wide' data-type='homework'><i class="ion-ios-filing-outline"></i> Todo (<span>0</span>) <i class="pull-right ion-ios-arrow-forward"></i></a>
+				<a href="#" class='btn-wide' data-type='agenda'><i class="ion-ios-paper-outline"></i> Agenda (<span>0</span>) <i class="pull-right ion-ios-arrow-forward"></i></a>
+				<a href="#" class='btn-wide' data-type='team'><i class="ion-person-stalker"></i> Team (<span>0</span>) <i class="pull-right ion-ios-arrow-forward"></i></a>
 			</div>
 			<div class="calendar-of-shadow"></div>
 			<div class="calendar-wrapper">
@@ -273,68 +272,209 @@
 			</div> <!-- .step-30 -->
 
 			<div class="step-32-sub content">
-				<h3 class="section no-margin-top">Define a Goal</h3>
-				<p style="text-align: justify">Having a <strong class="primary">Goal/Objective</strong> for
-				a meeting is priority 1 for defining the purpose of a meeting, 
-				other-wise the meeting is a meeting for the sake of a meeting...
-				which is boring and expensive.</p>
+				<div class="define define-goal">
+					<h3 class="section no-margin-top">Define a Goal</h3>
+					<p style="text-align: justify">Having a <strong class="primary">Goal/Objective</strong> for
+					a meeting is priority 1 for defining the purpose of a meeting, 
+					other-wise the meeting is a meeting for the sake of a meeting...
+					which is boring and expensive.</p>
 
-				<h3 class="section">
-					<i class="ion-ios-flag-outline"></i>
-					Goals
-				</h3>
-				<table class="table table-goal">
-					<thead>
-						<tr>
-							<th>Goal</th>
-							<th class="text-center">Importance</th>
-							<th class="text-center">Type</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>Daily update video cats to Sprint</td>
-							<td class="text-center">Urgent</td>
-							<td class="text-center">Review</td>
-						</tr>
-					</tbody>
-				</table>
+					<h3 class="section">
+						<i class="ion-ios-flag-outline"></i>
+						Goals
+					</h3>
+					<table class="table table-goal">
+						<thead>
+							<tr>
+								<th>Goal</th>
+								<th class="text-center">Importance</th>
+								<th class="text-center">Type</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
 
-				<form>
-					<label for="goal-name">Add new Goal</label>
-					<input id="goal-name" name="name" class="an-form-control" type="text" placeholder="Define your Goal/Objective">
+					<form>
+						<label for="goal-name">Add new Goal</label>
+						<input id="goal-name" name="name" class="an-form-control" type="text" placeholder="Define your Goal/Objective">
 
-					<div class="row">
-						<div class="col-md-6 col-xs-12">
-							<label for="goal-type">Type</label>
-							<select id="goal-type" name="type" class="an-form-control">
-								<option disabled selected>(Select)</option>
-								<option value="decide">Decide</option>
-								<option value="plan">Plan</option>
-								<option value="prioritize">Prioritize</option>
-								<option value="assess">Assess</option>
-								<option value="review">Review</option>
-							</select>
+						<div class="row">
+							<div class="col-md-6 col-xs-12">
+								<label for="goal-type">Type</label>
+								<select id="goal-type" name="type" class="an-form-control">
+									<option disabled selected>(Select)</option>
+									<option value="decide">Decide</option>
+									<option value="plan">Plan</option>
+									<option value="prioritize">Prioritize</option>
+									<option value="assess">Assess</option>
+									<option value="review">Review</option>
+								</select>
+							</div>
+							<div class="col-md-6 col-xs-12">
+								<label for="goal-importance">Importance</label>
+								<select id="goal-importance" name="importance" class="an-form-control">
+									<option disabled selected>(Select)</option>
+									<option value="urgent">Urgent/Critical</option>
+									<option value="required">Requried for [Sprint]</option>
+									<option value="requested">Requested for [Sprint]</option>
+									<option value="backlog">Backlog for [Project]</option>
+									<option value="other">Other [Fill in Blank]</option>
+								</select>
+							</div>
 						</div>
-						<div class="col-md-6 col-xs-12">
-							<label for="goal-importance">Importance</label>
-							<select id="goal-importance" name="importance" class="an-form-control">
-								<option disabled selected>(Select)</option>
-								<option value="urgent">Urgent/Critical</option>
-								<option value="required">Requried for [Sprint]</option>
-								<option value="requested">Requested for [Sprint]</option>
-								<option value="backlog">Backlog for [Project]</option>
-								<option value="other">Other [Fill in Blank]</option>
-							</select>
+
+						<div class="pull-right">
+							<button class="an-btn an-btn-primary btn-create-goal">Create</button>
 						</div>
-					</div>
 
-					<div class="pull-right">
-						<button type="submit" class="an-btn an-btn-primary btn-create-goal">Create</button>
-					</div>
+						<div class="clear"></div>
+					</form>
+				</div> <!-- .define-goal -->
 
-					<div class="clear"></div>
-				</form>
+				<div class="define define-homework" style="display: none">
+					<h3 class="section no-margin-top">Create To Do List</h3>
+					<p style="text-align: justify">Guests unprepared for meetings
+						that benefit from readliness is a sure fire way to
+						"spin wheel" and get nowhere. Let's define some required 
+						<strong class="primary">Homework</strong> for guests prior 
+						to starting a meeting</p>
+
+					<h3 class="section">
+						<i class="ion-ios-filing-outline"></i>
+						Homework
+					</h3>
+					<table class="table table-homework">
+						<thead>
+							<tr>
+								<th>To Do</th>
+								<th class="text-center">Attachments</th>
+								<th class="text-center"><i class="ion-android-people"></i></th>
+								<th class="text-center"><i class="ion-android-alarm-clock"></i></th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+
+					<form>
+						<div class="row">
+							<div class="col-md-8 col-xs-12">
+								<label for="todo-name">Add new To Do</label>
+								<input id="todo-name" name="name" class="an-form-control" type="text" placeholder="Describe Homework/Prerequisite">
+							</div>
+							<div class="col-md-4 col-xs-12">
+								<label for="todo-time-spent"><i class="ion-android-alarm-clock"></i> Time Cost</label>
+								<div class="input-group">
+									<input type="text" id="time-spent" class="form-control time-spent" name="time_spent" min="0">
+									<div class="input-group-btn">
+										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Hours <span class="caret"></span></button>
+										<ul class="dropdown-menu dropdown-menu-right">
+											<li><a href="#" data-type="minute">Minutes</a></li>
+											<li><a href="#" data-type="hour">Hours</a></li>
+											<li><a href="#" data-type="day">Days</a></li>
+											<li><a href="#" data-type="week">Weeks</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<label for="todo-assignee">Assignees</label>
+						<input id="todo-assignee" name="assignee" type="text">
+
+						<label for="todo-attachment">Attachments</label>
+						<div class="init-attachment-container">
+							<input name="todo-attachment" class="an-form-control input-attachment" type="file">
+						</div>
+
+						<div class="pull-right">
+							<button class="an-btn an-btn-primary btn-create-todo">Create</button>
+						</div>
+
+						<div class="clear"></div>
+					</form>
+				</div> <!-- .define-homework -->
+
+				<div class="define define-agenda" style="display: none">
+					<h3 class="section no-margin-top">Create an Agenda</h3>
+					<p style="text-align: justify">A solid <strong class="primary">agenda</strong>
+						will help keep the meeting time well spent and on target to adhere 
+						to the meeting goal. Agenda-less meetings are far more likely to get 
+						sidetracked with unrelated topics and derail your meeting.
+					</p>
+					<p>Let's set an agenda and resolve that.</p>
+
+					<h3 class="section">
+						<i class="ion-ios-filing-outline"></i>
+						Agenda
+					</h3>
+					<table class="table table-agenda">
+						<thead>
+							<tr>
+								<th>Agenda</th>
+								<th class="text-center"><i class="ion-android-people"></i></th>
+								<th class="text-center"><i class="ion-android-alarm-clock"></i></th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+
+					<form>
+						<label for="agenda-name">Add new Agenda</label>
+						<input id="agenda-name" name="name" class="an-form-control" type="text" placeholder="Describe your Goal/Objective">
+
+						<label for="agenda-assignee">Assignees</label>
+						<input id="agenda-assignee" name="assignee" type="text">
+
+						<label for="agenda-attachment">Attachments</label>
+						<div class="init-attachment-container">
+							<input name="agenda-attachment" class="an-form-control input-attachment" type="file">
+						</div>
+
+						<div class="pull-right">
+							<button class="an-btn an-btn-primary btn-create-agenda">Create</button>
+						</div>
+
+						<div class="clear"></div>
+					</form>
+				</div> <!-- .define-agenda -->
+
+				<div class="define define-team" style="display: none">
+					<div class="content">
+						<h3 class="section no-margin-top">Confirm your guest [TEAM]</h3>
+						<p style="text-align: justify">
+							A meeting is only valuable if the right guests are 
+							invited to attend it and benefit. Your guests are your 
+							<strong class="primay">Team</strong>, and without them 
+							the meeting has no value, but inviteing unecessary guests 
+							to your team will increase the cost of the meeting.
+						</p>
+						<p>
+							Remember to keep your 
+							<strong class="primary">Goal & Agenda</strong> 
+							in mind when you invite guests to your team so you get 
+							the most our of your meetings!
+						</p>
+
+						<h3 class="section">
+							<i class="ion-ios-filing-outline"></i>
+							Agenda
+						</h3>
+						<table class="table table-team">
+							<thead>
+								<tr>
+									<th>Team</th>
+									<th class="text-center">Remove</th>
+								</tr>
+							</thead>
+							<tbody>
+
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div> <!-- .summary -->
 	</div>
