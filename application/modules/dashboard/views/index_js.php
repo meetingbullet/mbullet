@@ -207,6 +207,22 @@ $(document).on("click", "#rate-content .submit", function(e) {
 
 });
 
+$(document).on('click', '.btn-join-project', function() {
+	var that = this;
+
+	$.get("<?php echo site_url('project/join/') ?>" + $(this).data('project-id'), (data) => {
+		data = JSON.parse(data);
+
+		if (data.message_type == 'danger') {
+			$.mbNotify(data.message, data.message_type);
+			return;
+		}
+
+		$(that).text($(that).data('lang-joined'));
+		$(that).prop('disabled', true);
+	})
+})
+
 <?php if ( ! $current_user->inited): ?>
 // $.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');
 <?php endif; ?>
