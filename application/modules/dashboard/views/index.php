@@ -1,4 +1,5 @@
 <?php
+$has_edit_project_permission = has_permission('Project.Edit.All');
 $has_new_homework = false;
 foreach ($my_todo['homeworks'] as $meeting_key => $homeworks) {
 	foreach ($homeworks as $homework) {
@@ -692,6 +693,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	<?php foreach ($other_projects as $project): ?>
 	<div id="popover-project-<?php echo $project->project_id ?>" style="display: none">
 		<div class="project-header">
+			<div class='project-header-content'>
 				<h4>
 					<a href="<?php echo site_url('project/' . $project->cost_code)?>"
 					class="project-title"
@@ -712,8 +714,20 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						<i class="ion-edit"></i>
 					</a>
 				</h4>
-			<?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?>
-			<i class="mb-open-modal ion-ios-plus-outline db-create-meeting" data-modal-id="db-create-meeting" data-url="<?php echo site_url('meeting/create/' . $project->cost_code) ?>"></i>
+				<p><?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?></p>
+			</div>
+
+			<?php if ($has_edit_project_permission) : ?>
+			<div class="pull-right">
+				<button class="an-btn an-btn-primary-transparent an-btn-small btn-join-project" 
+					data-lang-joined="<?php echo lang('db_joined') ?>"
+					data-project-id="<?php echo $project->project_id ?>">
+					<?php echo lang('db_join') ?>
+				</button>
+
+				<i class="mb-open-modal ion-ios-plus-outline db-create-meeting" data-modal-id="db-create-meeting" data-url="<?php echo site_url('meeting/create/' . $project->cost_code) ?>"></i>
+			</div>
+			<?php endif; ?>
 		</div>
 
 		<div class="mb-popover-content">

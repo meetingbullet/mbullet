@@ -47,3 +47,5 @@ $lang['db_my_meetings_guest'] = 'My meetings: Guest';
 $lang['db_x_participants'] = '{0} participants';
 $lang['db_x_hrs'] = '{0} hrs';
 $lang['db_create_project'] = 'Create Project';
+$lang['db_join'] = 'Join';
+$lang['db_joined'] = 'Joined';

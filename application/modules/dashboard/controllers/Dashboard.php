@@ -34,7 +34,7 @@ class Dashboard extends Authenticated_Controller
 	public function index()
 	{
 		$my_projects = $this->get_my_projects();
-		$my_project_ids = array_column((array) $my_projects, 'project_id');
+		$my_project_ids = array_column(json_decode(json_encode($my_projects), true), 'project_id');
 		$other_projects = $this->get_other_projects($my_project_ids);
 		$my_todo = $this->get_my_todo();
 		$evaluates = [];
@@ -348,7 +348,7 @@ class Dashboard extends Authenticated_Controller
 
 		->join('users u', 'u.user_id = projects.owner_id')
 		->where('projects.status !=', 'archive')
-		->where_not_in('project_id', $my_project_ids)
+		->where_not_in('project_id', count($my_project_ids) > 0 ? $my_project_ids : -1)
 		->where('organization_id', $this->current_user->current_organization_id)
 		->order_by('projects.name')
 		->find_all();
