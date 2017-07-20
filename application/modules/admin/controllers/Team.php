@@ -128,13 +128,17 @@ class Team extends Authenticated_Controller
 		Template::set('message_type', null);
 		Template::set('message', '');
 
-		$roles = $this->role_model->select('role_id, name, description, join_default')->where('organization_id', $this->current_user->current_organization_id)->find_all();
+		$roles = $this->role_model
+		->select('role_id, name, description, join_default')
+		->where('organization_id', $this->current_user->current_organization_id)
+		->find_all();
+
 		Template::set('roles', $roles);
 		
-
 		if (isset($_POST['add'])) {
 			$message = $this->invitation->send_invitation(
 				'organization', 
+				null, 
 				$this->input->post('email'), 
 				$this->input->post('invite_role')
 			);
