@@ -47,6 +47,10 @@ $('.init-project select').change();
 if (! $('.init-project select option').length) {
 	$('.init-project .add-project').first().click();
 }
+if (typeof(INIT_DATA.new_projects_count) == 'undefined') {
+	INIT_DATA.new_projects_count = 0;
+}
+$('#init .init-footer.calendar').html('<button class="pull-left an-btn an-btn-danger" id="previous-step">Back</button><form class="hidden" id="attachment-form"></form><button class="pull-right an-btn an-btn-success" id="next-step">Next</button>');
 </script>
 <style>
 .init-project .action {

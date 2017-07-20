@@ -310,4 +310,40 @@ $(document).on("click", '#init-create-project-modal form button[type=submit]', f
 		}
 	});
 });
+
+$(document).on('click', '#init .init-footer.calendar #previous-step, #init .init-footer.calendar #next-step', function() {
+	var screen_url = {
+		'40': '<?php echo site_url('/test/init_project?data=') ?>',
+		'50': '<?php echo site_url('/test/init_team?data=') ?>',
+		'60': '<?php echo site_url('/test/init_finish?data=') ?>',
+	};
+
+	$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').attr('disabled', 'disabled');
+
+	var that = $(this);
+
+	if (that.attr('id') == 'next-step' && INIT_DATA.currentStep < 60) {
+		INIT_DATA.currentStep += 10;
+	}
+
+	if (that.attr('id') == 'previous-step') {
+		INIT_DATA.currentStep -= 10;
+	}
+
+	if (INIT_DATA.currentStep == 60) {
+		$('#init .init-footer.calendar #next-step').text('Import');
+	}
+
+	var url = screen_url[INIT_DATA.currentStep.toString()] + JSON.stringify(INIT_DATA);
+
+	$.get({url}).done(function(data) {
+		data = JSON.parse(data);
+		console.log(data);
+
+		$('#init .init-body .calendar').html(data.modal_content);
+		$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
+	}).fail(function() {
+		console.log('failed');
+	});
+});
 // ------- baodg: end test ------- //
