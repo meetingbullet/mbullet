@@ -208,7 +208,7 @@ $(document).on("click", "#rate-content .submit", function(e) {
 });
 
 <?php if ( ! $current_user->inited): ?>
-$.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');
+// $.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');
 <?php endif; ?>
 
 // ------- baodg: start test ------- //
