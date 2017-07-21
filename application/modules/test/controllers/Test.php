@@ -545,7 +545,7 @@ class Test extends Authenticated_Controller
 			Template::render(); exit;
 		}
 
-		$data = json_decode($data, true);dump($data);
+		$data = json_decode($data, true);
 
 		if (empty($data) || empty($data['currentStep']) || $data['currentStep'] < 60) {
 			Template::set('message', 'Wrong data structure.');
@@ -602,7 +602,7 @@ class Test extends Authenticated_Controller
 				} else {
 					$this->load->library('invite/invitation');
 
-					$in_system_users = $this->user_model->select('email')->where_in('email', $user_emails)->as_array()->find_all();
+					$in_system_users = $this->user_model->select('user_id, email')->where_in('email', $user_emails)->as_array()->find_all();
 					if (empty($in_system_users)) $in_system_users = [];
 
 					$in_system_emails = array_column($in_system_users, 'email');
@@ -627,8 +627,6 @@ class Test extends Authenticated_Controller
 									'email' => $email
 								];
 							}
-
-							$meeting_users = array_merge($meeting_users, $in_system_users);
 						} else {
 							$this->meeting_member_model->insert([
 								'meeting_id' => $meeting_id,
@@ -636,6 +634,7 @@ class Test extends Authenticated_Controller
 							]);
 						}
 					}
+					$meeting_users = array_merge($meeting_users, $in_system_users);
 
 					$this->meeting_member_invite_model->insert_batch($member_data);
 					$this->mb_project->invite_emails($meeting_id, 'meeting', $this->current_user, $user_emails);
@@ -700,7 +699,8 @@ class Test extends Authenticated_Controller
 							'meeting_id' => $meeting_data['meeting_id'],
 							'name' => $item['name'],
 							'time_spent' => $item['time_spent'],
-							'created_by' => $this->current_user->user_id
+							'created_by' => $this->current_user->user_id,
+							'description' => ''
 						];
 					}
 
@@ -779,17 +779,17 @@ class Test extends Authenticated_Controller
 
 		$default_homework_data = [
 			'meeting_id' => $meeting_data['meeting_id'],
-			'name' => 'default agenda',
-			'description' => 'default agenda for rating in init process',
+			'name' => 'default homework',
+			'description' => 'default homework for rating in init process',
 			'time_spent' => 0,
 			'created_by' => $meeting_data['owner_id']
 		];
-		$default_homework_id = $this->agenda_model->insert($default_agenda_data);
+		$default_homework_id = $this->homework_model->insert($default_homework_data);
 
 		$default_agenda_members_data = [];
 		$default_homework_members_data = [];
 
-		$meeting_rated = false;
+		$rated = false;
 		foreach ($meeting_users as $user) {
 			if ($user['email'] != $meeting_data['owner_id']) {
 				$default_agenda_members_data[] = [
@@ -799,24 +799,25 @@ class Test extends Authenticated_Controller
 
 				$default_homework_members_data[] = [
 					'user_id' => $user['user_id'],
-					'agenda_id' => $default_homework_id
+					'homework_id' => $default_homework_id
 				];
 
 				if ($user['email'] == $this->current_user->email) {
-					$this->agenda_rate_model->skip_validation(true)->insert([
-						'agenda_id' => $default_agenda_id,
-						'user_id' => $this->current_user->user_id,
-						'rate' => $object_rate['agenda']
-					]);
+					if (! $rated) {
+						$rated = true;
 
-					$this->homework_rate_model->skip_validation(true)->insert([
-						'homework_id' => $default_homework_id,
-						'user_id' => $this->current_user->user_id,
-						'rate' => $object_rate['homework']
-					]);
+						$this->agenda_rate_model->skip_validation(true)->insert([
+							'agenda_id' => $default_agenda_id,
+							'user_id' => $this->current_user->user_id,
+							'rate' => $object_rate['agenda']
+						]);
 
-					if (! $meeting_rated) {
-						$meeting_rated = true;
+						$this->homework_rate_model->skip_validation(true)->insert([
+							'homework_id' => $default_homework_id,
+							'user_id' => $this->current_user->user_id,
+							'rate' => $object_rate['homework']
+						]);
+
 						$this->meeting_member_model->skip_validation(true)
 												->where('meeting_id', $meeting_data['meeting_id'])
 												->update_where('user_id', $this->current_user->user_id, ['rate' => $object_rate['meeting']]);
@@ -826,11 +827,11 @@ class Test extends Authenticated_Controller
 		}
 
 		if (! empty($default_agenda_members_data)) {
-			$this->agenda_member_models->insert($default_agenda_members_data);
+			$this->agenda_member_model->insert_batch($default_agenda_members_data);
 		}
 
 		if (! empty($default_homework_members_data)) {
-			$this->homework_member_models->insert($default_homework_members_data);
+			$this->homework_member_model->insert_batch($default_homework_members_data);
 		}
 	}
 
