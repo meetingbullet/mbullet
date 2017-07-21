@@ -7,6 +7,33 @@ class Test extends Authenticated_Controller
 		parent::__construct();
 		$this->load->helper('form');
 		$this->load->library('users/Auth');
+		$this->load->library('mb_project');
+		
+		$this->load->model('users/user_model');
+
+		$this->lang->load('homework/homework');
+		$this->load->model('homework/homework_model');
+		$this->load->model('homework/homework_rate_model');
+		$this->load->model('homework/homework_member_model');
+		$this->load->model('homework/homework_attachment_model');
+		
+		$this->load->model('agenda/agenda_model');
+		$this->load->model('agenda/agenda_member_model');
+		$this->load->model('agenda/agenda_rate_model');
+		$this->load->model('agenda/agenda_attachment_model');
+
+		$this->load->model('meeting/meeting_model');
+		$this->load->model('meeting/meeting_member_model');
+		$this->load->model('meeting/meeting_member_rate_model');
+		$this->load->model('meeting/meeting_member_invite_model');
+		$this->load->model('meeting/meeting_comment_model');
+		$this->load->model('meeting/goal_model');
+
+		$this->load->model('action/action_model');
+		$this->load->model('action/action_member_model');
+
+		$this->load->model('project/project_model');
+		$this->load->model('project/project_member_model');
 	}
 
 	public function login()
@@ -527,6 +554,8 @@ class Test extends Authenticated_Controller
 			Template::render(); exit;
 		}
 
+		$attachment = $_FILES;
+
 		foreach ($data['meetings'] as $event_id => $meeting) {
 			$user_emails = $meeting['members'];
 			$user_emails[] = $meeting['owner'];
@@ -534,10 +563,10 @@ class Test extends Authenticated_Controller
 			$project_key = $this->project_model->get_field($meeting['project_id'], 'cost_code');
 			$owner = $this->user_model->select('user_id')->find_by('email', $meeting['owner']);
 
-			if (empty($owner)) {
+			if (! empty($owner)) {
 				$action_id = $this->mb_project->get_object_id('action', $project_key . '-1');
 
-				$owner_id = $owner->owner_id;
+				$owner_id = $owner->user_id;
 				$owner_in_organization = $this->db->select('COUNT(*) as count')
 												->from('user_to_organizations uto')
 												->where('user_id', $owner_id)
@@ -556,13 +585,14 @@ class Test extends Authenticated_Controller
 
 				$meeting_data = [
 					'name' => $meeting['name'],
-					'description' => $meeting['description'],
+					//'description' => $meeting['description'],
 					'scheduled_start_time' => $meeting['scheduled_start_time'],
 					'in' => $meeting['in'],
 					'in_type' => 'minutes',
-					'project_id' => $meeting['project_id'],
+					'action_id' => $action_id,
 					'google_event_id' => $event_id,
-					'meeting_key' => $this->mb_project->get_next_key($project_key . '-1')
+					'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
+					'owner_id' => $owner_id
 				];
 
 				$meeting_id = $this->meeting_model->skip_validation(true)->insert($meeting_data);
@@ -572,7 +602,7 @@ class Test extends Authenticated_Controller
 				} else {
 					$this->load->library('invite/invitation');
 
-					$in_system_users = $this->user_model->select('email')->where_in('user_id, email', $user_emails)->as_array()->find_all();
+					$in_system_users = $this->user_model->select('email')->where_in('email', $user_emails)->as_array()->find_all();
 					if (empty($in_system_users)) $in_system_users = [];
 
 					$in_system_emails = array_column($in_system_users, 'email');
@@ -591,12 +621,12 @@ class Test extends Authenticated_Controller
 									'email' => $email,
 									'is_temporary' => 1,
 								]);
-							}
 
-							$meeting_users[] = [
-								'user_id' => $temp_user_id,
-								'email' => $email
-							];
+								$meeting_users[] = [
+									'user_id' => $temp_user_id,
+									'email' => $email
+								];
+							}
 
 							$meeting_users = array_merge($meeting_users, $in_system_users);
 						} else {
@@ -616,7 +646,7 @@ class Test extends Authenticated_Controller
 							'goal' => empty($meeting['goal']) ? [] : $meeting['goal'],
 							'homework' => empty($meeting['homework']) ? [] : $meeting['homework'],
 							'agenda' => empty($meeting['agenda']) ? [] : $meeting['agenda'],
-						], $meeting_data, $meeting_users);
+						], $meeting_data, $meeting_users, $data, $attachment);
 					}
 
 					if ($data['path'] == 'guest') {
@@ -641,11 +671,11 @@ class Test extends Authenticated_Controller
 		Template::render();
 	}
 
-	public function init_create_objects($objects, $meeting_data, $meeting_users)
+	public function init_create_objects($objects, $meeting_data, $meeting_users, $init_data, $files)
 	{
 		if (! empty($objects)) {
 			foreach ($objects as $type => $object_items) {
-				foreach ($object_items as $item) {
+				foreach ($object_items as $object_index => $item) {
 					if ($type == 'goal') {
 						$data = [
 							'meeting_id' => $meeting_data['meeting_id'],
@@ -659,7 +689,8 @@ class Test extends Authenticated_Controller
 							'meeting_id' => $meeting_data['meeting_id'],
 							'agenda_key' => $this->mb_project->get_next_key($meeting_data['meeting_key']),
 							'name' => $item['name'],
-							'owner_id' => $this->current_user->user_id
+							'owner_id' => $this->current_user->user_id,
+							'description' => ''
 						];
 					}
 
@@ -675,10 +706,48 @@ class Test extends Authenticated_Controller
 					$item_id = $this->{$type . '_model'}->insert($data);
 
 					if ($type != 'goal') {
+						if (! file_exists('user_data/' . $this->current_user->user_id)) {
+							mkdir('user_data/' . $this->current_user->user_id, 0777, true);
+						}
+
+						$upload_config = [
+							'upload_path'   => 'user_data/' . $this->current_user->user_id,
+							'allowed_types' => 'gif|jpg|jpeg|png|doc|docx|xls|txt',
+							'encrypt_name'  => true
+						];
+
+						$this->load->library('upload');
+						$this->upload->initialize($upload_config);
+
+						$temp = $files;
+						// $cpt = isset($temp[$type]['name']) ? count($temp[$type]['name']) : 0;
+						// for ($i = 0; $i < $cpt; $i++) {
+						// 	//$_FILES is weird!
+							// if (is_array($temp[$type]['name'])) {
+								for ($j = 0; $j < count($temp[$type]['name'][$meeting_data['google_event_id']][$object_index]); $j++) {
+									$attachment['image']['name'] = $temp[$type]['name'][$meeting_data['google_event_id']][$object_index][$j];
+									$attachment['image']['type'] = $temp[$type]['type'][$meeting_data['google_event_id']][$object_index][$j];
+									$attachment['image']['tmp_name'] = $temp[$type]['tmp_name'][$meeting_data['google_event_id']][$object_index][$j];
+									$attachment['image']['error'] = $temp[$type]['error'][$meeting_data['google_event_id']][$object_index][$j];
+									$attachment['image']['size'] = $temp[$type]['size'][$meeting_data['google_event_id']][$object_index][$j];
+
+									$_FILES = $attachment;
+									$this->upload->do_upload('image');
+									$upload_data = $this->upload->data();
+									$attachment_data = [
+										$type . '_id' => $item_id,
+										'url' => $upload_data['full_path']
+									];
+
+									$this->{$type . '_attachment_model'}->insert($attachment_data);
+								}
+						// 	}
+						// }
+
 						$object_members = [];
 						foreach ($item['assignees'] as $assignee_email) {
 							$index = array_search($assignee_email, array_column($meeting_users, 'email'));
-							if ($meeting_users[$index]['user_id'] != $meeting_data['owner_id']) {
+							if ($index !== false && ! empty($meeting_users[$index]['user_id']) && $meeting_users[$index]['user_id'] != $meeting_data['owner_id']) {
 								$assignee_id = $meeting_users[$index]['user_id'];
 								$object_members[] = [
 									'user_id' => $assignee_id,
@@ -764,8 +833,7 @@ class Test extends Authenticated_Controller
 		}
 	}
 
-	public function upload()
-	{
+	function upload() {
 		dump($_FILES);
 		Template::render();
 	}

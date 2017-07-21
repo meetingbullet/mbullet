@@ -1,20 +1,15 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Goal_model extends BF_Model
+class Agenda_attachment_model extends BF_Model
 {
-	protected $table_name	= 'goals';
-	protected $key			= 'goal_id';
+	protected $table_name	= 'agenda_attachments';
+	protected $key			= 'agenda_id';
 	protected $date_format	= 'datetime';
 
-	protected $log_user	= true;
-	protected $set_created	= true;
-	protected $set_modified = true;
+	protected $log_user	= false;
+	protected $set_created	= false;
+	protected $set_modified = false;
 	protected $soft_deletes	= false;
-
-	protected $created_field	 = 'created_on';
-	protected $modified_field	 = 'modified_on';
-	protected $created_by_field	 = 'created_by';
-	protected $modified_by_field	 = 'modified_by';
 
 	// Customize the operations of the model without recreating the insert,
 	// update, etc. methods by adding the method names to act as callbacks here.
@@ -42,7 +37,7 @@ class Goal_model extends BF_Model
 	// $insert_validation_rules array and out of the standard validation array.
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
-	protected $validation_rules		= array();
+	public $validation_rules		= array();
 	protected $insert_validation_rules  = array();
 	protected $skip_validation	= false;
 

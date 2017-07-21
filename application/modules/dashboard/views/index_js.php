@@ -324,6 +324,10 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 
 	var that = $(this);
 
+	if (INIT_DATA.currentStep == 60) {
+		$('#init #attachment-form').submit();
+	}
+
 	if (that.attr('id') == 'next-step' && INIT_DATA.currentStep < 60) {
 		INIT_DATA.currentStep += 10;
 	}
@@ -338,7 +342,17 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 			for (var i = 0; i < INIT_DATA.meetings[event_id].agenda.length; i++) {console.log('agenda');
 				for (var j = 0; j < INIT_DATA.meetings[event_id].agenda[i].attachment.length; j++) {console.log('attachment');
 					console.log(INIT_DATA.meetings[event_id].agenda[i].attachment[j]);
+					//INIT_DATA.meetings[event_id].agenda[i].attachment[j].name = event_id + '_ag_' + i + '[' + j + ']';
+					INIT_DATA.meetings[event_id].agenda[i].attachment[j].data('name', `agenda[${event_id}][${i}][${j}]`)
 					$('#init #attachment-form').append(INIT_DATA.meetings[event_id].agenda[i].attachment[j]);
+				}
+			}
+
+			for (var i = 0; i < INIT_DATA.meetings[event_id].homework.length; i++) {console.log('homework');
+				for (var j = 0; j < INIT_DATA.meetings[event_id].homework[i].attachment.length; j++) {console.log('attachment');
+					console.log(INIT_DATA.meetings[event_id].homework[i].attachment[j]);
+					INIT_DATA.meetings[event_id].homework[i].attachment[j].data('name', `homework[${event_id}][${i}][${j}]`)
+					$('#init #attachment-form').append(INIT_DATA.meetings[event_id].homework[i].attachment[j]);
 				}
 			}
 		}
@@ -361,6 +375,42 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		$('#init .init-body .config .content-container').fadeIn();
 	}).fail(function() {
 		console.log('failed');
+	});
+});
+
+$(document).on('submit','#init #attachment-form', function(e) {
+	e.preventDefault();
+	var that = $(this);
+
+	var fd = new FormData();
+	$('#init #attachment-form input[type="file"]').each(function() {
+		var this_input_file = $(this);console.log(this_input_file);
+		var file_data = this_input_file[0].files; // for multiple files
+		for(var i = 0; i < file_data.length; i++){
+			var name = this_input_file.attr('name');
+			fd.append(this_input_file.data('name'), file_data[i]);
+		}
+	});
+
+
+	var other_data = $('#init #attachment-form').serializeArray();
+	other_data.push({
+		name: 'data',
+		value: JSON.stringify(INIT_DATA) 
+	});
+	$.each(other_data,function(key,input){
+		fd.append(input.name,input.value);
+	});
+
+	$.ajax({
+		url: that.attr('action'),
+		data: fd,
+		contentType: false,
+		processData: false,
+		type: 'POST',
+		success: function(data){
+			console.log(data);
+		}
 	});
 });
 // ------- baodg: end test ------- //

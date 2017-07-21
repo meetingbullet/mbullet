@@ -517,7 +517,7 @@
 
 						<label for="todo-attachment">Attachments</label>
 						<div class="init-attachment-container">
-							<input name="todo-attachment" class="an-form-control input-attachment" type="file">
+							<input name="todo-attachment[]" class="an-form-control input-attachment" type="file">
 						</div>
 
 						<div class="pull-right">
