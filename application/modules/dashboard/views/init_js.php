@@ -159,22 +159,20 @@ $('.btn-next-step').click(function() {
 		$('.btn-next-step').prop('disabled', true);
 	}
 
+	if (INIT_DATA.currentStep == 32 && INIT_DATA.path == 'guest') {
+		INIT_DATA.currentStepIndex = 6;
+		INIT_DATA.currentStep = 40;
+		$('#init .step.passed + .step').addClass('passed');
+	}
+
 	switch (INIT_DATA.currentStep) {
 		case 30:
 			$('#init .init').addClass('blur');
 			$('#init .step-20').addClass('in');
 			break;
 		case 32:
-			if (INIT_DATA.path == 'owner') {
-				$('.bigest-challenge').slideDown();
-				$('.btn-next-step').prop('disabled', true);
-			} else {
-				INIT_DATA.currentStepIndex = 6;
-				INIT_DATA.currentStep = 40;
-				$('#init .step.passed + .step').addClass('passed');
-
-				// @baodg : Show Projects here (Guest path)
-			}
+			$('.bigest-challenge').slideDown();
+			$('.btn-next-step').prop('disabled', true);
 			break;
 		case 33:
 			if (INIT_DATA.path == 'owner') { // Path: Owner
