@@ -71,7 +71,7 @@ class Team extends Authenticated_Controller
 		];
 
 		if ($this->input->get('type') == 'all' || empty($this->input->get('type'))) {
-			$pagination_config['total_rows'] = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'COUNT(*) as count')[0]->count;
+			$pagination_config['total_rows'] = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'COUNT(*) as count', false, [])[0]->count;
 		}
 
 		if ($this->input->get('type') == 'disabled') {
