@@ -51,10 +51,9 @@ class Invite extends Authenticated_Controller
 			return;
 		}
 
-		$this->user_invite_model->update_where('invite_code', $invite_code, ['used' => '1']);
 
 		if (isset($_POST['accept'])) {
-			$this->user_invite_model->update_where('invite_code', $invite_code, ['status' => 'accepted']);
+			$this->user_invite_model->update_where('invite_code', $invite_code, ['status' => 'accepted', 'used' => 1]);
 			$this->user_to_organizations_model->insert([
 				'user_id' => $this->current_user->user_id,
 				'organization_id' => $invitation->organization_id,
