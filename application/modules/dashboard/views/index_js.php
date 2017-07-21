@@ -299,11 +299,13 @@ $(document).on("click", '#init-create-project-modal form button[type=submit]', f
 					// New meeting created, refresh modal;
 					INIT_DATA.new_projects_count += 1;
 
-					$.get({url : '<?php echo site_url('/test/init_project?data=') ?>' + JSON.stringify(INIT_DATA)}).done(function(refresh_data) {
+					$.post('<?php echo site_url('/test/init_project') ?>', {
+						data: JSON.stringify(INIT_DATA)
+					}).done(function(refresh_data) {
 						refresh_data = JSON.parse(refresh_data);
 						console.log(refresh_data);
 
-						$('#init .init-body .calendar').html(refresh_data.modal_content);
+						$('#init .init-body .config .content-container').html(refresh_data.modal_content);
 					});
 				}
 			}
@@ -313,9 +315,9 @@ $(document).on("click", '#init-create-project-modal form button[type=submit]', f
 
 $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init-footer.calendar #next-step', function() {
 	var screen_url = {
-		'40': '<?php echo site_url('/test/init_project?data=') ?>',
-		'50': '<?php echo site_url('/test/init_team?data=') ?>',
-		'60': '<?php echo site_url('/test/init_finish?data=') ?>',
+		'40': '<?php echo site_url('/test/init_project') ?>',
+		'50': '<?php echo site_url('/test/init_team') ?>',
+		'60': '<?php echo site_url('/test/init_finish') ?>',
 	};
 	$('#init .init-body .config .content-container').fadeOut();
 	$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').attr('disabled', 'disabled');
@@ -344,24 +346,13 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 
 	if (INIT_DATA.currentStep == 60) {
 		$('#init .init-footer.calendar #next-step').text('Import');
-
-		var formData = $('#init .attachment-form').serialize();
-
-		// You should sterilise the file names
-		$.each(data.files, function(key, value)
-		{
-			formData = formData + '&filenames[]=' + value;
-		});
-
-		$.post({
-			url: '<?php echo site_url('/test/upload') ?>',
-			data: formData
-		});
 	}
 
-	var url = screen_url[INIT_DATA.currentStep.toString()] + JSON.stringify(INIT_DATA);
+	var url = screen_url[INIT_DATA.currentStep.toString()];
 
-	$.get({url}).done(function(data) {
+	$.post(url, {
+		data: JSON.stringify(INIT_DATA)
+	}).done(function(data) {
 		data = JSON.parse(data);
 		console.log(data);
 

@@ -72,7 +72,7 @@ class Test extends Authenticated_Controller
 	public function init_project()
 	{
 		$this->load->model('project/project_model');
-		$data = $this->input->get('data');
+		$data = $this->input->post('data');
 
 		// $data = json_encode([
 		// 	'currentStep' => 40,
@@ -168,7 +168,7 @@ class Test extends Authenticated_Controller
 	public function init_team()
 	{
 		$this->load->model('user/user_model');
-		$data = $this->input->get('data');
+		$data = $this->input->post('data');
 
 		// $data = json_encode([
 		// 	'currentStep' => 50,
@@ -306,7 +306,7 @@ class Test extends Authenticated_Controller
 	public function init_finish()
 	{
 		$this->load->model('user/user_model');
-		$data = $this->input->get('data');
+		$data = $this->input->post('data');
 
 		// $data = json_encode([
 		// 	'currentStep' => 60,
@@ -438,7 +438,7 @@ class Test extends Authenticated_Controller
 	public function init_import()
 	{
 		$this->load->model('user/user_model');
-		$data = $this->input->get('data');
+		$data = $this->input->post('data');
 
 		// $data = json_encode([
 		// 	'currentStep' => 6,
