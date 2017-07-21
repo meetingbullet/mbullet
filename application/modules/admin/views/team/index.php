@@ -1,4 +1,11 @@
-
+<?php $cost_of_time = [
+	'1' => 'XS',
+	'2' => 'S',
+	'3' => 'M',
+	'4' => 'L',
+	'5' => 'XL'
+];
+?>
 <?php if (! $this->input->is_ajax_request()) : ?>
 <div class="an-body-topbar wow fadeIn">
 	<div class="an-page-title">
@@ -60,6 +67,7 @@
 										<?php echo lang('ad_tm_full_name') ?>
 									</h6>
 									<h6 class="basis-20"><?php echo lang('ad_tm_title') ?></h6>
+									<h6 class="basis-20"><?php echo lang('ad_tm_cost_of_time') ?></h6>
 									<h6 class="basis-20"><?php echo lang('ad_tm_email') ?></h6>
 									<h6 class="basis-10"><?php echo lang('ad_tm_role') ?></h6>
 									<h6 class="basis-20"><?php echo lang('ad_tm_last_login') ?></h6>
@@ -86,6 +94,9 @@
 										</div>
 										<div class="list-text basis-20">
 											<p><?php e($user->title) ?></p>
+										</div>
+										<div class="list-text basis-20">
+											<p><?php e($cost_of_time[$user->cost_of_time]) ?></p>
 										</div>
 										<div class="list-date email approve basis-20">
 											<p><?php e($user->email) ?></p>
@@ -161,6 +172,7 @@
 							<?php echo lang('ad_tm_full_name') ?>
 						</h6>
 						<h6 class="basis-20"><?php echo lang('ad_tm_title') ?></h6>
+						<h6 class="basis-20"><?php echo lang('ad_tm_cost_of_time') ?></h6>
 						<h6 class="basis-20"><?php echo lang('ad_tm_email') ?></h6>
 						<h6 class="basis-10"><?php echo lang('ad_tm_role') ?></h6>
 						<h6 class="basis-20"><?php echo lang('ad_tm_last_login') ?></h6>
@@ -187,6 +199,9 @@
 							</div>
 							<div class="list-text basis-20">
 								<p><?php e($user->title) ?></p>
+							</div>
+							<div class="list-text basis-20">
+								<p><?php e($cost_of_time[$user->cost_of_time]) ?></p>
 							</div>
 							<div class="list-date email approve basis-20">
 								<p><?php e($user->email) ?></p>

@@ -14,6 +14,10 @@
 		'4' => 'L',
 		'5' => 'XL'
 	], set_value('cost_of_time', isset($user->cost_of_time) ? $user->cost_of_time : null), lang('ad_tm_cost_of_time'), 'class="an-form-control"', '', true) ?>
+	<?php 
+	 if( $user->is_public==0 || $user->name!= 'Owner') {
+		unset($roles['1']);
+	} ?>
 	<?php echo mb_form_dropdown('role_id', $roles, set_value('role', isset($user->role_id) ? $user->role_id : null), lang('ad_tm_role'), 'class="an-form-control"', '', true) ?>
 	<div class="row">
 		<div class="col-md-3 col-sm-12">

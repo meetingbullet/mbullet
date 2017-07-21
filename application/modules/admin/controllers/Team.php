@@ -96,15 +96,15 @@ class Team extends Authenticated_Controller
 		$offset = ($current_page - 1) * $limit;
 
 		if ($this->input->get('type') == 'all' || empty($this->input->get('type'))) {
-			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, [], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, uto.cost_of_time, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, [], $limit, $offset);
 		}
 
 		if ($this->input->get('type') == 'disabled') {
-			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['enabled' => 0], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, uto.cost_of_time, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['enabled' => 0], $limit, $offset);
 		}
 
 		if ($this->input->get('type') == 'by_role') {
-			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['uto.role_id' => $role_id], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, uto.cost_of_time, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['uto.role_id' => $role_id], $limit, $offset);
 		}
 
 		$users_list['result'] = sprintf(lang('ad_tm_pager_result'), ($offset + 1), ($offset + count($users)), $pagination_config['total_rows']);
@@ -186,8 +186,9 @@ class Team extends Authenticated_Controller
 			$temp[$role->role_id] = $role->name;
 		}
 		$roles = $temp;
-		$user = $this->user_model->select('users.*, uto.organization_id, uto.role_id, uto.title, uto.cost_of_time, uto.enabled, CONCAT(first_name, " ", last_name) as full_name')
+		$user = $this->user_model->select('users.*, uto.organization_id,  r.is_public, r.name, uto.role_id, uto.title, uto.cost_of_time, uto.enabled, CONCAT(first_name, " ", last_name) as full_name')
 								->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
+								->join('roles r', 'r.role_id = uto.role_id')
 								->find($user_id);
 		if (empty($user)) {
 			Template::set('close_modal', 1);
