@@ -1121,6 +1121,12 @@ span.count {
 	color: white;
 }
 
+.step-32 .btn-wide > i:first-child {
+	font-size: 28px;
+	vertical-align: middle;
+	margin-right: 10px;
+}
+
 .step-32-sub .time-spent {
 	text-align: right;
 	border: 1px solid #999;
