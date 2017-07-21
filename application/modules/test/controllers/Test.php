@@ -274,15 +274,15 @@ class Test extends Authenticated_Controller
 				}
 			}
 
-			if (! isset($users[$meeting['owner']['email']])) {
-				$users[$meeting['owner']['email']] = [
+			if (! isset($users[$meeting['owner']])) {
+				$users[$meeting['owner']] = [
 					'projects' => [$meeting['project_id']],
 					'as_owner' => true
 				];
 			} else {
-				$users[$meeting['owner']['email']]['as_owner'] = true;
-				if (! in_array($meeting['project_id'], $users[$meeting['owner']['email']]['projects'])) {
-					$users[$meeting['owner']['email']]['projects'][] = $meeting['project_id'];
+				$users[$meeting['owner']]['as_owner'] = true;
+				if (! in_array($meeting['project_id'], $users[$meeting['owner']]['projects'])) {
+					$users[$meeting['owner']]['projects'][] = $meeting['project_id'];
 				}
 			}
 		}
@@ -406,8 +406,8 @@ class Test extends Authenticated_Controller
 				}
 			}
 
-			if (! in_array($meeting['owner']['email'], $emails)) {
-				$emails[] = $meeting['owner']['email'];
+			if (! in_array($meeting['owner'], $emails)) {
+				$emails[] = $meeting['owner'];
 			}
 
 			if (! in_array($meeting['project_id'], $projects)) {
@@ -529,10 +529,10 @@ class Test extends Authenticated_Controller
 
 		foreach ($data['meetings'] as $event_id => $meeting) {
 			$user_emails = $meeting['members'];
-			$user_emails[] = $meeting['owner']['email'];
+			$user_emails[] = $meeting['owner'];
 			$user_emails = array_unique($user_emails);
 			$project_key = $this->project_model->get_field($meeting['project_id'], 'cost_code');
-			$owner = $this->user_model->select('user_id')->find_by('email', $meeting['owner']['email']);
+			$owner = $this->user_model->select('user_id')->find_by('email', $meeting['owner']);
 
 			if (empty($owner)) {
 				$action_id = $this->mb_project->get_object_id('action', $project_key . '-1');
@@ -762,5 +762,11 @@ class Test extends Authenticated_Controller
 		if (! empty($default_homework_members_data)) {
 			$this->homework_member_models->insert($default_homework_members_data);
 		}
+	}
+
+	public function upload()
+	{
+		dump($_FILES);
+		Template::render();
 	}
 }

@@ -475,10 +475,17 @@ span.count {
 	transition: filter 0.5s ease-out;
 }
 
-.init .calendar {
+.init .calendar{
 	position: relative;
 	float: left;
 	width: 65%;
+}
+
+.init .config {
+	position: relative;
+	float: left;
+	width: 65%;
+	display: none;
 }
 
 .init .summary {

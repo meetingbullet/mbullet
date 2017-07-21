@@ -236,7 +236,7 @@ $.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-9
 // 	});
 // }, 3000);
 
-$(document).on('click', '#init .init-body .calendar .init-project .action .delete-meeting', function() {
+$(document).on('click', '#init .init-body .init-project .action .delete-meeting', function() {
 	var that = $(this);
 	if ($('#init .init-body .calendar .init-project .action .delete-meeting').length <= 1) {
 		swal("Warning", "We need at least 1 meeting to import", "warning");
@@ -257,7 +257,7 @@ $(document).on('click', '#init .init-body .calendar .init-project .action .delet
 		});
 });
 
-$(document).on('change', '#init .init-body .calendar .init-project select', function() {
+$(document).on('change', '#init .init-body .init-project select', function() {
 	var that = $(this);
 	var project_id = that.val();
 	var event_id = that.closest('tr').data('event-id');
@@ -317,7 +317,7 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		'50': '<?php echo site_url('/test/init_team?data=') ?>',
 		'60': '<?php echo site_url('/test/init_finish?data=') ?>',
 	};
-
+	$('#init .init-body .config .content-container').fadeOut();
 	$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').attr('disabled', 'disabled');
 
 	var that = $(this);
@@ -330,8 +330,33 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		INIT_DATA.currentStep -= 10;
 	}
 
+	if (INIT_DATA.currentStep == 50 && INIT_DATA.path == 'owner') {
+		$('#init #attachment-form').html();
+		for (var event_id in INIT_DATA.meetings) {console.log('meeting');
+			for (var i = 0; i < INIT_DATA.meetings[event_id].agenda.length; i++) {console.log('agenda');
+				for (var j = 0; j < INIT_DATA.meetings[event_id].agenda[i].attachment.length; j++) {console.log('attachment');
+					console.log(INIT_DATA.meetings[event_id].agenda[i].attachment[j]);
+					$('#init #attachment-form').append(INIT_DATA.meetings[event_id].agenda[i].attachment[j]);
+				}
+			}
+		}
+	}
+
 	if (INIT_DATA.currentStep == 60) {
 		$('#init .init-footer.calendar #next-step').text('Import');
+
+		var formData = $('#init .attachment-form').serialize();
+
+		// You should sterilise the file names
+		$.each(data.files, function(key, value)
+		{
+			formData = formData + '&filenames[]=' + value;
+		});
+
+		$.post({
+			url: '<?php echo site_url('/test/upload') ?>',
+			data: formData
+		});
 	}
 
 	var url = screen_url[INIT_DATA.currentStep.toString()] + JSON.stringify(INIT_DATA);
@@ -340,8 +365,9 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		data = JSON.parse(data);
 		console.log(data);
 
-		$('#init .init-body .calendar').html(data.modal_content);
+		$('#init .init-body .config .content-container .config-content').html(data.modal_content);
 		$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
+		$('#init .init-body .config .content-container').fadeIn();
 	}).fail(function() {
 		console.log('failed');
 	});

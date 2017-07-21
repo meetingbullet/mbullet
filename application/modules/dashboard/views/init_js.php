@@ -183,6 +183,19 @@ $('.btn-next-step').click(function() {
 
 			}
 			break;
+		case 40:
+			$.get({url: '<?php echo site_url('/test/init_project?data=') ?>' + JSON.stringify(INIT_DATA)}).done(function(data) {
+				data = JSON.parse(data);
+				console.log(data);
+
+				$('#init .init-body .config .content-container .config-content').html(data.modal_content);
+				$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
+			})
+
+			$('#init .init-body .calendar').fadeOut(400, function() {
+				$('#init .init-body .config').fadeIn();
+			});
+			break;
 	}
 
 	$('.btn-next-step').prop('disabled', true);

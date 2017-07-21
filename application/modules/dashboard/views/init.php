@@ -125,6 +125,11 @@
 				</div>
 			</div>
 		</div> <!-- .calendar -->
+		<div class="config">
+			<div class="content-container ">
+				<div class="config-content"></div>
+			</div>
+		</div>
 		<div class="summary">
 			<div class="bubba-tea"></div>
 			
