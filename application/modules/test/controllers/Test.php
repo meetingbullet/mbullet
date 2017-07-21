@@ -545,7 +545,7 @@ class Test extends Authenticated_Controller
 			Template::render(); exit;
 		}
 
-		$data = json_decode($data, true);
+		$data = json_decode($data, true);dump($data);
 
 		if (empty($data) || empty($data['currentStep']) || $data['currentStep'] < 60) {
 			Template::set('message', 'Wrong data structure.');
@@ -680,7 +680,8 @@ class Test extends Authenticated_Controller
 						$data = [
 							'meeting_id' => $meeting_data['meeting_id'],
 							'type' => $item['type'],
-							'importance' => $item['importance']
+							'importance' => $item['importance'],
+							'name' => ''
 						];
 					}
 
@@ -788,7 +789,7 @@ class Test extends Authenticated_Controller
 		$default_agenda_members_data = [];
 		$default_homework_members_data = [];
 
-		$meeting_rated == false;
+		$meeting_rated = false;
 		foreach ($meeting_users as $user) {
 			if ($user['email'] != $meeting_data['owner_id']) {
 				$default_agenda_members_data[] = [
