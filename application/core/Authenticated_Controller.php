@@ -52,7 +52,6 @@ class Authenticated_Controller extends Base_Controller
 	{
 		if (is_null($this->current_user->current_organization_id)) {
 			if (! is_null($this->current_organization_url) && ! (strstr($this->uri->uri_string(), 'invite/confirm') || $this->session->userdata('invite_code'))) {
-				var_dump(strstr($this->uri->uri_string(), 'invite/confirm'));
 				// user logged in but not choose organization or user can not access organization or user is not part of organization
 				$uo = $this->db->select('uo.enabled')
 							->from('user_to_organizations uo')
