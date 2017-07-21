@@ -125,7 +125,23 @@ $('.btn-convert-time + ul > li > a').click(function() {
 $('.btn-next-step').click(function() {
 	if (INIT_DATA.currentStepIndex + 1 >= STEPS.length) return;
 
+	// Next Goal, Todo, Agenda, Team
+	if (INIT_DATA.currentStep == 33 
+		&& INIT_DATA.path == 'owner'
+		&& $('.btn-wide.passed').length < $('.btn-wide').length) {
+		for (var i in $('.btn-wide')) {
+			if ( ! $($('.btn-wide')[i]).hasClass('passed')) {
+				$($('.btn-wide')[i]).click();
+				$($('.btn-wide')[i]).addClass('passed');
+				break;
+			}
+		}
+
+		return;
+	}
+
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
+
 	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
 
 	if (INIT_DATA.currentStep >= 31 && INIT_DATA.currentStep <= 33) {
@@ -135,8 +151,11 @@ $('.btn-next-step').click(function() {
 			$('#init .sub-step .dot.passed + .dot').addClass('passed');
 		}
 	} else {
-
 		$('#init .step.passed + .step').addClass('passed');
+	}
+
+	if (INIT_DATA.currentStep != 33) {
+		$('.btn-next-step').prop('disabled', true);
 	}
 
 	switch (INIT_DATA.currentStep) {
@@ -198,7 +217,7 @@ $('.btn-next-step').click(function() {
 			break;
 	}
 
-	$('.btn-next-step').prop('disabled', true);
+	
 });
 
 $('.btn-underdog').click(function() {
@@ -228,7 +247,7 @@ $('.btn-like-a-boss').click(function() {
 	
 	INIT_DATA.path = 'owner';
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
-	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
+	console.log('STEP:', INIT_DATA.currentStep)
 
 	// Remove all Guest meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
@@ -259,6 +278,7 @@ $('.btn-wide').click(function(e) {
 
 	$('.btn-wide').removeClass('selected');
 	$(this).addClass('selected');
+	$(this).addClass('passed');
 });
 
 $('.btn-create-goal').click(function(e) {
@@ -300,6 +320,8 @@ $('.btn-create-goal').click(function(e) {
 			<td class="text-center ${importance}">${importance_lang}</td>
 		</tr>
 	`).appendTo('.table-goal tbody').effect('highlight', {}, 500);
+
+	$('.table-wrapper.goal').slideDown();
 
 	INIT_DATA.meetings[currentEvent.eventId].goal[index] = {
 		name,
@@ -412,6 +434,7 @@ $('.btn-create-todo').click(function(e){
 	`).appendTo('.init .table-homework').effect('highlight', {}, 500);
 
 	$('.init .td-attachment').tooltip();
+	$('.table-wrapper.homework').slideDown();
 
 	$(this).parents('form').find('.init-attachment').each(function() {
 		$(this).slideUp(function(){
@@ -478,6 +501,7 @@ $('.btn-create-agenda').click(function(e){
 	`).appendTo('.init .table-agenda').effect('highlight', {}, 500);
 
 	$('.init .td-attachment').tooltip();
+	$('.table-wrapper.agenda').slideDown();
 
 	$(this).parents('form').find('.init-attachment').each(function() {
 		$(this).slideUp(function(){
@@ -493,6 +517,28 @@ $('.btn-create-agenda').click(function(e){
 	// Create atleast 1 agenda to continue
 	$('.btn-next-step').prop('disabled', false);
 });
+
+// Rating handler
+$('.table-rate input[type="radio"]').change(function() {
+	var type = $(this).prop('name');
+
+	if (typeof INIT_DATA.meetings[currentEvent.eventId].rate === undefined) {
+		INIT_DATA.meetings[currentEvent.eventId].rate = {
+			meeting: null,
+			homework: null,
+			agenda: null
+		}
+	}
+
+	INIT_DATA.meetings[currentEvent.eventId].rate[type] = $(this).val();
+
+	if (INIT_DATA.meetings[currentEvent.eventId].rate.meeting !== null
+		&& INIT_DATA.meetings[currentEvent.eventId].rate.homework !== null
+		&& INIT_DATA.meetings[currentEvent.eventId].rate.agenda !== null) {
+		
+		$('.btn-next-step').prop('disabled', false);
+	}
+})
 
 function enableAssigneeInput() {
 	var target = 'input[name="assignee"]';
@@ -598,7 +644,11 @@ $(document).on('click', '.init .fc-event', function(e){
 				$(`
 					<tr data-email="${event.attendees[i].email}">
 						<td>${event.attendees[i].email}</td>
-						<td class="text-center"><a href="#" class="remove-team"><i class="ion-close"></i></a></td>
+						<td class="text-center">
+							<a href="#" class="remove-team text-danger">
+								<i class="ion-close"></i>
+							</a>
+						</td>
 					</tr>
 				`).appendTo('.table-team tbody');
 			}
@@ -635,6 +685,18 @@ $(document).on('click', '.init .fc-event', function(e){
 		
 		
 	} else if ( $('#init .step-30 .guest:visible').length ) {
+		for (var i in event.attendees) {
+			if (event.attendees[i].responseStatus == 'declined') {
+				event.attendees.splice(i, 1);
+				continue;
+			}
+		}
+		
+		currentEvent = event;
+		console.log('event', event);
+
+		$('.init .step-30 .guest .instruction').slideUp();
+		$('.init .table-rate').slideDown();
 
 		$('.init .fc-event').removeClass('selected');
 		$(this).addClass('selected');

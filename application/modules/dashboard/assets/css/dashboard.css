@@ -1104,10 +1104,15 @@ span.count {
 	border-radius: 5px;
 }
 
+.step-32 .table-wrapper {
+	display: none;
+	margin-left: 30px;
+}
+
 .step-32 .btn-wide {
 	width: 100%;
 	display: block;
-	padding: 20px;
+	padding: 10px 20px;
 	font-size: large;
 	border-bottom: 1px solid #ececec;
 	transition: all 0.3s ease-out;
@@ -1121,6 +1126,12 @@ span.count {
 .step-32 .btn-wide.selected {
 	background: #2795c3;
 	color: white;
+}
+
+.step-32 .btn-wide > i:first-child {
+	font-size: 28px;
+	vertical-align: middle;
+	margin-right: 10px;
 }
 
 .step-32-sub .time-spent {
@@ -1153,7 +1164,7 @@ span.count {
 	margin-bottom: 3px;
 }
 
-.init .table .th > i {
+.init .table th > i {
 	font-size: 20px;
 	line-height: 20px;
 }
@@ -1212,4 +1223,13 @@ div.popover .project-header .db-create-meeting {
 	top: 10px;
 	right: 10px;
 	font-size: 20px;
+}
+
+.step-30 .table-rate tbody td:first-child {
+	font-size: 20px;
+}
+
+.step-30 .table-rate tbody td:first-child > i {
+	font-size: 27px;
+	vertical-align: middle;
 }
