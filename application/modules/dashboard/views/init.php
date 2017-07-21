@@ -397,8 +397,50 @@
 										</div>
 									</td>
 								</tr>
+
+								<tr class='avg-container'>
+									<td>
+										<span class="pull-right text-normal">
+											You rated this Meeting an Avg. of
+										</span>
+									</td>
+									<td class="text-center">
+										<div class="todo-rating">
+											<input type="radio" id="avg-star-5" name="avg" value="5"><label class="full" for="avg-star-5"></label>
+											<input type="radio" id="avg-star-4" name="avg" value="4"><label class="full" for="avg-star-4"></label>
+											<input type="radio" id="avg-star-3" name="avg" value="3"><label class="full" for="avg-star-3"></label>
+											<input type="radio" id="avg-star-2" name="avg" value="2"><label class="full" for="avg-star-2"></label>
+											<input type="radio" id="avg-star-1" name="avg" value="1"><label class="full" for="avg-star-1"></label>
+										</div>
+									</td>
+								</tr>
 							</tbody>
-						</table>
+						</table> <!-- .table-rate -->
+
+						<div class='share-container content' style="display: none">
+							<h3 class="section">
+								<i class="ion-ios-people-outline"></i> 
+								Team
+							</h3>
+
+							<p>
+								Share your Rating of this Meeting with your Team?
+								<a class="an-btn an-btn-success btn-share-rating" data-toggle="collapse" href="#share-rating-collapse">
+									<i class="ion-share"></i>
+									Share
+								</a>
+
+								<div id="share-rating-popover" style="display: none">
+									<textarea 
+										id="share-rating"
+										class="an-form-control" 
+										rows="3"
+										placeholder="Enter emails to share, separated by comma"></textarea>
+
+									<button class="an-btn an-btn-primary btn-send-rating">Send</button>
+								</div>
+							</p>
+						</div>
 					</div>
 				</div>
 			</div> <!-- .step-30 -->
@@ -590,8 +632,8 @@
 					</p>
 
 					<h3 class="section">
-						<i class="ion-ios-filing-outline"></i>
-						Agenda
+						<i class="ion-ios-people-outline"></i> 
+						Team
 					</h3>
 					<table class="table table-team">
 						<thead>
@@ -618,7 +660,7 @@
 	</div> <!-- .init-footer.summary -->
 </div> <!-- #init -->
 
-<div class="step-20">
+<div class="step-20 step-over">
 	<div class="block-wrapper">
 		<div class="block choose-your-path">
 			<h3 class="title">Choose your Path</h4>
@@ -669,8 +711,7 @@
 			</div>
 		</div>
 	</div>
-</div> <!-- #step-20 -->
-
+</div> <!-- .step-20 -->
 
 <!--
 <script>

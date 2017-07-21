@@ -122,6 +122,7 @@ $('.btn-convert-time + ul > li > a').click(function() {
 	}
 });
 
+// Next step
 $('.btn-next-step').click(function() {
 	if (INIT_DATA.currentStepIndex + 1 >= STEPS.length) return;
 
@@ -164,27 +165,21 @@ $('.btn-next-step').click(function() {
 			$('#init .step-20').addClass('in');
 			break;
 		case 32:
-			$('.bigest-challenge').slideDown();
-			$('.btn-next-step').prop('disabled', true);
+			if (INIT_DATA.path == 'owner') {
+				$('.bigest-challenge').slideDown();
+				$('.btn-next-step').prop('disabled', true);
+			} else {
+				INIT_DATA.currentStepIndex = 6;
+				INIT_DATA.currentStep = 40;
+				$('#init .step.passed + .step').addClass('passed');
+
+				// @baodg : Show Projects here (Guest path)
+			}
 			break;
 		case 33:
-			INIT_DATA.meetings[currentEvent.eventId] = {
-				name: currentEvent.title,
-				scheduled_start_time: currentEvent.start.format("YYYY-MM-DD HH:mm:ss"),
-				in: (currentEvent.end - currentEvent.start) / 1000 / 60,
-				owner: currentEvent.ownerEmail,
-				members: [],
-				goal: [],
-				homework: [],
-				agenda: [],
-				team: []
-			};
-
-			currentEvent.attendees.forEach((person) => {
-				INIT_DATA.meetings[currentEvent.eventId].members.push(person.email);
-			})
-
 			if (INIT_DATA.path == 'owner') { // Path: Owner
+
+				insertCurrentEvent();
 				
 				$('.step-30').slideUp();
 				$('.step-32-sub').slideDown(() => {
@@ -524,22 +519,43 @@ $('.btn-create-agenda').click(function(e){
 $('.table-rate input[type="radio"]').change(function() {
 	var type = $(this).prop('name');
 
-	if (typeof INIT_DATA.meetings[currentEvent.eventId].rate === undefined) {
-		INIT_DATA.meetings[currentEvent.eventId].rate = {
-			meeting: null,
-			homework: null,
-			agenda: null
-		}
+	if (INIT_DATA.meetings[currentEvent.eventId].rate[type] === null) {
+		$( $('#init .sub-step .dot:not(.passed)')[0] ).addClass('passed');
 	}
 
-	INIT_DATA.meetings[currentEvent.eventId].rate[type] = $(this).val();
+	INIT_DATA.meetings[currentEvent.eventId].rate[type] = parseInt( $(this).val() );
 
 	if (INIT_DATA.meetings[currentEvent.eventId].rate.meeting !== null
 		&& INIT_DATA.meetings[currentEvent.eventId].rate.homework !== null
 		&& INIT_DATA.meetings[currentEvent.eventId].rate.agenda !== null) {
 		
+		var avg = Math.round( 
+			(
+				INIT_DATA.meetings[currentEvent.eventId].rate.meeting +
+				INIT_DATA.meetings[currentEvent.eventId].rate.homework +
+				INIT_DATA.meetings[currentEvent.eventId].rate.agenda
+			) / 3 
+		);
+
+		$('input[name="avg"] + label').prop('style', 'color:rgb(216, 216, 216)');
+		$('#avg-star-' + avg).prop('checked', true);
+		$('.avg-container *:not(input)').slideDown();
+		$('.init .share-container').slideDown();
 		$('.btn-next-step').prop('disabled', false);
 	}
+})
+
+$('.btn-share-rating').popover({
+	html: true, 
+	placement: "left",
+	content: function() {
+		return $('#share-rating-popover').html();
+	}
+});
+
+$(document).on('.btn-send-rating', 'click', function() {
+	INIT_DATA.meetings[currentEvent.eventId].share_rating = $('#share-rating').val().trim().split(',');
+	$('.btn-share-rating').popover('hide');
 })
 
 function enableAssigneeInput() {
@@ -697,6 +713,16 @@ $(document).on('click', '.init .fc-event', function(e){
 		currentEvent = event;
 		console.log('event', event);
 
+		// Reset selected meeting & rates
+		INIT_DATA.meetings = {};
+		$('.init .todo-rating label').attr('style', '');
+		$('.init .todo-rating input').attr('style', '');
+		$('.init .todo-rating input').prop('checked', false);
+		$('.btn-next-step').prop('disabled', true);
+		$('#init .sub-step .dot.passed:not(:first-child)').removeClass('passed');
+		INIT_DATA.currentStepIndex = 3;
+		insertCurrentEvent();
+
 		$('.init .step-30 .guest .instruction').slideUp();
 		$('.init .table-rate').slideDown();
 
@@ -778,6 +804,30 @@ function updateOverview()
 		}
 	});
 
+}
+
+function insertCurrentEvent()
+{
+	INIT_DATA.meetings[currentEvent.eventId] = {
+		name: currentEvent.title,
+		scheduled_start_time: currentEvent.start.format("YYYY-MM-DD HH:mm:ss"),
+		in: (currentEvent.end - currentEvent.start) / 1000 / 60,
+		owner: currentEvent.ownerEmail,
+		members: [],
+		goal: [],
+		homework: [],
+		agenda: [],
+		team: [],
+		rate: {
+			meeting: null,
+			homework: null,
+			agenda: null
+		}
+	};
+
+	currentEvent.attendees.forEach((person) => {
+		INIT_DATA.meetings[currentEvent.eventId].members.push(person.email);
+	})
 }
 
 /*

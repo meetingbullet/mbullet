@@ -835,7 +835,7 @@ span.count {
 	transition: filter 0.5s ease-out;
 }
 
-.step-20 {
+.step-over {
 	max-height: 0;
 	opacity: 0;
 	position: absolute;
@@ -846,13 +846,13 @@ span.count {
 	transition: opacity 0.3s ease-out;
 }
 
-.step-20.in {
+.step-over.in {
 	max-height: none;
 	top: 0;
 	opacity: 1;
 }
 
-.step-20 .block {
+.step-over .block {
 	display: inline-block;
 	vertical-align: top;
 	background: white;
@@ -860,18 +860,18 @@ span.count {
 	font-size: 17px;
 }
 
-.step-20 > .block-wrapper {
+.step-over > .block-wrapper {
 	text-align: center;
 	margin: 20px;
 }
 
-.step-20 .block > .content {
+.step-over .block > .content {
 	padding: 8px;
 	max-width: 426px;
 	text-align: left;
 }
 
-.step-20 .path {
+.step-over .path {
 	margin: 0 20px;
 	min-height: 500px;
 	border: 1px solid #e0e0e0;
@@ -1225,6 +1225,10 @@ div.popover .project-header .db-create-meeting {
 	font-size: 20px;
 }
 
+.step-30 .table-rate tbody td {
+	padding: 8px 20px;
+}
+
 .step-30 .table-rate tbody td:first-child {
 	font-size: 20px;
 }
@@ -1232,4 +1236,26 @@ div.popover .project-header .db-create-meeting {
 .step-30 .table-rate tbody td:first-child > i {
 	font-size: 27px;
 	vertical-align: middle;
+}
+
+.step-30 .table-rate .text-normal {
+	font-size: 14px;
+}
+
+.step-30 .table-rate label {
+	cursor: initial;
+}
+
+.step-30 .table-rate .avg-container > * {
+	display: none;
+}
+
+.step-30 .btn-share-rating > i {
+	font-size: 28px;
+	vertical-align: middle;
+	line-height: 0;
+}
+
+.step-30 .btn-share-rating {
+	margin-left: 20px;
 }
