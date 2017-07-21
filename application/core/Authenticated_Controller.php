@@ -36,8 +36,7 @@ class Authenticated_Controller extends Base_Controller
 
 		parent::__construct();
 		$this->check_user_enabled();
-		$this->redirect_to_organization_url();
-		$this->redirect_to_invitation();
+		$this->redirect_to_invitation() || $this->redirect_to_organization_url();
 		$this->goto_create_organization();
 		$this->get_navigation_project_list();
 		$this->generate_calendar_uid();
@@ -52,7 +51,8 @@ class Authenticated_Controller extends Base_Controller
 	private function check_user_enabled()
 	{
 		if (is_null($this->current_user->current_organization_id)) {
-			if (! is_null($this->current_organization_url)) {
+			if (! is_null($this->current_organization_url) && ! (strstr($this->uri->uri_string(), 'invite/confirm') || $this->session->userdata('invite_code'))) {
+				var_dump(strstr($this->uri->uri_string(), 'invite/confirm'));
 				// user logged in but not choose organization or user can not access organization or user is not part of organization
 				$uo = $this->db->select('uo.enabled')
 							->from('user_to_organizations uo')
@@ -108,7 +108,7 @@ class Authenticated_Controller extends Base_Controller
 							->get()->row();
 		if ($orgs->total == 0) {
 			if (($this->router->fetch_module() != 'organization' && $this->router->fetch_class() != 'Organization' && $this->router->fetch_method() !== 'create')
-			&& ($this->router->fetch_module() != 'meeting' && $this->router->fetch_class() != 'Meeting' && $this->router->fetch_method() !== 'invite')) {
+			&& ($this->router->fetch_module() != 'meeting' && $this->router->fetch_class() != 'Meeting' && $this->router->fetch_method() !== 'confirm')) {
 				redirect('/organization/create');
 			}
 		}
@@ -116,6 +116,11 @@ class Authenticated_Controller extends Base_Controller
 
 	private function redirect_to_organization_url()
 	{
+		// Stay in the invite confirm page
+		if (strstr($this->uri->uri_string(), 'invite/confirm')) {
+			return;
+		}
+
 		if (is_null($this->current_user->current_organization_id)) {
 			// get main domain
 			$this->load->library('domain');
@@ -203,12 +208,16 @@ class Authenticated_Controller extends Base_Controller
 			$this->session->set_userdata('invite_action', null);
 
 			if ( $invite_type == 'organization' ) {
-				redirect('/invite/confirm/' . $invite_type . '/' . $invite_code);
+				redirect('/invite/confirm/' . $invite_code);
 			}
 
 			if ( $invite_type == 'project') {
 				redirect('/invite/confirm_project/' . $invite_code . '/' . $invite_action);
 			}
+
+			return true;
 		}
+
+		return false;
 	}
 }
