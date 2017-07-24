@@ -1,3 +1,5 @@
+<?php dump($roles); ?>
+
 <div class="modal-header">
 	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 	<h4 class="modal-title"><?php echo lang('ad_tm_edit_user') . ': ' . $user->full_name ?></h4>
@@ -16,9 +18,9 @@
 	], set_value('cost_of_time', isset($user->cost_of_time) ? $user->cost_of_time : null), lang('ad_tm_cost_of_time'), 'class="an-form-control"', '', true) ?>
 	<?php 
 	 if( $user->is_public==0 || $user->name!= 'Owner') {
-		unset($roles['1']);
+		unset($roles[$owner_role_id]);
 	} ?>
-	<?php echo mb_form_dropdown('role_id', $roles, set_value('role', isset($user->role_id) ? $user->role_id : null), lang('ad_tm_role'), 'class="an-form-control"', '', true) ?>
+	<?php echo mb_form_dropdown('role_id', $roles, set_value('role', isset($user->role_id) ? $user->role_id : null), lang('ad_tm_role'), ($user->is_public==1 && $user->name="Owner" && $current_user_role->is_public!= 1 && $current_user_role->name !="Owner") ? 'class="an-form-control" disabled="disabled"'  : 'class="an-form-control" ', '', true) ?>
 	<div class="row">
 		<div class="col-md-3 col-sm-12">
 			<label class="pull-right"><?php echo lang('ad_tm_enabled') ?><span class="required">*</span></label>

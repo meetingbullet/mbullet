@@ -115,7 +115,7 @@ class Team extends Authenticated_Controller
 		$users_list['data'] = $users;
 
 		$organization = $this->organization_model->find($this->current_user->current_organization_id);
-
+		
 		Template::set('organization', $organization);
 		Template::set('roles', $roles);
 		Template::set('users_list', $users_list);
@@ -164,6 +164,7 @@ class Team extends Authenticated_Controller
 
 	public function edit_user($user_id)
 	{
+		
 		if (! $this->input->is_ajax_request()) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
@@ -195,6 +196,12 @@ class Team extends Authenticated_Controller
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_user_not_found'));
 		}
+		$current_user_role = $this->user_model->select('r.is_public, r.name')
+											->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
+											->join('roles r', 'r.role_id = uto.role_id')
+											->find($this->current_user->user_id);
+		$owner_role_id = $this->role_model->select('role_id')->where('name', 'Owner')->find_all();
+
 
 		if ($this->input->post()) {
 			$this->form_validation->set_rules([
@@ -248,7 +255,8 @@ class Team extends Authenticated_Controller
 				Template::set('message', validation_errors());
 			}
 		}
-
+		Template::set('owner_role_id', $owner_role_id['0']->role_id);
+		Template::set('current_user_role', $current_user_role);
 		Template::set('roles', $roles);
 		Template::set('user', $user);
 		if ($this->input->is_ajax_request()) {
@@ -294,11 +302,10 @@ class Team extends Authenticated_Controller
 			'to' => $email,
 			'subject' => $email_template->email_title,
 			'message' => $this->parser->parse_string(html_entity_decode($email_template->email_template_content), [
-							'OWNER_NAME' => $owner->full_name,
+							'OWNER_NAME' => $this->current_user->first_name . ' ' . $this->current_user->last_name,
 							'USER_NAME' => $fullname
 						], true)
 		];
-
 		return $this->emailer->send($email_data, true);
 	}
 }
