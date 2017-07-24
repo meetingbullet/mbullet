@@ -845,7 +845,7 @@ if (!String.prototype.format) {
 	};
 }
 
-// start - baodg
+// ********start - baodg********
 $(document).on('click', '#init .init-body .init-project .action .delete-meeting', function() {
 	var that = $(this);
 	if ($('#init .init-body .calendar .init-project .action .delete-meeting').length <= 1) {
@@ -936,6 +936,15 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 
 	if (INIT_DATA.currentStep == 60) {
 		$('#init #attachment-form').submit();
+		swal({
+			title: "Importing...",
+			text: "Do not close the window until the process is done!",
+			type: "warning",
+			showCancelButton: false,
+			showConfirmButton: false
+		});
+
+		var import = true;
 	}
 
 	if (that.attr('id') == 'next-step' && INIT_DATA.currentStep < 60) {
@@ -970,6 +979,8 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 
 	if (INIT_DATA.currentStep == 60) {
 		$('#init .init-footer.calendar #next-step').text('Import');
+	} else {
+		$('#init .init-footer.calendar #next-step').text('Next');
 	}
 
 	var url = screen_url[INIT_DATA.currentStep.toString()];
@@ -983,6 +994,12 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		$('#init .init-body .config .content-container .config-content').html(data.modal_content);
 		$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
 		$('#init .init-body .config .content-container').fadeIn();
+
+		if (typeof(import) != 'undefined' && import == true) {
+			swal.close();
+			$('#init').modal('hide');
+			$.mbNotify('Import successfully', 'success');
+		}
 	}).fail(function() {
 		console.log('failed');
 	});
@@ -1023,4 +1040,4 @@ $(document).on('submit','#init #attachment-form', function(e) {
 		}
 	});
 });
-// end - baodg
+// ********end - baodg********

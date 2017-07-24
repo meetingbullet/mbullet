@@ -2717,6 +2717,10 @@ class Meeting extends Authenticated_Controller
 					if ($data['path'] == 'guest') {
 						$this->init_rate_objects($meeting['rate'], $meeting_data, $meeting_users);
 					}
+
+					$this->db->where('user_id', $this->current_user->user_id)
+							->where('organization_id', $this->current_user->current_organization_id)
+							->update('user_to_organizations', ['inited', 1]);
 				}
 			} else {
 				$error = true;

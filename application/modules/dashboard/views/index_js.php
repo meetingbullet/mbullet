@@ -225,16 +225,3 @@ $(document).on("click", "#rate-content .submit", function(e) {
 <?php if ( ! $current_user->inited): ?>
 $.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');
 <?php endif; ?>
-
-// ------- baodg: start test ------- //
-// setTimeout(function(){
-// 	$.get({url : '<?php echo site_url('/test/init_project?data=') ?>' + JSON.stringify(INIT_DATA)}).done(function(data) {
-// 		data = JSON.parse(data);
-// 		console.log(data);
-
-// 		$('#init .init-body .calendar').html(data.modal_content);
-// 	});
-// }, 3000);
-
-
-// ------- baodg: end test ------- //
