@@ -475,7 +475,6 @@ span.count {
 	padding: 10px 0;
 }
 
-<<<<<<< application/modules/dashboard/assets/css/dashboard.css
 /* Init modal */
 #init .modal-content {
 	background: transparent;
@@ -485,17 +484,39 @@ span.count {
 	transition: filter 0.5s ease-out;
 }
 
-.init .calendar {
+.init .calendar{
 	position: relative;
 	float: left;
 	width: 65%;
+	transition: all 0.5s ease-out;
+}
+
+.init .config {
+	position: relative;
+	float: left;
+	width: 100%;
+	min-height: 600px;
+	display: none;
 }
 
 .init .summary {
 	position: relative;
-	float: left;
+	float: right;
 	width: calc(35% - 20px);
 	margin-left: 20px;
+	transition: all 0.5s ease-out;
+}
+
+.init.hide-summary .summary {
+	width: 0;
+	height: 0;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.init.hide-summary .calendar {
+	width: 100%;
 }
 
 .init-nav {
@@ -719,6 +740,13 @@ span.count {
 	filter: blur(10px);
 }
 
+.calendar-wrapper {
+	transition: blur 0.5s ease-out;
+}
+.calendar-wrapper.blur {
+	filter: blur(10px);
+}
+
 .bubba-tea {
 	position: absolute;
 	width: 0;
@@ -741,6 +769,10 @@ span.count {
 	width: 100%;
 	border-bottom: 1px solid #a0b9c3;
 	color: #2795c3;
+}
+
+.init .section.no-margin-top {
+	margin-top: 0;
 }
 
 .init .an-small-doc-block .section {
@@ -807,13 +839,17 @@ span.count {
 }
 
 .init-footer {
-	display: table;
-	padding: 12px 20px;
-	min-height: 60px;
-	background: white;
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 	border-top: 1px solid #e0e0e0;
+	background: white;
+}
+
+.init-footer-content {
+	display: table;
+	padding: 12px 20px;
+	width: 100%;
+	height: 60px;
 }
 
 .btn-skip-init {
@@ -827,7 +863,7 @@ span.count {
 	transition: filter 0.5s ease-out;
 }
 
-.step-20 {
+.step-over {
 	max-height: 0;
 	opacity: 0;
 	position: absolute;
@@ -838,13 +874,13 @@ span.count {
 	transition: opacity 0.3s ease-out;
 }
 
-.step-20.in {
+.step-over.in {
 	max-height: none;
 	top: 0;
 	opacity: 1;
 }
 
-.step-20 .block {
+.step-over .block {
 	display: inline-block;
 	vertical-align: top;
 	background: white;
@@ -852,18 +888,18 @@ span.count {
 	font-size: 17px;
 }
 
-.step-20 > .block-wrapper {
+.step-over > .block-wrapper {
 	text-align: center;
 	margin: 20px;
 }
 
-.step-20 .block > .content {
+.step-over .block > .content {
 	padding: 8px;
 	max-width: 426px;
 	text-align: left;
 }
 
-.step-20 .path {
+.step-over .path {
 	margin: 0 20px;
 	min-height: 500px;
 	border: 1px solid #e0e0e0;
@@ -955,6 +991,7 @@ span.count {
 
 .step-30 .instruction .section {
 	margin-top: 0;
+	padding-top: 15px;
 }
 
 .step-30 .instruction .section-sub {
@@ -971,28 +1008,46 @@ span.count {
 	margin-right: 10px;
 }
 
-.step-30 .table-improve-meeting {
+.init .table-improve-meeting {
 	padding-top: 0;
 }
 
-.step-30 .table-improve-meeting th {
+.init .table th {
 	color: #b1b1b1;
 	font-weight: normal;
 	border-bottom: 1px solid #ddd;
 }
 
-.step-30 .table-improve-meeting .table {
+.init .table .table {
 	border-bottom: 1px solid #ddd;
-	    margin-bottom: 5px;
+	margin-bottom: 5px;
 }
 
 .init .fc-event.selected {
 	border: 2px dashed #006d36;
 }
 
-.step-30 .meeting-cost > .mic {
+.init .meeting-cost > .mic {
 	color: #2795c3;
 	padding-right: 10px;
+}
+
+.init .section i.btn {
+	color: #2795c3;
+	cursor: pointer;
+	font-size: 20px;
+	vertical-align: middle;
+	padding: 0;
+	float: right;
+}
+
+.init .btn {
+	color: #2795c3;
+	cursor: pointer;
+}
+
+.init .btn:hover {
+	color: #0b83b5;
 }
 
 .step-30 .bigest-challenge {
@@ -1038,6 +1093,7 @@ span.count {
 }
 
 .step-32 {
+	display: none;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -1050,12 +1106,131 @@ span.count {
 	border-radius: 5px;
 }
 
-.step-32-shadow {
+.step-32.in + .calendar-of-shadow {
+	top: 0;
+	opacity: 1;
+}
+
+.step-32-sub {
+	display: none;
+}
+
+.calendar-of-shadow {
 	position: absolute;
 	width: 100%;
 	height: 100%;
 	background: rgba(0, 0, 0, 0.15);
 	z-index: 5;
+	top: -9999px;
+	opacity: 0;
+	transition: opacity 0.5s ease-out;
+}
+
+.step-32-sub form {
+	padding: 10px;
+	border: 1px solid #dcdcdc;
+	border-radius: 5px;
+}
+
+.step-32 .table-wrapper {
+	display: none;
+	margin-left: 30px;
+}
+
+.step-32 .btn-wide {
+	width: 100%;
+	display: block;
+	padding: 10px 20px;
+	font-size: large;
+	border-bottom: 1px solid #ececec;
+	transition: all 0.3s ease-out;
+}
+
+.step-32 .btn-wide:hover {
+	background: #4eacd4;
+	color: white;
+}
+
+.step-32 .btn-wide.selected {
+	background: #2795c3;
+	color: white;
+}
+
+.step-32 .btn-wide > i:first-child {
+	font-size: 28px;
+	vertical-align: middle;
+	margin-right: 10px;
+}
+
+.step-32-sub .time-spent {
+	text-align: right;
+	border: 1px solid #999;
+	border-right: 0;
+	width: 50%;
+}
+
+.step-32-sub .time-spent.danger {
+	background-color: rgba(235, 84, 124, 0.1);
+	border: 1px solid rgba(235, 84, 124, 0.2);
+}
+
+.step-32-sub .time-spent + .input-group-btn > .btn {
+	border-color: #999;
+	height: 34px;
+	color: #333;
+}
+
+.init-attachment-container {
+	border: 1px solid #999;
+	border-radius: 2px;
+	margin-bottom: 20px;
+}
+
+.init-attachment-container .input-attachment{
+	padding: 5px;
+	border: none;
+	margin-bottom: 3px;
+}
+
+.init .table th > i {
+	font-size: 20px;
+	line-height: 20px;
+}
+
+.init .td-attachment > i {
+	font-size: 20px;
+	padding: 0 1px;
+}
+
+.init-attachment {
+	padding: 6px 10px;
+}
+
+.init-attachment > i {
+	font-size: 18px;
+	vertical-align: middle;
+}
+
+.init-attachment .delete {
+	cursor: pointer;
+}
+
+.init input[name="assignee"] + .selectize-control {
+	padding: 0;
+	border: 0;
+	margin-bottom: 15px;
+}
+.init input[name="assignee"] + .selectize-control > .selectize-input {
+	border: 1px solid #999;
+	box-shadow: none;
+}
+.init input[name="assignee"].danger + .selectize-control > .selectize-input {
+	background-color: rgba(235, 84, 124, 0.1);
+	border: 1px solid rgba(235, 84, 124, 0.2);
+}
+
+strong.primary {
+	color: #2795c3;
 }
 
 .an-main-nav.bottom {
@@ -1074,6 +1249,42 @@ div.popover .project-header .db-create-meeting {
 	cursor: pointer;
 	top: 10px;
 	right: 10px;
+	font-size: 20px;
+}
+
+.step-30 .table-rate tbody td {
+	padding: 8px 20px;
+}
+
+.step-30 .table-rate tbody td:first-child {
+	font-size: 20px;
+}
+
+.step-30 .table-rate tbody td:first-child > i {
+	font-size: 27px;
+	vertical-align: middle;
+}
+
+.step-30 .table-rate .text-normal {
+	font-size: 14px;
+}
+
+.step-30 .table-rate label {
+	cursor: initial;
+}
+
+.step-30 .table-rate .avg-container > * {
+	display: none;
+}
+
+.step-30 .btn-share-rating > i {
+	font-size: 28px;
+	vertical-align: middle;
+	line-height: 0;
+}
+
+.step-30 .btn-share-rating {
+	margin-left: 20px;
 	font-size: 28px;
 	vertical-align: middle;
 	color: #025d83;

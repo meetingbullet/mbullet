@@ -50,8 +50,9 @@ if (! $('.init-project select option').length) {
 if (typeof(INIT_DATA.new_projects_count) == 'undefined') {
 	INIT_DATA.new_projects_count = 0;
 }
-$('#init .init-footer.calendar').html('<button class="pull-left an-btn an-btn-danger" id="previous-step">Back</button><form class="hidden" action="<?php echo site_url('test/init_import') ?>" enctype="multipart/form-data" id="attachment-form"></form><button class="pull-right an-btn an-btn-success" id="next-step">Next</button>');
-console.log(INIT_DATA);
+$('#init .init-footer.calendar').html('<div class="init-footer-content">\
+<button class="pull-left an-btn an-btn-danger" id="previous-step">Back</button><form class="hidden" action="<?php echo site_url('test/init_import') ?>" enctype="multipart/form-data" id="attachment-form"></form><button class="pull-right an-btn an-btn-success" id="next-step">Next</button>\
+</div>')
 </script>
 <style>
 .init-project .action {
