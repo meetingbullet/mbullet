@@ -196,12 +196,14 @@ $('.btn-next-step').click(function() {
 			}
 			break;
 		case 40:
+
 			$.post('<?php echo site_url('/meeting/init_project') ?>', {
 				data: JSON.stringify(INIT_DATA)
 			}).done(function(data) {
 				data = JSON.parse(data);
 				console.log(data);
 
+				$('.init').addClass('hide-summary');
 				$('#init .init-body .config .content-container .config-content').html(data.modal_content);
 				$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
 			})
@@ -944,15 +946,29 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 			showConfirmButton: false
 		});
 
-		var import = true;
+		var isFinished = true;
 	}
 
 	if (that.attr('id') == 'next-step' && INIT_DATA.currentStep < 60) {
-		INIT_DATA.currentStep += 10;
+		INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
 	}
 
 	if (that.attr('id') == 'previous-step') {
-		INIT_DATA.currentStep -= 10;
+		INIT_DATA.currentStep = STEPS[--INIT_DATA.currentStepIndex];
+
+		if (INIT_DATA.currentStep < 40) {
+			if (INIT_DATA.path == 'owner') {
+
+			} else {
+
+			}
+
+			$('#init .init-body .config, .init-footer.calendar .init-footer-content > *').fadeOut(400, function() {
+				
+				$('#init .init-body .calendar').fadeIn();
+			});
+			$('.init').removeClass('hide-summary');
+		}
 	}
 
 	if (INIT_DATA.currentStep == 50 && INIT_DATA.path == 'owner') {
@@ -995,7 +1011,7 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
 		$('#init .init-body .config .content-container').fadeIn();
 
-		if (typeof(import) != 'undefined' && import == true) {
+		if (typeof isFinished !== undefined && isFinished == true) {
 			swal.close();
 			$('#init').modal('hide');
 			$.mbNotify('Import successfully', 'success');

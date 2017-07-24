@@ -652,11 +652,15 @@
 	</div>
 
 	<div class="init-footer calendar">
+		<div class="init-footer-content">
+		</div>
 	</div> <!-- .init-footer.calendar -->
 
 	<div class="init-footer summary">
-		<a href="#" class="btn-skip-init text-muted" data-dismiss="modal">SKIP</a>
-		<button class="an-btn an-btn-primary btn-next-step pull-right" disabled="disabled">NEXT</button>
+		<div class="init-footer-content">
+			<a href="#" class="btn-skip-init text-muted" data-dismiss="modal">SKIP</a>
+			<button class="an-btn an-btn-primary btn-next-step pull-right" disabled="disabled">NEXT</button>
+		</div>
 	</div> <!-- .init-footer.summary -->
 </div> <!-- #init -->
 
