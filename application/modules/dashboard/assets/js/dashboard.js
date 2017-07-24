@@ -57,6 +57,10 @@ $(document).ready(function() {
 							data = JSON.parse(data);
 							$('.my-projects .project-list').html(data.modal_content);
 						})
+
+						if ($(e.target).attr('id') == 'create-project') {
+							location.reload();
+						}
 					}
 				}
 			}

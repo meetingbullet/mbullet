@@ -414,7 +414,16 @@ span.count {
 
 .project-header h4 {
 	margin: 0 0 5px;
+	display: inline;
+}
 
+.btn-join-project {
+	margin-right: 15px;
+	text-transform: uppercase;
+}
+
+.project-header-content {
+	display: inline-block;
 }
 
 .project-body {
@@ -1238,7 +1247,6 @@ div.popover .project-header {
 
 div.popover .project-header .db-create-meeting {
 	cursor: pointer;
-	position: absolute;
 	top: 10px;
 	right: 10px;
 	font-size: 20px;
@@ -1277,4 +1285,7 @@ div.popover .project-header .db-create-meeting {
 
 .step-30 .btn-share-rating {
 	margin-left: 20px;
+	font-size: 28px;
+	vertical-align: middle;
+	color: #025d83;
 }

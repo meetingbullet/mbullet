@@ -120,6 +120,32 @@ class Project extends Authenticated_Controller
 		Template::render();
 	}
 
+	public function join($project_id)
+	{
+		if (! is_numeric($project_id) || ! has_permission('Project.Edit.All')) {
+			echo json_encode([
+				'message' => lang('pj_invalid_action'),
+				'message_type' => 'danger'
+			]);
+
+			return;
+		}
+
+		// Add to project members if not in
+		// Prevent duplicate row by MySQL Insert Ignore
+		$query = $this->db->insert_string('project_members', [
+			'project_id' => $project_id,
+			'user_id' => $this->current_user->user_id
+		]);
+
+		$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+		$query = $this->db->query($query);
+
+		echo json_encode([
+			'message_type' => 'success'
+		]);
+	}
+
 	private function save_project($type = 'insert', $project_id = null)
 	{
 		$data = $this->input->post();

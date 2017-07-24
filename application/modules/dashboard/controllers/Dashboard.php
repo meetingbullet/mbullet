@@ -33,7 +33,9 @@ class Dashboard extends Authenticated_Controller
 
 	public function index()
 	{
-		$projects = $this->get_my_projects();
+		$my_projects = $this->get_my_projects();
+		$my_project_ids = array_column(json_decode(json_encode($my_projects), true), 'project_id');
+		$other_projects = $this->get_other_projects($my_project_ids);
 		$my_todo = $this->get_my_todo();
 		$evaluates = [];
 		foreach ($my_todo['meetings'] as $meeting) {
@@ -129,7 +131,7 @@ class Dashboard extends Authenticated_Controller
 		$meeting_calendar = array_merge($meeting_calendar_scheduled, $meeting_calendar_started, $meeting_calendar_ended);
 
 		if (IS_AJAX) {
-			echo json_encode([$user, $projects, $my_todo]); exit;
+			echo json_encode([$user, $my_projects, $my_todo]); exit;
 		}
 
 		$event_sources = [
@@ -159,7 +161,8 @@ class Dashboard extends Authenticated_Controller
 			'current_user' => $this->current_user
 		], true), 'inline');
 
-		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
+		Template::set('my_projects', $my_projects);
+		Template::set('other_projects', $other_projects);
 		Template::set('my_todo', $my_todo && count($my_todo) > 0 ? $my_todo : []);
 		Template::set('my_meetings', array_merge($my_meetings, $member_meetings));
 		Template::set('current_user', $this->current_user);
@@ -173,9 +176,9 @@ class Dashboard extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$projects = $this->get_my_projects();
+		$my_projects = $this->get_my_projects();
 
-		Template::set('projects', $projects && count($projects) > 0 ? $projects : []);
+		Template::set('projects', $my_projects && count($my_projects) > 0 ? $my_projects : []);
 		Template::set('current_user', $this->current_user);
 		Template::render();
 	}
@@ -259,7 +262,7 @@ class Dashboard extends Authenticated_Controller
 
 	private function get_my_projects()
 	{
-		$projects = $this->project_model
+		$my_projects = $this->project_model
 		->select('projects.name, projects.project_id, projects.cost_code, u.email, u.avatar, u.first_name, u.last_name, 
 		(SELECT COUNT(*) FROM ' . $this->db->dbprefix('project_members') . ' WHERE ' . 
 		$this->db->dbprefix('project_members') . '.project_id = ' . 
@@ -273,8 +276,85 @@ class Dashboard extends Authenticated_Controller
 		->where('organization_id', $this->current_user->current_organization_id)
 		->order_by('projects.name')
 		->find_all();
+
+		if (empty($my_projects)) {
+			return [];
+		}
+
+		foreach ($my_projects as &$project) {
+			$project->total_used = $this->mb_project->total_used('project', $project->project_id);
+			$project->no_of_meeting = $this->meeting_model
+			->join('actions a', 'a.action_id = meetings.action_id')
+			->join('projects p', 'p.project_id = a.project_id')
+			->where('organization_id', $this->current_user->current_organization_id)
+			->where('p.project_id', $project->project_id)->count_all();
+
+			$project->next_meeting = $this->meeting_model->
+			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+			->join('actions a', 'a.action_id = meetings.action_id')
+			->join('projects p', 'p.project_id = a.project_id')
+			->join('users u', 'u.user_id = meetings.owner_id')
+			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+			->where('meetings.status', 'ready')
+			->where('scheduled_start_time > CURRENT_TIMESTAMP()', null, false)
+			->find_by('p.project_id', $project->project_id);
+
+			$this->meeting_model->
+			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+			->join('actions a', 'a.action_id = meetings.action_id')
+			->join('projects p', 'p.project_id = a.project_id')
+			->join('users u', 'u.user_id = meetings.owner_id')
+			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+			->where('meetings.status', 'ready')
+			->where('p.project_id', $project->project_id);
+
+			if ($project->next_meeting) {
+				$this->meeting_model->where('meetings.meeting_id !=', $project->next_meeting->meeting_id);
+			}
+
+			$project->scheduled_meetings = $this->meeting_model->find_all();
+			$project->scheduled_meetings || $project->scheduled_meetings = [];
+
+			$project->completed_meetings = $this->meeting_model->
+			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+			->join('actions a', 'a.action_id = meetings.action_id')
+			->join('projects p', 'p.project_id = a.project_id')
+			->join('users u', 'u.user_id = meetings.owner_id')
+			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+			->where('meetings.status', 'finished')
+			->where('p.project_id', $project->project_id)
+			->find_all();
+
+			$project->completed_meetings || $project->completed_meetings = [];
+		}
+
+		return $my_projects;
+	}
+
+	private function get_other_projects($my_project_ids)
+	{
+		$projects = $this->project_model
+		->select('projects.name, projects.project_id, projects.cost_code, 
+		u.email, u.avatar, u.first_name, u.last_name, 
+		(SELECT COUNT(*) FROM ' . $this->db->dbprefix('project_members') . ' WHERE ' . 
+		$this->db->dbprefix('project_members') . '.project_id = ' . 
+		$this->db->dbprefix('projects') . '.project_id) as member_number', false)
+
+		->join('users u', 'u.user_id = projects.owner_id')
+		->where('projects.status !=', 'archive')
+		->where_not_in('project_id', count($my_project_ids) > 0 ? $my_project_ids : -1)
+		->where('organization_id', $this->current_user->current_organization_id)
+		->order_by('projects.name')
+		->find_all();
+
 		if (empty($projects)) {
-			$projects = [];
+			return [];
 		}
 
 		foreach ($projects as &$project) {

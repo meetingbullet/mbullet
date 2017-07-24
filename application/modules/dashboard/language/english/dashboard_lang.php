@@ -49,3 +49,5 @@ $lang['db_x_hrs'] = '{0} hrs';
 $lang['db_create_project'] = 'Create Project';
 $lang['db_accepted'] = 'Accepted';
 $lang['db_declined'] = 'Declined';
+$lang['db_join'] = 'Join';
+$lang['db_joined'] = 'Joined';

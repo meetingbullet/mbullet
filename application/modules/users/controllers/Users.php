@@ -77,7 +77,9 @@ class Users extends Front_Controller
 
 		switch ($type) {
 			case 'organization': 
-				Template::set_message(lang('us_view_your_invitation'), 'info');
+				if (! $this->auth->is_logged_in()) {
+					Template::set_message(lang('us_view_your_invitation'), 'info');
+				}
 				redirect(LOGIN_URL);
 				break;
 			case 'project': 
