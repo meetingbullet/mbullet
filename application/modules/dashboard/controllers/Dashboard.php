@@ -419,7 +419,7 @@ class Dashboard extends Authenticated_Controller
 		->select('homework.homework_id, homework.name, s.meeting_key, 
 		s.name AS meeting_name, s.scheduled_start_time, s.in, s.in_type,
 		hr.user_id IS NOT NULL AS is_read', false)
-		->join('meetings s', 's.meeting_id = homework.meeting_id')
+		->join('meetings s', 's.meeting_id = homework.meeting_id AND s.scheduled_start_time IS NOT NULL')
 		->join('actions a', 'a.action_id = s.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
 		->join('homework_members hm', 'hm.homework_id = homework.homework_id AND hm.user_id = ' . $this->current_user->user_id, 'LEFT')
@@ -443,11 +443,16 @@ class Dashboard extends Authenticated_Controller
 		}
 
 		$evaluate_meetings = $this->meeting_model
-		->select('meetings.*, sm.rate, meetings.name as meeting_name, u.first_name, u.last_name, u.email, IF(' . $this->db->dbprefix('meetings') . '.owner_id = "' . $this->current_user->user_id . '", 1 , 0) AS is_owner, "evaluate" AS todo_type, "meeting" AS evaluate_mode')
+		->select('meetings.*, sm.rate, meetings.name as meeting_name, 
+		u.first_name, u.last_name, u.email, 
+		IF(' . $this->db->dbprefix('meetings') . '.owner_id = "' . $this->current_user->user_id . '", 1 , 0) AS is_owner, 
+		"evaluate" AS todo_type, "meeting" AS evaluate_mode,
+		r.user_id IS NOT NULL AS is_read', false)
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
 		->join('users u', 'u.user_id = meetings.owner_id')
 		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = "' . $this->current_user->user_id . '"', 'LEFT')
+		->join('meeting_reads r', 'meetings.meeting_id = r.meeting_id AND r.user_id =' . $this->current_user->user_id, 'LEFT')
 		->where('organization_id', $this->current_user->current_organization_id)
 		->where('(sm.user_id = "' . $this->current_user->user_id . '" OR meetings.owner_id = "' . $this->current_user->user_id . '")')
 		->where('meetings.manage_state', 'evaluate')
@@ -529,17 +534,20 @@ class Dashboard extends Authenticated_Controller
 
 		$evaluates = array_merge($evaluate_meetings, $evaluate_members, $evaluate_agendas, $evaluate_homeworks);
 	
-		$decides = $this->meeting_model->select('meetings.*, meetings.name as meeting_name, ag.*, ag.name as agenda_name, ag.description as agenda_description, "decide" as todo_type')
-								->join('actions a', 'a.action_id = meetings.action_id')
-								->join('projects p', 'p.project_id = a.project_id')
-								->join('agendas ag', 'ag.meeting_id = meetings.meeting_id', 'LEFT')
-								->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
-								->where('meetings.owner_id', $this->current_user->user_id)
-								->where('organization_id', $this->current_user->current_organization_id)
-								->where('meetings.manage_state', 'decide')
-								->where('ag.confirm_status IS NULL')
-								->group_by('ag.agenda_id')
-								->find_all();
+		$decides = $this->meeting_model
+		->select('meetings.*, meetings.name AS meeting_name, ag.*, 
+		ag.name AS agenda_name, ag.description AS agenda_description, 
+		"decide" AS todo_type')
+		->join('actions a', 'a.action_id = meetings.action_id')
+		->join('projects p', 'p.project_id = a.project_id')
+		->join('agendas ag', 'ag.meeting_id = meetings.meeting_id', 'LEFT')
+		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id', 'LEFT')
+		->where('meetings.owner_id', $this->current_user->user_id)
+		->where('organization_id', $this->current_user->current_organization_id)
+		->where('meetings.manage_state', 'decide')
+		->where('ag.confirm_status IS NULL')
+		->group_by('ag.agenda_id')
+		->find_all();
 		if (empty($decides)) {
 			$decides = [];
 		}
@@ -642,7 +650,10 @@ class Dashboard extends Authenticated_Controller
 	{
 		$eventIDs = $this->input->post('eventIDs');
 
-		if (empty($eventIDs)) echo "[]";
+		if (empty($eventIDs)) {
+			echo "[]";
+			return;
+		}
 
 		$meeting = $this->meeting_model
 		->select('google_event_id')
