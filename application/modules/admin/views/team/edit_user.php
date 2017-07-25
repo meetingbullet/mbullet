@@ -1,3 +1,4 @@
+
 <div class="modal-header">
 	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 	<h4 class="modal-title"><?php echo lang('ad_tm_edit_user') . ': ' . $user->full_name ?></h4>
@@ -14,7 +15,18 @@
 		'4' => 'L',
 		'5' => 'XL'
 	], set_value('cost_of_time', isset($user->cost_of_time) ? $user->cost_of_time : null), lang('ad_tm_cost_of_time'), 'class="an-form-control"', '', true) ?>
-	<?php echo mb_form_dropdown('role_id', $roles, set_value('role', isset($user->role_id) ? $user->role_id : null), lang('ad_tm_role'), 'class="an-form-control"', '', true) ?>
+	<?php 
+		if ($disable) {
+			echo mb_form_dropdown('role_id', $roles, set_value('role', isset($user->role_id) ? $user->role_id : null), lang('ad_tm_role'), 'class="an-form-control" disabled="disabled"' , '', true);
+		} else {
+			$temp = [];
+			foreach ($permissions as $permission) {
+				$temp[$permission->manage_role_id] = $permission->name;
+			}
+			$roles = $temp;
+			echo mb_form_dropdown('role_id', $roles, set_value('role', isset($user->role_id) ? $user->role_id : null), lang('ad_tm_role'), 'class="an-form-control" ' , '', true);
+		}
+	?>
 	<div class="row">
 		<div class="col-md-3 col-sm-12">
 			<label class="pull-right"><?php echo lang('ad_tm_enabled') ?><span class="required">*</span></label>

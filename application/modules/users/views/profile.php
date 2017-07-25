@@ -40,7 +40,7 @@ $defaultTimezone = isset($user->timezone) ? $user->timezone : strtoupper(setting
 										<div class="an-input-group">
 											<label class='an-form-avatar-label'><?php echo lang('us_reg_avatar') ?></label>
 											<div class="an-avatar">
-												<img class='an-form-avatar-preview' id="user-avatar-preview" src="<?php echo avatar_url($user->avatar) ?>"/>
+												<img class='an-form-avatar-preview' id="user-avatar-preview" src="<?php echo isset($user->avatar) ? avatar_url($user->avatar) : gravatar_url($user->email, 98); ?>"/>
 												<div class='an-form-avatar-dim'><span><i class='ion-ios-upload-outline'></i></span></div>
 												<input type="file" id="user-avatar" name="avatar" class="an-form-avatar"/>
 											</div>
