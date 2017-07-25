@@ -205,9 +205,7 @@ class User_model extends BF_Model
 			->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
 			->join('permission_manage pm', 'pm.role_id = uto.role_id')
 			->join('roles r', 'r.role_id = pm.manage_role_id')
-			->where('(r.organization_id=' . $user_organization_id )
-			->or_where('(r.organization_id is NULL')
-			->where('r.is_public = 1))')
+			->where('(r.organization_id=' . $user_organization_id . ' or r.organization_id is NULL and r.is_public = 1)')
 			->where('users.user_id=' . $current_user_id );
 		return $this->find_all();
 	}
