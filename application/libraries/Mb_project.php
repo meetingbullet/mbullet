@@ -3,12 +3,16 @@
 class Mb_project
 {
 	private $ci;
+	private $current_user;
 
 	public function __construct()
 	{
 		$this->ci =& get_instance();
+		$this->ci->load->library('users/auth');
+		$this->current_user = $this->ci->auth->user();
 	}
 
+	/**
 	/**
 	 * Get next key for Project, Action, Meeting, Agenda
 	 *
@@ -40,9 +44,11 @@ class Mb_project
 		}
 
 		
-		$query = $this->ci->db->select('MAX(CAST(REPLACE(`' . rtrim($table, 's') . '_key`, \'' . $parent_key . '-' . '\', \'\') AS UNSIGNED)) AS `last_key`', false)
-								->like('`' . rtrim($table, 's') . '_key`', $parent_key . '-', 'after')
-								->get($table);
+		$query = $this->ci->db
+		->select('MAX(CAST(REPLACE(`' . rtrim($table, 's') . '_key`, \'' . $parent_key . '-' . '\', \'\') AS UNSIGNED)) AS `last_key`', false)
+		->like('`' . rtrim($table, 's') . '_key`', $parent_key . '-', 'after')
+		->get($table);
+
 		if ($query->num_rows() > 0) {
 			$last_key = $query->row()->last_key;
 			return $parent_key . '-' . (empty($last_key) ? 1 : ($last_key + 1));
@@ -1019,6 +1025,44 @@ class Mb_project
 		->update($object_id, ['modified_on' => date('Y-m-d H:i:s')]);
 
 		return (boolean) $count;
+	}
+
+	
+	public function get_project_list()
+	{
+		$cost_code = '>~<';
+
+		if ($code = explode('-', $this->ci->uri->segment(2))) {
+			if (count($code)) {
+				$cost_code = $code[0];
+			}
+		}
+
+		$projects = $this->ci->db
+		->select('projects.project_id, name, cost_code, IF(cost_code = "'. $cost_code .'", 1, 0) AS is_selected')
+		->join('project_members pm', 'pm.project_id = projects.project_id AND user_id = "'. $this->current_user->user_id .'"', 'LEFT')
+		->where("(owner_id = '{$this->current_user->user_id}' OR user_id = '{$this->current_user->user_id}')", null, false)
+		->where('organization_id', $this->current_user->current_organization_id)
+		->where('projects.status !=', 'archive')
+		->get('projects')
+		->result();
+
+		$projects = $projects ? $projects : [];
+		foreach ($projects as $project) {
+			if ($project->is_selected) {
+				return [
+					'projects' => $projects,
+					'current_project_id' => $project->project_id,
+					'current_project_name' => $project->name
+				];
+			}
+		}
+
+		return [
+			'projects' => $projects,
+			'current_project_id' => null,
+			'current_project_name' => lang('projects')
+		];
 	}
 }
 /**
