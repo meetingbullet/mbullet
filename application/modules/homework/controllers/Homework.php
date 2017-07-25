@@ -10,7 +10,6 @@ class Homework extends Authenticated_Controller
 		$this->load->helper('mb_form');
 		$this->load->helper('text');
 
-		$this->load->library('mb_project');
 		$this->load->model('meeting/meeting_model');
 		$this->load->model('users/user_model');
 		

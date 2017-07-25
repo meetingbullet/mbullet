@@ -7,7 +7,6 @@ class Test extends Authenticated_Controller
 		parent::__construct();
 		$this->load->helper('form');
 		$this->load->library('users/Auth');
-		$this->load->library('mb_project');
 		
 		$this->load->model('users/user_model');
 
@@ -92,7 +91,6 @@ class Test extends Authenticated_Controller
 
 	public function update_parent()
 	{
-		$this->load->library('mb_project');
 		$this->mb_project->update_parent_object('homework');
 	}
 

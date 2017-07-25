@@ -8,7 +8,6 @@ class Dashboard extends Authenticated_Controller
 		$this->lang->load('dashboard');
 		$this->lang->load('project/project');
 		$this->lang->load('meeting/meeting');
-		$this->load->library('mb_project');
 		$this->load->model('project/project_model');
 		$this->load->model('project/project_member_model');
 		$this->load->model('homework/homework_model');
