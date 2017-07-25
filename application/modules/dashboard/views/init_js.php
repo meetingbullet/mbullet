@@ -150,7 +150,7 @@ $('.btn-next-step').click(function() {
 
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
 
-	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
+	//console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
 
 	if (INIT_DATA.currentStep >= 31 && INIT_DATA.currentStep <= 33) {
 		if ($('#init .sub-step .dot.passed').length === 0) {
@@ -204,15 +204,15 @@ $('.btn-next-step').click(function() {
 			break;
 		case 40:
 
-			$.post('<?php echo site_url('/meeting/init_project') ?>', {
+			$.post("<?php echo site_url('/meeting/init_project') ?>", {
 				data: JSON.stringify(INIT_DATA)
 			}).done(function(data) {
 				data = JSON.parse(data);
-				console.log(data);
+				// console.log(data);
 
 				$('.init').addClass('hide-summary');
-				$('#init .init-body .config .content-container .config-content').html(data.modal_content);
-				$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
+				$('.init .config .config-content').html(data.modal_content);
+				$('.init #previous-step, .init-footer.calendar button').removeAttr('disabled');
 			})
 
 			$('#init .init-body .calendar').fadeOut(400, function() {
@@ -231,7 +231,7 @@ $('.btn-underdog').click(function() {
 	
 	INIT_DATA.path = 'guest';
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
-	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
+	//console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
 
 	// Remove all Owner meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
@@ -251,7 +251,7 @@ $('.btn-like-a-boss').click(function() {
 	
 	INIT_DATA.path = 'owner';
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
-	console.log('STEP:', INIT_DATA.currentStep)
+	//console.log('STEP:', INIT_DATA.currentStep)
 
 	// Remove all Guest meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
@@ -721,7 +721,6 @@ $(document).on('click', '.init .fc-event', function(e){
 		}
 		
 		currentEvent = event;
-		console.log('event', event);
 
 		// Reset selected meeting & rates
 		INIT_DATA.meetings = {};
@@ -914,7 +913,6 @@ $(document).on('click', '#init .init-body .init-project .action .delete-meeting'
 	var event_id = that.closest('tr').data('event-id');
 	delete INIT_DATA.meetings[event_id];
 
-	console.log(INIT_DATA);
 	that.closest('tr')
 		.find('td')
 		.wrapInner('<div style="display: block;" />')
@@ -930,7 +928,6 @@ $(document).on('change', '#init .init-body .init-project select', function() {
 	var project_id = that.val();
 	var event_id = that.closest('tr').data('event-id');
 	INIT_DATA.meetings[event_id].project_id = project_id;
-	console.log(INIT_DATA);
 });
 
 $(document).on("click", '#init-create-project-modal form button[type=submit]', function(e) {
@@ -971,7 +968,6 @@ $(document).on("click", '#init-create-project-modal form button[type=submit]', f
 						data: JSON.stringify(INIT_DATA)
 					}).done(function(refresh_data) {
 						refresh_data = JSON.parse(refresh_data);
-						console.log(refresh_data);
 
 						$('#init .init-body .config .content-container').html(refresh_data.modal_content);
 					});
@@ -1029,19 +1025,16 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 
 	if (INIT_DATA.currentStep == 50 && INIT_DATA.path == 'owner') {
 		$('#init #attachment-form').html();
-		for (var event_id in INIT_DATA.meetings) {console.log('meeting');
-			for (var i = 0; i < INIT_DATA.meetings[event_id].agenda.length; i++) {console.log('agenda');
-				for (var j = 0; j < INIT_DATA.meetings[event_id].agenda[i].attachment.length; j++) {console.log('attachment');
-					console.log(INIT_DATA.meetings[event_id].agenda[i].attachment[j]);
-					//INIT_DATA.meetings[event_id].agenda[i].attachment[j].name = event_id + '_ag_' + i + '[' + j + ']';
+		for (var event_id in INIT_DATA.meetings) {
+			for (var i = 0; i < INIT_DATA.meetings[event_id].agenda.length; i++) {
+				for (var j = 0; j < INIT_DATA.meetings[event_id].agenda[i].attachment.length; j++) {
 					INIT_DATA.meetings[event_id].agenda[i].attachment[j].data('name', `agenda[${event_id}][${i}][${j}]`)
 					$('#init #attachment-form').append(INIT_DATA.meetings[event_id].agenda[i].attachment[j]);
 				}
 			}
 
-			for (var i = 0; i < INIT_DATA.meetings[event_id].homework.length; i++) {console.log('homework');
-				for (var j = 0; j < INIT_DATA.meetings[event_id].homework[i].attachment.length; j++) {console.log('attachment');
-					console.log(INIT_DATA.meetings[event_id].homework[i].attachment[j]);
+			for (var i = 0; i < INIT_DATA.meetings[event_id].homework.length; i++) {
+				for (var j = 0; j < INIT_DATA.meetings[event_id].homework[i].attachment.length; j++) {
 					INIT_DATA.meetings[event_id].homework[i].attachment[j].data('name', `homework[${event_id}][${i}][${j}]`)
 					$('#init #attachment-form').append(INIT_DATA.meetings[event_id].homework[i].attachment[j]);
 				}
@@ -1061,7 +1054,6 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		data: JSON.stringify(INIT_DATA)
 	}).done(function(data) {
 		data = JSON.parse(data);
-		console.log(data);
 
 		$('#init .init-body .config .content-container .config-content').html(data.modal_content);
 		$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
@@ -1073,7 +1065,7 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 			$.mbNotify('Import successfully', 'success');
 		}
 	}).fail(function() {
-		console.log('failed');
+		//console.log('failed');
 	});
 });
 
@@ -1083,7 +1075,7 @@ $(document).on('submit','#init #attachment-form', function(e) {
 
 	var fd = new FormData();
 	$('#init #attachment-form input[type="file"]').each(function() {
-		var this_input_file = $(this);console.log(this_input_file);
+		var this_input_file = $(this);
 		var file_data = this_input_file[0].files; // for multiple files
 		for(var i = 0; i < file_data.length; i++){
 			var name = this_input_file.attr('name');
@@ -1108,7 +1100,7 @@ $(document).on('submit','#init #attachment-form', function(e) {
 		processData: false,
 		type: 'POST',
 		success: function(data){
-			console.log(data);
+			//console.log(data);
 		}
 	});
 });
