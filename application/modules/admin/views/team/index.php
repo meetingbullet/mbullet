@@ -66,8 +66,8 @@
 									<h6 class="basis-20">
 										<?php echo lang('ad_tm_full_name') ?>
 									</h6>
-									<h6 class="basis-20"><?php echo lang('ad_tm_title') ?></h6>
-									<h6 class="basis-20"><?php echo lang('ad_tm_cost_of_time') ?></h6>
+									<h6 class="basis-10"><?php echo lang('ad_tm_title') ?></h6>
+									<h6 class="basis-10"><?php echo lang('ad_tm_cost_of_time') ?></h6>
 									<h6 class="basis-20"><?php echo lang('ad_tm_email') ?></h6>
 									<h6 class="basis-10"><?php echo lang('ad_tm_role') ?></h6>
 									<h6 class="basis-20"><?php echo lang('ad_tm_last_login') ?></h6>
@@ -92,10 +92,10 @@
 											</span-->
 											<a><?php e($user->first_name . ' ' . $user->last_name) ?></a>
 										</div>
-										<div class="list-text basis-20">
+										<div class="list-text basis-10">
 											<p><?php e($user->title) ?></p>
 										</div>
-										<div class="list-text basis-20">
+										<div class="list-text basis-10">
 											<p><?php e($cost_of_time[$user->cost_of_time]) ?></p>
 										</div>
 										<div class="list-date email approve basis-20">
@@ -171,8 +171,8 @@
 						<h6 class="basis-20">
 							<?php echo lang('ad_tm_full_name') ?>
 						</h6>
-						<h6 class="basis-20"><?php echo lang('ad_tm_title') ?></h6>
-						<h6 class="basis-20"><?php echo lang('ad_tm_cost_of_time') ?></h6>
+						<h6 class="basis-10"><?php echo lang('ad_tm_title') ?></h6>
+						<h6 class="basis-10"><?php echo lang('ad_tm_cost_of_time') ?></h6>
 						<h6 class="basis-20"><?php echo lang('ad_tm_email') ?></h6>
 						<h6 class="basis-10"><?php echo lang('ad_tm_role') ?></h6>
 						<h6 class="basis-20"><?php echo lang('ad_tm_last_login') ?></h6>
@@ -197,10 +197,10 @@
 								</span-->
 								<a><?php e($user->first_name . ' ' . $user->last_name) ?></a>
 							</div>
-							<div class="list-text basis-20">
+							<div class="list-text basis-10">
 								<p><?php e($user->title) ?></p>
 							</div>
-							<div class="list-text basis-20">
+							<div class="list-text basis-10">
 								<p><?php e($cost_of_time[$user->cost_of_time]) ?></p>
 							</div>
 							<div class="list-date email approve basis-20">

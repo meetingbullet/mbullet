@@ -181,6 +181,12 @@ class Team extends Authenticated_Controller
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_role_not_found'));
 		}
+		$permissions = $this->user_model->select('pm.manage_role_id, r.name')
+											->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
+											->join('permission_manage pm', 'pm.role_id = uto.role_id')
+											->join('roles r', 'r.role_id = pm.manage_role_id')
+											->where('users.user_id='.$this->current_user->user_id)
+											->find_all();
 
 		$temp = [];
 		foreach ($roles as $role) {
@@ -196,20 +202,27 @@ class Team extends Authenticated_Controller
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_user_not_found'));
 		}
-		$current_user_role = $this->user_model->select('r.is_public, r.name')
-											->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
-											->join('roles r', 'r.role_id = uto.role_id')
-											->find($this->current_user->user_id);
-		$owner_role_id = $this->role_model->select('role_id')->where('name', 'Owner')->find_all();
-
+		$disable = true;
+		foreach($permissions as $permission) {
+			if ($permission->manage_role_id == $user->role_id) {
+				$disable = false;
+				break;
+			}
+		}
 
 		if ($this->input->post()) {
+			$disable_rule = [
+				'field' => 'role_id',
+				'label' => 'lang:ad_tm_role',
+				'rules' => '',
+			];
+			$normal_rule = [
+				'field' => 'role_id',
+				'label' => 'lang:ad_tm_role',
+				'rules' => 'trim|required|numeric',
+			];
 			$this->form_validation->set_rules([
-				[
-					'field' => 'role_id',
-					'label' => 'lang:ad_tm_role',
-					'rules' => 'trim|required|numeric',
-				],
+				($disable) ? $disable_rule : $normal_rule,
 				[
 					'field' => 'cost_of_time',
 					'label' => 'lang:ad_tm_cost_of_time',
@@ -234,9 +247,10 @@ class Team extends Authenticated_Controller
 				if (empty($this->input->post('enabled'))) {
 					$data['enabled'] = 0;
 				}
-
+				if ($disable) {
+					$data['role_id'] = $user->role_id;
+				}
 				$updated = $this->user_to_organizations_model->where('organization_id', $this->current_user->current_organization_id)->skip_validation(true)->update($user_id, $data);
-
 				if ($updated) {
 					if ($data['enabled'] != $user->enabled) {
 						$this->notify_user_status($user->email, $user->full_name, $data['enabled']);
@@ -255,8 +269,8 @@ class Team extends Authenticated_Controller
 				Template::set('message', validation_errors());
 			}
 		}
-		Template::set('owner_role_id', $owner_role_id['0']->role_id);
-		Template::set('current_user_role', $current_user_role);
+		Template::set('disable', $disable);
+		Template::set('permissions', $permissions);
 		Template::set('roles', $roles);
 		Template::set('user', $user);
 		if ($this->input->is_ajax_request()) {
