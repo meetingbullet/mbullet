@@ -116,7 +116,9 @@
 				</div>
 				<a href="#" class='btn-wide' data-type='team'><i class="ion-ios-people-outline"></i> Team (<span>0</span>) <i class="pull-right ion-ios-arrow-forward"></i></a>
 			</div>
+
 			<div class="calendar-of-shadow"></div>
+
 			<div class="calendar-wrapper">
 				<div class="calendar-info">
 					<div class="wrapper">
@@ -130,7 +132,10 @@
 					</div>
 
 					<div class="wrapper">
-						<h2 id="calendar-init-title"></h2>
+						<h2 id="calendar-init-title">
+							<span class="month"></span>
+							<span class="year"></span>
+						</h2>
 					</div>
 
 					<div class="wrapper">
@@ -151,9 +156,24 @@
 							</div>
 
 							<div class="fc-button-group">
-								<button type="button" data-full-view="agendaDay" data-list-view="listDay" class="fc-button fc-change-view fc-state-default fc-corner-left">Day</button>
-								<button type="button" data-full-view="agendaWeek" data-list-view="listWeek" class="fc-button fc-change-view fc-state-default">Week</button>
-								<button type="button" data-full-view="month" data-list-view="listMonth" class="fc-button fc-change-view fc-state-default fc-corner-right fc-state-active">Month</button>
+								<button type="button" 
+									data-full-view="agendaDay" 
+									data-list-view="listDay" 
+									data-work="day"
+									data-work-lang="<?php echo lang('db_days') ?>" 
+									class="fc-button fc-change-view fc-state-default fc-corner-left">Day</button>
+								<button type="button" 
+									data-full-view="agendaWeek" 
+									data-list-view="listWeek"
+									data-work="week"
+									data-work-lang="<?php echo lang('db_weeks') ?>" 
+									class="fc-button fc-change-view fc-state-default">Week</button>
+								<button type="button" 
+									data-full-view="month" 
+									data-list-view="listMonth" 
+									data-work="month"
+									data-work-lang="<?php echo lang('db_months') ?>" 
+									class="fc-button fc-change-view fc-state-default fc-corner-right fc-state-active">Month</button>
 							</div>
 						</div>
 					</div>
@@ -176,9 +196,16 @@
 			<div class="step-10">
 				<div class="content">
 					<h3 class='title'>Hey <?php echo $current_user->first_name ?></h3>
-					<p>From <b>May 1, 2017 - May 31, 2017</b></p>
-					<p>You're in <b class='number totalMeeting'>0</b> meetings for <b class='number totalTime'>0</b> hours</p>
-					<p>That's <b class='number'><span class="percentOfWorkingHour">0</span>%</b> of your total working hours! <span class="text-muted">(based on 40hr work weeks)</span></p>
+					<p>From <b class='selectedRange'>May 1, 2017 - May 31, 2017</b></p>
+					<p>You're in <b class='number totalMeeting'>0</b> meetings 
+					for <b class='number totalTime'>0</b> hours</p>
+					<p>
+						That's 
+						<b class='number'>
+							<span class="percentOfWorkingX">0</span>%
+						</b> of your total working hours! 
+						<span class="text-muted">(based on <span class="Xhour"></span> work <span class="workX">weeks</span>)</span>
+					</p>
 
 					<h3 class="section">Overview</h3>
 					<div class="overview-table">

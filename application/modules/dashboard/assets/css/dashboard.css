@@ -484,6 +484,10 @@ span.count {
 	transition: filter 0.5s ease-out;
 }
 
+.init .fc-other-month.fc-event {
+	background: #c3e0db;
+}
+
 .init .calendar{
 	position: relative;
 	float: left;

@@ -51,3 +51,7 @@ $lang['db_accepted'] = 'Accepted';
 $lang['db_declined'] = 'Declined';
 $lang['db_join'] = 'Join';
 $lang['db_joined'] = 'Joined';
+$lang['db_months'] = 'months';
+$lang['db_weeks'] = 'weeks';
+$lang['db_days'] = 'days';
+$lang['db_x_hr'] = '{0}hr';
