@@ -22,6 +22,9 @@ $(document).ready(function() {
 		// we need to add it on our own.
 		data += '&' + $(this).find('[type="submit"]').attr('name') + '=';
 
+		// Temporary disable form's buttons to prevent duplicate requests
+		$(this).find('button').prop('disabled', true);
+
 		$.ajax({
 			type: "POST",
 			url: $(this).attr('action'),
@@ -48,6 +51,9 @@ $(document).ready(function() {
 						}
 					}
 				}
+			},
+			complete: function() {
+				$(this).find('button').prop('disabled', false);
 			}
 		});
 	});
