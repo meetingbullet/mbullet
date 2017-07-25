@@ -28,6 +28,7 @@ class Authenticated_Controller extends Base_Controller
 	{
 		$this->autoload['helpers'][]   = 'form';
 		$this->autoload['helpers'][]   = 'mb_general';
+		$this->autoload['libraries'][] = 'Mb_project';
 		$this->autoload['libraries'][] = 'Template';
 		$this->autoload['libraries'][] = 'Assets';
 		$this->autoload['libraries'][] = 'form_validation';
