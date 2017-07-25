@@ -197,7 +197,7 @@ class Team extends Authenticated_Controller
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_user_not_found'));
 		}
-		$permissions = $this->user_model->get_permission_edit($this->current_user->user_id, $user->organization_id);
+		$permissions = $this->user_model->get_permission_dropdown($this->current_user->user_id, $this->current_user->current_organization_id);
 
 		$disable = true;
 		if ($permissions) {
