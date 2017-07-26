@@ -181,12 +181,7 @@ class Team extends Authenticated_Controller
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_role_not_found'));
 		}
-		$permissions = $this->user_model->select('pm.manage_role_id, r.name')
-											->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
-											->join('permission_manage pm', 'pm.role_id = uto.role_id')
-											->join('roles r', 'r.role_id = pm.manage_role_id')
-											->where('users.user_id='.$this->current_user->user_id)
-											->find_all();
+		// dump($this->db->last_query());
 
 		$temp = [];
 		foreach ($roles as $role) {
@@ -196,17 +191,22 @@ class Team extends Authenticated_Controller
 		$user = $this->user_model->select('users.*, uto.organization_id,  r.is_public, r.name, uto.role_id, uto.title, uto.cost_of_time, uto.enabled, CONCAT(first_name, " ", last_name) as full_name')
 								->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
 								->join('roles r', 'r.role_id = uto.role_id')
+								->where('uto.organization_id = ' . $this->current_user->current_organization_id)
 								->find($user_id);
 		if (empty($user)) {
 			Template::set('close_modal', 1);
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_user_not_found'));
 		}
+		$permissions = $this->user_model->get_permission_dropdown($this->current_user->user_id, $this->current_user->current_organization_id);
+
 		$disable = true;
-		foreach($permissions as $permission) {
-			if ($permission->manage_role_id == $user->role_id) {
-				$disable = false;
-				break;
+		if ($permissions) {
+			foreach($permissions as $permission) {
+				if ($permission->manage_role_id == $user->role_id) {
+					$disable = false;
+					break;
+				}
 			}
 		}
 

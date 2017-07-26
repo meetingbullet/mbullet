@@ -1,4 +1,3 @@
-
 <div class="modal-header">
 	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 	<h4 class="modal-title"><?php echo lang('ad_tm_edit_user') . ': ' . $user->full_name ?></h4>
