@@ -191,6 +191,7 @@ class Team extends Authenticated_Controller
 		$user = $this->user_model->select('users.*, uto.organization_id,  r.is_public, r.name, uto.role_id, uto.title, uto.cost_of_time, uto.enabled, CONCAT(first_name, " ", last_name) as full_name')
 								->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
 								->join('roles r', 'r.role_id = uto.role_id')
+								->where('uto.organization_id = ' . $this->current_user->current_organization_id)
 								->find($user_id);
 		if (empty($user)) {
 			Template::set('close_modal', 1);
