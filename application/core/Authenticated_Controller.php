@@ -39,7 +39,6 @@ class Authenticated_Controller extends Base_Controller
 		$this->redirect_to_invitation() || $this->redirect_to_organization_url();
 		$this->goto_create_organization();
 		$this->get_navigation_project_list();
-		$this->generate_calendar_uid();
 
 		$this->form_validation->CI =& $this;
 		$this->form_validation->set_error_delimiters('', '');
@@ -167,28 +166,6 @@ class Authenticated_Controller extends Base_Controller
 				if ($project) {
 					$this->current_user->current_project_id = $project->project_id;
 					$this->current_user->current_project_name = $project->name;
-				}
-			}
-		}
-	}
-
-	private function generate_calendar_uid()
-	{
-		if (! empty($this->current_user->google_refresh_token)) {
-			$query = $this->db->select('calendar_uid')
-							->where('user_id', $this->current_user->user_id)
-							->where('organization_id', $this->current_user->current_organization_id)
-							->where('enabled', 1)
-							->get('user_to_organizations');
-			if ($query->num_rows() > 0) {
-				$calendar_uid = $query->row()->calendar_uid;
-				if (empty($calendar_uid)) {
-					$calendar_uid = md5(uniqid("", true) . mt_rand());
-					$this->db->set('calendar_uid', $calendar_uid)
-							->where('user_id', $this->current_user->user_id)
-							->where('organization_id', $this->current_user->current_organization_id)
-							->where('enabled', 1)
-							->update('user_to_organizations');
 				}
 			}
 		}
