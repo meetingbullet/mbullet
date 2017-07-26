@@ -1028,8 +1028,12 @@ class Mb_project
 	}
 
 
-	public function generate_calendar_uid($current_user)
+	public function generate_calendar_uid($current_user = null)
 	{
+		if (is_null($current_user)) {
+			$current_user = $this->current_user;
+		}
+
 		if (! empty($current_user->google_refresh_token)) {
 			$query = $this->ci->db->select('calendar_uid')
 								->where('user_id', $current_user->user_id)

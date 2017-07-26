@@ -39,7 +39,6 @@ class Authenticated_Controller extends Base_Controller
 		$this->check_user_enabled();
 		$this->redirect_to_invitation() || $this->redirect_to_organization_url();
 		$this->goto_create_organization();
-		$this->get_navigation_project_list();
 
 		$this->form_validation->CI =& $this;
 		$this->form_validation->set_error_delimiters('', '');
