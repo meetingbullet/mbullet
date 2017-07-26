@@ -68,6 +68,7 @@ class Homework extends Authenticated_Controller
 				$homework_id = $this->homework_model->insert($data);
 
 				if ($homework_id) {
+					$this->mb_project->add_experience_point(1);
 					$this->mb_project->update_parent_objects('homework', $homework_id);
 					$members = $this->input->post('member');
 					$members = explode(',', $members);

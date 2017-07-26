@@ -1027,7 +1027,6 @@ class Mb_project
 		return (boolean) $count;
 	}
 
-
 	public function generate_calendar_uid($current_user = null)
 	{
 		if (is_null($current_user)) {
@@ -1054,6 +1053,9 @@ class Mb_project
 		}
 	}
 	
+	/*
+		Return joined project list and curreny selected project
+	*/
 	public function get_project_list()
 	{
 		$cost_code = '>~<';
@@ -1089,6 +1091,24 @@ class Mb_project
 			'current_project_id' => null,
 			'current_project_name' => lang('projects')
 		];
+	}
+
+	/**
+	*	Add XP after contribute something to organization
+	*	@param int point 
+	*	@param int user_id
+	*	@return boolean success?
+	*/
+	public function add_experience_point($point, $current_user = null)
+	{
+		$current_user = $current_user === null 
+						? $this->current_user 
+						: $current_user;
+
+		$this->ci->db->set('experience_point', 'experience_point + ' . $point, false);
+		$this->ci->db->where('user_id', $current_user->user_id);
+		$this->ci->db->where('organization_id', $current_user->current_organization_id);
+		return $this->ci->db->update('user_to_organizations');
 	}
 }
 /**

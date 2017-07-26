@@ -28,6 +28,7 @@ $lang['pj_x_settings'] = '%s - Settings';
 
 // Messages
 $lang['pj_project_successfully_created'] = 'Project successfully created';
+$lang['pj_project_successfully_updated'] = 'Project successfully updated';
 $lang['pj_there_was_a_problem_while_creating_project'] = 'There was a problem while creating project';
 $lang['pj_duplicated_cost_code'] = 'Duplicated cost code';
 $lang['pj_not_have_config_permission'] = 'You do not have permission to change project settings';

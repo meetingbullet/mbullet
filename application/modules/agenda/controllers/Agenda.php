@@ -67,7 +67,9 @@ class Agenda extends Authenticated_Controller
 					$data['agenda_key'] = $this->mb_project->get_next_key($meeting_key);
 
 					$agenda_id = $this->agenda_model->insert($data);
+
 					if ($agenda_id) {
+						$this->mb_project->add_experience_point(1);
 						$this->mb_project->update_parent_objects('agenda', $agenda_id);
 						$assignees = $this->input->post('assignee');
 						$assignees = explode(',', $assignees);
