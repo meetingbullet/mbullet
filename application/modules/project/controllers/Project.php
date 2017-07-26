@@ -96,7 +96,7 @@ class Project extends Authenticated_Controller
 			if ($project = $this->save_project('update', $project_id)) {
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
-				Template::set('message', lang('pj_project_successfully_created'));
+				Template::set('message', lang('pj_project_successfully_updated'));
 				Template::set('data', $project);
 
 				// Just to reduce AJAX request size

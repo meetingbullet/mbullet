@@ -23,7 +23,7 @@ $(document).ready(function() {
 		data += '&' + $(this).find('[type="submit"]').attr('name') + '=';
 
 		// Temporary disable form's buttons to prevent duplicate requests
-		$(this).find('button').prop('disabled', true);
+		$(e.target).find('button').prop('disabled', true);
 
 		$.ajax({
 			type: "POST",
@@ -49,11 +49,15 @@ $(document).ready(function() {
 							$('#meeting-list .an-lists-body').append($.templates('#meeting-row').render(data.data));
 							$('#meeting-list .an-lists-body > div:last-child').effect("highlight", {}, 3000);
 						}
+
+						if ($(this).attr('id') == 'create-project-modal') {
+							location.reload();
+						}
 					}
 				}
 			},
 			complete: function() {
-				$(this).find('button').prop('disabled', false);
+				$(e.target).find('button').prop('disabled', false);
 			}
 		});
 	});

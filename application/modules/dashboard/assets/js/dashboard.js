@@ -30,7 +30,7 @@ $(document).ready(function() {
 		var data = $(e.target).serialize();
 
 		// Temporary disable form's buttons to prevent duplicate requests
-		$(this).find('button').prop('disabled', true);
+		$(e.target).find('button').prop('disabled', true);
 
 		// Since serialize does not include form's action button, 
 		// we need to add it on our own.
@@ -68,7 +68,7 @@ $(document).ready(function() {
 				}
 			},
 			complete: function() {
-				$(this).find('button').prop('disabled', false);
+				$(e.target).find('button').prop('disabled', false);
 			}
 		});
 	});

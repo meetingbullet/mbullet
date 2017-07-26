@@ -118,7 +118,9 @@ class Meeting extends Authenticated_Controller
 			}
 
 			if ($id = $this->meeting_model->insert($data)) {
+				$this->mb_project->add_experience_point(10);
 				$this->mb_project->update_parent_objects('meeting', $id);
+
 				if ($team = $this->input->post('team')) {
 					if ($team = explode(',', $team)) {
 						$member_data = [];

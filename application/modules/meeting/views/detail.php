@@ -215,7 +215,11 @@ if ($is_member && $is_owner) {
 					</div>
 
 					<?php if ($meeting->status == 'open'): ?>
-					<button class="an-btn an-btn-primary mb-open-modal" data-modal-id="create-homework-modal" data-url="<?php echo site_url('homework/create/' . $meeting->meeting_key) ?>" ><?php echo '<i class="ion-android-add"></i> ' . lang('hw_add_homework')?></button>
+					<button class="an-btn an-btn-primary mb-open-modal" 
+						data-modal-id="create-homework-modal" 
+						data-url="<?php echo site_url('homework/create/' . $meeting->meeting_key) ?>" >
+						<?php echo '<i class="ion-android-add"></i> ' . lang('hw_add_homework')?>
+					</button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
