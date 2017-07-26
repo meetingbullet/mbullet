@@ -54,6 +54,7 @@ $projects = $this->mb_project->get_project_list();
 			</div> <!-- end .AN-TOPBAR-LEFT-PART -->
 
 			<div class="an-topbar-right-part">
+			<?php /* Disable Notification 
 			<div class="an-notifications">
 				<div class="btn-group an-notifications-dropown notifications">
 				<button type="button" class="an-btn an-btn-icon dropdown-toggle js-has-new-notification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -208,7 +209,7 @@ $projects = $this->mb_project->get_project_list();
 				</div>-->
 				</div>
 			</div> <!-- end .AN-MESSAGE -->
-
+			*/ ?>
 			<div class="an-settings">
 				<div class="btn-group an-notifications-dropown settings">
 					<button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -217,11 +218,19 @@ $projects = $this->mb_project->get_project_list();
 					<div class="dropdown-menu">
 						<p class="an-info-count">Settings</p>
 						<ul class="an-settings-list">
+							<?php if (has_permission('Organization.Settings.Edit')): ?>
 							<li><a href="<?php echo site_url('admin/settings'); ?>"><i class="ion-ios-settings"></i>Preferences</a></li>
+							<?php endif; ?>
 							<li><a href="<?php echo site_url('admin/team'); ?>"><i class="ion-ios-people-outline"></i>Team</a></li>
+							<?php if (has_permission('User.Team.View')): ?>
+							<?php endif; ?>
 							<li><a href="<?php echo site_url('admin/invites'); ?>"><i class="ion-ios-personadd-outline"></i>Invitations</a></li>
+							<?php if (has_permission('Organization.Billing.Pay')): ?>
 							<li><a href="<?php echo site_url('admin/billing'); ?>"><i class="ion-social-usd-outline"></i>Billing</a></li>
+							<?php endif; ?>
+							<?php if (has_permission('Organization.Authentication.Manage')): ?>
 							<li><a href="<?php echo site_url('admin/auth'); ?>"><i class="ion-ios-locked-outline"></i>Authentication</a></li>
+							<?php endif; ?>
 						</ul>
 					</div>
 				</div>
