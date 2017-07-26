@@ -1027,6 +1027,28 @@ class Mb_project
 		return (boolean) $count;
 	}
 
+
+	public function generate_calendar_uid($current_user)
+	{
+		if (! empty($current_user->google_refresh_token)) {
+			$query = $this->ci->db->select('calendar_uid')
+								->where('user_id', $current_user->user_id)
+								->where('organization_id', $current_user->current_organization_id)
+								->where('enabled', 1)
+								->get('user_to_organizations');
+			if ($query->num_rows() > 0) {
+				$calendar_uid = $query->row()->calendar_uid;
+				if (empty($calendar_uid)) {
+					$calendar_uid = md5(uniqid("", true) . mt_rand());
+					$this->ci->db->set('calendar_uid', $calendar_uid)
+								->where('user_id', $current_user->user_id)
+								->where('organization_id', $current_user->current_organization_id)
+								->where('enabled', 1)
+								->update('user_to_organizations');
+				}
+			}
+		}
+	}
 	
 	public function get_project_list()
 	{

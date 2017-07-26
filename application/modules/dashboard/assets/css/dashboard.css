@@ -1251,9 +1251,10 @@ div.popover .project-header {
 
 div.popover .project-header .db-create-meeting {
 	cursor: pointer;
-	top: 10px;
+	top: 5px;
 	right: 10px;
 	font-size: 20px;
+	position: absolute;
 }
 
 .step-30 .table-rate tbody td {

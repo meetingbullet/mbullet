@@ -112,6 +112,10 @@ class Meeting extends Authenticated_Controller
 			}
 
 			$data['meeting_key'] = $this->mb_project->get_next_key($action->action_key);
+			// only when create meeting on dashboard calendar
+			if (! empty($this->input->get('scheduled_start_time'))) {
+				$data['scheduled_start_time'] = $this->input->get('scheduled_start_time');
+			}
 
 			if ($id = $this->meeting_model->insert($data)) {
 				$this->mb_project->update_parent_objects('meeting', $id);
@@ -2241,7 +2245,9 @@ class Meeting extends Authenticated_Controller
 					Template::set('message_type', 'success');
 					Template::set('close_modal', 1);
 
-					$service->events->delete($calendar_id, $event_id);
+					if (! empty($this->input->get('delete_source'))) {
+						$service->events->delete($calendar_id, $event_id);
+					}
 				}
 			}
 		}
@@ -2432,7 +2438,8 @@ class Meeting extends Authenticated_Controller
 					'start' => $event->scheduled_start_time,
 					'end' => date('Y-m-d H:i:s', strtotime($event->scheduled_start_time . ' + ' . $event->in . ' ' . $event->in_type)),
 					'title' => "{$event->meeting_key}: {$event->name}",
-					'url' => site_url('/meeting/' . $event->meeting_key)
+					'url' => site_url('/meeting/' . $event->meeting_key),
+					'meeting_id' => $event->meeting_id
 				];
 			}
 		}
@@ -2897,5 +2904,73 @@ class Meeting extends Authenticated_Controller
 		if (! empty($default_homework_members_data)) {
 			$this->homework_member_model->insert_batch($default_homework_members_data);
 		}
+	}
+
+	public function edit_calendar_event() {
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$meeting_id = $this->input->post('meeting_id');
+		$start = $this->input->post('start');
+		$end = $this->input->post('end');
+
+		if (empty($meeting_id) || empty($start) || empty($end)) {
+			echo json_encode([
+				'status' => 0
+			]); exit;
+		}
+
+		$meeting = $this->meeting_model->find($meeting_id);
+
+		if (empty($meeting) || $meeting->status != 'open' || $meeting->manage_state != 'setup') {
+			echo json_encode([
+				'status' => 0
+			]); exit;
+		}
+
+		$data = [
+			'scheduled_start_time' => $start,
+			'in' => (strtotime($end) - strtotime($start)) / 60,
+			'in_type' => 'minutes'
+		];
+
+		$updated = $this->meeting_model->skip_validation(true)->update($meeting_id, $data);
+
+		if (! $updated) {
+			echo json_encode([
+				'status' => 0
+			]); exit;
+		}
+
+		echo json_encode([
+			'status' => 1
+		]); exit;
+	}
+
+	public function select_project() {
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (has_permission('Project.Edit.All')) {
+			$projects = $this->project_model->select('projects.cost_code, projects.name')
+											->where('projects.organization_id', $this->current_user->current_organization_id)
+											->order_by('projects.modified_on', 'desc')
+											->find_all();
+		} else {
+			$projects = $this->project_model->select('projects.cost_code, projects.name')
+											->join('users u', 'u.user_id = projects.owner_id')
+											->join('project_members pm', 'projects.project_id = pm.project_id')
+											->where('projects.status !=', 'archive')
+											->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
+											->where('organization_id', $this->current_user->current_organization_id)
+											->order_by('projects.modified_on', 'desc')
+											->group_by('projects.project_id')
+											->find_all();
+		}
+
+		Template::set('projects', $projects);
+		Template::render();
 	}
 }

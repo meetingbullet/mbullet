@@ -53,6 +53,10 @@ if (! in_array($current_user->email, $event->attendees)) {
 			</p>
 		</div>
 		<?php endif; endforeach; ?>
+
+		<div>
+			<label><input type="checkbox" name="delete_source" value="1"/> Delete source event</label>
+		</div>
 	</div>
 
 	<div class="modal-footer">

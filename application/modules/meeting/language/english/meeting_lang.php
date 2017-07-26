@@ -209,3 +209,5 @@ $lang['st_confirm'] = 'Confirm';
 $lang['st_wrong_provided_data'] = 'There is something wrong with the provided data.';
 $lang['st_import_success'] = 'Event imported successfully.';
 $lang['st_meetings'] = 'Meetings';
+$lang['st_project'] = 'Project';
+$lang['st_choose'] = 'Choose';

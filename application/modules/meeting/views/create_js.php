@@ -101,3 +101,8 @@ $('#meeting-in').change();
 if ($('#meeting-in option:selected').val() == 'other') {
 	$('input#in, div#in-unit').show();
 }
+
+<?php if (! empty($this->input->get('in'))) : ?>
+$('#meeting-in option[value=other]').attr('selected', 'selected').change();
+$('#in').val('<?php echo $this->input->get('in') ?>');
+<?php endif ?>
