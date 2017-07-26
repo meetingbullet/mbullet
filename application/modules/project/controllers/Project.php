@@ -735,8 +735,26 @@ class Project extends Authenticated_Controller
 			return;
 		}
 
-		if ($project_id = $this->project_model->get_project_id($project_key, $this->current_user->current_organization_id, '*', false)) {
-			if (! $this->project_model->update($project_id, ['status' => $this->input->get('status')])) {
+		$project_id = $project_id = $this->project_model->get_project_id(
+			$project_key, 
+			$this->current_user->current_organization_id, 
+			'*', 
+			false
+		);
+
+		if ($project_id) {
+			if (! $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All')) {
+					echo json_encode([
+					'message' => lang('pj_invalid_action'),
+					'message_type' => 'danger'
+				]);
+				return;
+			}
+
+			if (! $this->project_model->update($project_id, [
+				'status' => $this->input->get('status')
+				])) {
+
 				echo json_encode([
 					'message' => lang('pj_unable_to_update_status'),
 					'message_type' => 'danger'
@@ -745,7 +763,12 @@ class Project extends Authenticated_Controller
 			}
 		}
 
-		$this->mb_project->notify_members($project_id, 'project', $this->current_user, 'update_status');
+		$this->mb_project->notify_members(
+			$project_id, 
+			'project', 
+			$this->current_user, 
+			'update_status'
+			);
 
 		echo json_encode([
 			'message' => lang('pj_project_status_updated'),
