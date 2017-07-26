@@ -25,10 +25,16 @@ $('#calendar-init').fullCalendar({
 		i = INIT_DATA.events.length;
 		INIT_DATA.events[i] = event;
 		element.data('index', i);
+
+		// Gray out events which are not in current month
+		if (event.end.format('M') != $('#calendar-init').fullCalendar('getDate').format('M')) {
+			$(element).addClass('fc-other-month');
+		}
 	},
 	viewRender: function(view) {
 		var title = view.title;
-		$("#calendar-init-title").html(title);
+		$("#calendar-init-title .month").html(title.split(' ')[0]);
+		$("#calendar-init-title .year").html(title.split(' ')[1]);
 	},
 	loading: function (isLoading) {
 		$('.calendar-init-wrapper').toggleClass('loading');
@@ -87,10 +93,11 @@ $('.calendar-info .fc-list-button').click(function() {
 $('.calendar-info .fc-change-view').click(function() {
 	var type = $('.fc-full-button').hasClass('fc-state-active') ? 'full' : 'list';
 	var view = $(this).data(type + '-view')
-
 	$('#calendar-init').fullCalendar('changeView', view)
 	$('.calendar-info .fc-change-view').removeClass('fc-state-active')
-	$(this).addClass('fc-state-active')
+	$(this).addClass('fc-state-active');
+
+	updateOverview();
 })
 
 $('.bigest-challenge .answer').click(function() {
@@ -143,7 +150,7 @@ $('.btn-next-step').click(function() {
 
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
 
-	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
+	//console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
 
 	if (INIT_DATA.currentStep >= 31 && INIT_DATA.currentStep <= 33) {
 		if ($('#init .sub-step .dot.passed').length === 0) {
@@ -197,15 +204,15 @@ $('.btn-next-step').click(function() {
 			break;
 		case 40:
 
-			$.post('<?php echo site_url('/meeting/init_project') ?>', {
+			$.post("<?php echo site_url('/meeting/init_project') ?>", {
 				data: JSON.stringify(INIT_DATA)
 			}).done(function(data) {
 				data = JSON.parse(data);
-				console.log(data);
+				// console.log(data);
 
 				$('.init').addClass('hide-summary');
-				$('#init .init-body .config .content-container .config-content').html(data.modal_content);
-				$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
+				$('.init .config .config-content').html(data.modal_content);
+				$('.init #previous-step, .init-footer.calendar button').removeAttr('disabled');
 			})
 
 			$('#init .init-body .calendar').fadeOut(400, function() {
@@ -224,7 +231,7 @@ $('.btn-underdog').click(function() {
 	
 	INIT_DATA.path = 'guest';
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
-	console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
+	//console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
 
 	// Remove all Owner meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
@@ -244,7 +251,7 @@ $('.btn-like-a-boss').click(function() {
 	
 	INIT_DATA.path = 'owner';
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
-	console.log('STEP:', INIT_DATA.currentStep)
+	//console.log('STEP:', INIT_DATA.currentStep)
 
 	// Remove all Guest meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
@@ -648,6 +655,10 @@ $(document).on('click', '.init .remove-team', function() {
 
 $(document).on('click', '.init .fc-event', function(e){
 	e.preventDefault();
+	if ($(this).hasClass('fc-other-month')) {
+		return false;
+	}
+
 	var event = INIT_DATA.events[$(this).data('index')];
 
 	if ( $('#init .step-30 .owner:visible').length ) {
@@ -674,7 +685,6 @@ $(document).on('click', '.init .fc-event', function(e){
 		
 
 		currentEvent = event;
-		console.log('event', event);
 		var date = event.start.format('ddd MMM D') == event.end.format('ddd MMM D') ?
 					event.start.format('ddd MMM D') :
 					event.start.format('ddd MMM D') + ' - ' + event.end.format('ddd MMM D');
@@ -711,7 +721,6 @@ $(document).on('click', '.init .fc-event', function(e){
 		}
 		
 		currentEvent = event;
-		console.log('event', event);
 
 		// Reset selected meeting & rates
 		INIT_DATA.meetings = {};
@@ -732,14 +741,20 @@ $(document).on('click', '.init .fc-event', function(e){
 });
 
 /*
-	Step 31: Update overview data onclick Event
+	Step 10: Update overview data on change calendar view
 */
 function updateOverview()
 {
 	var events = $('#calendar-init').fullCalendar('clientEvents');
+	var selectedDate = $('#calendar-init').fullCalendar('getDate');
+	var currentView = $('.init .fc-change-view.fc-state-active').data('work');
+	var startOfTime = selectedDate.clone().startOf(currentView);
+	var endOfTime = selectedDate.clone().endOf(currentView);
 	var savedEvents = [];
+	var eventIDs = [];
+	var MBEvents = [];
 
-	var oData = {
+	var overviewData = {
 		totalMeeting : 0,
 		totalTime : 0,
 		ownerMeeting : 0,
@@ -749,57 +764,80 @@ function updateOverview()
 		ownerMBMeeting : 0,
 		ownerMBTime : 0,
 		guestMBMeeting : 0,
-		guestMBTime : 0
+		guestMBTime : 0,
+		workX: $('.init .fc-change-view.fc-state-active').data('work-lang'),
+		selectedRange: startOfTime.format('ddd MMM D') + ' - ' + endOfTime.format('ddd MMM D'),
 	};
 
+
+	switch (currentView) {
+		case 'day':
+			workingTime = 8;
+			break;
+		case 'week':
+			workingTime = 40;
+			break;
+		case 'month':
+			workingTime = calcNumberOfWorkingDay(selectedDate);
+			break;
+	}
+
+	overviewData.Xhour = "<?php echo lang('db_x_hr') ?>".format(workingTime);
+
 	// Check event imported into MB
-	var eventIDs = [];
-	var MBEvents = [];
-	events.forEach((e) => {
-		if ( ! eventIDs[e.eventId]) {
-			eventIDs.push(e.eventId);
+	// Remove events which are not in current view
+	for (var i in events) {
+		if ( !( events[i].end.unix() >=  startOfTime.unix()
+				&& events[i].end.unix() <= endOfTime.unix() ) ) 
+		{
+			delete events[i];
+			continue;
 		}
-	});
+
+		if ( ! eventIDs[events[i].eventId]) {
+			eventIDs.push(events[i].eventId);
+		}
+	}
 
 	$.post("<?php echo site_url('dashboard/check_meeting_by_google_event_id') ?>", {eventIDs}, (data) => {
 		MBEvents = JSON.parse(data);
 		events.forEach(function(e, i) {
 			var increaseTime = e.allDay ? 24 * 60 : (e.end - e.start) / 1000 / 60;
-			oData.totalMeeting ++;
-			oData.totalTime += increaseTime;
+			overviewData.totalMeeting ++;
+			overviewData.totalTime += increaseTime;
 
 			if (e.isOwner === true) {
-				oData.ownerMeeting ++;
-				oData.ownerTime += increaseTime;
+				overviewData.ownerMeeting ++;
+				overviewData.ownerTime += increaseTime;
 
 				if (MBEvents[e.eventId]) {
-					oData.ownerMBMeeting ++;
-					oData.ownerMBTime += increaseTime;
+					overviewData.ownerMBMeeting ++;
+					overviewData.ownerMBTime += increaseTime;
 				}
 			} else {
-				oData.guestMeeting ++;
-				oData.guestTime += increaseTime;
+				overviewData.guestMeeting ++;
+				overviewData.guestTime += increaseTime;
 
 				if (MBEvents.indexOf(e.eventId) >= 0) {
-					oData.guestMBMeeting ++;
-					oData.guestMBTime += increaseTime;
+					overviewData.guestMBMeeting ++;
+					overviewData.guestMBTime += increaseTime;
 				}
 			}
 		});
 
-		oData.ownerNonMBMeeting = oData.ownerMeeting - oData.ownerMBMeeting;
-		oData.guestNonMBMeeting = oData.guestMeeting - oData.guestMBMeeting;
-		oData.ownerNonMBTime = oData.ownerTime - oData.ownerMBTime;
-		oData.guestNonMBTime = oData.guestTime - oData.guestMBTime;
-		oData.percentOfWorkingHour =  Math.ceil(oData.totalTime / 60 / 40 * 100);
+		overviewData.ownerNonMBMeeting = overviewData.ownerMeeting - overviewData.ownerMBMeeting;
+		overviewData.guestNonMBMeeting = overviewData.guestMeeting - overviewData.guestMBMeeting;
+		overviewData.ownerNonMBTime = overviewData.ownerTime - overviewData.ownerMBTime;
+		overviewData.guestNonMBTime = overviewData.guestTime - overviewData.guestMBTime;
+		overviewData.percentOfWorkingX =  Math.round(overviewData.totalTime / 60 / workingTime * 100);
 
-		for (var key in oData) {
+		for (var key in overviewData) {
 			// Convert Time to Hour
 			if (key.indexOf('Time') >= 0) {
-				$('#init .' + key).data('minute', oData[key]);
-				$('#init .' + key).text(Math.round(oData[key] * 10 / 60) / 10);
+				$('#init .' + key).data('minute', overviewData[key]);
+				$('#init .' + key).text(Math.round(overviewData[key] * 10 / 60) / 10);
 			} else {
-				$('#init .' + key).text(oData[key]);
+				$('#init .' + key).text(overviewData[key]);
 			}
 		}
 	});
@@ -830,6 +868,23 @@ function insertCurrentEvent()
 	})
 }
 
+function calcNumberOfWorkingDay(moment) 
+{
+	var cntDay = 0,
+		curDay = moment.clone().startOf('month'),
+		endOfMonth = moment.clone().endOf('month');
+	
+	do {
+		if (curDay.format('dddd') != 'Saturday' && curDay.format('dddd') != 'Sunday'){
+			cntDay++;
+		}
+
+		curDay.add(1, 'days');
+	} while (curDay.format('D') != endOfMonth.format('D'));
+
+	return cntDay * 8; // 8 hours per day
+}
+
 /*
 	sprintf() for JavaScript.
 	Grabs from https://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
@@ -858,7 +913,6 @@ $(document).on('click', '#init .init-body .init-project .action .delete-meeting'
 	var event_id = that.closest('tr').data('event-id');
 	delete INIT_DATA.meetings[event_id];
 
-	console.log(INIT_DATA);
 	that.closest('tr')
 		.find('td')
 		.wrapInner('<div style="display: block;" />')
@@ -874,7 +928,6 @@ $(document).on('change', '#init .init-body .init-project select', function() {
 	var project_id = that.val();
 	var event_id = that.closest('tr').data('event-id');
 	INIT_DATA.meetings[event_id].project_id = project_id;
-	console.log(INIT_DATA);
 });
 
 $(document).on("click", '#init-create-project-modal form button[type=submit]', function(e) {
@@ -915,7 +968,6 @@ $(document).on("click", '#init-create-project-modal form button[type=submit]', f
 						data: JSON.stringify(INIT_DATA)
 					}).done(function(refresh_data) {
 						refresh_data = JSON.parse(refresh_data);
-						console.log(refresh_data);
 
 						$('#init .init-body .config .content-container').html(refresh_data.modal_content);
 					});
@@ -973,19 +1025,16 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 
 	if (INIT_DATA.currentStep == 50 && INIT_DATA.path == 'owner') {
 		$('#init #attachment-form').html();
-		for (var event_id in INIT_DATA.meetings) {console.log('meeting');
-			for (var i = 0; i < INIT_DATA.meetings[event_id].agenda.length; i++) {console.log('agenda');
-				for (var j = 0; j < INIT_DATA.meetings[event_id].agenda[i].attachment.length; j++) {console.log('attachment');
-					console.log(INIT_DATA.meetings[event_id].agenda[i].attachment[j]);
-					//INIT_DATA.meetings[event_id].agenda[i].attachment[j].name = event_id + '_ag_' + i + '[' + j + ']';
+		for (var event_id in INIT_DATA.meetings) {
+			for (var i = 0; i < INIT_DATA.meetings[event_id].agenda.length; i++) {
+				for (var j = 0; j < INIT_DATA.meetings[event_id].agenda[i].attachment.length; j++) {
 					INIT_DATA.meetings[event_id].agenda[i].attachment[j].data('name', `agenda[${event_id}][${i}][${j}]`)
 					$('#init #attachment-form').append(INIT_DATA.meetings[event_id].agenda[i].attachment[j]);
 				}
 			}
 
-			for (var i = 0; i < INIT_DATA.meetings[event_id].homework.length; i++) {console.log('homework');
-				for (var j = 0; j < INIT_DATA.meetings[event_id].homework[i].attachment.length; j++) {console.log('attachment');
-					console.log(INIT_DATA.meetings[event_id].homework[i].attachment[j]);
+			for (var i = 0; i < INIT_DATA.meetings[event_id].homework.length; i++) {
+				for (var j = 0; j < INIT_DATA.meetings[event_id].homework[i].attachment.length; j++) {
 					INIT_DATA.meetings[event_id].homework[i].attachment[j].data('name', `homework[${event_id}][${i}][${j}]`)
 					$('#init #attachment-form').append(INIT_DATA.meetings[event_id].homework[i].attachment[j]);
 				}
@@ -1005,7 +1054,6 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		data: JSON.stringify(INIT_DATA)
 	}).done(function(data) {
 		data = JSON.parse(data);
-		console.log(data);
 
 		$('#init .init-body .config .content-container .config-content').html(data.modal_content);
 		$('#init .init-footer.calendar #previous-step, #init .init-footer.calendar button').removeAttr('disabled');
@@ -1017,7 +1065,7 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 			$.mbNotify('Import successfully', 'success');
 		}
 	}).fail(function() {
-		console.log('failed');
+		//console.log('failed');
 	});
 });
 
@@ -1027,7 +1075,7 @@ $(document).on('submit','#init #attachment-form', function(e) {
 
 	var fd = new FormData();
 	$('#init #attachment-form input[type="file"]').each(function() {
-		var this_input_file = $(this);console.log(this_input_file);
+		var this_input_file = $(this);
 		var file_data = this_input_file[0].files; // for multiple files
 		for(var i = 0; i < file_data.length; i++){
 			var name = this_input_file.attr('name');
@@ -1052,7 +1100,7 @@ $(document).on('submit','#init #attachment-form', function(e) {
 		processData: false,
 		type: 'POST',
 		success: function(data){
-			console.log(data);
+			//console.log(data);
 		}
 	});
 });

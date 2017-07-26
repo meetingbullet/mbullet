@@ -1,4 +1,8 @@
-		<header class="an-header wow fadeInDown" style="visibility: visible; animation-name: fadeInDown;">
+<?php
+$projects = $this->mb_project->get_project_list();
+?>
+		
+		<header class="an-header wow fadeInDown">
 			<div class="an-topbar-left-part">
 				<h3 class="an-logo-heading">
 					<a class="an-logo-link" href="<?php echo site_url(DEFAULT_LOGIN_LOCATION); ?>"><img src="<?php echo base_url('assets/images/logo-white.svg'); ?>" alt="<?php echo $this->settings_lib->item('site.title'); ?> " width="87" height="31"></a>
@@ -7,21 +11,17 @@
 				<div class="topbar-action">
 					<div class="btn-group">
 						<button type="button" class="an-btn an-btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<?php e($current_user->current_project_name) ?> <span class="caret"></span>
+							<?php e($projects['current_project_name']) ?> <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu">
-							<?php if ($current_user->projects && count($current_user->projects)): 
-									foreach ($current_user->projects AS $project):
-							?>
-							
-							<li<?php echo $project->project_id == $current_user->current_project_id ? ' class="active"' : '' ?>>
+							<?php foreach ($projects['projects'] AS $project): ?>
+							<li<?php echo $project->project_id == $projects['current_project_id'] ? ' class="active"' : '' ?>>
 								<a href="<?php echo site_url('project/' . $project->cost_code) ?>"><?php e($project->name)?></a>
 							</li>
 							<?php endforeach; ?>
-							<?php endif; ?>
 
 							<?php if (has_permission('Project.Create')) : ?>
-							<?php if ($current_user->projects && count($current_user->projects)): ?>
+							<?php if (count($projects['projects'])): ?>
 							<li role="separator" class="divider"></li>
 							<?php endif; ?>
 							<li>

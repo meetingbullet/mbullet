@@ -28,6 +28,7 @@ class Authenticated_Controller extends Base_Controller
 	{
 		$this->autoload['helpers'][]   = 'form';
 		$this->autoload['helpers'][]   = 'mb_general';
+		$this->autoload['libraries'][] = 'Mb_project';
 		$this->autoload['libraries'][] = 'Template';
 		$this->autoload['libraries'][] = 'Assets';
 		$this->autoload['libraries'][] = 'form_validation';
@@ -146,30 +147,6 @@ class Authenticated_Controller extends Base_Controller
 		}
 	}
 
-	private function get_navigation_project_list()
-	{
-		$this->current_user->projects = $this->db->select('projects.project_id, name, cost_code')
-													->join('project_members pm', 'pm.project_id = projects.project_id AND user_id = "'. $this->current_user->user_id .'"', 'LEFT')
-													->where("(owner_id = '{$this->current_user->user_id}' OR user_id = '{$this->current_user->user_id}')", null, false)
-													->where('organization_id', $this->current_user->current_organization_id)
-													->get('projects')
-													->result();
-
-		// Get current project name
-		$this->current_user->current_project_id = null;
-		$this->current_user->current_project_name = lang('projects');
-
-		if ($cost_code = explode('-', $this->uri->segment(2))) {
-			if (count($cost_code)) {
-				$cost_code = $cost_code[0];
-				$project = $this->db->select('project_id, name')->where('cost_code', $cost_code)->limit(1)->get('projects')->row();
-				if ($project) {
-					$this->current_user->current_project_id = $project->project_id;
-					$this->current_user->current_project_name = $project->name;
-				}
-			}
-		}
-	}
 
 	private function redirect_to_invitation()
 	{

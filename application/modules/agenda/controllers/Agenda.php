@@ -5,8 +5,6 @@ class Agenda extends Authenticated_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->library('mb_project');
-
 		$this->lang->load('agenda');
 
 		$this->load->helper('mb_form');

@@ -5,7 +5,7 @@ $project_label = [
 	'archive' => 'spam'
 ];
 ?>
-<div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
+<div class="an-body-topbar wow fadeIn">
 	<div class="an-page-title">
 		<h2><?php e($project_name)?></h2>
 	</div>

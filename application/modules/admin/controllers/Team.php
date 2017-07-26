@@ -71,7 +71,7 @@ class Team extends Authenticated_Controller
 		];
 
 		if ($this->input->get('type') == 'all' || empty($this->input->get('type'))) {
-			$pagination_config['total_rows'] = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'COUNT(*) as count')[0]->count;
+			$pagination_config['total_rows'] = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'COUNT(*) as count', false, [])[0]->count;
 		}
 
 		if ($this->input->get('type') == 'disabled') {
@@ -96,15 +96,15 @@ class Team extends Authenticated_Controller
 		$offset = ($current_page - 1) * $limit;
 
 		if ($this->input->get('type') == 'all' || empty($this->input->get('type'))) {
-			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, [], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, uto.cost_of_time, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, [], $limit, $offset);
 		}
 
 		if ($this->input->get('type') == 'disabled') {
-			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['enabled' => 0], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, uto.cost_of_time, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['enabled' => 0], $limit, $offset);
 		}
 
 		if ($this->input->get('type') == 'by_role') {
-			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['uto.role_id' => $role_id], $limit, $offset);
+			$users = $this->user_model->get_organization_users($this->current_user->current_organization_id, 'uto.user_id, uto.title, uto.cost_of_time, email, first_name, last_name, avatar, last_login, uto.enabled, r.name as role_name, r.role_id, r.is_public', true, ['uto.role_id' => $role_id], $limit, $offset);
 		}
 
 		$users_list['result'] = sprintf(lang('ad_tm_pager_result'), ($offset + 1), ($offset + count($users)), $pagination_config['total_rows']);
@@ -115,7 +115,7 @@ class Team extends Authenticated_Controller
 		$users_list['data'] = $users;
 
 		$organization = $this->organization_model->find($this->current_user->current_organization_id);
-
+		
 		Template::set('organization', $organization);
 		Template::set('roles', $roles);
 		Template::set('users_list', $users_list);
@@ -164,6 +164,7 @@ class Team extends Authenticated_Controller
 
 	public function edit_user($user_id)
 	{
+		
 		if (! $this->input->is_ajax_request()) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
@@ -180,28 +181,48 @@ class Team extends Authenticated_Controller
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_role_not_found'));
 		}
+		$permissions = $this->user_model->select('pm.manage_role_id, r.name')
+											->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
+											->join('permission_manage pm', 'pm.role_id = uto.role_id')
+											->join('roles r', 'r.role_id = pm.manage_role_id')
+											->where('users.user_id='.$this->current_user->user_id)
+											->find_all();
 
 		$temp = [];
 		foreach ($roles as $role) {
 			$temp[$role->role_id] = $role->name;
 		}
 		$roles = $temp;
-		$user = $this->user_model->select('users.*, uto.organization_id, uto.role_id, uto.title, uto.cost_of_time, uto.enabled, CONCAT(first_name, " ", last_name) as full_name')
+		$user = $this->user_model->select('users.*, uto.organization_id,  r.is_public, r.name, uto.role_id, uto.title, uto.cost_of_time, uto.enabled, CONCAT(first_name, " ", last_name) as full_name')
 								->join('user_to_organizations uto', 'uto.user_id = users.user_id', 'left')
+								->join('roles r', 'r.role_id = uto.role_id')
 								->find($user_id);
 		if (empty($user)) {
 			Template::set('close_modal', 1);
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_user_not_found'));
 		}
+		$disable = true;
+		foreach($permissions as $permission) {
+			if ($permission->manage_role_id == $user->role_id) {
+				$disable = false;
+				break;
+			}
+		}
 
 		if ($this->input->post()) {
+			$disable_rule = [
+				'field' => 'role_id',
+				'label' => 'lang:ad_tm_role',
+				'rules' => '',
+			];
+			$normal_rule = [
+				'field' => 'role_id',
+				'label' => 'lang:ad_tm_role',
+				'rules' => 'trim|required|numeric',
+			];
 			$this->form_validation->set_rules([
-				[
-					'field' => 'role_id',
-					'label' => 'lang:ad_tm_role',
-					'rules' => 'trim|required|numeric',
-				],
+				($disable) ? $disable_rule : $normal_rule,
 				[
 					'field' => 'cost_of_time',
 					'label' => 'lang:ad_tm_cost_of_time',
@@ -226,9 +247,10 @@ class Team extends Authenticated_Controller
 				if (empty($this->input->post('enabled'))) {
 					$data['enabled'] = 0;
 				}
-
+				if ($disable) {
+					$data['role_id'] = $user->role_id;
+				}
 				$updated = $this->user_to_organizations_model->where('organization_id', $this->current_user->current_organization_id)->skip_validation(true)->update($user_id, $data);
-
 				if ($updated) {
 					if ($data['enabled'] != $user->enabled) {
 						$this->notify_user_status($user->email, $user->full_name, $data['enabled']);
@@ -247,7 +269,8 @@ class Team extends Authenticated_Controller
 				Template::set('message', validation_errors());
 			}
 		}
-
+		Template::set('disable', $disable);
+		Template::set('permissions', $permissions);
 		Template::set('roles', $roles);
 		Template::set('user', $user);
 		if ($this->input->is_ajax_request()) {
@@ -293,11 +316,10 @@ class Team extends Authenticated_Controller
 			'to' => $email,
 			'subject' => $email_template->email_title,
 			'message' => $this->parser->parse_string(html_entity_decode($email_template->email_template_content), [
-							'OWNER_NAME' => $owner->full_name,
+							'OWNER_NAME' => $this->current_user->first_name . ' ' . $this->current_user->last_name,
 							'USER_NAME' => $fullname
 						], true)
 		];
-
 		return $this->emailer->send($email_data, true);
 	}
 }

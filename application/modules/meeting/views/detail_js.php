@@ -71,10 +71,16 @@ $(document).on("submit", '.form-ajax', (e) => {
 	// Clear script in an opened modal for Javascript run after modal is updated
 	$('.modal.in .modal-content script').text('');
 
+	// Temporary disable form's buttons to prevent duplicate requests
+	$(this).find('button').prop('disabled', true);
+
 	$.ajax({
 		type: "POST",
 		url: $(e.target).attr('action'),
 		data: data,
+		complete: function() {
+			$(this).find('button').prop('disabled', false);
+		},
 		success: (data) => {
 			data = JSON.parse(data);
 
