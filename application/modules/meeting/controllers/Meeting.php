@@ -212,6 +212,12 @@ class Meeting extends Authenticated_Controller
 		// 	redirect(DEFAULT_LOGIN_LOCATION);
 		// }
 
+		$project_id = $this->mb_project->get_object_id('project', $project_key);
+		$project = $this->project_model->select('cost_of_time_1, value_of_time_1')->as_array()->find($project_id);
+
+		Template::set('default_cost_of_time', $project['value_of_time_1']);
+		Template::set('default_cost_of_time_name', $project['cost_of_time_1']);
+
 		$meeting = $this->meeting_model->select('meetings.*, p.project_id')
 								->join('actions a', 'a.action_id = meetings.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
@@ -223,15 +229,15 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$meeting_members = $this->meeting_member_model->where('meeting_id', $meeting->meeting_id)->as_array()->find_all();
-		$meeting_members = $meeting_members && count($meeting_members) > 0 ? array_column($meeting_members, 'user_id') : [];
-		Template::set('meeting_members', $meeting_members);
+		// $meeting_members = $this->meeting_member_model->where('meeting_id', $meeting->meeting_id)->as_array()->find_all();
+		// $meeting_members = $meeting_members && count($meeting_members) > 0 ? array_column($meeting_members, 'user_id') : [];
+		$meeting_invitees = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
+		$meeting_invitee_emails = empty($meeting_invitees) ? [] : array_column($meeting_invitees, 'invite_email');
+		Template::set('meeting_members', $meeting_invitee_emails);
 		Template::set('meeting', $meeting);
 
-		$project_key = explode('-', $meeting_key);
-		$project_key = $project_key[0];
-
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $meeting->project_id);
+		//$project_members = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
 
 		Template::set('project_members', $project_members);
 		Assets::add_js($this->load->view('create_js', [
@@ -257,30 +263,65 @@ class Meeting extends Authenticated_Controller
 			$this->db->query($query);
 
 			if ($this->meeting_model->update($meeting->meeting_id, $data)) {
-				$this->meeting_member_model->delete_where(['meeting_id' => $meeting->meeting_id]);
+				// $this->meeting_member_model->delete_where(['meeting_id' => $meeting->meeting_id]);
 				$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
+				$meeting_members = $this->meeting_member_model->join('users', 'users.user_id = meeting_members.user_id')->where('meeting_id', $meeting->meeting_id)->as_array()->find_all();
+				$member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'emails');
+				$member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
+				$invitee_emails = $meeting_invitee_emails;
 
 				if ($team = $this->input->post('team')) {
 					if ($team = explode(',', $team)) {
 						$member_data = [];
-						foreach ($team as $member) {
-							$member_data[] = [
-								'meeting_id' => $meeting->meeting_id,
-								'user_id' => $member
-							];
+						// foreach ($team as $member) {
+						// 	$member_data[] = [
+						// 		'meeting_id' => $meeting->meeting_id,
+						// 		'user_id' => $member
+						// 	];
 
-							// Add to project members if not in
-							// Prevent duplicate row by MySQL Insert Ignore
-							$query = $this->db->insert_string('project_members', [
-								'project_id' => $meeting->project_id,
-								'user_id' => $member
-							]);
+						// 	// Add to project members if not in
+						// 	// Prevent duplicate row by MySQL Insert Ignore
+						// 	$query = $this->db->insert_string('project_members', [
+						// 		'project_id' => $meeting->project_id,
+						// 		'user_id' => $member
+						// 	]);
 
-							$query = str_replace('INSERT', 'INSERT IGNORE', $query);
-							$this->db->query($query);
+						// 	$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+						// 	$this->db->query($query);
+						// }
+
+						// $this->meeting_member_model->insert_batch($member_data);
+						if (! empty($team)) {
+							$invite_data = [];
+							$this->load->library('invite/invitation');
+							foreach ($team as $email) {
+								if (array_search($email, $invitee_emails) === false) {
+									$invite_data[] = [
+										'invite_email' => $email,
+										'meeting_id' => $meeting->meeting_id,
+										'invite_code' => $this->invitation->generateRandomString(64),
+									];
+								}
+							}
+
+							$removed_members = $this->meeting_member_model->select('users.user_id')
+																			->join('users', 'users.user_id = meeting_members.user_id')
+																			->where_not_in('email', $team)
+																			->where('meeting_id', $meeting->meeting_id)
+																			->as_array()
+																			->find_all();
+							$removed_member_ids = empty($removed_members) ? [] : array_column($removed_members, 'user_id');
+							if (! empty($removed_member_ids)) {
+								$this->meeting_member_model->where_in('user_id', $removed_member_ids)->delete_where(['meeting_id' => $meeting->meeting_id]);
+							}
+		
+							$this->meeting_member_invite_model->where_not_in('invite_email', $team)->delete_where(['meeting_id' => $meeting->meeting_id]);
+
+							if (! empty($invite_data)) {
+								$this->meeting_member_invite_model->insert_batch($invite_data);
+							}
 						}
 
-						$this->meeting_member_model->insert_batch($member_data);
 						if ((! empty($data['status'])) && $data['status'] != $meeting->status) {
 							$this->mb_project->notify_members($meeting->meeting_id, 'meeting', $this->current_user, 'update_status');
 						}

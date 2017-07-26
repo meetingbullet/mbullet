@@ -118,19 +118,24 @@ $(document).on("submit", '.form-ajax', (e) => {
 						var team = $('#form-update-meeting input[name="team"]').val().split(',');
 						var owner_html = $('.meeting-detail .owner').html();
 						var resource_html = '';
-
-						project_members.forEach((item) => {
-							if (item.id == owner_id) {
-								owner_html = '<img class="user-avatar" title="'+ item.name +'" src="'+ item.avatar +'" style="width: 24px; height: 24px"> <span class="user-name">'+ item.name +'</span>';
-							}
-
-							if (team.indexOf(item.id) >= 0) {
+						project_members.concat(anonymous_members).forEach((item) => {
+							var i = team.indexOf(item.email);
+							if (i >= 0) {
 								resource_html += '<li>\
 													<img class="user-avatar" title="'+ item.name + '" src="'+ item.avatar + '" style="width: 24px; height: 24px">\
-													<span class="user-name">'+ item.name + '</span>\
+													<span class="user-name">'+ (typeof(item.name) != 'undefined' ? item.name : item.email) + '</span>\
 													<span class="badge badge-'+ item.cost_of_time + ' badge-bordered pull-right">'+ item.cost_of_time_name +'</span>\
 												</li>';
+								team.splice(i, 1);
 							}
+						});
+
+						team.forEach((email) => {
+							resource_html += '<li>\
+												<img class="user-avatar" title="'+ email + '" src="//www.gravatar.com/avatar/?d=identicon" style="width: 24px; height: 24px">\
+												<span class="user-name">'+ email + '</span>\
+												<span class="badge badge-'+ default_cost_of_time + ' badge-bordered pull-right">'+ default_cost_of_time_name +'</span>\
+											</li>';
 						});
 
 						// Update view
