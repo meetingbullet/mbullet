@@ -29,6 +29,7 @@ $lang['db_total_xp'] = 'XP: %s';
 $lang['db_rate'] = 'Rate';
 $lang['db_owned_by_x'] = 'Owned by %s';
 $lang['db_next_meeting'] = 'Next Meeting';
+$lang['db_unscheduled_meeting'] = 'Unscheduled Meeting';
 $lang['db_scheduled_meeting'] = 'Scheduled Meeting';
 $lang['db_completed_meeting'] = 'Completed Meeting';
 $lang['db_overview'] = 'Overview';
