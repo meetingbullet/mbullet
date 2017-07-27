@@ -584,6 +584,53 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					</div>
 				</div> <!-- Next Meeting -->
 
+				<div class="panel panel-default panel-unscheduled-meeting">
+					<div class="panel-heading" role="tab">
+						<h4 class="panel-title">
+							<a href="#unscheduled-meeting-body" role="button" data-toggle="collapse">
+								<?php echo lang('db_unscheduled_meeting') ?>
+							</a>
+						</h4>
+					</div>
+					<div id="unscheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+						<div class="an-user-lists">
+							<div class="list-title">
+								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+							</div>
+
+							<div class="an-lists-body">
+							<?php if ($project->unscheduled_meetings && count($project->unscheduled_meetings)) : 
+									foreach ($project->unscheduled_meetings as $item) : ?>
+									<div class="list-user-single">
+										<div class="list-date number basis-30">
+											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
+										</div>
+										<div class="list-name basis-50">
+											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
+										</div>
+										<div class="list-action basis-50">
+											<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
+										</div>
+									</div> <!-- end .USER-LIST-SINGLE -->
+								<?php endforeach; 
+							else : ?>
+								<div id="no-meeting" class="list-user-single">
+									<div class="list-text basis-30">
+									</div>
+									<div class="list-date email approve basis-40">
+										<?php e(lang('pj_no_meeting')) ?>
+									</div>
+									<div class="list-text basis-30">
+									</div>
+								</div>
+							<?php endif ?>
+							</div>
+						</div>
+					</div>
+				</div> <!-- Unscheduled Meeting -->
+
 				<div class="panel panel-default panel-scheduled-meeting">
 					<div class="panel-heading" role="tab">
 						<h4 class="panel-title">
@@ -825,6 +872,53 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						</div>
 					</div>
 				</div> <!-- Next Meeting -->
+
+				<div class="panel panel-default panel-unscheduled-meeting">
+					<div class="panel-heading" role="tab">
+						<h4 class="panel-title">
+							<a href="#unscheduled-meeting-body" role="button" data-toggle="collapse">
+								<?php echo lang('db_unscheduled_meeting') ?>
+							</a>
+						</h4>
+					</div>
+					<div id="unscheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+						<div class="an-user-lists">
+							<div class="list-title">
+								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+							</div>
+
+							<div class="an-lists-body">
+							<?php if ($project->unscheduled_meetings && count($project->unscheduled_meetings)) : 
+									foreach ($project->unscheduled_meetings as $item) : ?>
+									<div class="list-user-single">
+										<div class="list-date number basis-30">
+											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
+										</div>
+										<div class="list-name basis-50">
+											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
+										</div>
+										<div class="list-action basis-50">
+											<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
+										</div>
+									</div> <!-- end .USER-LIST-SINGLE -->
+								<?php endforeach; 
+							else : ?>
+								<div id="no-meeting" class="list-user-single">
+									<div class="list-text basis-30">
+									</div>
+									<div class="list-date email approve basis-40">
+										<?php e(lang('pj_no_meeting')) ?>
+									</div>
+									<div class="list-text basis-30">
+									</div>
+								</div>
+							<?php endif ?>
+							</div>
+						</div>
+					</div>
+				</div> <!-- Unscheduled Meeting -->
 
 				<div class="panel panel-default panel-scheduled-meeting">
 					<div class="panel-heading" role="tab">

@@ -48,27 +48,6 @@ class Dashboard extends Authenticated_Controller
 		unset($my_todo['meetings']);
 		$my_todo['evaluates'] = $evaluates;
 
-		$my_meetings = $this->meeting_model->select('meetings.*, u.first_name, u.last_name, u.email, u.avatar')
-									->join('users u', 'u.user_id = meetings.owner_id')
-									->join('actions a', 'a.action_id = meetings.action_id')
-									->join('projects p', 'p.project_id = a.project_id')
-									->where('(meetings.status = "ready" OR meetings.status = "inprogress")', null, false)
-									->where('meetings.owner_id', $this->current_user->user_id)
-									->where('organization_id', $this->current_user->current_organization_id)
-									->find_all();
-		$my_meetings = $my_meetings && count($my_meetings) > 0 ? $my_meetings : [];
-
-		$member_meetings = $this->meeting_member_model->select('s.*, u.first_name, u.last_name, u.email, u.avatar')
-									->join('meetings s', 's.meeting_id = meeting_members.meeting_id AND s.owner_id != ' . $this->current_user->user_id)
-									->join('users u', 'u.user_id = s.owner_id')
-									->join('actions a', 'a.action_id = s.action_id')
-									->join('projects p', 'p.project_id = a.project_id')
-									->where('(s.status = "ready" OR s.status = "inprogress")', null, false)
-									->where('meeting_members.user_id', $this->current_user->user_id)
-									->find_all();
-
-		$member_meetings = $member_meetings && count($member_meetings) > 0 ? $member_meetings : [];
-
 		$user = $this->user_model->select('users.user_id, avatar, email, first_name, CONCAT(first_name, " ", last_name) AS full_name, ROUND(SUM(mmr.rate) / COUNT(mmr.rate)) AS avarage_rate, uto.experience_point as total_xp')
 									->join('meeting_member_rates mmr', 'mmr.attendee_id = users.user_id')
 									->join('user_to_organizations uto', 'users.user_id = uto.user_id AND uto.organization_id = "' . $this->current_user->current_organization_id . '"')
@@ -163,7 +142,6 @@ class Dashboard extends Authenticated_Controller
 		Template::set('my_projects', $my_projects);
 		Template::set('other_projects', $other_projects);
 		Template::set('my_todo', $my_todo && count($my_todo) > 0 ? $my_todo : []);
-		Template::set('my_meetings', array_merge($my_meetings, $member_meetings));
 		Template::set('current_user', $this->current_user);
 		Template::set('user', $user);
 		Template::set('page_title', lang('db_dashboard'));
@@ -289,6 +267,18 @@ class Dashboard extends Authenticated_Controller
 			->where('organization_id', $this->current_user->current_organization_id)
 			->where('p.project_id', $project->project_id)->count_all();
 
+			$project->unscheduled_meetings = $this->meeting_model->
+			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+			->join('actions a', 'a.action_id = meetings.action_id')
+			->join('projects p', 'p.project_id = a.project_id')
+			->join('users u', 'u.user_id = meetings.owner_id')
+			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+			->where('scheduled_start_time IS NULL', null, false)
+			->where('p.project_id', $project->project_id)
+			->find_all();
+
 			$project->next_meeting = $this->meeting_model->
 			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
 			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
@@ -376,6 +366,17 @@ class Dashboard extends Authenticated_Controller
 			->where('meetings.status', 'ready')
 			->where('scheduled_start_time > CURRENT_TIMESTAMP()', null, false)
 			->find_by('p.project_id', $project->project_id);
+
+			$project->unscheduled_meetings = $this->meeting_model->
+			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+			->join('actions a', 'a.action_id = meetings.action_id')
+			->join('projects p', 'p.project_id = a.project_id')
+			->join('users u', 'u.user_id = meetings.owner_id')
+			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+			->where('p.project_id', $project->project_id)
+			->find_all();
 
 			$this->meeting_model->
 			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
