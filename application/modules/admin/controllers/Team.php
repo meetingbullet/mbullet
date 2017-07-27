@@ -119,6 +119,7 @@ class Team extends Authenticated_Controller
 		Template::set('organization', $organization);
 		Template::set('roles', $roles);
 		Template::set('users_list', $users_list);
+		Template::set('page_title', lang('ad_tm_team'));
 		Template::render();
 	}
 

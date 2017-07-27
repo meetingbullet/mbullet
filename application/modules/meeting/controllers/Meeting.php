@@ -455,6 +455,7 @@ class Meeting extends Authenticated_Controller
 		Template::set('action_key', $action_key);
 		Template::set('meeting_key', $meeting_key);
 		Template::set('current_user', $this->current_user);
+		Template::set('page_title', $meeting->name);
 		Template::set_view('detail');
 		Template::render();
 	}

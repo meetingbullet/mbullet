@@ -494,7 +494,7 @@ class Project extends Authenticated_Controller
 		}
 		// get meetings list
 		$meetings = $this->project_model->get_meetings($project_id, $pagination_config['per_page'], ($meetings_current_page - 1) * $pagination_config['per_page']);
-
+		
 		// @TODO need to optimize query
 		if ($meetings) {
 			foreach ($meetings as &$meeting) {
@@ -537,6 +537,7 @@ class Project extends Authenticated_Controller
 		Assets::add_module_js('project', 'action_board.js');
 		Template::set('project_name', $project->name);
 		Template::set('project_key', $project_key);
+		Template::set('page_title', $project->name);
 		Template::set_view('detail');
 		Template::render();
 	}

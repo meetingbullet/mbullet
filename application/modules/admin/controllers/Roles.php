@@ -23,6 +23,7 @@ class Roles extends Authenticated_Controller
 			[ 'name' => lang('rl_roles') ] ,
 		]);
 		Template::set('roles', $roles);
+		Template::set('page_title', lang('rl_roles'));
 		Template::render();
 	}
 

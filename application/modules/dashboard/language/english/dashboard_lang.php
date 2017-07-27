@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
+$lang['db_dashboard'] = 'Dashboard';
 $lang['db_welcome_x'] = 'Welcome <span class="name">%s</span>';
 $lang['db_x_meeting'] = '%d meeting';
 $lang['db_x_meetings'] = '%d meetings';
