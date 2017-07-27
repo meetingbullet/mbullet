@@ -126,7 +126,8 @@ $(document).ready(function() {
 	$(document).on('click', '#event-import-modal .dismiss-user', function() {
 		var that = $(this);
 
-		if ($('#event-import-modal .email').length > 2 && ((that.parent().find('.owner').length && $('.in-system').length > 1) || (! that.parent().find('.owner').length && $('.in-system .owner').length > 0))) {
+		// if ($('#event-import-modal .email').length > 2 && ((that.parent().find('.owner').length && $('.in-system').length > 1) || (! that.parent().find('.owner').length && $('.in-system .owner').length > 0))) {
+		if ($('#event-import-modal .email').length > 1 && ((that.parent().find('.owner').length && $('.in-system').length > 1) || (! that.parent().find('.owner').length && $('.in-system .owner').length > 0))) {
 			var user_emails = $('input[name=user_emails]').val();
 			var owner_email = $('input[name=owner_email]').val();
 
@@ -155,7 +156,8 @@ $(document).ready(function() {
 				console.log(user_emails, owner_email);
 			}
 		} else {
-			swal("Warning", "A meeting needs at least 1 owner and 1 member", "warning");
+			// swal("Warning", "A meeting needs at least 1 owner and 1 member", "warning");
+			swal("Warning", "A meeting needs at least 1 owner", "warning");
 		}
 	});
 
@@ -194,10 +196,12 @@ $(document).ready(function() {
 
 	$(document).on('click', '#event-import-modal #save_step_2', function(e) {
 		e.preventDefault();
-		if ($('.email').length > 2 && $('input[name=owner_email]').val() != '' && $('input[name=user_emails]').val() != '') {
+		// if ($('.email').length > 2 && $('input[name=owner_email]').val() != '' && $('input[name=user_emails]').val() != '') {
+		if ($('.email').length > 1 && $('input[name=owner_email]').val() != '') {
 			ajax_submit(true);
 		} else {
-			swal("Warning", "A meeting needs at least 1 owner and 1 member", "warning");
+			// swal("Warning", "A meeting needs at least 1 owner and 1 member", "warning");
+			swal("Warning", "A meeting needs at least 1 owner", "warning");
 		}
 	});
 
