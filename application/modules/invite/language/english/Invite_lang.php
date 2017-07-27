@@ -1,5 +1,7 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
+$lang['iv_invitation'] = 'Invitation';
+
 // Action
 $lang['iv_accept']			= 'Accept';
 $lang['iv_decline']			= 'Decline';

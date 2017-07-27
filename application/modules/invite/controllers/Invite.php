@@ -71,6 +71,7 @@ class Invite extends Authenticated_Controller
 
 		$this->session->set_userdata('invite_code', NULL);
 		Template::set('invitation', $invitation);
+		Template::set('page_title', lang('iv_invitation'));
 		Template::render();
 	}
 

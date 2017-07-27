@@ -166,6 +166,7 @@ class Dashboard extends Authenticated_Controller
 		Template::set('my_meetings', array_merge($my_meetings, $member_meetings));
 		Template::set('current_user', $this->current_user);
 		Template::set('user', $user);
+		Template::set('page_title', lang('db_dashboard'));
 		Template::render('dashboard');
 	}
 
