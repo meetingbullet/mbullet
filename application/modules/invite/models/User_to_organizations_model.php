@@ -52,4 +52,12 @@ class User_to_organizations_model extends BF_Model
 	{
 		parent::__construct();
 	}
+
+	public function update_to_default_role($role_id, $organization_id, $default_role_id){
+			return $this->update(['organization_id' => $organization_id, 'role_id' => $role_id],  ['role_id' => $default_role_id]);
+	}
+
+	public function role_contain_user($role_id) {
+		return $this->select('count(*) as c')->where('user_id is not null')->where('role_id', $role_id)->find_all();
+	}
 }

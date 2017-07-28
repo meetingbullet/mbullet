@@ -8,6 +8,8 @@ class Roles extends Authenticated_Controller
 		$this->lang->load('roles');
 		$this->load->helper('mb_form_helper');
 		$this->load->model('roles/role_model');
+		$this->load->model('invite/User_to_organizations_model');
+		Assets::add_module_js('admin', 'invite.js');
 	}
 
 	public function index()
@@ -50,19 +52,37 @@ class Roles extends Authenticated_Controller
 		}
 
 		if (isset($_POST['save'])) {
-			if ( ! $data = $this->save_role($role_id) ) {
-				Template::set('message', lang('rl_unable_to_create_role') );
-				Template::set('message_type', 'danger');
-			} else {
-				if ($role_id) {
-					Template::set('message', sprintf(lang('rl_role_updated'), $data->name) );
+			$this->form_validation->set_rules([
+				[
+					'field' => 'name',
+					'label' => 'lang:rl_name',
+					'rules' => 'trim|required|max_length[255]',
+				],
+				[
+					'field' => 'description',
+					'label' => 'lang:rl_description',
+					'rules' => 'trim|required|max_length[255]',
+				],
+			]);
+			if ($this->form_validation->run()) {
+				if ( ! $data = $this->save_role($role_id) ) {
+					Template::set('message', lang('rl_unable_to_create_role') );
+					Template::set('message_type', 'danger');
 				} else {
-					Template::set('message', lang('rl_role_created') );
-				}
+					if ($role_id) {
+						Template::set('message', sprintf(lang('rl_role_updated'), $data->name) );
+					} else {
+						Template::set('message', lang('rl_role_created') );
+					}
 
-				Template::set('data', $data);
-				Template::set('close_modal', 1);
-				Template::set('message_type', 'success');
+					Template::set('data', $data);
+					Template::set('close_modal', 1);
+					Template::set('message_type', 'success');
+				}
+			} else {
+				Template::set('close_modal', 0);
+				Template::set('message_type', 'danger');
+				Template::set('message', validation_errors());
 			}
 		}
 
@@ -133,6 +153,7 @@ class Roles extends Authenticated_Controller
 								->where('organization_id', $this->current_user->current_organization_id)
 								->limit(1)
 								->find($role_id);
+		$default_role_id = $this->role_model->get_organization_default_role($this->current_user->current_organization_id);
 
 		if (! $role) {
 			echo json_encode([
@@ -141,13 +162,22 @@ class Roles extends Authenticated_Controller
 			]);
 			return;
 		}
-
-		if ($this->role_model->delete($role_id)) {
+		if (! $default_role_id) {
 			echo json_encode([
-				'message_type' => 'success',
-				'message' => sprintf(lang('rl_role_x_has_been_deleted'), $role->name)
+				'message_type' => 'danger',
+				'message' => lang('rl_dont_have_default_role')
 			]);
 			return;
+		}
+
+		if ($this->User_to_organizations_model->update_to_default_role($role_id, $this->current_user->current_organization_id,$default_role_id['0']->role_id)) {
+			if ($this->role_model->delete($role_id)) {
+				echo json_encode([
+					'message_type' => 'success',
+					'message' => sprintf(lang('rl_role_x_has_been_deleted'), $role->name)
+				]);
+				return;
+			}
 		}
 
 		echo json_encode([
@@ -196,7 +226,7 @@ class Roles extends Authenticated_Controller
 			} 
 		}
 
-		return $this->role_model->select('role_id, name, description, join_default')->limit(1)->find($role_id);
+		return $this->role_model->select('role_id, name, description, join_default, is_public')->limit(1)->find($role_id);
 	}
 
 	private function notify_user_status($email, $fullname, $status)
@@ -241,5 +271,19 @@ class Roles extends Authenticated_Controller
 		];
 
 		return $this->emailer->send($email_data, true);
+	}
+
+	public function check($role_id = null) {
+		if ( $this->User_to_organizations_model->role_contain_user($role_id)['0']->c != 0) {
+			echo json_encode([
+			'm' => 'true',
+			]);
+
+		} else {
+			echo json_encode([
+			'm' => 'false',
+			]);
+
+		}
 	}
 }

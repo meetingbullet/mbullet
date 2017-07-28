@@ -48,16 +48,16 @@
 	<?php else: ?>
 		<p class="an-small-doc-block">
 			<?php echo lang('rl_invited_user_will_be_automatically_joint_to_this_role') ?>
+			<input name="join_default" value="on" type="hidden">
 		</p>
 	<?php endif; ?>
 </div>
 
 <div class="<?php echo IS_AJAX ? 'modal-footer' : 'container-fluid pull-right' ?>">
 	<button type="submit" name="save" class="an-btn an-btn-primary"><?php e(isset($role) ? lang('rl_update') : lang('rl_create'))?></button>
-	<?php if (isset($role)): ?>
+	<?php if (isset($role) && $role->join_default == 0): ?>
 	<button class="an-btn an-btn-danger mb-btn-delete-role" data-role-id="<?php e($role->role_id)?>"><?php e(lang('rl_delete'))?></button>
 	<?php endif; ?>
 	<a href="#" class="an-btn an-btn-danger-transparent" <?php echo IS_AJAX ? 'data-dismiss="modal"' : '' ?>><?php e(lang('rl_cancel'))?></a>
 </div>
-
 <?php echo form_close(); ?>
