@@ -17,7 +17,9 @@ class Roles extends Authenticated_Controller
 		$roles = $this->role_model->where('organization_id', $this->current_user->current_organization_id)
 									->or_where('is_public', 1)
 									->find_all();
-
+		foreach($roles as &$role) {
+			$role->number_users =  $this->User_to_organizations_model->role_contain_user($role->role_id,$this->current_user->current_organization_id)['0']->count;
+		}
 		Assets::add_js($this->load->view('roles/index_js', null, true), 'inline');
 		Template::set('current_role_id', $this->current_user->role_ids[$this->current_user->current_organization_id]);
 		Template::set('breadcrumb', [
@@ -75,6 +77,7 @@ class Roles extends Authenticated_Controller
 						Template::set('message', lang('rl_role_created') );
 					}
 
+					$data->number_users = $this->User_to_organizations_model->role_contain_user($role_id,$this->current_user->current_organization_id)['0']->count;
 					Template::set('data', $data);
 					Template::set('close_modal', 1);
 					Template::set('message_type', 'success');
@@ -88,7 +91,6 @@ class Roles extends Authenticated_Controller
 
 		if (is_numeric($role_id) ) {
 			$role = $this->role_model->select('role_id, name, description, join_default, is_public')->find($role_id);
-
 			if ( ! $role) {
 				Template::set('message', lang('rl_cannot_find_the_role') );
 				Template::set('message_type', 'danger');
@@ -274,7 +276,7 @@ class Roles extends Authenticated_Controller
 	}
 
 	public function check($role_id = null) {
-		if ( $this->User_to_organizations_model->role_contain_user($role_id)['0']->c != 0) {
+		if ( $this->User_to_organizations_model->role_contain_user($role_id, $this->current_user->current_organization_id)['0']->count != 0) {
 			echo json_encode([
 			'm' => 'true',
 			]);

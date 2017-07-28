@@ -27,6 +27,7 @@ $(document).ready(function() {
             url: $(e.target).attr('action'),
             data: data,
             success: (data) => {
+                console.log(data);
                 data = JSON.parse(data);
 
                 if (data.close_modal === 0) {
@@ -66,6 +67,7 @@ $(document).ready(function() {
 
                         $('#role-' + data.data.role_id + ' .list-name a').text(data.data.name);
                         $('#role-' + data.data.role_id + ' .list-description').text(data.data.description);
+                        $('#role-' + data.data.role_id + ' .list-number-users').text(data.data.number_users);
                         $('#role-' + data.data.role_id).effect("highlight", {}, 3000);
                     }
                 }

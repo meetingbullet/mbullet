@@ -48,14 +48,15 @@ $can_delete = has_permission('Role.Team.Delete');
 							<div class="an-user-lists tables messages">
 								<div class="list-title">
 									<h6 class="basis-20"><?php e(lang('rl_name'))?></h6>
-									<h6 class="basis-50"><?php echo lang('rl_description') ?></h6>
+									<h6 class="basis-40"><?php echo lang('rl_description') ?></h6>
+									<h6 class="basis-10"><?php echo lang('rl_number_users') ?></h6>
 									<h6 class="basis-10 text-center"><?php e(lang('rl_join_default'))?></h6>
 									<h6 class="basis-20"><?php echo lang('rl_action') ?></h6>
 								</div>
 
 								<div class="an-lists-body an-customScrollbar ps-container ps-theme-default" style="max-height:none">
 									<?php foreach ($roles as $role) :?>
-									<div id="role-<?php e($role->role_id) ?>" class="list-user-single">
+									<div id="role-<?php e($role->role_id) ?>" class="list-user-single <?php echo $role->join_default == 1 ? 'div-join-default' : '' ?>">
 										<div class="list-name basis-20">
 											<?php if ($can_edit && $role->role_id != $current_role_id && $role->is_public == 0): ?>
 											<a href="<?php echo site_url('admin/roles/create/' . $role->role_id) ?>" class='mb-open-modal' data-modal-id="update-role-modal"><?php e($role->name)?></a>
@@ -63,8 +64,11 @@ $can_delete = has_permission('Role.Team.Delete');
 											<strong><?php e($role->name)?></strong>
 											<?php endif; ?>
 										</div>
-										<div class="list-description basis-50">
+										<div class="list-description basis-40">
 											<?php e($role->description)?>
+										</div>
+										<div class="list-number-users basis-10">
+											<?php e($role->number_users)?>
 										</div>
 										<div class="list-join-default basis-10 text-center">
 											<?php if ($role->join_default == 1): ?>
@@ -105,8 +109,11 @@ $can_delete = has_permission('Role.Team.Delete');
 				<strong>{{:name}}</strong>
 				<?php endif; ?>
 			</div>
-			<div class="list-name basis-50">
+			<div class="list-name basis-40">
 				{{:description}}
+			</div>
+			<div class="list-name basis-10">
+				{{:number_users}}
 			</div>
 			<div class="list-join-default basis-10 text-center">
 			</div>

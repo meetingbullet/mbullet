@@ -18,8 +18,9 @@ $lang['rl_ok'] = 'OK';
 $lang['rl_name'] = 'Name';
 $lang['rl_description'] = 'Description';
 $lang['rl_action'] = 'Action';
+$lang['rl_number_users'] = 'Users';
 $lang['rl_join_default'] = 'Join default';
-$lang['rl_an_user_will_be_joint_to_this_role_after_accepting_an_invitation'] = '(An user will be joint to this role after accepting an invitation)';
+$lang['rl_an_user_will_be_joint_to_this_role_after_accepting_an_invitation'] = '(An user will be joint to this role after login by organization email for the first time)';
 $lang['rl_unable_to_create_role'] = 'Unable to create role';
 // Message & Info
 $lang['rl_max_255_character'] = 'Max 255 characters.';

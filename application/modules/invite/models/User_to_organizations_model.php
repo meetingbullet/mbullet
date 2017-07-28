@@ -57,7 +57,7 @@ class User_to_organizations_model extends BF_Model
 			return $this->update(['organization_id' => $organization_id, 'role_id' => $role_id],  ['role_id' => $default_role_id]);
 	}
 
-	public function role_contain_user($role_id) {
-		return $this->select('count(*) as c')->where('user_id is not null')->where('role_id', $role_id)->find_all();
+	public function role_contain_user($role_id, $organization_id) {
+		return $this->select('count(*) as count')->where('user_id is not null')->where('role_id', $role_id)->where('organization_id', $organization_id)->find_all();
 	}
 }
