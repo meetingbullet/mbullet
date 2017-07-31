@@ -50,7 +50,10 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					<?php if ($has_new_homework):?>
 					<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
 					<?php endif; ?>
+
+					<?php if ($my_todo['homeworks_count'] + $evaluates_count > 0): ?>
 					<span class="count"><?php echo $my_todo['homeworks_count'] + $evaluates_count ?></span>
+					<?php endif; ?>
 					</span>
 				</a>
 
@@ -67,7 +70,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							<?php if ($has_new_homework):?>
 							<span class="badge badge-warning badge-bordered badge-homework-new">new</span>
 							<?php endif; ?>
+							<?php if ($my_todo['homeworks_count'] > 0): ?>
 							<span class="badge badge-primary pull-right homework-counter"><?php echo $my_todo['homeworks_count'] ?></span>
+							<?php endif; ?>
 						</a>
 					</li>
 					<li>
@@ -81,7 +86,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							<?php if ($has_new_rating):?>
 							<span class="badge badge-warning badge-bordered badge-rate-new">new</span>
 							<?php endif; ?>
+							<?php if ($evaluates_count > 0): ?>
 							<span class="badge badge-primary pull-right"><?php echo $evaluates_count ?></span>
+							<?php endif; ?>
 						</a>
 					</li>
 				</ul>
