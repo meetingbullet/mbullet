@@ -235,7 +235,7 @@ $('.btn-underdog').click(function() {
 
 	// Remove all Owner meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
-		if (item.isOwner == true) {
+		if (item.isOwner == true && item._id !== undefined) {
 			$('#calendar-init').fullCalendar('removeEvents', item._id);
 		}
 	});
@@ -255,7 +255,7 @@ $('.btn-like-a-boss').click(function() {
 
 	// Remove all Guest meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
-		if (item.isOwner == false) {
+		if (item.isOwner == false && item.id !== undefined) {
 			$('#calendar-init').fullCalendar('removeEvents', item._id);
 		}
 	});
