@@ -423,8 +423,7 @@ span.count {
 	display: inline;
 }
 
-.btn-join-project {
-	margin-right: 15px;
+.btn-join-project, .btn-create-meeting {
 	text-transform: uppercase;
 }
 
@@ -1253,14 +1252,6 @@ strong.primary {
 
 div.popover .project-header {
 	position: relative;
-}
-
-div.popover .project-header .db-create-meeting {
-	cursor: pointer;
-	top: 5px;
-	right: 10px;
-	font-size: 20px;
-	position: absolute;
 }
 
 .step-30 .table-rate tbody td {

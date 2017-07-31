@@ -105,7 +105,8 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				<ul class="an-child-nav js-open-nav" style="display: none;">
 					<?php foreach ($my_projects AS $project): ?>
 					<li>
-						<a href="<?php echo site_url('project/' . $project->cost_code)?>" class='mb-popover-project <?php if ( !$project->is_read) echo 'new' ?>' 
+						<a 	href="<?php echo site_url('project/' . $project->cost_code)?>" 
+							class='mb-popover-project <?php if ( !$project->is_read) echo 'new' ?>' 
 							data-project-id="<?php echo $project->project_id ?>" 
 							data-name="<?php echo $project->name ?>" 
 							data-owned="<?php echo $project->owned_by_x ?>"
@@ -136,10 +137,15 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				<ul class="an-child-nav js-open-nav" style="display: none;">
 					<?php foreach ($other_projects AS $project): ?>
 					<li>
-						<a href="<?php echo site_url('project/' . $project->cost_code)?>" class='mb-popover-project' 
+						<a 	href="<?php echo site_url('project/' . $project->cost_code)?>" 
+							class='mb-popover-project' 
 							data-project-id="<?php echo $project->project_id ?>" 
-							data-toggle="popover" 
-							data-placement="right">
+							data-name="<?php echo $project->name ?>" 
+							data-owned="<?php echo $project->owned_by_x ?>"
+							data-cost-code="<?php echo $project->cost_code ?>" 
+							data-team="<?php echo $project->member_number ?>" 
+							data-type="other"
+							>
 							<?php echo ($project->name . " <b>[{$project->cost_code}]</b>") ?>
 						</a>
 					</li>
@@ -466,7 +472,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	</div> <!-- #popover-rate -->
 </div> <!-- #template -->
 
-<script type="text/vit" id="popover-project">
+<script typ="text/vit" id="popover-project">
 	<div class="project-header">
 		<div class='project-header-content'>
 			<h4>
@@ -493,18 +499,20 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		</div>
 
 		<div class="pull-right">
-			{{if has_permission_project_view_all}}
+			{{if has_permission_project_view_all && type == "other"}}
 			<button class="an-btn an-btn-primary-transparent an-btn-small btn-join-project" 
 				data-lang-joined="<?php echo lang('db_joined') ?>"
 				data-project-id="{{:project_id}}">
-				<?php echo lang('db_join') ?>
+				<?php echo lang('db_join_project') ?>
 			</button>
 			{{/if}}
 
 			{{if has_permission_project_edit}}
-			<i class="mb-open-modal ion-ios-plus-outline db-create-meeting" 
-				data-modal-id="db-create-meeting" 
-				data-url="<?php echo site_url('meeting/create/') ?>{{:cost_code}}"></i>
+			<a 	href="<?php echo site_url('meeting/create/') ?>{{:cost_code}}"
+				class="an-btn an-btn-primary-transparent an-btn-small btn-create-meeting mb-open-modal"
+				data-modal-id="create-meeting">
+				<?php echo lang('st_new_meeting') ?>
+			</a>
 			{{/if}}
 		</div>
 	</div>
@@ -527,7 +535,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 								<?php echo lang('db_meeting') ?><br/>
 								<b class='number'>{{:no_of_meeting}}</b>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-3 team-wrapper">
 								<i class="ion-android-people"></i>
 								<?php echo lang('db_team') ?><br/>
 								<b class='number'>{{:team}}</b>

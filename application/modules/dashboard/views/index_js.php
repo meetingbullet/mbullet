@@ -220,6 +220,9 @@ $(document).on('click', '.btn-join-project', function() {
 
 		$(that).text($(that).data('lang-joined'));
 		$(that).prop('disabled', true);
+
+		var currentTeam = $(that).closest('.popover').find('.team-wrapper .number').text();
+		$(that).closest('.popover').find('.team-wrapper .number').text(parseInt(currentTeam )+ 1);
 	})
 })
 
@@ -237,6 +240,7 @@ $('.mb-popover-project').popover({
 			data.owned_by_x = $(that).data('owned');
 			data.cost_code = $(that).data('cost-code');
 			data.team = $(that).data('team');
+			data.type = $(that).data('type');
 
 			output = $('#popover-project').render(data, {
 				round: function(a, b) {
