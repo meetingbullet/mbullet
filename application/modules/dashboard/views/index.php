@@ -1026,3 +1026,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	</div> <!-- #popover-project -->
 	<?php endforeach; ?>
 </div> <!-- #template -->
+
+<div class="hidden">
+	<textarea name="recurring">RRULE:FREQ=DAILY;INTERVAL=5;COUNT=100</textarea>
+</div>

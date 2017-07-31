@@ -24,7 +24,14 @@ class Dashboard extends Authenticated_Controller
 		$this->load->helper('date');
 		$this->load->helper('text');
 
+		Assets::add_module_js('dashboard', 'jquery.tmpl.js');
+		Assets::add_module_js('dashboard', 'jquery.tools.dateinput.js');
+		Assets::add_module_js('dashboard', 'jquery.tools.overlay.js');
+		Assets::add_module_js('dashboard', 'jquery.recurrenceinput.js');
 		Assets::add_module_js('dashboard', 'dashboard.js');
+		// Assets::add_module_css('dashboard', 'jquery.tools.dateinput.css');
+		// Assets::add_module_css('dashboard', 'jquery.tools.overlay.css');
+		// Assets::add_module_css('dashboard', 'jquery.recurrenceinput.css');
 		Assets::add_module_css('dashboard', 'dashboard.css');
 		Assets::add_module_css('meeting', 'meeting.css');
 		Assets::add_module_css('homework', 'homework.css');
