@@ -466,7 +466,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	</div> <!-- #popover-rate -->
 </div> <!-- #template -->
 
-<script typ="text/vit" id="popover-project">
+<script type="text/vit" id="popover-project">
 	<div class="project-header">
 		<div class='project-header-content'>
 			<h4>

@@ -244,7 +244,7 @@ $('.mb-popover-project').popover({
 				}
 			});
 
-			//that.cache = output; // Temporary disable cache for debugging
+			that.cache = output;
 			$(that).next().children('.popover-content').html(output)
 			$(that).popover('reposition')
 		})
