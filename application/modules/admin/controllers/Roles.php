@@ -176,7 +176,9 @@ class Roles extends Authenticated_Controller
 			if ($this->role_model->delete($role_id)) {
 				echo json_encode([
 					'message_type' => 'success',
-					'message' => sprintf(lang('rl_role_x_has_been_deleted'), $role->name)
+					'message' => sprintf(lang('rl_role_x_has_been_deleted'), $role->name),
+					'default_role_id' => $default_role_id['0']->role_id,
+					'number_users' => $this->User_to_organizations_model->role_contain_user($default_role_id['0']->role_id, $this->current_user->current_organization_id)['0']->count
 				]);
 				return;
 			}
@@ -276,14 +278,21 @@ class Roles extends Authenticated_Controller
 	}
 
 	public function check($role_id = null) {
+		$is_default = false;
+		$default_role_id = $this->role_model->get_organization_default_role($this->current_user->current_organization_id);
+		if ( $default_role_id['0']->role_id == $role_id) {
+			$is_default =  true;
+		}
 		if ( $this->User_to_organizations_model->role_contain_user($role_id, $this->current_user->current_organization_id)['0']->count != 0) {
 			echo json_encode([
-			'm' => 'true',
+				'has_users' => 'true',
+				'is_default_role' => $is_default,
 			]);
 
 		} else {
 			echo json_encode([
-			'm' => 'false',
+				'has_users' => 'false',
+				'is_default_role' => $is_default,
 			]);
 
 		}

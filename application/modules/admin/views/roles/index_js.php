@@ -1,11 +1,18 @@
 $(document).on('click', '.mb-btn-delete-role', function(e) {
 	e.preventDefault();
 	var check = null;
+	var is_default = null;
 	var _this = this;
 	$.get("<?php echo site_url('admin/roles/check/') ?>" + $(_this).data('role-id'), (data) => {
-				check = JSON.parse(data).m;
-			
-	if (check=="false"){
+				check = JSON.parse(data).has_users;
+				is_default = JSON.parse(data).is_default_role;
+	if (is_default == true) {
+		swal({
+				title: "<?php e(lang('rl_error')) ?>",
+				text: "<?php e(lang('rl_cannot_delete_default_role')) ?>",
+				type: "warning",
+			});
+	} else if (check=="false" && is_default==false){
 		swal({
 			title: "<?php e(lang('rl_are_you_sure')) ?>",
 			text: "<?php e(lang('rl_you_wont_be_able_to_recover_role')) ?>",
@@ -28,13 +35,7 @@ $(document).on('click', '.mb-btn-delete-role', function(e) {
 				swal.close();
 			});
 		});
-		if ($(_this).parent().parent().children(".list-join-default").html().trim().length != 0 ) {
-			swal({
-				title: "<?php e(lang('rl_error')) ?>",
-				text: "<?php e(lang('rl_cannot_delete_default_role')) ?>",
-				type: "warning",
-			});
-		}
+		
 	} else {
 		swal({
 			title: "<?php e(lang('rl_are_you_sure')) ?>",
@@ -66,13 +67,14 @@ $(document).on('click', '.mb-btn-delete-role', function(e) {
 				if (data.message_type == 'success') {
 					$('#role-' + $(_this).data('role-id')).slideUp();
 					$('#update-role-modal').modal('hide');
+					$('#role-' + data.default_role_id + ' .list-number-users').html(data.number_users);
 				}
 
 				swal.close();
 			});
 		});
 		} else {
-			swal("Cancelled", "", "error");
+			swal.close();
 		}
 		});
 	}
