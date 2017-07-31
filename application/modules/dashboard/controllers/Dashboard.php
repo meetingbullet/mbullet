@@ -155,19 +155,6 @@ class Dashboard extends Authenticated_Controller
 		Template::render('dashboard');
 	}
 
-	public function my_projects()
-	{
-		if (! IS_AJAX) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
-
-		$my_projects = $this->get_my_projects();
-
-		Template::set('projects', $my_projects && count($my_projects) > 0 ? $my_projects : []);
-		Template::set('current_user', $this->current_user);
-		Template::render();
-	}
-
 	public function skip_setup()
 	{
 		if ($this->current_user->inited) {
@@ -247,7 +234,7 @@ class Dashboard extends Authenticated_Controller
 
 	private function get_my_projects()
 	{
-		$my_projects = $this->project_model
+		$projects = $this->project_model
 		->select('projects.name, projects.project_id, projects.cost_code, u.email, u.avatar, u.first_name, u.last_name, 
 		(SELECT COUNT(*) FROM ' . $this->db->dbprefix('project_members') . ' WHERE ' . 
 		$this->db->dbprefix('project_members') . '.project_id = ' . 
@@ -262,76 +249,104 @@ class Dashboard extends Authenticated_Controller
 		->order_by('projects.name')
 		->find_all();
 
-		if (empty($my_projects)) {
+		if (empty($projects)) {
 			return [];
 		}
 
-		foreach ($my_projects as &$project) {
-			$project->total_used = $this->mb_project->total_used('project', $project->project_id);
-			$project->no_of_meeting = $this->meeting_model
-			->join('actions a', 'a.action_id = meetings.action_id')
-			->join('projects p', 'p.project_id = a.project_id')
-			->where('organization_id', $this->current_user->current_organization_id)
-			->where('p.project_id', $project->project_id)->count_all();
-
-			$project->unscheduled_meetings = $this->meeting_model->
-			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
-			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
-			->join('actions a', 'a.action_id = meetings.action_id')
-			->join('projects p', 'p.project_id = a.project_id')
-			->join('users u', 'u.user_id = meetings.owner_id')
-			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
-			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
-			->where('scheduled_start_time IS NULL', null, false)
-			->where('p.project_id', $project->project_id)
-			->find_all();
-
-			$project->next_meeting = $this->meeting_model->
-			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
-			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
-			->join('actions a', 'a.action_id = meetings.action_id')
-			->join('projects p', 'p.project_id = a.project_id')
-			->join('users u', 'u.user_id = meetings.owner_id')
-			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
-			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
-			->where('meetings.status', 'ready')
-			->where('scheduled_start_time > CURRENT_TIMESTAMP()', null, false)
-			->find_by('p.project_id', $project->project_id);
-
-			$this->meeting_model->
-			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
-			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
-			->join('actions a', 'a.action_id = meetings.action_id')
-			->join('projects p', 'p.project_id = a.project_id')
-			->join('users u', 'u.user_id = meetings.owner_id')
-			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
-			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
-			->where('meetings.status', 'ready')
-			->where('p.project_id', $project->project_id);
-
-			if ($project->next_meeting) {
-				$this->meeting_model->where('meetings.meeting_id !=', $project->next_meeting->meeting_id);
-			}
-
-			$project->scheduled_meetings = $this->meeting_model->find_all();
-			$project->scheduled_meetings || $project->scheduled_meetings = [];
-
-			$project->completed_meetings = $this->meeting_model->
-			select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
-			meetings.status, u.email, u.avatar, u.first_name, u.last_name')
-			->join('actions a', 'a.action_id = meetings.action_id')
-			->join('projects p', 'p.project_id = a.project_id')
-			->join('users u', 'u.user_id = meetings.owner_id')
-			->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
-			->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
-			->where('meetings.status', 'finished')
-			->where('p.project_id', $project->project_id)
-			->find_all();
-
-			$project->completed_meetings || $project->completed_meetings = [];
+		foreach ($projects as &$project) {
+			$project->owned_by_x = sprintf(lang('db_owned_by_x'), $project->first_name);
 		}
 
-		return $my_projects;
+
+		return $projects;
+	}
+
+	public function get_project_detail($project_id)
+	{
+		$result = [];
+
+		$result['total_used'] = $this->mb_project->total_used('project', $project_id);
+		$result['no_of_meeting'] = $this->meeting_model
+		->join('actions a', 'a.action_id = meetings.action_id')
+		->join('projects p', 'p.project_id = a.project_id')
+		->where('organization_id', $this->current_user->current_organization_id)
+		->where('p.project_id', $project_id)->count_all();
+
+		$result['unscheduled_meetings'] = $this->meeting_model->
+		select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+		meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+		->join('actions a', 'a.action_id = meetings.action_id')
+		->join('projects p', 'p.project_id = a.project_id')
+		->join('users u', 'u.user_id = meetings.owner_id')
+		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+		->where('scheduled_start_time IS NULL', null, false)
+		->where('p.project_id', $project_id)
+		->find_all();
+
+		$result['next_meeting'] = $this->meeting_model->
+		select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+		meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+		->join('actions a', 'a.action_id = meetings.action_id')
+		->join('projects p', 'p.project_id = a.project_id')
+		->join('users u', 'u.user_id = meetings.owner_id')
+		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+		->where('meetings.status', 'ready')
+		->where('scheduled_start_time > CURRENT_TIMESTAMP()', null, false)
+		->find_by('p.project_id', $project_id);
+
+
+		$this->meeting_model->
+		select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+		meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+		->join('actions a', 'a.action_id = meetings.action_id')
+		->join('projects p', 'p.project_id = a.project_id')
+		->join('users u', 'u.user_id = meetings.owner_id')
+		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+		->where('meetings.status', 'ready')
+		->where('p.project_id', $project_id);
+
+		if ($result['next_meeting']) {
+			$result['next_meeting']->scheduled_start_time = display_time($result['next_meeting']->scheduled_start_time);
+			$this->meeting_model->where('meetings.meeting_id !=', $result['next_meeting']->meeting_id);
+		}
+
+		$result['scheduled_meetings'] = $this->meeting_model->find_all();
+
+		$result['completed_meetings'] = $this->meeting_model->
+		select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+		meetings.status, u.email, u.avatar, u.first_name, u.last_name')
+		->join('actions a', 'a.action_id = meetings.action_id')
+		->join('projects p', 'p.project_id = a.project_id')
+		->join('users u', 'u.user_id = meetings.owner_id')
+		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
+		->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
+		->where('meetings.status', 'finished')
+		->where('p.project_id', $project_id)
+		->find_all();
+
+		$this->parse_display_time($result['unscheduled_meetings']);
+		$this->parse_display_time($result['scheduled_meetings']);
+		$this->parse_display_time($result['completed_meetings']);
+
+		echo json_encode($result);
+	}
+
+	private function parse_display_time(&$meetings)
+	{
+		if (! is_array($meetings)) return false;
+
+		foreach ($meetings as &$meeting) {
+			if ($meeting->scheduled_start_time !== null) {
+				$meeting->scheduled_start_time = display_time($meeting->scheduled_start_time);
+			}
+
+			if (isset($meeting->status)) {
+				$meeting->status_text = lang('st_' . $meeting->status);
+			}
+		}
 	}
 
 	private function get_other_projects($my_project_ids)

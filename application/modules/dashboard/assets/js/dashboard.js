@@ -76,8 +76,22 @@ $(document).ready(function() {
 	$('[data-toggle="popover]').data("bs.popover", {inState: { click: false, hover: false, focus: false }});
 });
 
+$(document).on('show.bs.popover', function (e) {
+	// Close popover project on click another one
+	if ($('.an-sidebar-nav .popover.in').length > 0) {
+		$('.mb-popover-project').not(e.target).popover('hide');
+	}
+});
+
 $(document).on('hidden.bs.popover', function (e) {
 	$(e.target).data("bs.popover").inState.click = false;
+});
+
+$(document).click(function(e) {
+	// Close popover project on blur
+	if (! $(e.target).closest('.popover').length === 0) {
+		$('.mb-popover-project').popover('hide');
+	}
 });
 
 $('#homework').click(function(e) {
@@ -103,14 +117,6 @@ $('#open-rate').click(function(e) {
 
 	$('[data-toggle="popover"]').not(this).popover('hide');
 })
-
-$('.mb-popover-project').popover({
-	html: true, 
-	content: function() {
-		$('[data-toggle="popover"]').not(this).popover('hide');
-		return $('#popover-project-' + $(this).data('project-id')).html();
-	}
-});
 
 $(document).on('click', '.btn-time + ul > li > a', function(e) {
 	e.preventDefault();

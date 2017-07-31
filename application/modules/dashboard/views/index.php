@@ -107,10 +107,12 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					<li>
 						<a href="<?php echo site_url('project/' . $project->cost_code)?>" class='mb-popover-project <?php if ( !$project->is_read) echo 'new' ?>' 
 							data-project-id="<?php echo $project->project_id ?>" 
-							data-toggle="popover" 
-							data-placement="right">
+							data-name="<?php echo $project->name ?>" 
+							data-owned="<?php echo $project->owned_by_x ?>"
+							data-cost-code="<?php echo $project->cost_code ?>" 
+							data-team="<?php echo $project->member_number ?>" 
+							>
 							<?php echo ($project->name . " <b>[{$project->cost_code}]</b>") ?>
-
 							<?php if ( ! $project->is_read): ?>
 							<span class="badge badge-warning badge-bordered badge-new">new</span>
 							<?php endif; ?>
@@ -165,6 +167,8 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 			</div> <!-- end .AN-TOPBAR-LEFT-PART -->
 
 			<div class="an-topbar-right-part">
+
+				<?php /*
 				<div class="an-notifications">
 					<div class="btn-group an-notifications-dropown notifications">
 					<button type="button" class="an-btn an-btn-icon dropdown-toggle js-has-new-notification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -180,7 +184,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					</button>
 					</div>
 				</div> <!-- end .AN-MESSAGE -->
-
+				*/ ?>
 				<div class="an-settings">
 					<div class="btn-group an-notifications-dropown settings">
 						<button type="button" class="an-btn an-btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -460,572 +464,308 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 			</table>
 		</div>
 	</div> <!-- #popover-rate -->
-
-	<?php foreach ($my_projects as $project): ?>
-	<div id="popover-project-<?php echo $project->project_id ?>" style="display: none">
-		<div class="project-header">
-				<h4>
-					<a href="<?php echo site_url('project/' . $project->cost_code)?>"
-					class="project-title"
-					data-toggle="manual"
-					data-title="<?php echo lang('pj_edit_project_name') ?>"
-					data-pk="<?php echo $project->project_id ?>" 
-					data-name="name"
-					data-mode="inline"
-					data-inputclass="edit-title"
-					data-url="<?php echo site_url('project/ajax_edit') ?>" >
-						<?php echo $project->name ?>
-					</a> 
-					<a href="<?php echo site_url('project/' . $project->cost_code)?>">
-					<span>[<?php echo $project->cost_code ?>]</span>
-					</a>
-
-					<a href="#" class="enable-edit-title" data-target="#project-<?php echo $project->project_id ?>">
-						<i class="ion-edit"></i>
-					</a>
-				</h4>
-			<?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?>
-			<i class="mb-open-modal ion-ios-plus-outline db-create-meeting" data-modal-id="db-create-meeting" data-url="<?php echo site_url('meeting/create/' . $project->cost_code) ?>"></i>
-		</div>
-
-		<div class="mb-popover-content">
-			<div class="project-body">
-				<div class="panel panel-default panel-overview">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#overview-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_overview') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="overview-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="panel-body">
-							<div class="row number-container">
-								<div class="col-md-3">
-									<i class="ion-android-people"></i>
-									<?php echo lang('db_meeting') ?><br/>
-									<b class='number'><?php echo $project->no_of_meeting ?></b>
-								</div>
-								<div class="col-md-3">
-									<i class="ion-android-people"></i>
-									<?php echo lang('db_team') ?><br/>
-									<b class='number'><?php echo $project->member_number ?></b>
-								</div>
-								<div class="col-md-3 time-wrapper">
-									<i class="ion-ios-alarm-outline"></i>
-									<?php echo lang('db_time') ?><br/>
-									<button class="btn btn-default btn-time dropdown-toggle" data-toggle="dropdown" style="padding: 2px">
-										<b class='number'><?php echo round($project->total_used['time'], 2) ?></b>
-										<span class='text'><?php echo lang('db_minutes') ?></span>
-										<span class="caret"></span>
-									</button>
-									<ul class="dropdown-menu" data-minute="<?php echo round($project->total_used['time'], 2) ?>">
-										<li><a href="#" data-option="minute"><?php echo lang('db_minutes') ?></a></li>
-										<li><a href="#" data-option="hour"><?php echo lang('db_hours') ?></a></li>
-										<li><a href="#" data-option="day"><?php echo lang('db_days') ?></a></li>
-									</ul>
-								</div>
-								<div class="col-md-3">
-									<i class="ion-android-people"></i>
-									<?php echo lang('db_points') ?><br/>
-									<b class='number'><?php echo round($project->total_used['point'], 2) ?></b>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div> <!-- Overview -->
-
-				<div class="panel panel-default panel-next-meeting">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#next-meeting-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_next_meeting') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="next-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="an-user-lists">
-							<div class="list-title">
-								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-								<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
-								<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-							</div>
-
-							<div class="an-lists-body">
-							<?php if ($project->next_meeting) : $item = $project->next_meeting; ?>
-								<div class="list-user-single">
-									<div class="list-date number basis-30">
-										<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
-									</div>
-									<div class="list-name basis-50">
-										<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
-									</div>
-									<div class="list-date number basis-30">
-										<?php echo display_time($item->scheduled_start_time) ?>
-									</div>
-									<div class="list-action basis-20">
-										<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
-									</div>
-								</div> <!-- end .USER-LIST-SINGLE -->
-							<?php else : ?>
-								<div id="no-meeting" class="list-user-single">
-									<div class="list-text basis-30">
-									</div>
-									<div class="list-date email approve basis-40">
-										<?php e(lang('pj_no_meeting')) ?>
-									</div>
-									<div class="list-text basis-30">
-									</div>
-								</div>
-							<?php endif ?>
-							</div> <!-- end .AN-LISTS-BODY -->
-						</div>
-					</div>
-				</div> <!-- Next Meeting -->
-
-				<div class="panel panel-default panel-unscheduled-meeting">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#unscheduled-meeting-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_unscheduled_meeting') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="unscheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="an-user-lists">
-							<div class="list-title">
-								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-							</div>
-
-							<div class="an-lists-body">
-							<?php if ($project->unscheduled_meetings && count($project->unscheduled_meetings)) : 
-									foreach ($project->unscheduled_meetings as $item) : ?>
-									<div class="list-user-single">
-										<div class="list-date number basis-30">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
-										</div>
-										<div class="list-name basis-50">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
-										</div>
-										<div class="list-action basis-50">
-											<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
-										</div>
-									</div> <!-- end .USER-LIST-SINGLE -->
-								<?php endforeach; 
-							else : ?>
-								<div id="no-meeting" class="list-user-single">
-									<div class="list-text basis-30">
-									</div>
-									<div class="list-date email approve basis-40">
-										<?php e(lang('pj_no_meeting')) ?>
-									</div>
-									<div class="list-text basis-30">
-									</div>
-								</div>
-							<?php endif ?>
-							</div>
-						</div>
-					</div>
-				</div> <!-- Unscheduled Meeting -->
-
-				<div class="panel panel-default panel-scheduled-meeting">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#scheduled-meeting-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_scheduled_meeting') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="scheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="an-user-lists">
-							<div class="list-title">
-								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-								<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
-								<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-							</div>
-
-							<div class="an-lists-body">
-							<?php if ($project->scheduled_meetings && count($project->scheduled_meetings)) : 
-									foreach ($project->scheduled_meetings as $item) : ?>
-									<div class="list-user-single">
-										<div class="list-date number basis-30">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
-										</div>
-										<div class="list-name basis-50">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
-										</div>
-										<div class="list-date number basis-30">
-											<?php echo display_time($item->scheduled_start_time) ?>
-										</div>
-										<div class="list-action basis-20">
-											<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
-										</div>
-									</div> <!-- end .USER-LIST-SINGLE -->
-								<?php endforeach; 
-							else : ?>
-								<div id="no-meeting" class="list-user-single">
-									<div class="list-text basis-30">
-									</div>
-									<div class="list-date email approve basis-40">
-										<?php e(lang('pj_no_meeting')) ?>
-									</div>
-									<div class="list-text basis-30">
-									</div>
-								</div>
-							<?php endif ?>
-							</div>
-						</div>
-					</div>
-				</div> <!-- Scheduled Meeting -->
-
-				<div class="panel panel-default panel-completed-meeting">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#completed-meeting-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_completed_meeting') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="completed-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="an-user-lists">
-							<div class="list-title">
-								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-								<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
-								<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-							</div>
-
-							<div class="an-lists-body">
-							<?php if ($project->completed_meetings && count($project->completed_meetings)) : 
-									foreach ($project->completed_meetings as $item) : ?>
-									<div class="list-user-single">
-										<div class="list-date number basis-30">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
-										</div>
-										<div class="list-name basis-50">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
-										</div>
-										<div class="list-date number basis-30">
-											<?php echo display_time($item->scheduled_start_time) ?>
-										</div>
-										<div class="list-action basis-20">
-											<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
-										</div>
-									</div> <!-- end .USER-LIST-SINGLE -->
-								<?php endforeach; 
-							else : ?>
-								<div id="no-meeting" class="list-user-single">
-									<div class="list-text basis-30">
-									</div>
-									<div class="list-date email approve basis-40">
-										<?php e(lang('pj_no_meeting')) ?>
-									</div>
-									<div class="list-text basis-30">
-									</div>
-								</div>
-							<?php endif ?>
-							</div>
-						</div>
-					</div>
-				</div> <!-- Completed Meeting -->
-			</div>
-		</div>
-	</div> <!-- #popover-project -->
-	<?php endforeach; ?>
-
-	<?php foreach ($other_projects as $project): ?>
-	<div id="popover-project-<?php echo $project->project_id ?>" style="display: none">
-		<div class="project-header">
-			<div class='project-header-content'>
-				<h4>
-					<a href="<?php echo site_url('project/' . $project->cost_code)?>"
-					class="project-title"
-					data-toggle="manual"
-					data-title="<?php echo lang('pj_edit_project_name') ?>"
-					data-pk="<?php echo $project->project_id ?>" 
-					data-name="name"
-					data-mode="inline"
-					data-inputclass="edit-title"
-					data-url="<?php echo site_url('project/ajax_edit') ?>" >
-						<?php echo $project->name ?>
-					</a> 
-					<a href="<?php echo site_url('project/' . $project->cost_code)?>">
-					<span>[<?php echo $project->cost_code ?>]</span>
-					</a>
-
-					<a href="#" class="enable-edit-title" data-target="#project-<?php echo $project->project_id ?>">
-						<i class="ion-edit"></i>
-					</a>
-				</h4>
-				<p><?php echo sprintf(lang('db_owned_by_x'), $project->first_name) ?></p>
-			</div>
-
-			<?php if ($has_edit_project_permission) : ?>
-			<div class="pull-right">
-				<button class="an-btn an-btn-primary-transparent an-btn-small btn-join-project" 
-					data-lang-joined="<?php echo lang('db_joined') ?>"
-					data-project-id="<?php echo $project->project_id ?>">
-					<?php echo lang('db_join') ?>
-				</button>
-
-				<i class="mb-open-modal ion-ios-plus-outline db-create-meeting" data-modal-id="db-create-meeting" data-url="<?php echo site_url('meeting/create/' . $project->cost_code) ?>"></i>
-			</div>
-			<?php endif; ?>
-		</div>
-
-		<div class="mb-popover-content">
-			<div class="project-body">
-				<div class="panel panel-default panel-overview">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#overview-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_overview') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="overview-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="panel-body">
-							<div class="row number-container">
-								<div class="col-md-3">
-									<i class="ion-android-people"></i>
-									<?php echo lang('db_meeting') ?><br/>
-									<b class='number'><?php echo $project->no_of_meeting ?></b>
-								</div>
-								<div class="col-md-3">
-									<i class="ion-android-people"></i>
-									<?php echo lang('db_team') ?><br/>
-									<b class='number'><?php echo $project->member_number ?></b>
-								</div>
-								<div class="col-md-3 time-wrapper">
-									<i class="ion-ios-alarm-outline"></i>
-									<?php echo lang('db_time') ?><br/>
-									<button class="btn btn-default btn-time dropdown-toggle" data-toggle="dropdown" style="padding: 2px">
-										<b class='number'><?php echo round($project->total_used['time'], 2) ?></b>
-										<span class='text'><?php echo lang('db_minutes') ?></span>
-										<span class="caret"></span>
-									</button>
-									<ul class="dropdown-menu" data-minute="<?php echo round($project->total_used['time'], 2) ?>">
-										<li><a href="#" data-option="minute"><?php echo lang('db_minutes') ?></a></li>
-										<li><a href="#" data-option="hour"><?php echo lang('db_hours') ?></a></li>
-										<li><a href="#" data-option="day"><?php echo lang('db_days') ?></a></li>
-									</ul>
-								</div>
-								<div class="col-md-3">
-									<i class="ion-android-people"></i>
-									<?php echo lang('db_points') ?><br/>
-									<b class='number'><?php echo round($project->total_used['point'], 2) ?></b>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div> <!-- Overview -->
-
-				<div class="panel panel-default panel-next-meeting">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#next-meeting-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_next_meeting') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="next-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="an-user-lists">
-							<div class="list-title">
-								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-								<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
-								<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-							</div>
-
-							<div class="an-lists-body">
-							<?php if ($project->next_meeting) : $item = $project->next_meeting; ?>
-								<div class="list-user-single">
-									<div class="list-date number basis-30">
-										<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
-									</div>
-									<div class="list-name basis-50">
-										<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
-									</div>
-									<div class="list-date number basis-30">
-										<?php echo display_time($item->scheduled_start_time) ?>
-									</div>
-									<div class="list-action basis-20">
-										<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
-									</div>
-								</div> <!-- end .USER-LIST-SINGLE -->
-							<?php else : ?>
-								<div id="no-meeting" class="list-user-single">
-									<div class="list-text basis-30">
-									</div>
-									<div class="list-date email approve basis-40">
-										<?php e(lang('pj_no_meeting')) ?>
-									</div>
-									<div class="list-text basis-30">
-									</div>
-								</div>
-							<?php endif ?>
-							</div> <!-- end .AN-LISTS-BODY -->
-						</div>
-					</div>
-				</div> <!-- Next Meeting -->
-
-				<div class="panel panel-default panel-unscheduled-meeting">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#unscheduled-meeting-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_unscheduled_meeting') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="unscheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="an-user-lists">
-							<div class="list-title">
-								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-							</div>
-
-							<div class="an-lists-body">
-							<?php if ($project->unscheduled_meetings && count($project->unscheduled_meetings)) : 
-									foreach ($project->unscheduled_meetings as $item) : ?>
-									<div class="list-user-single">
-										<div class="list-date number basis-30">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
-										</div>
-										<div class="list-name basis-50">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
-										</div>
-										<div class="list-action basis-50">
-											<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
-										</div>
-									</div> <!-- end .USER-LIST-SINGLE -->
-								<?php endforeach; 
-							else : ?>
-								<div id="no-meeting" class="list-user-single">
-									<div class="list-text basis-30">
-									</div>
-									<div class="list-date email approve basis-40">
-										<?php e(lang('pj_no_meeting')) ?>
-									</div>
-									<div class="list-text basis-30">
-									</div>
-								</div>
-							<?php endif ?>
-							</div>
-						</div>
-					</div>
-				</div> <!-- Unscheduled Meeting -->
-
-				<div class="panel panel-default panel-scheduled-meeting">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#scheduled-meeting-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_scheduled_meeting') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="scheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="an-user-lists">
-							<div class="list-title">
-								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-								<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
-								<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-							</div>
-
-							<div class="an-lists-body">
-							<?php if ($project->scheduled_meetings && count($project->scheduled_meetings)) : 
-									foreach ($project->scheduled_meetings as $item) : ?>
-									<div class="list-user-single">
-										<div class="list-date number basis-30">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
-										</div>
-										<div class="list-name basis-50">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
-										</div>
-										<div class="list-date number basis-30">
-											<?php echo display_time($item->scheduled_start_time) ?>
-										</div>
-										<div class="list-action basis-20">
-											<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
-										</div>
-									</div> <!-- end .USER-LIST-SINGLE -->
-								<?php endforeach; 
-							else : ?>
-								<div id="no-meeting" class="list-user-single">
-									<div class="list-text basis-30">
-									</div>
-									<div class="list-date email approve basis-40">
-										<?php e(lang('pj_no_meeting')) ?>
-									</div>
-									<div class="list-text basis-30">
-									</div>
-								</div>
-							<?php endif ?>
-							</div>
-						</div>
-					</div>
-				</div> <!-- Scheduled Meeting -->
-
-				<div class="panel panel-default panel-completed-meeting">
-					<div class="panel-heading" role="tab">
-						<h4 class="panel-title">
-							<a href="#completed-meeting-body" role="button" data-toggle="collapse">
-								<?php echo lang('db_completed_meeting') ?>
-							</a>
-						</h4>
-					</div>
-					<div id="completed-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-						<div class="an-user-lists">
-							<div class="list-title">
-								<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-								<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-								<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
-								<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-							</div>
-
-							<div class="an-lists-body">
-							<?php if ($project->completed_meetings && count($project->completed_meetings)) : 
-									foreach ($project->completed_meetings as $item) : ?>
-									<div class="list-user-single">
-										<div class="list-date number basis-30">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->meeting_key) ?></a>
-										</div>
-										<div class="list-name basis-50">
-											<a href="<?php e("/meeting/{$item->meeting_key}") ?>"><?php e($item->name) ?></a>
-										</div>
-										<div class="list-date number basis-30">
-											<?php echo display_time($item->scheduled_start_time) ?>
-										</div>
-										<div class="list-action basis-20">
-											<span class="msg-tag label label-bordered label-<?php echo $item->status ?>"><?php e(str_replace('-', ' ', $item->status)) ?></span>
-										</div>
-									</div> <!-- end .USER-LIST-SINGLE -->
-								<?php endforeach; 
-							else : ?>
-								<div id="no-meeting" class="list-user-single">
-									<div class="list-text basis-30">
-									</div>
-									<div class="list-date email approve basis-40">
-										<?php e(lang('pj_no_meeting')) ?>
-									</div>
-									<div class="list-text basis-30">
-									</div>
-								</div>
-							<?php endif ?>
-							</div>
-						</div>
-					</div>
-				</div> <!-- Completed Meeting -->
-			</div>
-		</div>
-	</div> <!-- #popover-project -->
-	<?php endforeach; ?>
 </div> <!-- #template -->
+
+<script type="text/vit" id="popover-project">
+	<div class="project-header">
+		<div class='project-header-content'>
+			<h4>
+				<a href="<?php echo site_url('project/')?>{{:cost_code}}"
+				class="project-title"
+				data-toggle="manual"
+				data-title="<?php echo lang('pj_edit_project_name') ?>"
+				data-pk="{{:project_id}}" 
+				data-name="name"
+				data-mode="inline"
+				data-inputclass="edit-title"
+				data-url="<?php echo site_url('project/ajax_edit/') ?>{{:project_id}}" >
+					{{:name}}
+				</a> 
+				<a href="<?php echo site_url('project/')?>{{:cost_code}}">
+				<span>[{{:cost_code}}]</span>
+				</a>
+
+				<a href="#" class="enable-edit-title" data-target="#project-{{:project_id}}">
+					<i class="ion-edit"></i>
+				</a>
+			</h4>
+			<p>{{:owned_by_x}}</p>
+		</div>
+
+		<div class="pull-right">
+			{{if has_permission_project_view_all}}
+			<button class="an-btn an-btn-primary-transparent an-btn-small btn-join-project" 
+				data-lang-joined="<?php echo lang('db_joined') ?>"
+				data-project-id="{{:project_id}}">
+				<?php echo lang('db_join') ?>
+			</button>
+			{{/if}}
+
+			{{if has_permission_project_edit}}
+			<i class="mb-open-modal ion-ios-plus-outline db-create-meeting" 
+				data-modal-id="db-create-meeting" 
+				data-url="<?php echo site_url('meeting/create/') ?>{{:cost_code}}"></i>
+			{{/if}}
+		</div>
+	</div>
+
+	<div class="mb-popover-content">
+		<div class="project-body">
+			<div class="panel panel-default panel-overview">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#overview-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_overview') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="overview-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="panel-body">
+						<div class="row number-container">
+							<div class="col-md-3">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_meeting') ?><br/>
+								<b class='number'>{{:no_of_meeting}}</b>
+							</div>
+							<div class="col-md-3">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_team') ?><br/>
+								<b class='number'>{{:team}}</b>
+							</div>
+							<div class="col-md-3 time-wrapper">
+								<i class="ion-ios-alarm-outline"></i>
+								<?php echo lang('db_time') ?><br/>
+								<button class="btn btn-default btn-time dropdown-toggle" data-toggle="dropdown" style="padding: 2px">
+									<b class='number'>{{:~round(total_used.time, 10)}}</b>
+									<span class='text'><?php echo lang('db_minutes') ?></span>
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu" data-minute="{{:total_used.time}}">
+									<li><a href="#" data-option="minute"><?php echo lang('db_minutes') ?></a></li>
+									<li><a href="#" data-option="hour"><?php echo lang('db_hours') ?></a></li>
+									<li><a href="#" data-option="day"><?php echo lang('db_days') ?></a></li>
+								</ul>
+							</div>
+							<div class="col-md-3">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_points') ?><br/>
+								<b class='number'>{{:~round(total_used.point, 10)}}</b>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!-- Overview -->
+
+			<div class="panel panel-default panel-next-meeting">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#next-meeting-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_next_meeting') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="next-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="an-user-lists">
+						<div class="list-title">
+							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+							<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
+							<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+						</div>
+
+						<div class="an-lists-body">
+						{{if next_meeting}}
+							<div class="list-user-single">
+								<div class="list-date number basis-30">
+									<a href="<?php echo site_url("/meeting/") ?>{{:next_meeting.meeting_key}}">
+										{{:next_meeting.meeting_key}}
+									</a>
+								</div>
+								<div class="list-name basis-50">
+									<a href="<?php echo site_url("/meeting/") ?>{{:next_meeting.meeting_key}}">
+										{{:next_meeting.name}}
+									</a>
+								</div>
+								<div class="list-date number basis-30">
+									{{:next_meeting.scheduled_start_time}}
+								</div>
+								<div class="list-action basis-20">
+									<span class="msg-tag label label-bordered label-{{:next_meeting.status}}">
+										{{:next_meeting.status_text}}
+									</span>
+								</div>
+							</div> <!-- end .USER-LIST-SINGLE -->
+						{{else}}
+							{{include tmpl="#emptyMeetingList"/}}
+						{{/if}}
+						</div> <!-- end .AN-LISTS-BODY -->
+					</div>
+				</div>
+			</div> <!-- Next Meeting -->
+
+			<div class="panel panel-default panel-unscheduled-meeting">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#unscheduled-meeting-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_unscheduled_meeting') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="unscheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="an-user-lists">
+						<div class="list-title">
+							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+						</div>
+
+						<div class="an-lists-body">
+						{{if unscheduled_meetings}}
+							{{for unscheduled_meetings}}
+								<div class="list-user-single">
+									<div class="list-date number basis-30">
+										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:meeting_key}}</a>
+									</div>
+									<div class="list-name basis-50">
+										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:name}}</a>
+									</div>
+									<div class="list-action basis-50">
+										<span class="msg-tag label label-bordered label-{{:status}}">{{:status_text}}</span>
+									</div>
+								</div> <!-- end .USER-LIST-SINGLE -->
+							{{/for}}
+						{{else}}
+							<div id="no-meeting" class="list-user-single">
+								<div class="list-text basis-30">
+								</div>
+								<div class="list-date email approve basis-40">
+									<?php e(lang('pj_no_meeting')) ?>
+								</div>
+								<div class="list-text basis-30">
+								</div>
+							</div>
+						{{/if}}
+						</div>
+					</div>
+				</div>
+			</div> <!-- Unscheduled Meeting -->
+
+			<div class="panel panel-default panel-scheduled-meeting">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#scheduled-meeting-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_scheduled_meeting') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="scheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="an-user-lists">
+						<div class="list-title">
+							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+							<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
+							<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+						</div>
+
+						<div class="an-lists-body">
+						{{if scheduled_meetings}}
+							{{for scheduled_meetings}}
+								<div class="list-user-single">
+									<div class="list-date number basis-30">
+										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:meeting_key}}</a>
+									</div>
+									<div class="list-name basis-50">
+										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:name}}</a>
+									</div>
+									<div class="list-date number basis-30">
+										{{:scheduled_start_time}}
+									</div>
+									<div class="list-action basis-20">
+										<span class="msg-tag label label-bordered label-{{:status}}">{{:status_text}}</span>
+									</div>
+								</div> <!-- end .USER-LIST-SINGLE -->
+							{{/for}}
+						{{else}}
+							<div id="no-meeting" class="list-user-single">
+								<div class="list-text basis-30">
+								</div>
+								<div class="list-date email approve basis-40">
+									<?php e(lang('pj_no_meeting')) ?>
+								</div>
+								<div class="list-text basis-30">
+								</div>
+							</div>
+						{{/if}}
+						</div>
+					</div>
+				</div>
+			</div> <!-- Scheduled Meeting -->
+
+			<div class="panel panel-default panel-completed-meeting">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#completed-meeting-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_completed_meeting') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="completed-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="an-user-lists">
+						<div class="list-title">
+							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+							<h6 class="basis-30"><?php e(lang('pj_scheduled_start_time')) ?></h6>
+							<h6 class="basis-20"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+						</div>
+
+						<div class="an-lists-body">
+						{{if completed_meetings}}
+							{{for completed_meetings}}
+								<div class="list-user-single">
+									<div class="list-date number basis-30">
+										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:meeting_key}}</a>
+									</div>
+									<div class="list-name basis-50">
+										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:name}}</a>
+									</div>
+									<div class="list-date number basis-30">
+										{{:scheduled_start_time}}
+									</div>
+									<div class="list-action basis-20">
+										<span class="msg-tag label label-bordered label-{{:status}}">{{:status_text}}</span>
+									</div>
+								</div> <!-- end .USER-LIST-SINGLE -->
+							{{/for}}
+						{{else}}
+							<div id="no-meeting" class="list-user-single">
+								<div class="list-text basis-30">
+								</div>
+								<div class="list-date email approve basis-40">
+									<?php e(lang('pj_no_meeting')) ?>
+								</div>
+								<div class="list-text basis-30">
+								</div>
+							</div>
+						{{/if}}
+						</div>
+					</div>
+				</div>
+			</div> <!-- Completed Meeting -->
+		</div>
+	</div>
+</script>
+
+<script id="emptyMeetingList" type="text/vit">
+	<div class="list-user-single">
+		<div class="list-text basis-30">
+		</div>
+		<div class="list-date email approve basis-40">
+			<?php e(lang('pj_no_meeting')) ?>
+		</div>
+		<div class="list-text basis-30">
+		</div>
+	</div>
+</script>
 
 <div class="hidden">
 	<textarea name="recurring">RRULE:FREQ=DAILY;INTERVAL=5;COUNT=100</textarea>
