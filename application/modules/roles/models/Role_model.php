@@ -75,4 +75,15 @@ class Role_model extends BF_Model
 					->order_by('role_id')
 					->find_all();
 	}
+
+	public function get_organization_default_role($organization_id) {
+		$default_role_id = $this->select('role_id')
+							->where('organization_id', $organization_id)
+							->where('join_default', 1)
+							->find_all();
+		// $is_update = $this->join('user_to_organizations uto', 'uto.role_id = roles.role_id')
+		// 			->update('role_id', $role_id, ['role_id' => $default_role_id->role_id])
+		return $default_role_id;
+
+	}
 }
