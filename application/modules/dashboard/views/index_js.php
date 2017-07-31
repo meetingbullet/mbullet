@@ -223,6 +223,76 @@ $(document).on('click', '.btn-join-project', function() {
 	})
 })
 
+$('.mb-popover-project').popover({
+	html: true,
+	content: function() {
+		if (this.cache) return this.cache;
+		var that = this;
+
+		$.get("<?php echo site_url('dashboard/get_project_detail/') ?>" + $(that).data('project-id'), function(data) {
+			data = JSON.parse(data);
+
+			data.project_id = $(that).data('project-id');
+			data.name = $(that).data('name');
+			data.owned_by_x = $(that).data('owned');
+			data.cost_code = $(that).data('cost-code');
+			data.team = $(that).data('team');
+
+			output = $('#popover-project').render(data, {
+				round: function(a, b) {
+					return Math.round(a * b) / b
+				}
+			});
+
+			that.cache = output;
+			$(that).next().children('.popover-content').html(output)
+			$(that).popover('reposition')
+		})
+
+		return "<div class='popover-loading'><?php echo lang('db_loading') ?></div>";
+	}
+});
+
+function get_project_detail(that, project_id)
+{
+	
+}
+
 <?php if ( ! $current_user->inited): ?>
 $.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');
 <?php endif; ?>
+
+/*
+	Popover dynamic content re-positioning function
+	From: https://stackoverflow.com/a/45092467/3722765
+	Usage: $element.popover('reposition')
+*/
+$.fn.popover.Constructor.prototype.reposition = function () {
+	var $tip = this.tip()
+	var autoPlace = true
+
+	var placement = typeof this.options.placement === 'function' ? this.options.placement.call(this, $tip[0], this.$element[0]) : this.options.placement
+
+	var pos = this.getPosition()
+	var actualWidth = $tip[0].offsetWidth
+	var actualHeight = $tip[0].offsetHeight
+
+	if (autoPlace) {
+		var orgPlacement = placement
+		var viewportDim = this.getPosition(this.$viewport)
+
+		placement = placement === 'bottom' &&
+			pos.bottom + actualHeight > viewportDim.bottom ? 'top' : placement === 'top' &&
+			pos.top - actualHeight < viewportDim.top ? 'bottom' : placement === 'right' &&
+			pos.right + actualWidth > viewportDim.width ? 'left' : placement === 'left' &&
+			pos.left - actualWidth < viewportDim.left ? 'right' : placement
+
+		$tip
+			.removeClass(orgPlacement)
+			.addClass(placement)
+	}
+
+	var calculatedOffset = this.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
+
+	this.applyPlacement(calculatedOffset, placement)
+}
