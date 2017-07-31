@@ -343,6 +343,12 @@ span.count {
 	max-width: none;
 }
 
+.popover-loading {
+	padding: 20px;
+	text-align: center;
+	width: 100%;
+}
+
 .mb-popover-content .table {
 	margin-bottom: 0;
 }
