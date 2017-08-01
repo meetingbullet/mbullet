@@ -53,7 +53,8 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : (!empty(getenv('CI_ENV')) ? getenv('CI_ENV') : 'development'));
+$console_ci_env = getenv('CI_ENV');
+define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : (!empty($console_ci_env) ? $console_ci_env : 'development'));
 
 /*
  *------------------------------------------------------------------------------

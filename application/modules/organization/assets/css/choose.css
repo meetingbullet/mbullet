@@ -7,3 +7,6 @@ img.organization-icon {
 span.organization-name {
 	font-weight: bold;
 }
+.list-user-single {
+	cursor: pointer !important;
+}

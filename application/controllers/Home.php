@@ -33,9 +33,6 @@ class Home extends Front_Controller
 	{
 		parent::__construct();
 
-		//temporary redirect to login page as require from Mathias :)
-		redirect(LOGIN_URL);
-
 		$this->load->helper('application');
 		$this->load->library('Template');
 		$this->load->library('Assets');
@@ -59,7 +56,8 @@ class Home extends Front_Controller
 	{
 		$this->load->library('users/auth');
 		$this->set_current_user();
-		if (isset($current_user->email)) redirect('dashboard');
+		if (isset($this->current_user->email)) redirect('dashboard');
+		else redirect(LOGIN_URL);
 		Template::render();
 	}//end index()
 
