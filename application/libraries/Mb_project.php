@@ -84,7 +84,7 @@ class Mb_project
 				if ($query->num_rows() > 0) return $query->row()->meeting_id;
 				break;
 			case 'agenda':
-				$query = $this->ci->db->select('t.agenda_id')->from('agendas t')->join('meetings s', 's.meeting_id = t.meeting_id')->join('action a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.agenda_key', $object_key)->where('p.organization_id', $organization_id)->get();
+				$query = $this->ci->db->select('t.agenda_id')->from('agendas t')->join('meetings s', 's.meeting_id = t.meeting_id')->join('actions a', 'a.action_id = s.action_id')->join('projects p', 'p.project_id = a.project_id')->where('t.agenda_key', $object_key)->where('p.organization_id', $organization_id)->get();
 				if ($query->num_rows() > 0) return $query->row()->agenda_id;
 				break;
 			default:

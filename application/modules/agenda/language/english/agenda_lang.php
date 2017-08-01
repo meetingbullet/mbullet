@@ -26,3 +26,10 @@ $lang['ag_resolved'] = 'Resolved';
 $lang['ag_skipped'] = 'Skipped';
 $lang['ag_jumped'] = 'Jumped';
 $lang['ag_parking_lot'] = 'Parking Lot';
+
+$lang['ag_edit_agenda'] = 'Edit agenda';
+$lang['ag_save'] = 'Save';
+$lang['ag_delete_success'] = 'Agenda deleted successfully';
+$lang['ag_delete_fail'] = 'There was a problem while deleting agenda.';
+$lang['ag_update_agenda_success'] = 'Agenda updated successfully';
+$lang['ag_update_agenda_fail'] = 'There was a problem while updating agenda.';

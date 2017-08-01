@@ -243,3 +243,82 @@ $(document).ready(function() {
 		}, 60000);
 	});
 });
+
+$(document).on('click', '#agenda-list tbody tr', function() {
+	var that = $(this);
+	var url = '<?php echo site_url('agenda/edit/') ?>' + that.find('td:first-child').text().trim();
+	console.log(url);
+	$.mbOpenModalViaUrl('edit-agenda', url);
+});
+
+
+$(document).on('click', '#edit-agenda [type=submit]', function(e) {
+	e.preventDefault();
+
+	var that = $(this);
+	var form = that.closest('form');
+	var data = form.serialize();
+
+	// Since serialize does not include form's action button, 
+	// we need to add it on our own.
+	data += '&' + $(e.target).find('[type="submit"]').attr('name') + '=';
+
+	form.find('button').attr('disabled', 'disabled');
+	$.ajax({
+		type: "POST",
+		url: form.attr('action'),
+		data: data,
+		complete: function() {
+			form.find('button').removeAttr('disabled');
+		},
+		success: function(data) {
+			data = JSON.parse(data);
+
+			if (data.close_modal === 0) {
+				$('.modal .modal-content').html(data.modal_content);
+			} else {
+				$('.modal').modal('hide');
+			}
+
+			if (data.message_type) {
+				$.mbNotify(data.message, data.message_type);
+
+				if (data.message_type == 'success') {
+					console.log(data);
+					$(`#agenda-list tbody tr[data-agenda-id=${data.data.agenda_id}]`)
+					.find('td')
+					.wrapInner('<div style="display: block;" />')
+					.parent()
+					.find('td > div')
+					.slideUp('fast', function(){
+						$(`#agenda-list tbody tr[data-agenda-id=${data.data.agenda_id}]`).remove();
+						$('#agenda-list tbody').append($.templates('#agenda-row').render(data.data));
+						$('#agenda-list tbody tr:last-child').effect("highlight", {}, 3000);
+					});
+				}
+			}
+		}
+	});
+});
+
+$(document).on('click', '#agenda-list .close-btn, #homework-list .close-btn', function(e) {
+	e.stopPropagation();
+	var that = $(this);
+	var agenda_key = that.closest('tr').find('td:first-child').text();
+	var url = '<?php echo site_url('agenda/delete/') ?>' + agenda_key;
+	$.get({url}).done(function(data) {
+		data = JSON.parse(data);
+		if (data.status == 1) {
+			that.closest('tr')
+			.find('td')
+			.wrapInner('<div style="display: block;" />')
+			.parent()
+			.find('td > div')
+			.slideUp('fast', function(){
+				$(`#agenda-list tbody tr[data-agenda-id=${data.data.agenda_id}]`).remove();
+			});
+		}
+
+		$.mbNotify(data.message, data.message_type);
+	});
+})

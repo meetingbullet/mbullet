@@ -202,4 +202,154 @@ class Agenda extends Authenticated_Controller
 
 		return $data;
 	}
+
+	public function edit($agenda_key)
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$agenda_id = $this->mb_project->get_object_id('agenda', $agenda_key);
+
+		if (empty($agenda_id)) {
+			Template::set_message(lang('ag_agenda_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		// $keys = explode('-', $meeting_key);
+		// if (empty($keys) || count($keys) < 3) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
+
+		// $project_key = $keys[0];
+
+		if (! $this->mb_project->has_permission('agenda', $agenda_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
+		}
+
+		$organization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		if (empty($organization_members)) {
+			$organization_members = [];
+		}
+
+		if ($agenda_id === false) {
+			Template::set('message', lang('ag_not_have_permission'));
+			Template::set('message_type', 'danger');
+		} else {
+			Template::set('close_modal', 0);
+
+			$agenda = $this->agenda_model->find($agenda_id);
+			$selected_members = $this->agenda_member_model->select('user_id')->where('agenda_id', $agenda_id)->as_array()->find_all();
+			if (empty($selected_members)) {
+				$selected_members = [];
+			} else {
+				$selected_members = array_column($selected_members, 'user_id');
+			}
+
+			if ($this->input->post()) {
+				$rules = $this->agenda_model->get_validation_rules();
+				$this->form_validation->set_rules($rules['create']);
+
+				if ($this->form_validation->run() !== false) {
+					$data = $this->agenda_model->prep_data($this->input->post());
+					$updated = $this->agenda_model->skip_validation(true)->update($agenda_id, $data);
+
+					if ($updated) {
+						//$this->mb_project->add_experience_point(1);
+						$this->mb_project->update_parent_objects('agenda', $agenda_id);
+						$this->agenda_member_model->delete($agenda_id);
+						$assignees = $this->input->post('assignee');
+						$assignees = explode(',', $assignees);
+						if (! empty($assignees)) {
+							foreach ($assignees as $user_id) {
+								if (! empty($user_id)) {
+									$agenda_members[] = [
+										'agenda_id' => $agenda_id,
+										'user_id' => $user_id
+									];
+								}
+							}
+
+							if (! empty($agenda_members)) {
+								$inserted = $this->agenda_member_model->insert_batch($agenda_members);
+								if ($inserted) {
+									//$this->mb_project->notify_members($agenda_id, 'agenda', $this->current_user, 'insert');
+									Template::set('message', lang('ag_update_agenda_success'));
+									Template::set('message_type', 'success');
+									Template::set('data', $this->ajax_agenda_data($agenda_id));
+									Template::set('close_modal', 1);
+
+								} else {
+									Template::set('message', lang('ag_add_agenda_member_fail'));
+									Template::set('message_type', 'danger');
+								}
+							} else {
+								Template::set('message', lang('ag_update_agenda_success'));
+								Template::set('message_type', 'success');
+								Template::set('data', $this->ajax_agenda_data($agenda_id));
+								Template::set('close_modal', 1);
+							}
+						} else {
+							$error = true;
+						}
+					} else {
+						$error = true;
+					}
+				} else {
+					$error = true;
+				}
+
+				if (! empty($error)) {
+					Template::set('message', lang('ag_update_agenda_fail'));
+					Template::set('message_type', 'danger');
+				}
+			}
+		}
+		// Assets::add_js($this->load->view('create_js', [
+		// 	'organization_members' => $organization_members
+		// ], true), 'inline');
+		Template::set('organization_members', $organization_members);
+		Template::set('agenda_members', $selected_members);
+		Template::set('agenda', $agenda);
+		Template::render();
+	}
+
+	public function delete($agenda_key)
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$agenda_id = $this->mb_project->get_object_id('agenda', $agenda_key);
+
+		if (empty($agenda_id)) {
+			Template::set_message(lang('ag_agenda_key_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (! $this->mb_project->has_permission('agenda', $agenda_id, 'Project.Edit.All')) {
+			$this->auth->restrict();
+		}
+
+		$deleted = $this->agenda_model->delete($agenda_id);
+		if ($deleted) {
+			$this->agenda_member_model->delete($agenda_id);
+			echo json_encode([
+				'status' => 1,
+				'message' => lang('ag_delete_success'),
+				'message_type' => 'success',
+				'data' => [
+					'agenda_id' => $agenda_id
+				]
+			]);
+			exit;
+		}
+
+		echo json_encode([
+			'status' => 0,
+			'message' => lang('ag_delete_fail'),
+			'message_type' => 'danger'
+		]);
+		exit;
+	}
 }
