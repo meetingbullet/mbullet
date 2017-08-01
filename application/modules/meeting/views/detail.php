@@ -120,6 +120,7 @@ if ($is_member && $is_owner) {
 									<?php if ($meeting->status == 'finished' || $meeting->status == 'resolved') : ?>
 									<th class="text-center"><?php e(lang('st_confirmation_status'))?></th>
 									<?php endif ?>
+									<th></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -143,6 +144,7 @@ if ($is_member && $is_owner) {
 										<span class="label label-bordered label-<?php e($agenda->confirm_status) ?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 									</td>
 									<?php endif ?>
+									<td class='basis-10 text-right'><i class="ion-close-circled close-btn"></i></td>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
@@ -442,6 +444,7 @@ if ($is_member && $is_owner) {
 		<td class="basis-10 agenda-status text-center">
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
+		<td class='basis-10 text-right'><i class="ion-close-circled close-btn"></i></td>
 	</tr>
 </script>
 
