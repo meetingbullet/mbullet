@@ -175,6 +175,7 @@ if ($is_member && $is_owner) {
 									<th class='text-center'><?php e(lang('hw_time_spent'))?></th>
 									<th><?php e(lang('hw_attachment'))?></th>
 									<th class="text-center"><?php e(lang('hw_status'))?></th>
+									<th></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -210,6 +211,7 @@ if ($is_member && $is_owner) {
 									<td class='basis-10 homework-status text-center'>
 										<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></span>
 									</td>
+									<td class='basis-10 text-right'><i class="ion-close-circled close-btn"></i></td>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
@@ -470,6 +472,7 @@ if ($is_member && $is_owner) {
 		<td class='basis-10 homework-status text-center'>
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
+		<td class='basis-10 text-right'><i class="ion-close-circled close-btn"></i></td>
 	</tr>
 </script>
 

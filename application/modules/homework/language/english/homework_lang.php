@@ -36,3 +36,10 @@ $lang['hw_paste_your_attachment_url'] = 'Paste your attachment URL here';
 $lang['hw_invalid_url'] = 'Invalid URL';
 $lang['hw_duplicated_attachment'] = 'Duplicated attachment';
 $lang['hw_edit_attachment_name'] = 'Edit attachment name';
+
+$lang['hw_unable_to_update_homework'] = 'Unable to update homework';
+$lang['hw_update_success'] = 'Homework updated successfully';
+$lang['hw_update_homework'] = 'Update homework';
+$lang['hw_save'] = 'Save';
+$lang['hw_delete_success'] = 'Homework deleted successfully';
+$lang['hw_delete_fail'] = 'Unable to delete homework';
