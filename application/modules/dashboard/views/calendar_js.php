@@ -134,7 +134,8 @@ $(document).ready(function() {
 					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD HH:mm:ss')) + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');
 				}
 			}
-		}
+		},
+		defaultView: 'agendaWeek'
 	});
 
 	$('#calendar .fc-ggcToggle-button, #calendar .fc-mbcToggle-button').addClass('fc-state-active');

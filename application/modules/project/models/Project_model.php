@@ -48,7 +48,7 @@ class Project_model extends BF_Model
         array(
             'field' => 'cost_code',
             'label' => 'lang:pj_cost_code',
-            'rules' => 'trim|required|max_length[64]',
+            'rules' => 'trim|required|alpha_numeric|max_length[64]',
         )
     );
 

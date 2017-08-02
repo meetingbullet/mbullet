@@ -169,7 +169,7 @@ class Project extends Authenticated_Controller
 
 		if ($this->form_validation->run() === false) {
 			logit('form_validation false');
-			Template::set('message', lang('pj_there_was_a_problem_while_creating_project'));
+			Template::set('message', validation_errors() /*lang('pj_there_was_a_problem_while_creating_project')*/);
 			return false;
 		}
 
