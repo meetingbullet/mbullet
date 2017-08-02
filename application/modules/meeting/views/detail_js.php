@@ -251,7 +251,6 @@ $(document).on('click', '#agenda-list tbody tr', function() {
 	$.mbOpenModalViaUrl('edit-agenda', url);
 });
 
-
 $(document).on('click', '#edit-agenda [type=submit]', function(e) {
 	e.preventDefault();
 
@@ -301,7 +300,7 @@ $(document).on('click', '#edit-agenda [type=submit]', function(e) {
 	});
 });
 
-$(document).on('click', '#agenda-list .close-btn, #homework-list .close-btn', function(e) {
+$(document).on('click', '#agenda-list .close-btn', function(e) {
 	e.stopPropagation();
 	var that = $(this);
 	var agenda_key = that.closest('tr').find('td:first-child').text();
@@ -321,4 +320,82 @@ $(document).on('click', '#agenda-list .close-btn, #homework-list .close-btn', fu
 
 		$.mbNotify(data.message, data.message_type);
 	});
-})
+});
+
+$(document).on('click', '#homework-list tbody tr', function() {
+	var that = $(this);
+	var url = '<?php echo site_url('homework/edit/') ?>' + that.data('homework-id');
+	console.log(url);
+	$.mbOpenModalViaUrl('edit-homework', url);
+});
+
+$(document).on('click', '#edit-homework [type=submit]', function(e) {
+	e.preventDefault();
+
+	var that = $(this);
+	var form = that.closest('form');
+	var data = form.serialize();
+
+	// Since serialize does not include form's action button, 
+	// we need to add it on our own.
+	data += '&' + $(e.target).find('[type="submit"]').attr('name') + '=';
+
+	form.find('button').attr('disabled', 'disabled');
+	$.ajax({
+		type: "POST",
+		url: form.attr('action'),
+		data: data,
+		complete: function() {
+			form.find('button').removeAttr('disabled');
+		},
+		success: function(data) {
+			data = JSON.parse(data);
+
+			if (data.close_modal === 0) {
+				$('.modal .modal-content').html(data.modal_content);
+			} else {
+				$('.modal').modal('hide');
+			}
+
+			if (data.message_type) {
+				$.mbNotify(data.message, data.message_type);
+
+				if (data.message_type == 'success') {
+					console.log(data);
+					$(`#homework-list tbody tr[data-homework-id=${data.data.homework_id}]`)
+					.find('td')
+					.wrapInner('<div style="display: block;" />')
+					.parent()
+					.find('td > div')
+					.slideUp('fast', function(){
+						$(`#homework-list tbody tr[data-homework-id=${data.data.homework_id}]`).remove();
+						$('#homework-list tbody').append($.templates('#homework-row').render(data.data));
+						$('#homework-list tbody tr:last-child').effect("highlight", {}, 3000);
+					});
+				}
+			}
+		}
+	});
+});
+
+$(document).on('click', '#homework-list .close-btn', function(e) {
+	e.stopPropagation();
+	var that = $(this);
+	var homework_id = that.closest('tr').data('homework-id');
+	var url = '<?php echo site_url('homework/delete/') ?>' + homework_id;
+	$.get({url}).done(function(data) {
+		data = JSON.parse(data);
+		if (data.status == 1) {
+			that.closest('tr')
+			.find('td')
+			.wrapInner('<div style="display: block;" />')
+			.parent()
+			.find('td > div')
+			.slideUp('fast', function(){
+				$(`#homework-list tbody tr[data-homework-id=${homework_id}]`).remove();
+			});
+		}
+
+		$.mbNotify(data.message, data.message_type);
+	});
+});

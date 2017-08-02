@@ -16,6 +16,8 @@ class Homework extends Authenticated_Controller
 		$this->load->model('homework_model');
 		$this->load->model('homework_member_model');
 		$this->load->model('homework_attachment_model');
+		$this->load->model('homework_read_model');
+		$this->load->model('homework_rate_model');
 
 		Assets::add_module_css('homework', 'homework.css');
 	}
@@ -161,8 +163,7 @@ class Homework extends Authenticated_Controller
 		$test = $this->homework_model->select('homework.' . $this->input->post('name'))
 		->join('homework_members hwm', 'hwm.homework_id = homework.homework_id AND hwm.user_id = ' . $this->current_user->user_id, 'LEFT')
 		->join('meetings s', 's.meeting_id = homework.meeting_id AND (s.status = "open" OR s.status = "ready" OR s.status = "inprogress")') // Can only edit when meeting is OPEN
-		->where('homework.created_by', $this->current_user->user_id)
-		->or_where('hwm.user_id', $this->current_user->user_id)
+		->where('(homework.created_by = "' . $this->current_user->user_id . '" OR hwm.user_id = "' . $this->current_user->user_id . '")')
 		->find($this->input->post('pk'));
 
 		if ($test === false) {
@@ -244,5 +245,167 @@ class Homework extends Authenticated_Controller
 		}
 
 		return $data;
+	}
+
+	public function edit($homework_id)
+	{
+		$test = $this->homework_model->select('homework.*')
+									->join('homework_members hwm', 'hwm.homework_id = homework.homework_id AND hwm.user_id = ' . $this->current_user->user_id, 'LEFT')
+									->join('meetings s', 's.meeting_id = homework.meeting_id AND (s.status = "open" OR s.status = "ready" OR s.status = "inprogress")') // Can only edit when meeting is OPEN
+									->where('(homework.created_by = "' . $this->current_user->user_id . '" OR hwm.user_id = "' . $this->current_user->user_id . '")')
+									->find($homework_id);
+
+		if ($test === false && ! has_permission('Project.Edit.All')) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('hw_no_permission_to_edit')
+			]);
+			exit;
+		}
+
+		Template::set('homework', $test);
+
+		$organization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		if (empty($organization_members)) {
+			$organization_members = [];
+		}
+
+		$selected_members = $this->homework_member_model->select('user_id')->where('homework_id', $homework_id)->as_array()->find_all();
+		if (empty($selected_members)) {
+			$selected_members = [];
+		} else {
+			$selected_members = array_column($selected_members, 'user_id');
+		}
+		Template::set('homework_members', $selected_members);
+
+		$selected_attachments = $this->homework_attachment_model->where('homework_id', $homework_id)->as_array()->find_all();
+		if (empty($selected_attachments)) {
+			$selected_attachments = [];
+		}
+		Template::set('homework_attachments', $selected_attachments);
+
+		Template::set('close_modal', 0);
+		Template::set('organization_members', $organization_members);
+
+		if ($this->input->post()) {
+			$data = $this->homework_model->prep_data($this->input->post());
+
+			$this->form_validation->set_rules($this->homework_model->get_validation_rules('update'));
+
+			if ($this->form_validation->run() === false) {
+				Template::set('message', lang('hw_unable_to_update_homework'));
+				Template::set('message_type', 'danger');
+				Template::render();
+				return;
+			}
+
+			$updated = $this->homework_model->update($homework_id, $data);
+
+			if ($updated) {
+				$this->homework_member_model->delete($homework_id);
+				$this->mb_project->update_parent_objects('homework', $homework_id);
+				$members = $this->input->post('member');
+				$members = explode(',', $members);
+				if (! empty($members)) {
+					foreach ($members as $user_id) {
+						if (! empty($user_id)) {
+							$homework_members[] = [
+								'homework_id' => $homework_id,
+								'user_id' => $user_id
+							];
+						}
+					}
+
+					if (! empty($homework_members)) {
+						if ($inserted = $this->homework_member_model->insert_batch($homework_members) ) {
+							$this->homework_attachment_model->delete_where(['homework_id' => $homework_id]);
+							if ($attachments = $this->input->post('attachments')) {
+								if (is_array($attachments)) {
+									foreach ($attachments as &$att) {
+										$att['homework_id'] = $homework_id;
+
+										if ($att['title'] == '') $att['title'] = null;
+										if ($att['favicon'] == '') $att['favicon'] = null;
+									}
+
+									$this->homework_attachment_model->insert_batch($attachments);
+								}
+							}
+
+							//$this->mb_project->notify_members($homework_id, 'homework', $this->current_user, 'insert');
+							Template::set('message', lang('hw_update_success'));
+							Template::set('message_type', 'success');
+							Template::set('data', $this->ajax_homework_data($homework_id));
+							Template::set('close_modal', 1);
+						} else {
+							Template::set('message', lang('hw_unable_to_update_homework'));
+							Template::set('message_type', 'danger');
+						}
+					} else {
+						Template::set('message', lang('hw_update_success'));
+						Template::set('message_type', 'success');
+						Template::set('data', $this->ajax_homework_data($homework_id));
+						Template::set('close_modal', 1);
+					}
+				} else {
+					$error = true;
+				}
+			} else {
+				$error = true;
+			}
+
+			if (! empty($error)) {
+				Template::set('message', lang('hw_unable_to_update_homework'));
+				Template::set('message_type', 'danger');
+			}
+		}
+
+		Assets::add_js($this->load->view('create_js', [
+			'organization_members' => $organization_members
+		], true), 'inline');
+		Template::render();
+	}
+
+	public function delete($homework_id)
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$test = $this->homework_model->select('homework.*')
+									->join('homework_members hwm', 'hwm.homework_id = homework.homework_id AND hwm.user_id = ' . $this->current_user->user_id, 'LEFT')
+									->join('meetings s', 's.meeting_id = homework.meeting_id AND (s.status = "open" OR s.status = "ready" OR s.status = "inprogress")') // Can only edit when meeting is OPEN
+									->where('(homework.created_by = "' . $this->current_user->user_id . '" OR hwm.user_id = "' . $this->current_user->user_id . '")')
+									->find($homework_id);
+
+		if ($test === false && ! has_permission('Project.Edit.All')) {
+			echo json_encode([
+				'status' => 0,
+				'message_type' => 'danger',
+				'message' => lang('hw_no_permission_to_edit')
+			]);
+			exit;
+		}
+
+		$deleted = $this->homework_model->delete($homework_id);
+		if ($deleted) {
+			$this->homework_member_model->delete($homework_id);
+			$this->homework_read_model->delete_where(['homework_id' => $homework_id]);
+			$this->homework_rate_model->delete_where(['homework_id' => $homework_id]);
+			$this->homework_attachment_model->delete_where(['homework_id' => $homework_id]);
+			echo json_encode([
+				'status' => 1,
+				'message' => lang('hw_delete_success'),
+				'message_type' => 'success',
+			]);
+			exit;
+		}
+
+		echo json_encode([
+			'status' => 0,
+			'message' => lang('hw_delete_fail'),
+			'message_type' => 'danger'
+		]);
+		exit;
 	}
 }

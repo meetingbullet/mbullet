@@ -12,6 +12,10 @@ class Agenda extends Authenticated_Controller
 
 		$this->load->model('agenda_model');
 		$this->load->model('agenda_member_model');
+		$this->load->model('agenda_read_model');
+		$this->load->model('agenda_rate_model');
+		$this->load->model('agenda_vote_model');
+		$this->load->model('agenda_attachment_model');
 
 		$this->load->model('meeting/meeting_model');
 		$this->load->model('users/user_model');
@@ -334,6 +338,10 @@ class Agenda extends Authenticated_Controller
 		$deleted = $this->agenda_model->delete($agenda_id);
 		if ($deleted) {
 			$this->agenda_member_model->delete($agenda_id);
+			$this->agenda_read_model->delete_where(['agenda_id' => $agenda_id]);
+			$this->agenda_rate_model->delete_where(['agenda_id' => $agenda_id]);
+			$this->agenda_vote_model->delete_where(['agenda_id' => $agenda_id]);
+			$this->agenda_attachment_model->delete_where(['agenda_id' => $agenda_id]);
 			echo json_encode([
 				'status' => 1,
 				'message' => lang('ag_delete_success'),
