@@ -94,7 +94,24 @@ $(document).ready(function() {
 				{
 					meeting_id: event.meeting_id,
 					start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-					end: moment(event.start).format('YYYY-MM-DD HH:mm:ss')
+					end: moment(event.end).format('YYYY-MM-DD HH:mm:ss')
+				}
+			).done(function(data) {
+				data = JSON.parse(data);
+				if (data.status == 0) {
+					revertFunc();
+				}
+			}).fail(function() {
+				revertFunc();
+			})
+		},
+		eventResize: function(event, delta, revertFunc) {
+			$.post(
+				'<?php echo site_url('meeting/edit_calendar_event') ?>',
+				{
+					meeting_id: event.meeting_id,
+					start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
+					end: moment(event.end).format('YYYY-MM-DD HH:mm:ss')
 				}
 			).done(function(data) {
 				data = JSON.parse(data);
@@ -112,7 +129,7 @@ $(document).ready(function() {
 				$('#calendar').fullCalendar('unselect');
 			} else {
 				if ($('#calendar').fullCalendar('getView') == 'month') {
-					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD') + ' 09:00:00') + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');
+					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD HH:mm:ss')) + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');
 				} else {
 					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD HH:mm:ss')) + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');
 				}
@@ -289,7 +306,7 @@ $(document).ready(function() {
 		var duration = $('#calendar-create-event-modal input[name="in"]').val();
 
 		if (typeof(project_key) != 'undefined' && project_key != '') {
-			$.get('<?php echo site_url('meeting/create/') ?>' + project_key + '?scheduled_start_time=' + encodeURIComponent(scheduled_start_time) + '&in=' + encodeURIComponent(duration), (data) => {
+			$.get('<?php echo site_url('meeting/create/') ?>' + project_key + '?recurring=1&scheduled_start_time=' + encodeURIComponent(scheduled_start_time) + '&in=' + encodeURIComponent(duration), (data) => {
 				data = JSON.parse(data);
 
 				if (data.message_type != 'success' && data.message_type != null) {
@@ -311,9 +328,10 @@ $(document).ready(function() {
 		}
 	});
 
+
 	$(document).on('click', '#calendar-create-event-modal .form-ajax [type="submit"]', function(e) {
 		e.preventDefault();
-
+		$('#calendar-create-event-modal .form-ajax [type="submit"]').attr('disabled', 'disabled');
 		var data = $('#calendar-create-event-modal .form-ajax').serialize();
 		// Since serialize does not include form's action button, 
 		// we need to add it on our own.
@@ -339,7 +357,96 @@ $(document).ready(function() {
 					}
 					$.mbNotify(data.message, data.message_type);
 				}
+
+				$('#calendar-create-event-modal .form-ajax [type="submit"]').removeAttr('disabled');
 			}
 		});
+	});
+
+	$(document).on('hide.bs.modal', '#calendar-create-event-modal', function() {
+		console.log('hide');
+		if ($('.rimain button[name="ridelete"]').attr('display') != 'none') {
+			$('.rimain button[name="ridelete"]').click();
+		}
+	});
+
+	$("textarea[name=recurring]").recurrenceinput({
+		formOverlay: {
+			speed: 'slow',
+			fixed: false
+		},
+		rtemplate: {
+			daily: {
+				rrule: 'FREQ=DAILY',
+				fields: [
+					'ridailyinterval',
+					'rirangeoptions'
+				]
+			},
+			weekly: {
+				rrule: 'FREQ=WEEKLY',
+				fields: [
+					'riweeklyinterval',
+					'riweeklyweekdays',
+					'rirangeoptions'
+				]
+			},
+			monthly: {
+				rrule: 'FREQ=MONTHLY',
+				fields: [
+					'rimonthlyinterval',
+					'rimonthlyoptions',
+					'rirangeoptions'
+				]
+			},
+			yearly: {
+				rrule: 'FREQ=YEARLY',
+				fields: [
+					'riyearlyinterval',
+					'riyearlyoptions',
+					'rirangeoptions'
+				]
+			}
+		},
+		hasRepeatForeverButton: false
+	});
+
+	$(document).on('click', '.ributtons input', function() {
+		if ($('#messagearea').text() == '') {
+			$('#calendar-create-event-modal').fadeToggle();
+		}
+	});
+
+	$(document).on('click', '.ributtons .ricancelbutton', function() {
+		if ($('#calendar-create-event-modal textarea[name=rrule_recurring]').val() == '') {
+			$('#calendar-create-event-modal input[name="repeat"]').removeAttr('checked');
+			$('#calendar-create-event-modal input[name="repeat"]').prop("checked", false);
+		}
+	});
+
+	$(document).on('click', '#calendar-create-event-modal input[name="repeat"]', function() {
+		var that = $(this);
+
+		if (that.prop("checked") == true) {
+			$('#calendar-create-event-modal').fadeOut();
+			$('.rimain button[name="riedit"]').click();
+		} else {
+			$('#calendar-create-event-modal textarea[name=rrule_recurring]').val('');
+			$('#calendar-create-event-modal input[name=readable]').val('Does not repeat');
+			$('#calendar-create-event-modal #readble').html('Does not repeat');
+		}
+	});
+
+	$('textarea[name=recurring]').on('change', function() {
+		var that = $(this);
+		if ($('#calendar-create-event-modal input[name="repeat"]').prop("checked") == true) {
+			$('#calendar-create-event-modal textarea[name=rrule_recurring]').val($('textarea[name=recurring]').val());
+			$('#calendar-create-event-modal input[name=readable]').val($('.ridisplay .ridisplay').text());
+			$('#calendar-create-event-modal #readble').html($('.ridisplay .ridisplay').text());
+		} else {
+			$('#calendar-create-event-modal textarea[name=rrule_recurring]').val('');
+			$('#calendar-create-event-modal input[name=readable]').val('Does not repeat');
+			$('#calendar-create-event-modal #readble').html('Does not repeat');
+		}
 	});
 });

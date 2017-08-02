@@ -369,3 +369,13 @@
 	padding-top: 3px;
 	display: inline-block;
 }
+
+#agenda-list tbody tr,
+#homework-list tbody tr {
+	cursor: pointer;
+}
+
+#agenda-list tbody tr .close-btn:hover,
+#homework-list tbody tr .close-btn:hover {
+	color: #eb547c;
+}

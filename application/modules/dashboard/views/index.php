@@ -781,3 +781,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		</div>
 	</div>
 </script>
+
+<div class="hidden">
+	<textarea name="recurring">RRULE:FREQ=DAILY;INTERVAL=5;COUNT=100</textarea>
+</div>

@@ -472,6 +472,10 @@ span.count {
 	background: #3fb4a0;
 }
 
+.fc-event {
+	border: 1px solid #fff !important;
+}
+
 .mb-popover-content .an-user-lists .an-lists-body {
 	max-height: none;
 }
@@ -1291,3 +1295,181 @@ div.popover .project-header {
 	vertical-align: middle;
 	color: #025d83;
 }
+
+#calroot {
+	background: #fff;
+	z-index: 2001;
+	border-radius: 2px;
+	box-shadow: 1px 1px 4px 3px #eee;
+	padding: 10px;
+}
+
+#caldays span,
+.calweek a {
+	padding: 10px;
+	width: 40px !important;
+	height: 40px !important;
+	display: inline-block;
+	text-align: center;
+}
+
+#caltitle {
+	display: inline-block;
+}
+
+.calsunday {
+	color: #eb547c;
+}
+
+#calprev,
+#calnext {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	float: left;
+}
+
+#calnext {
+	float: right;
+}
+
+#calnext::before,
+#calprev::before {
+	display: inline-block;
+	font-family: "Ionicons";
+	cursor: pointer;
+}
+
+#calnext::before {
+	content: "\f125";
+}
+
+#calprev::before {
+	content: "\f124";
+}
+
+#calhead {
+	text-align: center;
+}
+
+#calmonth {
+	margin-right: 5px;
+}
+
+.riform {
+	background: #fff;
+	border-radius: 3px;
+	box-shadow: 0 3px 9px rgba(2, 93, 131, 0.2);
+	border: 0;
+	z-index: 2000;
+	width: 700px;
+}
+
+.riform h1 {
+	padding: 15px;
+	border-bottom: 1px solid #e5e5e5;
+	margin: 0;
+	font-size: 18px;
+	text-transform: uppercase;
+}
+
+.riform div#rirtemplate {
+	padding-top: 15px;
+}
+
+.riform #rirtemplate .label {
+	display: inline-block;
+	max-width: 100%;
+	margin-bottom: 5px;
+	font-weight: bold;
+	color: #333333;
+	float: left;
+	width: 30%;
+	padding: 0 15px;
+}
+
+.ributtons {
+	padding: 15px;
+	text-align: right;
+	border-top: 1px solid #e5e5e5;
+	overflow: hidden;
+}
+
+.ributtons input {
+	display: inline-block;
+	margin-bottom: 0;
+	font-weight: normal;
+	text-align: center;
+	vertical-align: middle;
+	touch-action: manipulation;
+	cursor: pointer;
+	background-image: none;
+	border: 1px solid transparent;
+	white-space: nowrap;
+	outline: 0;
+	transition: 0.3s;
+	padding: 7px 20px;
+	font-size: 14px;
+	line-height: 1.42857;
+	border-radius: 3px;
+	user-select: none;
+	float: right;
+	margin-right: 5px;
+}
+
+.ributtons .ricancelbutton  {
+	color: #ffffff;
+	background-color: #eb547c;
+	border-color: #eb547c;
+}
+
+.ributtons .risavebutton  {
+	position: relative;
+	background: #025d83;
+	border: 1px solid #025d83;
+	color: #ffffff;
+}
+
+.riform .field {
+	float: left;
+	margin-bottom: 10px;
+}
+
+.riform div.field {
+	width: 70%;
+}
+
+.riform .field > div {
+	margin-bottom: 10px;
+}
+
+#riformfields, .rifield {
+	overflow: hidden;
+	width: 100%;
+}
+
+.riweeklyweekday {
+	display: inline-block;
+}
+
+/*.riform .close {
+	width: 20px;
+	height: 20px;
+	margin-top: 3px;
+}
+
+.riform .close::before {
+	content: "\f129";
+	display: inline-block;
+	font-family: "Ionicons";
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	text-rendering: auto;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-size: 7px;
+}*/

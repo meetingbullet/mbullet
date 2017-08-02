@@ -89,6 +89,26 @@ $times = [
 						</div>
 					</div>
 				</div>
+				<?php if (! empty($this->input->get('recurring'))) : ?>
+				<div class="row">
+					<div class="col-md-3 col-sm-12">
+						<label for="in" class="pull-right"><?php e(lang('st_repeat')) ?></label>
+					</div>
+					<div class="col-md-9 col-sm-12">
+						<div class="row">
+							<div class="col-md-9 col-sm-12">
+								<input type="checkbox" style="margin-top: 10px;" name="repeat" value="1" <?php echo set_value('repeat') == 1 ? 'checked' : '' ?> />
+								<span id="readble"><?php echo set_value('readable') ?></span>
+								<input type="text" class="hidden" name="readable" value="<?php echo set_value('readable') ?>" />
+								<textarea name="rrule_recurring" class="hidden"><?php echo set_value('rrule_recurring') ?></textarea> 
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+				$('textarea[name=recurring]').change();
+				</script>
+				<?php endif ?>
 		</div>
 
 		<div class="<?php echo $this->input->is_ajax_request() ? 'modal-footer' : 'container-fluid pull-right' ?>">

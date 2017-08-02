@@ -122,40 +122,98 @@ class Meeting extends Authenticated_Controller
 					$member_data = [];
 					$members = $this->user_model->select('email, user_id')->where_in('user_id', $team)->as_array()->find_all();
 					if (! in_array($data['owner_id'], array_column($members, 'user_id'))) {
-						if ($id = $this->meeting_model->insert($data)) {
-							$this->mb_project->add_experience_point(10);
-							$this->mb_project->update_parent_objects('meeting', $id);
-							$user_ids = [$data['owner_id']];
-							$this->load->library('invite/invitation');
-							foreach ($members as $member) {
-								if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
-									$member_data[] = [
-										'meeting_id' => $id,
-										'invite_email' => $member['email'],
-										'invite_code' => $this->invitation->generateRandomString(64),
-									];
-								} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
-									$this->meeting_member_model->insert([
-										'meeting_id' => $id,
-										'user_id' => $member['user_id']
-									]);
-								}
+						if (empty($this->input->post('repeat'))) {
+							if ($id = $this->meeting_model->insert($data)) {
+								$this->mb_project->add_experience_point(10);
+								$this->mb_project->update_parent_objects('meeting', $id);
+								$user_ids = [$data['owner_id']];
+								$this->load->library('invite/invitation');
+								foreach ($members as $member) {
+									if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+										$member_data[] = [
+											'meeting_id' => $id,
+											'invite_email' => $member['email'],
+											'invite_code' => $this->invitation->generateRandomString(64),
+										];
+									} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+										$this->meeting_member_model->insert([
+											'meeting_id' => $id,
+											'user_id' => $member['user_id']
+										]);
+									}
 
-								if (! in_array($member['user_id'], $user_ids)) {
-									$user_ids[] = $member['user_id'];
+									if (! in_array($member['user_id'], $user_ids)) {
+										$user_ids[] = $member['user_id'];
+									}
+								}
+								
+								$this->meeting_member_invite_model->insert_batch($member_data);
+								// $this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
+								$this->mb_project->invite_users($id, 'meeting', $this->current_user, $user_ids);
+
+								Template::set('close_modal', 1);
+								Template::set('message_type', 'success');
+								Template::set('message', lang('st_meeting_successfully_created'));
+								Template::set('data', $this->ajax_meeting_data($id));
+
+								// Just to reduce AJAX request size
+								if (IS_AJAX) {
+									Template::set('content', '');
 								}
 							}
-							
-							$this->meeting_member_invite_model->insert_batch($member_data);
-							// $this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
-							$this->mb_project->invite_users($id, 'meeting', $this->current_user, $user_ids);
+						} else {
+							require_once APPPATH . 'modules/meeting/libraries/rrule/RRuleInterface.php';
+							require_once APPPATH . 'modules/meeting/libraries/rrule/RfcParser.php';
+							require_once APPPATH . 'modules/meeting/libraries/rrule/RSet.php';
+							require_once APPPATH . 'modules/meeting/libraries/rrule/RRule.php';
+
+							$rule = RRule\RfcParser::parseRRule($this->input->post('rrule_recurring'));
+							$rule['DTSTART'] = $data['scheduled_start_time'];
+							$rrule = new RRule\RRule($rule);
+
+							if ($rrule->isInfinite()) {
+								$occurrences = $rrule->getOccurrencesBetween(null , date('Y-m-d', strtotime($rule['DTSTART'] . ' + 6 months')));
+							} else {
+								$occurrences = $rrule->getOccurrences();
+							}
+
+							$this->load->library('invite/invitation');
+							foreach ($occurrences as $occurrence) {
+								$member_data = [];
+								$data['scheduled_start_time'] = $occurrence->format('Y-m-d H:i:s');
+								if ($id = $this->meeting_model->insert($data)) {
+									$this->mb_project->add_experience_point(10);
+									$this->mb_project->update_parent_objects('meeting', $id);
+									$user_ids = [$data['owner_id']];
+									foreach ($members as $member) {
+										if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+											$member_data[] = [
+												'meeting_id' => $id,
+												'invite_email' => $member['email'],
+												'invite_code' => $this->invitation->generateRandomString(64),
+											];
+										} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+											$this->meeting_member_model->insert([
+												'meeting_id' => $id,
+												'user_id' => $member['user_id']
+											]);
+										}
+
+										if (! in_array($member['user_id'], $user_ids)) {
+											$user_ids[] = $member['user_id'];
+										}
+									}
+									
+									$this->meeting_member_invite_model->insert_batch($member_data);
+									// $this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
+									$this->mb_project->invite_users($id, 'meeting', $this->current_user, $user_ids);
+								}
+							}
 
 							Template::set('close_modal', 1);
 							Template::set('message_type', 'success');
 							Template::set('message', lang('st_meeting_successfully_created'));
-							Template::set('data', $this->ajax_meeting_data($id));
 
-							// Just to reduce AJAX request size
 							if (IS_AJAX) {
 								Template::set('content', '');
 							}
@@ -2977,7 +3035,8 @@ class Meeting extends Authenticated_Controller
 		}
 	}
 
-	public function edit_calendar_event() {
+	public function edit_calendar_event()
+	{
 		if (! $this->input->is_ajax_request()) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
@@ -3019,7 +3078,8 @@ class Meeting extends Authenticated_Controller
 		]); exit;
 	}
 
-	public function select_project() {
+	public function select_project()
+	{
 		if (! $this->input->is_ajax_request()) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
