@@ -384,33 +384,18 @@ function renderPopover(that, data)
 			fill: false,
 			backgroundColor: 'rgb(54, 162, 235)',
 			borderColor: 'rgb(54, 162, 235)',
-			data: [
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-			],
+			data: data.stats.team,
 		}, {
 			label: "Rating",
 			fill: false,
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: [
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-			],
+			data: data.stats.rate,
 		}, {
 			label: "Hours",
 			backgroundColor: 'rgb(75, 192, 192)',
 			borderColor: 'rgb(75, 192, 192)',
-			data: [
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-			],
+			data: data.stats.hour,
 			fill: false,
 		}]
 	};
@@ -426,11 +411,6 @@ function renderPopover(that, data)
 	$(that).popover('reposition');
 	$('#popover-project').data('rendered', true)
 }
-
-window.randomScalingFactor = function() {
-	return Math.round(Math.random() * 100);
-};
-
 
 <?php if ( ! $current_user->inited): ?>
 $.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');

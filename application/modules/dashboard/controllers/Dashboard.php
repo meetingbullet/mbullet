@@ -339,8 +339,10 @@ class Dashboard extends Authenticated_Controller
 		$result['has_permission_project_view_all'] = has_permission('Project.View.All');
 
 		// Progress
-		$result['pending_meeting'] = $result['next_meeting'] + count($result['unscheduled_meetings']);
-		$result['used_meeting'] = count($result['completed_meetings']);
+		$cnt_unscheduled = $result['unscheduled_meetings'] ? count($result['unscheduled_meetings']) : 0;
+		$cnt_completed = $result['completed_meetings'] ? count($result['completed_meetings']) : 0;
+		$result['pending_meeting'] = ((int) $result['next_meeting']) + $cnt_unscheduled;
+		$result['used_meeting'] = $cnt_completed;
 		$result['total_stars'] = 0;
 		$result['rated_stars'] = 0;
 
@@ -352,7 +354,7 @@ class Dashboard extends Authenticated_Controller
 
 		$all_meetings || $all_meetings = [];
 
-		if (count($all_meetings > 0)) {
+		if (count($all_meetings) > 0) {
 			$all_meetings = array_column($all_meetings, 'meeting_id');
 			
 			$count_homework = $this->homework_model->where_in('meeting_id', $all_meetings)->count_all();
@@ -426,7 +428,59 @@ class Dashboard extends Authenticated_Controller
 
 		$result['members'] = $project_members;
 
+		// Stats
+		$result['stats'] = [];
+		$result['stats']['team'] = [];
+		$result['stats']['rate'] = [];
+		$result['stats']['hour'] = [];
+
+		$latest_meeting = $this->meeting_model
+		->select('meetings.meeting_id, meetings.created_on,
+		(SELECT COUNT(*) 
+			FROM mb_meeting_members mm 
+			WHERE mm.meeting_id = mb_meetings.meeting_id) AS team,
+		(SELECT IFNULL(SUM(rate) / COUNT(*), 0)
+			FROM mb_meeting_members mm 
+			WHERE mm.meeting_id = mb_meetings.meeting_id AND rate IS NOT NULL) AS rate,
+		(SELECT TRUNCATE(SUM(IF(in_type = "minutes", `in`, IF(in_type = "hours", `in` * 60, IF(in_type = "days", `in` * 24 * 60, `in` * 5 * 24 * 60)))) / 60, 2)
+			FROM mb_meetings m2 
+			WHERE m2.meeting_id = mb_meetings.meeting_id
+			AND m2.created_on <= mb_meetings.created_on) AS total_meeting_hours,
+		(SELECT IFNULL(SUM(time_spent), 0) FROM mb_homework hw 
+			JOIN mb_meetings m2 ON m2.meeting_id = hw.meeting_id 
+			WHERE m2.meeting_id = mb_meetings.meeting_id
+			AND m2.created_on <= mb_meetings.created_on) AS total_homework_hours
+		', false)
+		->join('actions a', 'a.action_id = meetings.action_id')
+		->join('projects p', 'a.project_id = p.project_id AND p.project_id = '. $project_id)
+		->order_by('meetings.created_on', 'DESC')
+		->limit(4)
+		->as_array()
+		->find_all();
+
+		$result['l'] = $this->db->last_query();
+
+		if ($latest_meeting && count($latest_meeting) > 0) {
+			$i = 0;
+
+			for ($i=3; $i>=0; $i--) {
+				if (isset($latest_meeting[$i])) {
+					$result['stats']['team'][] = $latest_meeting[$i]['team'];
+					$result['stats']['rate'][] = $latest_meeting[$i]['rate']; // AVG Rating for meeting
+					$result['stats']['hour'][] = $latest_meeting[$i]['total_meeting_hours'] + $latest_meeting[$i]['total_homework_hours'];
+				} else {
+					$result['stats']['team'][] = null;
+					$result['stats']['rate'][] = null;
+					$result['stats']['hour'][] = null;
+				}
+			}
+		}
+
 		echo json_encode($result);
+	}
+
+	private function get_meeting_stats($date) {
+
 	}
 
 	private function parse_display_time(&$meetings)
