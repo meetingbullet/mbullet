@@ -15,13 +15,13 @@
 	<script src="<?php echo Template::theme_url("js-plugins/selectize.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/owl.carousel.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/Chart.min.js"); ?>" type="text/javascript"></script>
+	<script src="<?php echo Template::theme_url("js-plugins/Chart.PieceLabel.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/circle-progress.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/bootstrap-datetimepicker.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/readmore.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/jsrender.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/fullcalendar.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/gcal.min.js"); ?>" type="text/javascript"></script>
-	<script src="<?php echo Template::theme_url("js/customize-chart.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/bootstrap-notify.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/sweetalert.min.js"); ?>" type="text/javascript"></script>
 	<script src="<?php echo Template::theme_url("js-plugins/bootstrap-switch.min.js"); ?>" type="text/javascript"></script>

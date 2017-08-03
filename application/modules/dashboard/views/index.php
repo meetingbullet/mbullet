@@ -1,5 +1,4 @@
 <?php
-$has_edit_project_permission = has_permission('Project.Edit.All');
 $has_new_homework = false;
 foreach ($my_todo['homeworks'] as $meeting_key => $homeworks) {
 	foreach ($homeworks as $homework) {
@@ -111,9 +110,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 
 				<ul class="an-child-nav js-open-nav" style="display: none;">
 					<?php foreach ($my_projects AS $project): ?>
-					<li>
+					<li class='project' data-project-id="<?php echo $project->project_id ?>">
 						<a 	href="<?php echo site_url('project/' . $project->cost_code)?>" 
-							class='mb-popover-project <?php if ( !$project->is_read) echo 'new' ?>' 
+							class='js-show-child-nav mb-popover-project <?php if ( !$project->is_read) echo 'new' ?>' 
 							data-project-id="<?php echo $project->project_id ?>" 
 							data-name="<?php echo $project->name ?>" 
 							data-owned="<?php echo $project->owned_by_x ?>"
@@ -125,6 +124,27 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							<span class="badge badge-warning badge-bordered badge-new">new</span>
 							<?php endif; ?>
 						</a>
+
+						<ul class="an-child-nav js-open-nav">
+							<li class="mb-child-nav" data-order="2">
+								<a href='#'>
+									<i class="ion-ios-pulse-strong"></i>
+									<?php echo lang('db_summary') ?>
+								</a>
+							</li>
+							<li class="mb-child-nav" data-order="3">
+								<a href='#'>
+									<i class="ion-ios-people"></i>
+									<?php echo lang('db_team') ?>
+								</a>
+							</li>
+							<li class="mb-child-nav" data-order="4">
+								<a href='#'>
+									<i class="ion-ios-pie"></i>
+									<?php echo lang('db_statistics') ?>
+								</a>
+							</li>
+						</ul>
 					</li>
 					<?php endforeach; ?>
 				</ul>
@@ -479,7 +499,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	</div> <!-- #popover-rate -->
 </div> <!-- #template -->
 
-<script type="text/vit" id="popover-project">
+<script typ="text/vit" id="popover-project">
 	<div class="project-header">
 		<div class='project-header-content'>
 			<h4>
@@ -525,7 +545,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	</div>
 
 	<div class="mb-popover-content">
-		<div class="project-body">
+		<div class="project-body order-1">
 			<div class="panel panel-default panel-overview">
 				<div class="panel-heading" role="tab">
 					<h4 class="panel-title">
@@ -767,6 +787,179 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</div>
 			</div> <!-- Completed Meeting -->
 		</div>
+
+		<div class="project-body order-2">
+			<div class="panel panel-default panel-overview">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#progress-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_project_progress') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="progress-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-8 col-xs-12">
+								<div class="progress-container">
+									<div>
+										<b>
+											<i class="ion-ios-people"></i>
+											<?php echo lang('db_meetings') ?>
+										</b>
+
+										<span class="pull-right">
+											4/8
+											<?php echo lang('db_meetings') ?>
+										</span>
+									</div>
+								
+									<div class="progress">
+										<div class="progress-bar progress-bar-success" style="width: 60%;">
+										</div>
+									</div>
+
+									<div class="row text-center">
+										<div class="col-md-4">
+											<?php echo lang('db_total') ?><br/>
+											<b>4</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_pending') ?><br/>
+											<b>4</b>
+										</div>
+									</div>
+								</div>
+								<div class="progress-container">
+									<div>
+										<b>
+											<i class="ion-ios-star"></i>
+											<?php echo lang('db_star_rating') ?>
+										</b>
+
+										<span class="pull-right">
+											32/40 (92%)
+										</span>
+									</div>
+									<div class="progress">
+										<div class="progress-bar progress-bar-success" style="width: 92%;">
+										</div>
+									</div>
+
+									<div class="row text-center">
+										<div class="col-md-4">
+											<?php echo lang('db_total') ?><br/>
+											<b>32</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_rated') ?><br/>
+											<b>40</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_unrated') ?><br/>
+											<b>8</b>
+										</div>
+									</div>
+								</div>
+
+								<div class="progress-container">
+									<div>
+										<b>
+											<i class="ion-ios-people"></i>
+											<?php echo lang('db_project_pts') ?>
+										</b>
+
+										<span class="pull-right">
+											4/8 (50%)
+										</span>
+									</div>
+									<div class="progress">
+										<div class="progress-bar progress-bar-success" style="width: 60%;">
+										</div>
+									</div>
+
+									<div class="row text-center">
+										<div class="col-md-4">
+											<?php echo lang('db_allowed_pts') ?><br/>
+											<b>4</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_logged_pts') ?><br/>
+											<b>4</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_unused_pts') ?><br/>
+											<b>4</b>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4 col-xs-12">
+								<canvas id="pie-chart" width="400" height="400">
+								</canvas>
+							</div>
+						</div> <!-- .row -->
+					</div>
+				</div>
+			</div> <!-- Project Progress -->
+		</div>
+
+		<div class="project-body order-3">
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#team-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_team') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="team-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="member">
+						<div class="row">
+							<div class="col-md-11">
+								<span class="avatar" style="background: url('assets/images/users/user2.jpg') center center no-repeat"></span>
+								<span class="info">
+									<a href="#"><b>Alex Jordan</b></a><br>
+									<span class="text-info">
+									<?php echo lang('db_project_pts') ?> 10 &nbsp;
+									<i class="ion-ios-star"></i> 8/10 &nbsp;
+									<?php echo lang('db_abg') ?> 
+										<i class="ion-ios-star"></i>
+										<i class="ion-ios-star"></i>
+										<i class="ion-ios-star"></i>
+										<i class="ion-ios-star"></i>
+										<i class="ion-ios-star-outline"></i>
+										4
+									</span>
+								</span>
+							</div>
+							<div class="col-md-1" style="padding: 10px;">
+								<button class="an-btn an-btn-icon small muted danger"><i class="icon-trash"></i></button>
+							</div>
+						</div>
+					</div>
+					<div class="member">
+						<span class="avatar" style="background: url('assets/images/users/user1.jpg') center center no-repeat; background-size: cover;"></span>
+						<a href="#">Alex Jordan</a>
+					</div>
+				</div>
+			</div> 
+		</div> <!-- Team members -->
+
+		<div class="project-body order-4">
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#stats-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_statistics') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="stats-body" class="panel-collapse collapse in" role="tabpanel">
+					<canvas id="stats-chart" width="100%" height="400"></canvas>
+				</div>
+			</div> 
+		</div> <!-- Team members -->
 	</div>
 </script>
 

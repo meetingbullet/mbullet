@@ -229,12 +229,10 @@ $(document).on('click', '.btn-join-project', function() {
 $('.mb-popover-project').popover({
 	html: true,
 	content: function() {
-		if (this.cache) return this.cache;
 		var that = this;
 
 		$.get("<?php echo site_url('dashboard/get_project_detail/') ?>" + $(that).data('project-id'), function(data) {
 			data = JSON.parse(data);
-
 			data.project_id = $(that).data('project-id');
 			data.name = $(that).data('name');
 			data.owned_by_x = $(that).data('owned');
@@ -242,25 +240,149 @@ $('.mb-popover-project').popover({
 			data.team = $(that).data('team');
 			data.type = $(that).data('type');
 
-			output = $('#popover-project').render(data, {
-				round: function(a, b) {
-					return Math.round(a * b) / b
-				}
-			});
-
-			that.cache = output;
-			$(that).next().children('.popover-content').html(output)
-			$(that).popover('reposition')
+			renderPopover(that, data);
 		})
 
 		return "<div class='popover-loading'><?php echo lang('db_loading') ?></div>";
 	}
 });
 
-function get_project_detail(that, project_id)
+
+$(document).on('show.bs.popover', function (e) {
+	// Close popover project on click another one
+	if ($('.an-sidebar-nav .popover.in').length > 0) {
+		$('.mb-popover-project').not(e.target).popover('hide');
+	}
+});
+
+$(document).on('hidden.bs.popover', function (e) {
+	$(e.target).data("bs.popover").inState.click = false;
+	$(e.target).data("bs.popover").secondCall = false;
+});
+
+$(document).click(function(e) {
+	// Close popover project on blur
+	if (! $(e.target).closest('.popover').length === 0) {
+		$('.mb-popover-project').popover('hide');
+	}
+});
+
+function renderPopover(that, data)
 {
-	
+	// Prevent duplicate rendering due to Popover contents function runs twice?
+	if ($('#popover-project').data('rendered') === true) {
+		$('#popover-project').data('rendered', false)
+		return;
+	}
+
+	output = $('#popover-project').render(data, {
+		round: function(a, b) {
+			return Math.round(a * b) / b
+		}
+	});
+
+	that.cache = output;
+	$(that).next().children('.popover-content').html(output);
+
+	// Testing chart
+	var pie = document.getElementById("pie-chart").getContext("2d");
+	var progressData = {
+		labels: [
+			"PTS: 25", ""
+		],
+		datasets: [{
+			data: [25, 75],
+			backgroundColor: [
+			"#025d83",
+			"#f5f5f5",
+			],
+			hoverBackgroundColor: [
+				"#0080b5",
+				"#f5f5f5",
+			]
+		}]
+	};
+
+	var pieChart = new Chart(pie, {
+		type: 'doughnut',
+		data: progressData,
+		options: {
+			legend: {
+				display: false,
+			},
+			tooltips: {
+				enabled: false
+			},
+			pieceLabel: {
+				mode: 'label'
+			},
+			title: {
+				display: true,
+				text: 'Overall 50%'
+			},
+			elements: {
+				arc: {
+					borderWidth: 0,
+				}
+			}
+		}
+	});
+
+	var statsElement = document.getElementById("stats-chart").getContext("2d");
+	var statsData = {
+		labels: ["L-3", "L-2", "L-1", "Last"],
+		datasets: [{
+			label: "Team",
+			fill: false,
+			backgroundColor: 'rgb(54, 162, 235)',
+			borderColor: 'rgb(54, 162, 235)',
+			data: [
+				randomScalingFactor(),
+				randomScalingFactor(),
+				randomScalingFactor(),
+				randomScalingFactor(),
+			],
+		}, {
+			label: "Rating",
+			fill: false,
+			backgroundColor: 'rgb(255, 99, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: [
+				randomScalingFactor(),
+				randomScalingFactor(),
+				randomScalingFactor(),
+				randomScalingFactor(),
+			],
+		}, {
+			label: "Hours",
+			backgroundColor: 'rgb(75, 192, 192)',
+			borderColor: 'rgb(75, 192, 192)',
+			data: [
+				randomScalingFactor(),
+				randomScalingFactor(),
+				randomScalingFactor(),
+				randomScalingFactor(),
+			],
+			fill: false,
+		}]
+	};
+
+	var statsChart = new Chart(statsElement, {
+		type: 'line',
+		data: statsData,
+		options: {
+			maintainAspectRatio: false,
+		}
+	});
+
+	$(that).popover('reposition');
+	$('#popover-project').data('rendered', true)
 }
+
+window.randomScalingFactor = function() {
+	return Math.round(Math.random() * 100);
+};
+
 
 <?php if ( ! $current_user->inited): ?>
 $.mbOpenModalViaUrl('init', "<?php echo site_url('dashboard/init') ?>", 'modal-95');
@@ -299,4 +421,57 @@ $.fn.popover.Constructor.prototype.reposition = function () {
 	var calculatedOffset = this.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
 
 	this.applyPlacement(calculatedOffset, placement)
+}
+
+// Child Nav Active
+$('.mb-child-nav').click(function(e) {
+	var project_id = $(this).closest('li.project').data('project-id');
+
+	if ($(this).hasClass('active')) {
+		bringToTop(1);
+
+		$(this).removeClass('active');
+		return;
+	}
+
+	// Switch order
+	bringToTop($(this).data('order'));
+
+	$('.mb-child-nav').removeClass('active');
+	$(this).addClass('active');
+});
+
+function bringToTop(order_index, speed = 300)  {
+	var row = $('.order-' + order_index);
+	var h = row.outerHeight();
+	var pos = row.position();
+
+	row.css({
+		position: 'absolute',
+		left: pos.left,
+		top: pos.top
+	});
+	row.next().css('margin-top', h);
+	row.animate({
+		top: 0
+	}, speed, 'easeOutQuart');
+	row.next().animate({
+		marginTop: 2
+	}, speed, 'easeOutQuart');
+	row.parent().animate({
+		paddingTop: h
+	}, speed, 'easeOutQuart', function() {
+		row.parent().css('padding-top', '');
+		row.parent().children(':first').before(row);
+		row.css('position', 'relative');
+		row.siblings().css({
+			marginTop: ''
+		});
+
+		row.find('.panel-collapse').collapse('show');
+	});
+
+	$('.mb-popover-content').animate({
+		scrollTop: 0
+	}, speed);
 }
