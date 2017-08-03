@@ -544,7 +544,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		</div>
 	</div>
 
-	<div class="mb-popover-content">
+	<div class="mb-popover-content" data-project-id="{{:project_id}}">
 		<div class="project-body order-1">
 			<div class="panel panel-default panel-overview">
 				<div class="panel-heading" role="tab">
@@ -809,24 +809,25 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 										</b>
 
 										<span class="pull-right">
-											4/8
+											{{:used_meeting}}/{{:no_of_meeting}}
 											<?php echo lang('db_meetings') ?>
 										</span>
 									</div>
 								
 									<div class="progress">
-										<div class="progress-bar progress-bar-success" style="width: 60%;">
+										<div class="progress-bar progress-bar-success" 
+											style="width: {{:used_meeting / no_of_meeting * 100 }}%;">
 										</div>
 									</div>
 
 									<div class="row text-center">
 										<div class="col-md-4">
 											<?php echo lang('db_total') ?><br/>
-											<b>4</b>
+											<b>{{:no_of_meeting}}</b>
 										</div>
 										<div class="col-md-4">
 											<?php echo lang('db_pending') ?><br/>
-											<b>4</b>
+											<b>{{:pending_meeting}}</b>
 										</div>
 									</div>
 								</div>
@@ -838,26 +839,26 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 										</b>
 
 										<span class="pull-right">
-											32/40 (92%)
+											{{:rated_stars}}/{{:total_stars}} ({{:rated_stars / total_stars * 100}}%)
 										</span>
 									</div>
 									<div class="progress">
-										<div class="progress-bar progress-bar-success" style="width: 92%;">
+										<div class="progress-bar progress-bar-success" style="width: {{:rated_stars / total_stars * 100}}%;">
 										</div>
 									</div>
 
 									<div class="row text-center">
 										<div class="col-md-4">
 											<?php echo lang('db_total') ?><br/>
-											<b>32</b>
+											<b>{{:total_stars}}</b>
 										</div>
 										<div class="col-md-4">
 											<?php echo lang('db_rated') ?><br/>
-											<b>40</b>
+											<b>{{:rated_stars}}</b>
 										</div>
 										<div class="col-md-4">
 											<?php echo lang('db_unrated') ?><br/>
-											<b>8</b>
+											<b>{{:total_stars - rated_stars}}</b>
 										</div>
 									</div>
 								</div>
@@ -870,26 +871,26 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 										</b>
 
 										<span class="pull-right">
-											4/8 (50%)
+											{{:~parseFloat(total_used.point.toFixed(1))}}/{{:allowed_point}} ({{:(total_used.point / allowed_point * 100).toFixed(1)}}%)
 										</span>
 									</div>
 									<div class="progress">
-										<div class="progress-bar progress-bar-success" style="width: 60%;">
+										<div class="progress-bar progress-bar-success" style="width: {{:(total_used.point / allowed_point * 100)}}%;">
 										</div>
 									</div>
 
 									<div class="row text-center">
 										<div class="col-md-4">
 											<?php echo lang('db_allowed_pts') ?><br/>
-											<b>4</b>
+											<b>{{:allowed_point}}</b>
 										</div>
 										<div class="col-md-4">
 											<?php echo lang('db_logged_pts') ?><br/>
-											<b>4</b>
+											<b>{{:~parseFloat(total_used.point.toFixed(1))}}</b>
 										</div>
 										<div class="col-md-4">
 											<?php echo lang('db_unused_pts') ?><br/>
-											<b>4</b>
+											<b>{{:allowed_point - ~parseFloat(total_used.point.toFixed(1))}}</b>
 										</div>
 									</div>
 								</div>
@@ -914,34 +915,33 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					</h4>
 				</div>
 				<div id="team-body" class="panel-collapse collapse in" role="tabpanel">
+					{{for members}}
 					<div class="member">
 						<div class="row">
 							<div class="col-md-11">
-								<span class="avatar" style="background: url('assets/images/users/user2.jpg') center center no-repeat"></span>
+								<span class="avatar" style="background-image: url('{{:avatar_url}}')"></span>
 								<span class="info">
-									<a href="#"><b>Alex Jordan</b></a><br>
+									<a href="#"><b>{{:full_name}}</b></a><br>
 									<span class="text-info">
-									<?php echo lang('db_project_pts') ?> 10 &nbsp;
-									<i class="ion-ios-star"></i> 8/10 &nbsp;
-									<?php echo lang('db_abg') ?> 
-										<i class="ion-ios-star"></i>
-										<i class="ion-ios-star"></i>
-										<i class="ion-ios-star"></i>
-										<i class="ion-ios-star"></i>
-										<i class="ion-ios-star-outline"></i>
-										4
+									<?php echo lang('db_project_pts') ?> {{:pts.toFixed(1)}} &nbsp;
+									<i class="ion-ios-star"></i> {{:rated_stars}}/{{:total_stars}} &nbsp;
+									<?php echo lang('db_avg') ?> 
+										{{:~countingStars( (rated_stars / total_stars * 5).toFixed(0) )}}
+										{{:~countingStars( total_stars > 0 ? 5 - (rated_stars / total_stars * 5).toFixed(0) : 5, "ion-ios-star-outline")}}
+										{{: total_stars > 0 ? (rated_stars / total_stars * 5).toFixed(0) : ''}}
 									</span>
 								</span>
 							</div>
 							<div class="col-md-1" style="padding: 10px;">
-								<button class="an-btn an-btn-icon small muted danger"><i class="icon-trash"></i></button>
+								<button class="an-btn an-btn-icon small muted danger btn-remove-member" 
+									data-user-id="{{:user_id}}"
+									data-full-name="{{:full_name}}">
+									<i class="icon-trash"></i>
+								</button>
 							</div>
 						</div>
-					</div>
-					<div class="member">
-						<span class="avatar" style="background: url('assets/images/users/user1.jpg') center center no-repeat; background-size: cover;"></span>
-						<a href="#">Alex Jordan</a>
-					</div>
+					</div> <!-- .member -->
+					{{/for}}
 				</div>
 			</div> 
 		</div> <!-- Team members -->

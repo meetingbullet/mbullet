@@ -1511,10 +1511,8 @@ div.popover .project-header {
 
 .mb-popover-content .member {
 	padding: 10px 0;
-}
-
-.mb-popover-content .member:nth-child(even) {
-	background: #f5f5f5;
+	border-bottom: 1px solid #eee;
+	margin: 0 10px;
 }
 
 .mb-popover-content .member .info {

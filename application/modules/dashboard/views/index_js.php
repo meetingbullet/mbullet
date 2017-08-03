@@ -233,6 +233,7 @@ $('.mb-popover-project').popover({
 
 		$.get("<?php echo site_url('dashboard/get_project_detail/') ?>" + $(that).data('project-id'), function(data) {
 			data = JSON.parse(data);
+
 			data.project_id = $(that).data('project-id');
 			data.name = $(that).data('name');
 			data.owned_by_x = $(that).data('owned');
@@ -267,6 +268,35 @@ $(document).click(function(e) {
 	}
 });
 
+$(document).on('click', '.btn-remove-member', function(e){
+	console.log($(this).data('user-id'), $(this).closest('.mb-popover-content').data('project-id'))
+	var that = this;
+	swal({
+		title: '<?php echo lang("db_are_you_sure") ?>',
+		text: "<?php echo lang('db_remove_member_message') ?>",
+		type: 'warning',
+		html: true,
+		showCancelButton: true,
+		confirmButtonColor: '#3085d6',
+		cancelButtonColor: '#d33',
+		confirmButtonText: '<?php echo lang("db_yes_remove_x") ?>'.format($(this).data('full-name'))
+		}, function () {
+		
+		$.post('<?php echo site_url("project/remove_member/") ?>', {
+			user_id: $(that).data('user-id'),
+			project_id: $(that).closest('.mb-popover-content').data('project-id')
+		}, (data) => {
+			data = JSON.parse(data);
+			
+			$.mbNotify(data.message, data.message_type);
+
+			if (data.message_type == 'success') {
+				$(that).closest('.member').slideUp();
+			}
+		})
+	})
+})
+
 function renderPopover(that, data)
 {
 	// Prevent duplicate rendering due to Popover contents function runs twice?
@@ -275,23 +305,41 @@ function renderPopover(that, data)
 		return;
 	}
 
+	if (data.message_type == 'danger' ) {
+		$.mbNotify(data.message, data.message_type);
+		$('#popover-project').data('rendered', false);
+		return;
+	}
+
 	output = $('#popover-project').render(data, {
 		round: function(a, b) {
 			return Math.round(a * b) / b
+		},
+		round: Math.round,
+		parseFloat,
+		countingStars: function(n, icon = "ion-ios-star") {
+			str = "";
+
+			for (var i=0; i<n; i++) {
+				str+= `<i class="${icon}"></i>\n`;
+			}
+
+			return str;
 		}
 	});
 
 	that.cache = output;
 	$(that).next().children('.popover-content').html(output);
-
+	console.log("<?php echo lang('db_pts_x') ?>".format(Math.round(data.total_used.point * 10) / 10))
 	// Testing chart
 	var pie = document.getElementById("pie-chart").getContext("2d");
 	var progressData = {
 		labels: [
-			"PTS: 25", ""
+			// pieceLabel plugin has problem with its Text width overflows the => hidden
+			"<?php echo lang('db_pts_x') ?>".format(Math.round(data.total_used.point)), ""
 		],
 		datasets: [{
-			data: [25, 75],
+			data: [data.total_used.point, data.allowed_point],
 			backgroundColor: [
 			"#025d83",
 			"#f5f5f5",
@@ -318,7 +366,7 @@ function renderPopover(that, data)
 			},
 			title: {
 				display: true,
-				text: 'Overall 50%'
+				text: "<?php echo lang('db_overall_x') ?>".format(Math.round(data.total_used.point / data.allowed_point * 100 * 10) / 10)
 			},
 			elements: {
 				arc: {

@@ -9,6 +9,7 @@ class Dashboard extends Authenticated_Controller
 		$this->lang->load('project/project');
 		$this->lang->load('meeting/meeting');
 		$this->load->model('project/project_model');
+		$this->load->model('project/project_constraint_model');
 		$this->load->model('project/project_member_model');
 		$this->load->model('homework/homework_model');
 		$this->load->model('homework/homework_member_model');
@@ -265,11 +266,22 @@ class Dashboard extends Authenticated_Controller
 	{
 		$result = [];
 
+		// Restrict
+		if (! $this->mb_project->has_permission('project', $project_id, 'Project.View.All')) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('db_you_have_not_earned_permission_to_view_this_project'),
+				'lqr' => $this->db->last_query(),
+			]);
+			return;
+		}
+
+		$result['allowed_point'] = $this->project_constraint_model->select('total_point_project')->find($project_id);
+		$result['allowed_point'] && $result['allowed_point'] = (int) $result['allowed_point']->total_point_project;
 		$result['total_used'] = $this->mb_project->total_used('project', $project_id);
 		$result['no_of_meeting'] = $this->meeting_model
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
-		->where('organization_id', $this->current_user->current_organization_id)
 		->where('p.project_id', $project_id)->count_all();
 
 		$result['unscheduled_meetings'] = $this->meeting_model->
@@ -278,8 +290,6 @@ class Dashboard extends Authenticated_Controller
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
 		->join('users u', 'u.user_id = meetings.owner_id')
-		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
-		->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
 		->where('scheduled_start_time IS NULL', null, false)
 		->where('p.project_id', $project_id)
 		->find_all();
@@ -290,8 +300,6 @@ class Dashboard extends Authenticated_Controller
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
 		->join('users u', 'u.user_id = meetings.owner_id')
-		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
-		->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
 		->where('meetings.status', 'ready')
 		->where('scheduled_start_time > CURRENT_TIMESTAMP()', null, false)
 		->find_by('p.project_id', $project_id);
@@ -303,8 +311,6 @@ class Dashboard extends Authenticated_Controller
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
 		->join('users u', 'u.user_id = meetings.owner_id')
-		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
-		->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
 		->where('meetings.status', 'ready')
 		->where('p.project_id', $project_id);
 
@@ -321,8 +327,6 @@ class Dashboard extends Authenticated_Controller
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
 		->join('users u', 'u.user_id = meetings.owner_id')
-		->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $this->current_user->user_id, 'LEFT')
-		->where('(mm.user_id = \'' . $this->current_user->user_id . '\' OR meetings.owner_id = \'' . $this->current_user->user_id . '\')')
 		->where('meetings.status', 'finished')
 		->where('p.project_id', $project_id)
 		->find_all();
@@ -333,6 +337,94 @@ class Dashboard extends Authenticated_Controller
 
 		$result['has_permission_project_edit'] = $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All');
 		$result['has_permission_project_view_all'] = has_permission('Project.View.All');
+
+		// Progress
+		$result['pending_meeting'] = $result['next_meeting'] + count($result['unscheduled_meetings']);
+		$result['used_meeting'] = count($result['completed_meetings']);
+		$result['total_stars'] = 0;
+		$result['rated_stars'] = 0;
+
+		$all_meetings = $this->meeting_model->select('meeting_id')
+		->join('actions a', 'meetings.action_id = a.action_id')
+		->join('projects p', 'p.project_id = a.project_id AND p.project_id = ' . $project_id)
+		->as_array()
+		->find_all();
+
+		$all_meetings || $all_meetings = [];
+
+		if (count($all_meetings > 0)) {
+			$all_meetings = array_column($all_meetings, 'meeting_id');
+			
+			$count_homework = $this->homework_model->where_in('meeting_id', $all_meetings)->count_all();
+			$count_agenda = $this->agenda_model->where_in('meeting_id', $all_meetings)->count_all();
+			$count_member = $this->meeting_member_model->where_in('meeting_id', $all_meetings)->count_all();
+
+			$result['total_stars'] += count($all_meetings) + $count_agenda + $count_homework + $count_member;
+			$result['total_stars'] *= 5;
+
+			$count_homework = $this->homework_model->where_in('meeting_id', $all_meetings)
+			->join('homework_rates r', 'r.homework_id = homework.homework_id')
+			->count_all();
+
+			$count_agenda = $this->agenda_model->where_in('meeting_id', $all_meetings)
+			->join('agenda_rates r', 'r.agenda_id = agendas.agenda_id')
+			->count_all();
+
+			$count_member = $this->meeting_member_model->where_in('meeting_members.meeting_id', $all_meetings)
+			->join('meeting_member_rates r', 'r.meeting_id = meeting_members.meeting_id')
+			->count_all();
+
+			$count_meeting_rate = $this->meeting_model->where_in('meetings.meeting_id', $all_meetings)
+			->join('meeting_members r', 'r.meeting_id = meetings.meeting_id AND r.rate IS NOT NULL')
+			->count_all();
+
+			$result['rated_stars'] += $count_homework + $count_agenda + $count_member + $count_meeting_rate;
+		}
+
+		// Team
+		$project_members = $this->project_member_model->select('u.user_id, 
+		CONCAT(first_name, " ", last_name) AS full_name, email, avatar')
+		->where('project_id', $project_id)
+		->join('users u', 'u.user_id = project_members.user_id')
+		->find_all();
+
+		$project_members || $project_members = [];
+
+		foreach ($project_members as &$user) {
+			$user->total_stars = 0;
+			$user->rated_stars = 0;
+			$user->avg_stars = 0;
+			$user->pts = 0;
+			$user->avatar_url = avatar_url($user->avatar, $user->email);
+		}
+
+		if (is_array($project_members) && count($project_members) > 0 && count($all_meetings) > 0) {
+			foreach ($project_members as &$user) {
+				$joined_meetings = $this->meeting_model
+				->select('meetings.meeting_id')
+				->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $user->user_id)
+				->where_in('meetings.meeting_id', $all_meetings)
+				->as_array()
+				->find_all();
+
+				$joined_meetings || $joined_meetings = [];
+				$user->total_stars = count($joined_meetings) * 5;
+
+				if (count($joined_meetings) > 0) {
+					$rated_stars = $this->meeting_member_rate_model->select_sum('rate')
+					->where_in('meeting_id', array_column($joined_meetings, 'meeting_id'))
+					->find_by('attendee_id', $user->user_id);
+
+					if ($rated_stars && is_numeric($rated_stars->rate)) {
+						$user->rated_stars = $rated_stars->rate;
+					}
+				}
+
+				$user->pts = $this->mb_project->total_user_point_used($user->user_id, 'project', $project_id);
+			}
+		}
+
+		$result['members'] = $project_members;
 
 		echo json_encode($result);
 	}

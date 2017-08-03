@@ -885,23 +885,6 @@ function calcNumberOfWorkingDay(moment)
 	return cntDay * 8; // 8 hours per day
 }
 
-/*
-	sprintf() for JavaScript.
-	Grabs from https://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
-	Usage: "{0} is dead, but {1} is alive! {0} {2}".format("ASP", "ASP.NET")
-*/
-if (!String.prototype.format) {
-	String.prototype.format = function() {
-		var args = arguments;
-		return this.replace(/{(\d+)}/g, function(match, number) { 
-		return typeof args[number] != 'undefined'
-			? args[number]
-			: match
-		;
-		});
-	};
-}
-
 // ********start - baodg********
 $(document).on('click', '#init .init-body .init-project .action .delete-meeting', function() {
 	var that = $(this);
