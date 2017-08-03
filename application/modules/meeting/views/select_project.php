@@ -12,10 +12,16 @@
 			</div>
 			<div class="col-md-9 col-sm-12">
 				<select name="project" class="an-form-control">
-				<?php foreach ($projects as $project) : ?>
-					<option value="<?php echo $project->cost_code ?>"><?php echo $project->name ?></option>
-				<?php endforeach ?>
-				</select>
+					<option value="">Unspecified Project</option>
+					<optgroup label="My projects">
+					<?php foreach ($my_projects as $project) : ?>
+						<option value="<?php echo $project->cost_code ?>"><?php echo $project->name ?></option>
+					<?php endforeach ?>
+					<optgroup label="Other projects">
+					<?php foreach ($other_projects as $project) : ?>
+						<option value="<?php echo $project->cost_code ?>"><?php echo $project->name ?></option>
+					<?php endforeach ?>
+					</select>
 				<input name="in" type="hidden" value="<?php echo (strtotime($this->input->get('end')) - strtotime($this->input->get('start'))) / 60 ?>"/>
 				<input name="scheduled_start_time" type="hidden" value="<?php echo $this->input->get('start') ?>" />
 			</div>

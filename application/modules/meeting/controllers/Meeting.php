@@ -30,6 +30,7 @@ class Meeting extends Authenticated_Controller
 		$this->load->model('meeting_member_invite_model');
 		$this->load->model('meeting_comment_model');
 		$this->load->model('meeting/goal_model');
+		$this->load->model('private_meeting_model');
 
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
@@ -3084,24 +3085,83 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (has_permission('Project.Edit.All')) {
-			$projects = $this->project_model->select('projects.cost_code, projects.name')
-											->where('projects.organization_id', $this->current_user->current_organization_id)
-											->order_by('projects.modified_on', 'desc')
-											->find_all();
-		} else {
-			$projects = $this->project_model->select('projects.cost_code, projects.name')
-											->join('users u', 'u.user_id = projects.owner_id')
-											->join('project_members pm', 'projects.project_id = pm.project_id')
-											->where('projects.status !=', 'archive')
-											->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
-											->where('organization_id', $this->current_user->current_organization_id)
-											->order_by('projects.modified_on', 'desc')
-											->group_by('projects.project_id')
-											->find_all();
+		$projects = $this->project_model->select('projects.cost_code, projects.name, IF((pm.user_id = \'' . $this->current_user->user_id . '\' OR ' . $this->db->dbprefix('projects') . '.owner_id = \'' . $this->current_user->user_id . '\'), 1, 0) AS is_mine')
+										->join('users u', 'u.user_id = projects.owner_id')
+										->join('project_members pm', 'projects.project_id = pm.project_id')
+										->where('projects.status !=', 'archive')
+										->where('organization_id', $this->current_user->current_organization_id)
+										->order_by('projects.modified_on', 'desc')
+										->group_by('projects.project_id')
+										->find_all();
+		if (empty($projects)) $projects = [];
+
+		$my_projects = [];
+		$other_projects = [];
+		foreach ($projects as $project) {
+			if ($project->is_mine) {
+				$my_projects[] = $project;
+			} else {
+				$other_projects[] = $project;
+			}
 		}
 
-		Template::set('projects', $projects);
+		Template::set('my_projects', $my_projects);
+		Template::set('other_projects', $other_projects);
+		Template::render();
+	}
+
+	public function create_private()
+	{
+
+		// Get list resource/team member
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+
+		if (isset($_POST['save'])) {
+			$data = $this->meeting_model->prep_data($this->input->post());
+			$data['organization_id'] = $this->current_user->current_organization_id;
+
+			if ($this->input->post('owner_id') == '') {
+				$data['owner_id'] = $this->current_user->user_id;
+			}
+
+			// only when create meeting on dashboard calendar
+			if (! empty($this->input->get('scheduled_start_time'))) {
+				$data['scheduled_start_time'] = $this->input->get('scheduled_start_time');
+			}
+
+			if ($team = $this->input->post('team')) {
+				if ($team = explode(',', $team)) {
+					$member_data = [];
+					$members = $this->user_model->select('email, user_id')->where_in('user_id', $team)->as_array()->find_all();
+					if (! in_array($data['owner_id'], array_column($members, 'user_id'))) {
+						$data['members'] = json_encode(array_column($members, 'email'));
+					} else {
+						Template::set('close_modal', 0);
+						Template::set('message_type', 'danger');
+						Template::set('message', lang('st_owner_can_not_be_member'));
+						Template::render();
+						return;
+					}
+				}
+			}
+
+			if (! empty($this->input->post('rrule_recurring'))) {
+				$data['recurring_rule'] = $this->input->post('rrule_recurring');
+			}
+
+			$id = $this->private_meeting_model->insert($data);
+			if ($id) {
+				Template::set('close_modal', 1);
+				Template::set('message_type', 'success');
+				Template::set('message', lang('st_meeting_successfully_created'));
+			} else {
+				Template::set('close_modal', 0);
+				Template::set('message_type', 'danger');
+				Template::set('message', lang('st_there_was_a_problem_while_creating_meeting'));
+			}
+		}
+
+		Template::set('project_members', $project_members);
 		Template::render();
 	}
 }

@@ -305,28 +305,33 @@ $(document).ready(function() {
 
 		var scheduled_start_time = $('#calendar-create-event-modal input[name="scheduled_start_time"]').val();
 		var duration = $('#calendar-create-event-modal input[name="in"]').val();
+		var url = '<?php echo site_url('meeting/') ?>';
 
 		if (typeof(project_key) != 'undefined' && project_key != '') {
-			$.get('<?php echo site_url('meeting/create/') ?>' + project_key + '?recurring=1&scheduled_start_time=' + encodeURIComponent(scheduled_start_time) + '&in=' + encodeURIComponent(duration), (data) => {
-				data = JSON.parse(data);
-
-				if (data.message_type != 'success' && data.message_type != null) {
-					$.notify({
-						message: data.message
-					}, {
-						type: data.message_type,
-						z_index: 1051
-					});
-
-					return;
-				}
-				$('#calendar-create-event-modal .modal-content').fadeOut(400, function() {
-					$('#calendar-create-event-modal .modal-dialog').removeClass('modal-sm').addClass('modal-lg');
-					$('#calendar-create-event-modal .modal-content').html(data.modal_content);
-					$('#calendar-create-event-modal .modal-content').fadeIn();
-				});
-			});
+			url += 'create/' + project_key;
+		} else {
+			url+= 'create_private/';
 		}
+
+		$.get(url + '?recurring=1&scheduled_start_time=' + encodeURIComponent(scheduled_start_time) + '&in=' + encodeURIComponent(duration), (data) => {
+			data = JSON.parse(data);
+
+			if (data.message_type != 'success' && data.message_type != null) {
+				$.notify({
+					message: data.message
+				}, {
+					type: data.message_type,
+					z_index: 1051
+				});
+
+				return;
+			}
+			$('#calendar-create-event-modal .modal-content').fadeOut(400, function() {
+				$('#calendar-create-event-modal .modal-dialog').removeClass('modal-sm').addClass('modal-lg');
+				$('#calendar-create-event-modal .modal-content').html(data.modal_content);
+				$('#calendar-create-event-modal .modal-content').fadeIn();
+			});
+		});
 	});
 
 
