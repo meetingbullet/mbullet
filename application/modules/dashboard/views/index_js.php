@@ -167,7 +167,7 @@ $(document).on("click", "#rate-content .submit", function(e) {
 		$.post({
 			url: url,
 			data: data,
-		}).done(function(data) {console.log(data);
+		}).done(function(data) {
 			data = JSON.parse(data);
 			if (data.message_type == 'success') {
 				$(submit_btn)
@@ -188,7 +188,6 @@ $(document).on("click", "#rate-content .submit", function(e) {
 				z_index: 1051
 			});
 		}).fail(function(xhr, statusText) {
-			console.log(xhr.status);
 			$.notify({
 				message: data.message
 			}, {
@@ -269,7 +268,6 @@ $(document).click(function(e) {
 });
 
 $(document).on('click', '.btn-remove-member', function(e){
-	console.log($(this).data('user-id'), $(this).closest('.mb-popover-content').data('project-id'))
 	var that = this;
 	swal({
 		title: '<?php echo lang("db_are_you_sure") ?>',
@@ -330,7 +328,6 @@ function renderPopover(that, data)
 
 	that.cache = output;
 	$(that).next().children('.popover-content').html(output);
-	console.log("<?php echo lang('db_pts_x') ?>".format(Math.round(data.total_used.point * 10) / 10))
 	// Testing chart
 	var pie = document.getElementById("pie-chart").getContext("2d");
 	var progressData = {
