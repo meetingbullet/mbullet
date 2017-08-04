@@ -218,12 +218,15 @@ $projects = $this->mb_project->get_project_list();
 					<div class="dropdown-menu">
 						<p class="an-info-count">Settings</p>
 						<ul class="an-settings-list">
+							<!--
 							<?php if (has_permission('Organization.Settings.Edit')): ?>
 							<li><a href="<?php echo site_url('admin/settings'); ?>"><i class="ion-ios-settings"></i>Preferences</a></li>
 							<?php endif; ?>
-							<li><a href="<?php echo site_url('admin/team'); ?>"><i class="ion-ios-people-outline"></i>Team</a></li>
+							-->
 							<?php if (has_permission('User.Team.View')): ?>
+							<li><a href="<?php echo site_url('admin/team'); ?>"><i class="ion-ios-people-outline"></i>Team</a></li>
 							<?php endif; ?>
+							<!--
 							<li><a href="<?php echo site_url('admin/invites'); ?>"><i class="ion-ios-personadd-outline"></i>Invitations</a></li>
 							<?php if (has_permission('Organization.Billing.Pay')): ?>
 							<li><a href="<?php echo site_url('admin/billing'); ?>"><i class="ion-social-usd-outline"></i>Billing</a></li>
@@ -231,6 +234,7 @@ $projects = $this->mb_project->get_project_list();
 							<?php if (has_permission('Organization.Authentication.Manage')): ?>
 							<li><a href="<?php echo site_url('admin/auth'); ?>"><i class="ion-ios-locked-outline"></i>Authentication</a></li>
 							<?php endif; ?>
+							-->
 						</ul>
 					</div>
 				</div>

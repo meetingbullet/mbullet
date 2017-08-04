@@ -127,6 +127,8 @@ $(document).ready(function() {
 			var now = new Date();
 			if (start._d.getTime() <= now.getTime()) {
 				$('#calendar').fullCalendar('unselect');
+
+				$.mbNotify('<?php echo lang("db_select_from_today_to_future") ?>', 'warning');
 			} else {
 				if ($('#calendar').fullCalendar('getView') == 'month') {
 					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD HH:mm:ss')) + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');

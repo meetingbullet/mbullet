@@ -253,16 +253,27 @@ $(document).on('show.bs.popover', function (e) {
 	if ($('.an-sidebar-nav .popover.in').length > 0) {
 		$('.mb-popover-project').not(e.target).popover('hide');
 	}
+
+	// Add body blur
+	if ($(e.target).hasClass('mb-popover-project')) {
+		$('.an-page-content').addClass('mb-blur');
+	}
 });
 
 $(document).on('hidden.bs.popover', function (e) {
 	$(e.target).data("bs.popover").inState.click = false;
 	$(e.target).data("bs.popover").secondCall = false;
+
+	// Add body blur
+	if ($(e.target).hasClass('mb-popover-project')) {
+		$('.an-page-content').removeClass('mb-blur');
+	}
 });
 
 $(document).click(function(e) {
-	// Close popover project on blur
-	if (! $(e.target).closest('.popover').length === 0) {
+	if ($('.an-sidebar-nav .popover.in').length > 0
+		&& $(e.target).closest('.an-page-content').length > 0) {
+
 		$('.mb-popover-project').popover('hide');
 	}
 });
@@ -311,6 +322,10 @@ function renderPopover(that, data)
 
 	output = $('#popover-project').render(data, {
 		round: function(a, b) {
+			if (typeof a !== "number") {
+				return 0;
+			}
+
 			return Math.round(a * b) / b
 		},
 		parseFloat,
