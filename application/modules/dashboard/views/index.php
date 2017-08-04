@@ -839,11 +839,11 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 										</b>
 
 										<span class="pull-right">
-											{{:rated_stars}}/{{:total_stars}} ({{:rated_stars / total_stars * 100}}%)
+											{{:rated_stars}}/{{:total_stars}} ({{:~round(rated_stars / total_stars * 100, 10)}}%)
 										</span>
 									</div>
 									<div class="progress">
-										<div class="progress-bar progress-bar-success" style="width: {{:rated_stars / total_stars * 100}}%;">
+										<div class="progress-bar progress-bar-success" style="width: {{:~round(rated_stars / total_stars * 100, 10)}}%;">
 										</div>
 									</div>
 
@@ -871,11 +871,11 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 										</b>
 
 										<span class="pull-right">
-											{{:~parseFloat(total_used.point.toFixed(1))}}/{{:allowed_point}} ({{:(total_used.point / allowed_point * 100).toFixed(1)}}%)
+											{{:~round(total_used.point, 10)}}/{{:allowed_point}} ({{:~round(total_used.point / allowed_point * 100, 10)}}%)
 										</span>
 									</div>
 									<div class="progress">
-										<div class="progress-bar progress-bar-success" style="width: {{:(total_used.point / allowed_point * 100)}}%;">
+										<div class="progress-bar progress-bar-success" style="width: {{:~round(total_used.point / allowed_point * 100, 10)}}%;">
 										</div>
 									</div>
 

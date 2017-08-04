@@ -313,7 +313,6 @@ function renderPopover(that, data)
 		round: function(a, b) {
 			return Math.round(a * b) / b
 		},
-		round: Math.round,
 		parseFloat,
 		countingStars: function(n, icon = "ion-ios-star") {
 			str = "";
