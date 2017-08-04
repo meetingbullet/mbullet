@@ -34,6 +34,7 @@ $lang['pj_duplicated_cost_code'] = 'Duplicated cost code';
 $lang['pj_not_have_config_permission'] = 'You do not have permission to change project settings';
 $lang['pj_project_status_updated'] = 'Project status updated';
 $lang['pj_invalid_action'] = 'Invalid action';
+$lang['pj_member_removed'] = 'Member removed';
 
 // Fields
 $lang['pj_project_name'] 			= 'Project name';

@@ -235,7 +235,7 @@ $('.btn-underdog').click(function() {
 
 	// Remove all Owner meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
-		if (item.isOwner == true) {
+		if (item.isOwner == true && item._id !== undefined) {
 			$('#calendar-init').fullCalendar('removeEvents', item._id);
 		}
 	});
@@ -255,7 +255,7 @@ $('.btn-like-a-boss').click(function() {
 
 	// Remove all Guest meeting
 	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
-		if (item.isOwner == false) {
+		if (item.isOwner == false && item.id !== undefined) {
 			$('#calendar-init').fullCalendar('removeEvents', item._id);
 		}
 	});
@@ -883,23 +883,6 @@ function calcNumberOfWorkingDay(moment)
 	} while (curDay.format('D') != endOfMonth.format('D'));
 
 	return cntDay * 8; // 8 hours per day
-}
-
-/*
-	sprintf() for JavaScript.
-	Grabs from https://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
-	Usage: "{0} is dead, but {1} is alive! {0} {2}".format("ASP", "ASP.NET")
-*/
-if (!String.prototype.format) {
-	String.prototype.format = function() {
-		var args = arguments;
-		return this.replace(/{(\d+)}/g, function(match, number) { 
-		return typeof args[number] != 'undefined'
-			? args[number]
-			: match
-		;
-		});
-	};
 }
 
 // ********start - baodg********

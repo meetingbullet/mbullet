@@ -828,6 +828,88 @@ class Project extends Authenticated_Controller
 		}
 	}
 
+	public function remove_member()
+	{
+		$user_id = $this->input->post('user_id');
+		$project_id = $this->input->post('project_id');
+
+		if ( ! is_numeric($user_id) && is_numeric($project_id)) {
+			echo json_encode([
+				'message' => lang('pj_invalid_action'),
+				'message_type' => 'danger'
+			]);
+			return;
+		}
+
+		// Restrict
+		if ( ! $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All')) {
+			dump($project_id, $user_id); die;
+			echo json_encode([
+				'message' => lang('pj_invalid_action'),
+				'message_type' => 'danger'
+			]);
+			return;
+		}
+
+		// Remove from Project -> Meetings -> Agenda -> Homework
+		if ($this->project_member_model->delete_where([
+			'project_id' => $project_id, 'user_id' => $user_id
+			]) ) {
+
+			$fx = $this->db->dbprefix;
+
+			$this->db->trans_begin();
+
+			$this->db->query("
+				DELETE mlem FROM {$fx}agenda_members mlem
+				JOIN {$fx}agendas ag ON ag.agenda_id = mlem.agenda_id
+				JOIN {$fx}meetings m ON m.meeting_id = ag.meeting_id
+				JOIN {$fx}actions a ON a.action_id = m.action_id
+				WHERE a.project_id = $project_id AND mlem.user_id = $user_id;
+			");
+
+			$this->db->query("
+				DELETE mlem FROM {$fx}homework_members mlem
+				JOIN {$fx}homework hw ON hw.homework_id = mlem.homework_id
+				JOIN {$fx}meetings m ON m.meeting_id = hw.meeting_id
+				JOIN {$fx}actions a ON a.action_id = m.action_id
+				WHERE a.project_id = $project_id AND mlem.user_id = $user_id;
+			");
+
+			$this->db->query("
+				DELETE mlem FROM {$fx}meeting_members mlem
+				JOIN {$fx}meetings m ON m.meeting_id = mlem.meeting_id
+				JOIN {$fx}actions a ON a.action_id = m.action_id
+				WHERE a.project_id = $project_id AND mlem.user_id = $user_id;
+			");
+
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+
+				echo json_encode([
+					'message' => lang('pj_unknown_error_orcurred'),
+					'message_type' => 'danger'
+				]);
+				
+				return;
+			} else {
+				$this->db->trans_commit();
+			}
+
+			echo json_encode([
+				'message' => lang('pj_member_removed'),
+				'message_type' => 'success'
+			]);
+
+			return;
+		}
+
+		echo json_encode([
+			'message' => lang('pj_invalid_action'),
+			'message_type' => 'danger'
+		]);
+	}
+
 	private function get_actions($project_id)
 	{
 		// get all project actions, sort by sort order

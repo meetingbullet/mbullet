@@ -1,5 +1,4 @@
 <?php
-$has_edit_project_permission = has_permission('Project.Edit.All');
 $has_new_homework = false;
 foreach ($my_todo['homeworks'] as $meeting_key => $homeworks) {
 	foreach ($homeworks as $homework) {
@@ -50,7 +49,10 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					<?php if ($has_new_homework):?>
 					<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
 					<?php endif; ?>
+
+					<?php if ($my_todo['homeworks_count'] + $evaluates_count > 0): ?>
 					<span class="count"><?php echo $my_todo['homeworks_count'] + $evaluates_count ?></span>
+					<?php endif; ?>
 					</span>
 				</a>
 
@@ -67,7 +69,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							<?php if ($has_new_homework):?>
 							<span class="badge badge-warning badge-bordered badge-homework-new">new</span>
 							<?php endif; ?>
+							<?php if ($my_todo['homeworks_count'] > 0): ?>
 							<span class="badge badge-primary pull-right homework-counter"><?php echo $my_todo['homeworks_count'] ?></span>
+							<?php endif; ?>
 						</a>
 					</li>
 					<li>
@@ -81,7 +85,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							<?php if ($has_new_rating):?>
 							<span class="badge badge-warning badge-bordered badge-rate-new">new</span>
 							<?php endif; ?>
+							<?php if ($evaluates_count > 0): ?>
 							<span class="badge badge-primary pull-right"><?php echo $evaluates_count ?></span>
+							<?php endif; ?>
 						</a>
 					</li>
 				</ul>
@@ -104,8 +110,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 
 				<ul class="an-child-nav js-open-nav" style="display: none;">
 					<?php foreach ($my_projects AS $project): ?>
-					<li>
-						<a href="<?php echo site_url('project/' . $project->cost_code)?>" class='mb-popover-project <?php if ( !$project->is_read) echo 'new' ?>' 
+					<li class='project' data-project-id="<?php echo $project->project_id ?>">
+						<a 	href="<?php echo site_url('project/' . $project->cost_code)?>" 
+							class='js-show-child-nav mb-popover-project <?php if ( !$project->is_read) echo 'new' ?>' 
 							data-project-id="<?php echo $project->project_id ?>" 
 							data-name="<?php echo $project->name ?>" 
 							data-owned="<?php echo $project->owned_by_x ?>"
@@ -117,6 +124,27 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							<span class="badge badge-warning badge-bordered badge-new">new</span>
 							<?php endif; ?>
 						</a>
+
+						<ul class="an-child-nav js-open-nav">
+							<li class="mb-child-nav" data-order="2">
+								<a href='#'>
+									<i class="ion-ios-pulse-strong"></i>
+									<?php echo lang('db_summary') ?>
+								</a>
+							</li>
+							<li class="mb-child-nav" data-order="3">
+								<a href='#'>
+									<i class="ion-ios-people"></i>
+									<?php echo lang('db_team') ?>
+								</a>
+							</li>
+							<li class="mb-child-nav" data-order="4">
+								<a href='#'>
+									<i class="ion-ios-pie"></i>
+									<?php echo lang('db_statistics') ?>
+								</a>
+							</li>
+						</ul>
 					</li>
 					<?php endforeach; ?>
 				</ul>
@@ -136,10 +164,15 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				<ul class="an-child-nav js-open-nav" style="display: none;">
 					<?php foreach ($other_projects AS $project): ?>
 					<li>
-						<a href="<?php echo site_url('project/' . $project->cost_code)?>" class='mb-popover-project' 
+						<a 	href="<?php echo site_url('project/' . $project->cost_code)?>" 
+							class='mb-popover-project' 
 							data-project-id="<?php echo $project->project_id ?>" 
-							data-toggle="popover" 
-							data-placement="right">
+							data-name="<?php echo $project->name ?>" 
+							data-owned="<?php echo $project->owned_by_x ?>"
+							data-cost-code="<?php echo $project->cost_code ?>" 
+							data-team="<?php echo $project->member_number ?>" 
+							data-type="other"
+							>
 							<?php echo ($project->name . " <b>[{$project->cost_code}]</b>") ?>
 						</a>
 					</li>
@@ -466,7 +499,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	</div> <!-- #popover-rate -->
 </div> <!-- #template -->
 
-<script type="text/vit" id="popover-project">
+<script typ="text/vit" id="popover-project">
 	<div class="project-header">
 		<div class='project-header-content'>
 			<h4>
@@ -493,24 +526,26 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		</div>
 
 		<div class="pull-right">
-			{{if has_permission_project_view_all}}
+			{{if has_permission_project_view_all && type == "other"}}
 			<button class="an-btn an-btn-primary-transparent an-btn-small btn-join-project" 
 				data-lang-joined="<?php echo lang('db_joined') ?>"
 				data-project-id="{{:project_id}}">
-				<?php echo lang('db_join') ?>
+				<?php echo lang('db_join_project') ?>
 			</button>
 			{{/if}}
 
 			{{if has_permission_project_edit}}
-			<i class="mb-open-modal ion-ios-plus-outline db-create-meeting" 
-				data-modal-id="db-create-meeting" 
-				data-url="<?php echo site_url('meeting/create/') ?>{{:cost_code}}"></i>
+			<a 	href="<?php echo site_url('meeting/create/') ?>{{:cost_code}}"
+				class="an-btn an-btn-primary-transparent an-btn-small btn-create-meeting mb-open-modal"
+				data-modal-id="create-meeting">
+				<?php echo lang('st_new_meeting') ?>
+			</a>
 			{{/if}}
 		</div>
 	</div>
 
-	<div class="mb-popover-content">
-		<div class="project-body">
+	<div class="mb-popover-content" data-project-id="{{:project_id}}">
+		<div class="project-body order-1">
 			<div class="panel panel-default panel-overview">
 				<div class="panel-heading" role="tab">
 					<h4 class="panel-title">
@@ -527,7 +562,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 								<?php echo lang('db_meeting') ?><br/>
 								<b class='number'>{{:no_of_meeting}}</b>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-3 team-wrapper">
 								<i class="ion-android-people"></i>
 								<?php echo lang('db_team') ?><br/>
 								<b class='number'>{{:team}}</b>
@@ -752,6 +787,179 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</div>
 			</div> <!-- Completed Meeting -->
 		</div>
+
+		<div class="project-body order-2">
+			<div class="panel panel-default panel-overview">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#progress-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_project_progress') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="progress-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-8 col-xs-12">
+								<div class="progress-container">
+									<div>
+										<b>
+											<i class="ion-ios-people"></i>
+											<?php echo lang('db_meetings') ?>
+										</b>
+
+										<span class="pull-right">
+											{{:used_meeting}}/{{:no_of_meeting}}
+											<?php echo lang('db_meetings') ?>
+										</span>
+									</div>
+								
+									<div class="progress">
+										<div class="progress-bar progress-bar-success" 
+											style="width: {{:used_meeting / no_of_meeting * 100 }}%;">
+										</div>
+									</div>
+
+									<div class="row text-center">
+										<div class="col-md-4">
+											<?php echo lang('db_total') ?><br/>
+											<b>{{:no_of_meeting}}</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_pending') ?><br/>
+											<b>{{:pending_meeting}}</b>
+										</div>
+									</div>
+								</div>
+								<div class="progress-container">
+									<div>
+										<b>
+											<i class="ion-ios-star"></i>
+											<?php echo lang('db_star_rating') ?>
+										</b>
+
+										<span class="pull-right">
+											{{:rated_stars}}/{{:total_stars}} ({{:~round(rated_stars / total_stars * 100, 10)}}%)
+										</span>
+									</div>
+									<div class="progress">
+										<div class="progress-bar progress-bar-success" style="width: {{:~round(rated_stars / total_stars * 100, 10)}}%;">
+										</div>
+									</div>
+
+									<div class="row text-center">
+										<div class="col-md-4">
+											<?php echo lang('db_total') ?><br/>
+											<b>{{:total_stars}}</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_rated') ?><br/>
+											<b>{{:rated_stars}}</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_unrated') ?><br/>
+											<b>{{:total_stars - rated_stars}}</b>
+										</div>
+									</div>
+								</div>
+
+								<div class="progress-container">
+									<div>
+										<b>
+											<i class="ion-ios-people"></i>
+											<?php echo lang('db_project_pts') ?>
+										</b>
+
+										<span class="pull-right">
+											{{:~round(total_used.point, 10)}}/{{:allowed_point}} ({{:~round(total_used.point / allowed_point * 100, 10)}}%)
+										</span>
+									</div>
+									<div class="progress">
+										<div class="progress-bar progress-bar-success" style="width: {{:~round(total_used.point / allowed_point * 100, 10)}}%;">
+										</div>
+									</div>
+
+									<div class="row text-center">
+										<div class="col-md-4">
+											<?php echo lang('db_allowed_pts') ?><br/>
+											<b>{{:allowed_point}}</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_logged_pts') ?><br/>
+											<b>{{:~parseFloat(total_used.point.toFixed(1))}}</b>
+										</div>
+										<div class="col-md-4">
+											<?php echo lang('db_unused_pts') ?><br/>
+											<b>{{:allowed_point - ~parseFloat(total_used.point.toFixed(1))}}</b>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4 col-xs-12">
+								<canvas id="pie-chart" width="400" height="400">
+								</canvas>
+							</div>
+						</div> <!-- .row -->
+					</div>
+				</div>
+			</div> <!-- Project Progress -->
+		</div>
+
+		<div class="project-body order-3">
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#team-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_team') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="team-body" class="panel-collapse collapse in" role="tabpanel">
+					{{for members}}
+					<div class="member">
+						<div class="row">
+							<div class="col-md-11">
+								<span class="avatar" style="background-image: url('{{:avatar_url}}')"></span>
+								<span class="info">
+									<a href="#"><b>{{:full_name}}</b></a><br>
+									<span class="text-info">
+									<?php echo lang('db_project_pts') ?> {{:pts.toFixed(1)}} &nbsp;
+									<i class="ion-ios-star"></i> {{:rated_stars}}/{{:total_stars}} &nbsp;
+									<?php echo lang('db_avg') ?> 
+										{{:~countingStars( (rated_stars / total_stars * 5).toFixed(0) )}}
+										{{:~countingStars( total_stars > 0 ? 5 - (rated_stars / total_stars * 5).toFixed(0) : 5, "ion-ios-star-outline")}}
+										{{: total_stars > 0 ? (rated_stars / total_stars * 5).toFixed(0) : ''}}
+									</span>
+								</span>
+							</div>
+							<div class="col-md-1" style="padding: 10px;">
+								<button class="an-btn an-btn-icon small muted danger btn-remove-member" 
+									data-user-id="{{:user_id}}"
+									data-full-name="{{:full_name}}">
+									<i class="icon-trash"></i>
+								</button>
+							</div>
+						</div>
+					</div> <!-- .member -->
+					{{/for}}
+				</div>
+			</div> 
+		</div> <!-- Team members -->
+
+		<div class="project-body order-4">
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#stats-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_statistics') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="stats-body" class="panel-collapse collapse in" role="tabpanel">
+					<canvas id="stats-chart" width="100%" height="400"></canvas>
+				</div>
+			</div> 
+		</div> <!-- Team members -->
 	</div>
 </script>
 
