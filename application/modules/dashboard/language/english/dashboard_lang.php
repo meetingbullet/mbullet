@@ -77,4 +77,4 @@ $lang['db_yes_remove_x'] = 'Yes, remove {0}';
 $lang['db_remove_member_message'] = 'You won\'t be able to revert this!';
 $lang['db_overall_x'] = 'Overall {0}%';
 $lang['db_pts_x'] = 'PTS {0}';
-$lang['pj_unknown_error_orcurred'] = 'Unknown error orcurred, please try again later';
+$lang['db_select_from_today_to_future'] = 'Please select a valid date (from Today onwards)';

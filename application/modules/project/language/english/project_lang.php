@@ -35,6 +35,7 @@ $lang['pj_not_have_config_permission'] = 'You do not have permission to change p
 $lang['pj_project_status_updated'] = 'Project status updated';
 $lang['pj_invalid_action'] = 'Invalid action';
 $lang['pj_member_removed'] = 'Member removed';
+$lang['pj_unknown_error_orcurred'] = 'Unknown error orcurred, please try again later';
 
 // Fields
 $lang['pj_project_name'] 			= 'Project name';
