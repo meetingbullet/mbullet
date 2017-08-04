@@ -24,3 +24,4 @@ $lang['ad_tm_user_not_found'] = 'User not found';
 $lang['ad_tm_invite_user'] = 'Invite User';
 $lang['ad_tm_team'] = 'Team';
 $lang['ad_tm_roles'] = 'Roles';
+$lang['ad_tm_permissions'] = 'Permissions';

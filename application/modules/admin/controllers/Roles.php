@@ -22,10 +22,7 @@ class Roles extends Authenticated_Controller
 		}
 		Assets::add_js($this->load->view('roles/index_js', null, true), 'inline');
 		Template::set('current_role_id', $this->current_user->role_ids[$this->current_user->current_organization_id]);
-		Template::set('breadcrumb', [
-			[ 'name' => lang('rl_team'), 'path' => 'admin/team' ] ,
-			[ 'name' => lang('rl_roles') ] ,
-		]);
+		Template::set('breadcrumb', [ ['name' => lang('rl_roles')], ]);
 		Template::set('roles', $roles);
 		Template::set('page_title', lang('rl_roles'));
 		Template::render();

@@ -38,6 +38,11 @@ $can_delete = has_permission('Role.Team.Delete');
 							<?php echo lang('rl_roles') ?>
 						</a>
 					</li>
+					<li >
+						<a href="<?php echo site_url('admin/permissions') ?>">
+							<?php echo lang('rl_permissions') ?>
+						</a>
+					</li>
 				</ul>
 			</div>
 			<div class="tab-content">
