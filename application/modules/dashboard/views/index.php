@@ -542,6 +542,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 			<a 	href="<?php echo site_url('meeting/create/') ?>{{:cost_code}}"
 				class="an-btn an-btn-primary-transparent an-btn-small btn-create-meeting mb-open-modal"
 				data-modal-id="create-meeting">
+				<i class="ion-android-add"></i> 
 				<?php echo lang('st_new_meeting') ?>
 			</a>
 			{{/if}}
