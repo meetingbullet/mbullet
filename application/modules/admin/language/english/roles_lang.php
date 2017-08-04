@@ -4,6 +4,7 @@
 $lang['rl_roles'] = 'Roles';
 $lang['rl_admin'] = 'Admin';
 $lang['rl_team'] = 'Team';
+$lang['rl_permissions'] = 'Permissions';
 
 // Action
 $lang['rl_create_role'] = 'Create role';

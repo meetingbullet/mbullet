@@ -120,6 +120,7 @@ class Team extends Authenticated_Controller
 		Template::set('roles', $roles);
 		Template::set('users_list', $users_list);
 		Template::set('page_title', lang('ad_tm_team'));
+		Template::set('breadcrumb', [ ['name' => lang('ad_tm_team')], ]);
 		Template::render();
 	}
 
@@ -182,7 +183,6 @@ class Team extends Authenticated_Controller
 			Template::set('message_type', 'danger');
 			Template::set('message', lang('ad_tm_role_not_found'));
 		}
-		// dump($this->db->last_query());
 
 		$temp = [];
 		foreach ($roles as $role) {

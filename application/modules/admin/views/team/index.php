@@ -34,6 +34,11 @@
 							<?php echo lang('ad_tm_roles') ?>
 						</a>
 					</li>
+					<li>
+						<a href="<?php echo site_url('admin/permissions') ?>">
+							<?php echo lang('ad_tm_permissions') ?>
+						</a>
+					</li>
 				</ul>
 			</div>
 			<div class="tab-content" style="padding: 20px 0 0 0">
