@@ -2098,21 +2098,46 @@ class Meeting extends Authenticated_Controller
 	{
 		$decisions = ['accept', 'maybe', 'decline'];
 		$meeting = $this->meeting_model->find($meeting_id);
-		$meeting_invite = $this->meeting_member_invite_model->where('invite_email', $this->current_user->email)
-															->where('invite_code', $invite_code)
-															->find_by('meeting_id', $meeting_id);
+		$meeting_invite = $this->meeting_member_invite_model
+			->where('invite_email', $this->current_user->email)
+			->where('invite_code', $invite_code)
+			->find_by('meeting_id', $meeting_id);
 
 		if (empty($meeting) || empty($meeting_invite)) {
+			if (IS_AJAX) {
+				echo json_encode([
+					'message' => lang('st_something_went_wrong'),
+					'message_type' => 'danger'
+				]);
+				return;
+			}
+
 			Template::set_message(lang('st_something_went_wrong'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		if (empty($meeting_id) || empty($invite_code) || empty($decision) || ! in_array($decision, $decisions)) { echo 2;
+			if (IS_AJAX) {
+				echo json_encode([
+					'message' => lang('st_something_went_wrong'),
+					'message_type' => 'danger'
+				]);
+				return;
+			}
+
 			Template::set_message(lang('st_something_went_wrong'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
 		} else {
 			if ($meeting_invite->status != 'NEEDS-ACTION') {
+				echo json_encode([
+					'message' => lang('st_decided'),
+					'message_type' => 'warning'
+				]);
+				return;
+
 				Template::set_message(lang('st_decided'), 'warning');
 				redirect('meeting/' . $meeting->meeting_key);
+
 			} elseif ($decision == 'accept' || $decision == 'maybe') {
 				if ($decision == 'accept') {
 					$status = 'ACCEPTED';
@@ -2129,6 +2154,14 @@ class Meeting extends Authenticated_Controller
 									->join('organizations s', 's.organization_id = p.organization_id')
 									->find_by('meetings.meeting_id', $meeting_id);
 				if (empty($organization)) {
+					if (IS_AJAX) {
+						echo json_encode([
+							'message' => lang('st_something_went_wrong'),
+							'message_type' => 'danger'
+						]);
+						return;
+					}
+
 					Template::set_message(lang('st_something_went_wrong'), 'danger');
 					redirect('meeting/' . $meeting->meeting_key);
 				}
@@ -2146,6 +2179,13 @@ class Meeting extends Authenticated_Controller
 						'role_id' => $default_role->role_id
 					]);
 					if ($added === false) {
+						if (IS_AJAX) {
+							echo json_encode([
+								'message' => lang('st_something_went_wrong'),
+								'message_type' => 'danger'
+							]);
+							return;
+						}
 						Template::set_message(lang('st_something_went_wrong'), 'danger');
 						redirect('meeting/' . $meeting->meeting_key);
 					}
@@ -2156,6 +2196,14 @@ class Meeting extends Authenticated_Controller
 					'user_id' => $this->current_user->user_id
 				]);
 				if ($added === false) {
+					if (IS_AJAX) {
+						echo json_encode([
+							'message' => lang('st_something_went_wrong'),
+							'message_type' => 'danger'
+						]);
+						return;
+					}
+
 					Template::set_message(lang('st_something_went_wrong'), 'danger');
 					redirect('meeting/' . $meeting->meeting_key);
 				}
@@ -2164,10 +2212,22 @@ class Meeting extends Authenticated_Controller
 				$status = 'DECLINED';
 			}
 
-			$decided = $this->meeting_member_invite_model->set('status', $status)->update($meeting_invite->meeting_member_invite_id);
+			$decided = $this->meeting_member_invite_model
+				->update($meeting_invite->meeting_member_invite_id, [
+					'status' => $status
+				]);
+
 			if (! $decided) {
 				Template::set_message(lang('st_something_went_wrong'), 'danger');
 			}
+		}
+
+		if (IS_AJAX) {
+			echo json_encode([
+				'message' => lang('st_invitation_accepted'),
+				'message_type' => 'success'
+			]);
+			return;
 		}
 
 		redirect('meeting/' . $meeting->meeting_key);

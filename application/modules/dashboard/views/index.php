@@ -286,6 +286,38 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		</header> <!-- end .AN-HEADER -->
 
 		<div class="an-content-body">
+			<div class="alert-wrapper">
+				<?php foreach ($meeting_invites as $invite): ?>
+				<div class="alert alert-info" role="alert">
+					<?php echo sprintf(
+									lang('db_x_invited_you_to_meeting_y'),
+									display_user(
+										$invite->email, 
+										$invite->first_name, 
+										$invite->last_name, 
+										$invite->avatar 
+										),
+									$invite->name
+								);
+					?>
+
+					<div class="pull-right meeting-invite-action"
+						data-meeting-id="<?php echo $invite->meeting_id ?>"
+						data-invite-code="<?php echo $invite->invite_code ?>"
+						>
+						<button class="an-btn an-btn-success an-btn-small" data-action="accept">
+							<?php echo lang('db_accept') ?>
+						</button> 
+						<button class="an-btn an-btn-danger-transparent an-btn-small" data-action="decline">
+							<?php echo lang('db_decline') ?>
+						</button>
+						<button class="an-btn an-btn-transparent an-btn-small" data-action="maybe">
+							<?php echo lang('db_perhaps') ?>
+						</button>
+					</div>
+				</div>
+				<?php endforeach; ?>
+			</div> <!-- .alert-wrapper -->
 			<div class="calendar-wrapper">
 				<div class="heading-wrapper">
 					<h1 class="db-h1">
@@ -295,7 +327,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					</h1>
 				</div>
 				<div id="calendar"></div>
-			</div>
+			</div><!-- .calendar-wrapper -->
 		</div> <!-- end .AN-CONTENT-BODY -->
 
 		<footer class="an-footer">

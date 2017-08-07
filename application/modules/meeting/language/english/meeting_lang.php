@@ -220,3 +220,4 @@ $lang['st_owner_can_not_be_member'] = 'A user should not be both owner and membe
 $lang['st_new_meeting'] = 'New Meeting';
 $lang['st_repeat'] = 'Repeat';
 $lang['st_current_state'] = 'Current Repeat State';
+$lang['st_invitation_accepted'] = 'Invitation accepted';
