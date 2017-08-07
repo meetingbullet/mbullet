@@ -493,7 +493,7 @@ class Dashboard extends Authenticated_Controller
 			}
 
 			if (isset($meeting->status)) {
-				$meeting->status_text = lang('st_' . $meeting->status);
+				$meeting->lang_status = lang('st_' . $meeting->status);
 			}
 		}
 	}

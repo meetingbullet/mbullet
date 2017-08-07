@@ -113,6 +113,7 @@ $lang['st_time_alotted'] = 'Time alotted for %s has been reached.';
 $lang['st_please_finish_other_agenda'] = 'Please finish other agenda before start a new agenda';
 $lang['st_agenda_placed'] = 'agenda is placed in parking lot';
 $lang['st_invalid_action'] = 'Invalid Action';
+$lang['st_you_have_not_earned_permission_to_create_meeting'] = 'You have not earned permission to create meeting';
 $lang['st_cannot_start_meeting_without_any_agenda'] = 'Cannot start meeting without any agenda';
 $lang['st_waiting_for_start'] = 'Waiting for start';
 $lang['st_please_resolve_all_agenda_before_finish'] = 'Please resolve all agendas before finish';

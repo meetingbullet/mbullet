@@ -60,18 +60,26 @@ class Meeting extends Authenticated_Controller
 	public function create($project_key = null)
 	{
 		if (empty($project_key)) {
-			redirect(DEFAULT_LOGIN_LOCATION);
+			Template::set('close_modal', 0);
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_project_key_does_not_exist'));
+			return;
 		}
 
 		$project_id = $this->mb_project->get_object_id('project', $project_key);
 
 		if (empty($project_id)) {
-			Template::set_message(lang('st_project_key_does_not_exist'), 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
+			Template::set('close_modal', 0);
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_project_key_does_not_exist'));
+			return;
 		}
 
 		if (! $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All')) {
-			$this->auth->restrict();
+			Template::set('close_modal', 0);
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_you_have_not_earned_permission_to_create_meeting'));
+			return;
 		}
 
 		$action = $this->action_model->select('action_id, action_key, p.project_id')
@@ -210,6 +218,7 @@ class Meeting extends Authenticated_Controller
 								}
 							}
 
+							Template::set('data', $data);
 							Template::set('close_modal', 1);
 							Template::set('message_type', 'success');
 							Template::set('message', lang('st_meeting_successfully_created'));

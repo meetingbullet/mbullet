@@ -631,7 +631,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 								</div>
 								<div class="list-action basis-20">
 									<span class="msg-tag label label-bordered label-{{:next_meeting.status}}">
-										{{:next_meeting.status_text}}
+										{{:next_meeting.lang_status}}
 									</span>
 								</div>
 							</div> <!-- end .USER-LIST-SINGLE -->
@@ -661,19 +661,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 
 						<div class="an-lists-body">
 						{{if unscheduled_meetings}}
-							{{for unscheduled_meetings}}
-								<div class="list-user-single">
-									<div class="list-date number basis-30">
-										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:meeting_key}}</a>
-									</div>
-									<div class="list-name basis-50">
-										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:name}}</a>
-									</div>
-									<div class="list-action basis-50">
-										<span class="msg-tag label label-bordered label-{{:status}}">{{:status_text}}</span>
-									</div>
-								</div> <!-- end .USER-LIST-SINGLE -->
-							{{/for}}
+							{{for unscheduled_meetings tmpl="#unscheduledSingle" /}}
 						{{else}}
 							<div id="no-meeting" class="list-user-single">
 								<div class="list-text basis-30">
@@ -721,7 +709,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 										{{:scheduled_start_time}}
 									</div>
 									<div class="list-action basis-20">
-										<span class="msg-tag label label-bordered label-{{:status}}">{{:status_text}}</span>
+										<span class="msg-tag label label-bordered label-{{:status}}">{{:lang_status}}</span>
 									</div>
 								</div> <!-- end .USER-LIST-SINGLE -->
 							{{/for}}
@@ -772,7 +760,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 										{{:scheduled_start_time}}
 									</div>
 									<div class="list-action basis-20">
-										<span class="msg-tag label label-bordered label-{{:status}}">{{:status_text}}</span>
+										<span class="msg-tag label label-bordered label-{{:status}}">{{:lang_status}}</span>
 									</div>
 								</div> <!-- end .USER-LIST-SINGLE -->
 							{{/for}}
@@ -978,6 +966,20 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		<div class="list-text basis-30">
 		</div>
 	</div>
+</script>
+
+<script id="unscheduledSingle" type="text/vit">
+	<div class="list-user-single">
+		<div class="list-date number basis-30">
+			<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:meeting_key}}</a>
+		</div>
+		<div class="list-name basis-50">
+			<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:name}}</a>
+		</div>
+		<div class="list-action basis-50">
+			<span class="msg-tag label label-bordered label-{{:status}}">{{:lang_status}}</span>
+		</div>
+	</div> <!-- end .USER-LIST-SINGLE -->
 </script>
 
 <div class="hidden">
