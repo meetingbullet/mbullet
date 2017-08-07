@@ -134,6 +134,10 @@
 	color: #eb547c;
 }
 
+.meeting-time-schedule .input-group-btn {
+	white-space: unset;
+}
+
 .form-td {
 	display: inline-block;
 	width: 150px !important;

@@ -37,7 +37,7 @@
 				</div>
 
 				<?php echo mb_form_input('text', 'owner_id', lang('st_owner'), true, $meeting->owner_id, 'owner-id an-tags-input', '', lang('st_select_team_member')) ?>
-				<?php echo mb_form_input('text', 'team', lang('st_resource'), false, implode(',', $meeting_members), 'team select-member an-tags-input', '', lang('st_add_team_member')) ?>
+				<?php echo mb_form_input('text', 'team', lang('st_resource'), true, implode(',', $meeting_members), 'team select-member an-tags-input', '', lang('st_add_team_member')) ?>
 
 				<div class="row">
 					<div class="col-md-3 col-sm-12">

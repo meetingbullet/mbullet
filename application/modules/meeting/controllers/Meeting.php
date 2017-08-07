@@ -412,7 +412,7 @@ class Meeting extends Authenticated_Controller
 							} else {
 								Template::set('close_modal', 0);
 								Template::set('message_type', 'danger');
-								Template::set('message', lang('st_there_was_a_problem_while_creating_meeting'));
+								Template::set('message', lang('st_please_add_team_member'));
 							}
 						} else {
 							Template::set('close_modal', 0);
@@ -424,7 +424,7 @@ class Meeting extends Authenticated_Controller
 			} else {
 				Template::set('close_modal', 0);
 				Template::set('message_type', 'danger');
-				Template::set('message', lang('st_there_was_a_problem_while_creating_meeting'));
+				Template::set('message', lang('st_please_add_team_member'));
 			}
 
 			Template::render();
@@ -577,6 +577,14 @@ class Meeting extends Authenticated_Controller
 
 		$meeting->members = $this->meeting_member_model->get_meeting_member($meeting_id);
 
+		// We can't start without members
+		if (count($meeting->members) === 0) {
+			Template::set('message_type', 'warning');
+			Template::set('message', lang('st_cannot_start_meeting_without_any_member'));
+			Template::set('content', '');
+			Template::render();
+			return;
+		}
 		$agendas = $this->agenda_model->select('agendas.*, 
 											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
 											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)
