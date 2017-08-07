@@ -115,6 +115,7 @@ $lang['st_please_finish_other_agenda'] = 'Please finish other agenda before star
 $lang['st_agenda_placed'] = 'agenda is placed in parking lot';
 $lang['st_invalid_action'] = 'Invalid Action';
 $lang['st_you_have_not_earned_permission_to_create_meeting'] = 'You have not earned permission to create meeting';
+$lang['st_you_have_not_earned_permission_to_view_this_meeting'] = 'You have not earned permission to view this meeting';
 $lang['st_cannot_start_meeting_without_any_agenda'] = 'Cannot start meeting without any agenda';
 $lang['st_cannot_start_meeting_without_any_member'] = 'Cannot start meeting without any member';
 $lang['st_waiting_for_start'] = 'Waiting for start';
