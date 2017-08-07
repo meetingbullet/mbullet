@@ -151,6 +151,8 @@ class Dashboard extends Authenticated_Controller
 			->where('p.organization_id', $this->current_user->current_organization_id)
 			->find_all();
 
+		$meeting_invites || $meeting_invites = [];
+
 		Assets::add_js($this->load->view('calendar_js', [
 			'event_sources' => $event_sources
 		], true), 'inline');
