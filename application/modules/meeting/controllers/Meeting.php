@@ -83,14 +83,18 @@ class Meeting extends Authenticated_Controller
 			return;
 		}
 
-		$action = $this->action_model->select('action_id, action_key, p.project_id')
-									->join('projects p', 'actions.project_id = p.project_id')
-									->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
-									->limit(1)
-									->find_by('action_key', $project_key . '-1');
+		$action = $this->action_model
+			->select('action_id, action_key, p.project_id')
+			->join('projects p', 'actions.project_id = p.project_id')
+			->join('user_to_organizations uto', 'uto.organization_id = p.organization_id AND uto.user_id = ' . $this->current_user->user_id)
+			->limit(1)
+			->find_by('action_key', $project_key . '-1');
 
 		if ($action === false) {
-			redirect(DEFAULT_LOGIN_LOCATION);
+			Template::set('close_modal', 0);
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_project_key_does_not_exist'));
+			return;
 		}
 
 		// Get list resource/team member
@@ -98,9 +102,10 @@ class Meeting extends Authenticated_Controller
 
 		// Create Meeting from Open Parking Lot agendas
 		if (isset($_POST['from_meeting'])) {
-			$open_agendas = $this->agenda_model->where('confirm_status', 'open_parking_lot')
-											->where('meeting_id', $this->input->post('from_meeting'))
-											->find_all();
+			$open_agendas = $this->agenda_model
+			->where('confirm_status', 'open_parking_lot')
+			->where('meeting_id', $this->input->post('from_meeting'))
+			->find_all();
 											
 			Template::set('open_agendas', $open_agendas);
 		} else {
@@ -455,8 +460,12 @@ class Meeting extends Authenticated_Controller
 		}
 
 		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
-			$this->auth->restrict();
+			Template::set_message(lang('st_you_have_not_earned_permission_to_view_this_meeting'), 'warning');
+			redirect(DEFAULT_LOGIN_LOCATION);
+			return;
 		}
+
+
 
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
@@ -466,10 +475,28 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$meeting = $this->meeting_model->get_meeting_by_key($meeting_key, $this->current_user->current_organization_id, 'meetings.*, u.email, u.first_name, u.last_name, u.avatar');
+		$meeting = $this->meeting_model->get_meeting_by_key(
+			$meeting_key, 
+			$this->current_user->current_organization_id, 
+			'meetings.*, u.email, u.first_name, u.last_name, u.avatar'
+			);
 
 		if (! $meeting) {
 			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		// Only invited member can join
+		$invited_members = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
+
+		if ($meeting->owner_id != $this->current_user->user_id
+				&& ! in_array(
+					$this->current_user->user_id, 
+					array_column($invited_members, 'user_id'))
+			) {
+
+			Template::set_message(lang('st_you_have_not_earned_permission_to_view_this_meeting'), 'warning');
+			redirect(DEFAULT_LOGIN_LOCATION);
+			return;
 		}
 
 		$agendas = $this->agenda_model->select('agendas.*, u.email, u.first_name, u.last_name, u.avatar')
@@ -505,8 +532,6 @@ class Meeting extends Authenticated_Controller
 			}
 		}
 
-		// $invited_members = $this->meeting_member_model->get_meeting_member($meeting_id);
-		$invited_members = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
 		$point_used = number_format($this->mb_project->total_point_used('meeting', $meeting->meeting_id), 2);
 
 		$evaluated = $this->is_evaluated($meeting_id);
