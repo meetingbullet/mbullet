@@ -444,11 +444,13 @@ class Meeting extends Authenticated_Controller
 	public function detail($meeting_key = null)
 	{
 		if (empty($meeting_key)) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
 		$keys = explode('-', $meeting_key);
 		if (empty($keys) || count($keys) < 3) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
@@ -459,13 +461,10 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
-			Template::set_message(lang('st_you_have_not_earned_permission_to_view_this_meeting'), 'warning');
+		if (! $can_view = $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
+			Template::set_message(lang('st_you_have_no_permission_to_view_this_meeting'), 'warning');
 			redirect(DEFAULT_LOGIN_LOCATION);
-			return;
 		}
-
-
 
 		$project_key = $keys[0];
 		$action_key = $keys[0] . '-' . $keys[1];
@@ -482,21 +481,21 @@ class Meeting extends Authenticated_Controller
 			);
 
 		if (! $meeting) {
+			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		// Only invited member can join
+		// Only invited member or owner (even project or organization) can view
 		$invited_members = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
 
-		if ($meeting->owner_id != $this->current_user->user_id
+		if ( !$can_view && $meeting->owner_id != $this->current_user->user_id
 				&& ! in_array(
 					$this->current_user->user_id, 
 					array_column($invited_members, 'user_id'))
 			) {
 
-			Template::set_message(lang('st_you_have_not_earned_permission_to_view_this_meeting'), 'warning');
+			Template::set_message(lang('st_you_have_no_permission_to_view_this_meeting'), 'warning');
 			redirect(DEFAULT_LOGIN_LOCATION);
-			return;
 		}
 
 		$agendas = $this->agenda_model->select('agendas.*, u.email, u.first_name, u.last_name, u.avatar')
