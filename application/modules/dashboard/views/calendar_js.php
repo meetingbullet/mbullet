@@ -84,7 +84,7 @@ $(document).ready(function() {
 		firstDay: 1, // Monday
 		// aspectRatio: 1, // content Width-to-Height
 		editable: false,
-		height: ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight()), /* 2 = calendar table border,  30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom */ 
+		height: ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight()) + $('.alert-wrapper').height(), /* 2 = calendar table border,  30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */ 
 		eventLimit: true, // allow "more" link when too many events
 		eventSources: <?php echo json_encode($event_sources) ?>,
 		editable: true,

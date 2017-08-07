@@ -514,3 +514,21 @@ function bringToTop(order_index, speed = 300)  {
 		scrollTop: 0
 	}, speed);
 }
+
+// Meeting invites
+$('.meeting-invite-action button').click(function() {
+	var meeting_id = $(this).parent().data('meeting-id');
+	var invite_code = $(this).parent().data('invite-code');
+	var action = $(this).data('action');
+	var that = this;
+
+	$.get(`<?php echo site_url('meeting/invite/') ?>${meeting_id}\\${invite_code}\\${action}`,  (data) => {
+		data = JSON.parse(data);
+
+		$.mbNotify(data.message, data.message_type);
+
+		if (data.message_type === 'success' || data.message_type === 'warning') {
+			$(that).closest('.alert').slideUp();
+		}
+	})
+});

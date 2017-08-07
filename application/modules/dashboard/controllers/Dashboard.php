@@ -18,6 +18,7 @@ class Dashboard extends Authenticated_Controller
 		$this->load->model('meeting/meeting_model');
 		$this->load->model('meeting/meeting_member_model');
 		$this->load->model('meeting/meeting_member_rate_model');
+		$this->load->model('meeting/meeting_member_invite_model');
 		$this->load->model('agenda/agenda_model');
 		$this->load->model('agenda/agenda_member_model');
 		$this->load->model('agenda/agenda_rate_model');
@@ -137,6 +138,19 @@ class Dashboard extends Authenticated_Controller
 			]
 		];
 
+		// Meeting invites
+		$meeting_invites = $this->meeting_member_invite_model
+			->select('m.name, m.meeting_key, m.meeting_id, invite_code,
+			u.first_name, u.last_name, u.email, u.avatar')
+			->join('meetings m', 'm.meeting_id = meeting_member_invites.meeting_id')
+			->join('actions a', 'm.action_id = a.action_id')
+			->join('projects p', 'p.project_id = a.project_id')
+			->join('users u', 'u.user_id = m.created_by')
+			->where('meeting_member_invites.status', 'NEEDS-ACTION')
+			->where('invite_email', $this->current_user->email)
+			->where('p.organization_id', $this->current_user->current_organization_id)
+			->find_all();
+
 		Assets::add_js($this->load->view('calendar_js', [
 			'event_sources' => $event_sources
 		], true), 'inline');
@@ -148,6 +162,7 @@ class Dashboard extends Authenticated_Controller
 		], true), 'inline');
 
 		Template::set('my_projects', $my_projects);
+		Template::set('meeting_invites', $meeting_invites);
 		Template::set('other_projects', $other_projects);
 		Template::set('my_todo', $my_todo && count($my_todo) > 0 ? $my_todo : []);
 		Template::set('current_user', $this->current_user);
