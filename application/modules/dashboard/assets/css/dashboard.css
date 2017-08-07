@@ -1457,6 +1457,14 @@ div.popover .project-header {
 	display: inline-block;
 }
 
+#messagearea {
+	padding: 15px;
+	background: #eb547c;
+	color: #fff;
+	border-radius: 4px;
+	margin: 15px;
+}
+
 /*.riform .close {
 	width: 20px;
 	height: 20px;
@@ -1531,4 +1539,9 @@ div.popover .project-header {
 .mb-popover-content .ion-ios-star-outline {
 	font-size: 18px;
 	color: orange;
+}
+
+#private-meeting-list {
+	text-transform: uppercase;
+	cursor: pointer;
 }

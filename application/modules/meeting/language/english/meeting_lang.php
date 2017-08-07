@@ -219,3 +219,4 @@ $lang['st_choose'] = 'Choose';
 $lang['st_owner_can_not_be_member'] = 'A user should not be both owner and member of a meeting at the same time.';
 $lang['st_new_meeting'] = 'New Meeting';
 $lang['st_repeat'] = 'Repeat';
+$lang['st_current_state'] = 'Current Repeat State';

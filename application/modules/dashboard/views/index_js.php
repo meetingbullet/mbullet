@@ -514,3 +514,20 @@ function bringToTop(order_index, speed = 300)  {
 		scrollTop: 0
 	}, speed);
 }
+
+$('#private-meeting-list').popover({
+	html: true,
+	content: function() {
+		var that = this;
+
+		$.get({ url: '<?php echo site_url('meeting/get_private_meetings') ?>' }).done(function(data) {
+			data = JSON.parse(data);
+			if (data.status == 1) {
+				$(that).next().children('.popover-content').html($('#popover-private-meetings').render(data));
+				$(that).popover('reposition');
+			}
+		});
+
+		return "<div class='popover-loading'><?php echo lang('db_loading') ?></div>";
+	}
+});

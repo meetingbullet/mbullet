@@ -3128,24 +3128,38 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$projects = $this->project_model->select('projects.cost_code, projects.name, IF((pm.user_id = \'' . $this->current_user->user_id . '\' OR ' . $this->db->dbprefix('projects') . '.owner_id = \'' . $this->current_user->user_id . '\'), 1, 0) AS is_mine')
+		$my_projects = $this->project_model->select('projects.project_id, projects.cost_code, projects.name')
 										->join('users u', 'u.user_id = projects.owner_id')
 										->join('project_members pm', 'projects.project_id = pm.project_id')
-										->where('projects.status !=', 'archive')
+										->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
 										->where('organization_id', $this->current_user->current_organization_id)
-										->order_by('projects.modified_on', 'desc')
+										->where('projects.status !=', 'archive')
+										->order_by('projects.name', 'asc')
 										->group_by('projects.project_id')
+										->as_array()
 										->find_all();
-		if (empty($projects)) $projects = [];
+		if (empty($my_projects)) {
+			$my_projects = [];
+			$my_project_ids = [];
+		} else {
+			$my_project_ids = array_column($my_projects, 'project_id');
+		}
 
-		$my_projects = [];
-		$other_projects = [];
-		foreach ($projects as $project) {
-			if ($project->is_mine) {
-				$my_projects[] = $project;
-			} else {
-				$other_projects[] = $project;
+		if (has_permission('Project.View.All')) {
+			$this->project_model->select('projects.project_id, projects.cost_code, projects.name')
+											->join('users u', 'u.user_id = projects.owner_id')
+											->where('projects.status !=', 'archive');
+			
+			if (! empty($my_project_ids)) {
+				$this->project_model->where_not_in('projects.project_id', $my_project_ids);
 			}
+
+			$other_projects = $this->project_model->where('organization_id', $this->current_user->current_organization_id)
+											->order_by('projects.name', 'asc')
+											->as_array()
+											->find_all();
+		} else {
+			$other_projects = [];
 		}
 
 		Template::set('my_projects', $my_projects);
@@ -3206,5 +3220,34 @@ class Meeting extends Authenticated_Controller
 
 		Template::set('project_members', $project_members);
 		Template::render();
+	}
+
+	public function get_private_meetings()
+	{
+		$meetings = $this->private_meeting_model->where('organization_id', $this->current_user->current_organization_id)
+										->where('created_by', $this->current_user->user_id)
+										->find_all();
+		if (empty($meetings)) $meetings = [];
+		
+		$team = [];
+		foreach ($meetings as $meeting) {
+			$members = [];
+			if (! empty($meeting->members)) {
+				$members = json_decode($meeting->members, true);
+			}
+
+			foreach ($members as $member) {
+				if (! in_array($member, $team)) {
+					$team[] = $member;
+				}
+			}
+		}
+
+		echo json_encode([
+			'status' => 1,
+			'meetings' => $meetings,
+			'no_of_meeting' => count($meetings),
+			'team' => count($team)
+		]); exit;
 	}
 }
