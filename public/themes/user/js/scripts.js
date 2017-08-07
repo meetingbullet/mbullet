@@ -16,26 +16,6 @@
     });
   }
 
-
-  /*
-   * custom scroll scripts
-   */
-  if ($('.an-info-content').length > 0) {
-    $('.an-info-content').perfectScrollbar({
-      wheelPropagation: true,
-    });
-  }
-
-  if ($('.an-customScrollbar').length > 0) {
-    $('.an-customScrollbar').perfectScrollbar({
-      wheelPropagation: true,
-    });
-  }
-
-
-
-
-
   /*
    * Slectize plugin call
    * customize basic select box

@@ -7,7 +7,7 @@
 						</div>
 						<div class="an-component-body">
 							<div class="an-user-lists user-stats">
-								<div class="an-lists-body an-customScrollbar ps-container ps-theme-default list-organizations">
+								<div class="an-lists-body list-organizations">
 <?php if (is_array($organizations)) foreach ($organizations as $organization) { ?>
 									<a href="<?php echo $organization->url; ?>">
 										<div class="list-user-single">

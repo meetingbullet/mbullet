@@ -643,10 +643,6 @@ body.modal-open .main-wrapper:not(.modal) {
 	margin-left: 5px;
 }
 
-.chat-container.chat-page .an-lists-body {
-	max-height: none;
-}
-
 .chat-container .an-time i {
 	margin-right: 0;
 }
@@ -759,4 +755,9 @@ body.modal-open .main-wrapper:not(.modal) {
 	border-left: 0;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
+}
+
+/* Disable scroll on List */
+.an-lists-body {
+	max-height: none;
 }
