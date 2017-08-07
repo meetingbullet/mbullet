@@ -325,8 +325,11 @@ class Agenda extends Authenticated_Controller
 		}
 
 		$agenda_id = $this->mb_project->get_object_id('agenda', $agenda_key);
+		$agenda_count = $this->agenda_model->join('meetings', 'meetings.meeting_id = agendas.meeting_id AND meetings.status == "open"', 'LEFT')
+									->where('agenda.agenda_id', $agenda_id)
+									->count_all();
 
-		if (empty($agenda_id)) {
+		if (empty($agenda_id) || $agenda_count == 0) {
 			Template::set_message(lang('ag_agenda_key_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
