@@ -303,22 +303,34 @@ $(document).on('click', '#edit-agenda [type=submit]', function(e) {
 $(document).on('click', '#agenda-list .close-btn', function(e) {
 	e.stopPropagation();
 	var that = $(this);
-	var agenda_key = that.closest('tr').find('td:first-child').text();
-	var url = '<?php echo site_url('agenda/delete/') ?>' + agenda_key;
-	$.get({url}).done(function(data) {
-		data = JSON.parse(data);
-		if (data.status == 1) {
-			that.closest('tr')
-			.find('td')
-			.wrapInner('<div style="display: block;" />')
-			.parent()
-			.find('td > div')
-			.slideUp('fast', function(){
-				$(`#agenda-list tbody tr[data-agenda-id=${data.data.agenda_id}]`).remove();
-			});
-		}
+	swal({
+		title: "Are you sure?",
+		text: "You will not be able to recover this!",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: "Yes, delete it!",
+		closeOnConfirm: false
+	},
+	function(){
+		var agenda_key = that.closest('tr').find('td:first-child').text();
+		var url = '<?php echo site_url('agenda/delete/') ?>' + agenda_key;
+		$.get({url}).done(function(data) {
+			swal.close();
+			data = JSON.parse(data);
+			if (data.status == 1) {
+				that.closest('tr')
+				.find('td')
+				.wrapInner('<div style="display: block;" />')
+				.parent()
+				.find('td > div')
+				.slideUp('fast', function(){
+					$(`#agenda-list tbody tr[data-agenda-id=${data.data.agenda_id}]`).remove();
+				});
+			}
 
-		$.mbNotify(data.message, data.message_type);
+			$.mbNotify(data.message, data.message_type);
+		});
 	});
 });
 
@@ -381,21 +393,34 @@ $(document).on('click', '#edit-homework [type=submit]', function(e) {
 $(document).on('click', '#homework-list .close-btn', function(e) {
 	e.stopPropagation();
 	var that = $(this);
-	var homework_id = that.closest('tr').data('homework-id');
-	var url = '<?php echo site_url('homework/delete/') ?>' + homework_id;
-	$.get({url}).done(function(data) {
-		data = JSON.parse(data);
-		if (data.status == 1) {
-			that.closest('tr')
-			.find('td')
-			.wrapInner('<div style="display: block;" />')
-			.parent()
-			.find('td > div')
-			.slideUp('fast', function(){
-				$(`#homework-list tbody tr[data-homework-id=${homework_id}]`).remove();
-			});
-		}
 
-		$.mbNotify(data.message, data.message_type);
+	swal({
+		title: "Are you sure?",
+		text: "You will not be able to recover this!",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: "Yes, delete it!",
+		closeOnConfirm: false
+	},
+	function(){
+		var homework_id = that.closest('tr').data('homework-id');
+		var url = '<?php echo site_url('homework/delete/') ?>' + homework_id;
+		$.get({url}).done(function(data) {
+			swal.close();
+			data = JSON.parse(data);
+			if (data.status == 1) {
+				that.closest('tr')
+				.find('td')
+				.wrapInner('<div style="display: block;" />')
+				.parent()
+				.find('td > div')
+				.slideUp('fast', function(){
+					$(`#homework-list tbody tr[data-homework-id=${homework_id}]`).remove();
+				});
+			}
+
+			$.mbNotify(data.message, data.message_type);
+		});
 	});
 });
