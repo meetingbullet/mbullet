@@ -244,7 +244,7 @@ $(document).ready(function() {
 	});
 });
 
-$(document).on('click', '#agenda-list tbody tr', function() {
+$(document).on('click', '#agenda-list tbody tr.editable', function() {
 	var that = $(this);
 	var url = '<?php echo site_url('agenda/edit/') ?>' + that.find('td:first-child').text().trim();
 	console.log(url);
@@ -334,7 +334,7 @@ $(document).on('click', '#agenda-list .close-btn', function(e) {
 	});
 });
 
-$(document).on('click', '#homework-list tbody tr', function() {
+$(document).on('click', '#homework-list tbody tr.editable', function() {
 	var that = $(this);
 	var url = '<?php echo site_url('homework/edit/') ?>' + that.data('homework-id');
 	console.log(url);

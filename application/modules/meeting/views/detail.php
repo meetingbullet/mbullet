@@ -125,7 +125,7 @@ if ($is_member && $is_owner) {
 							</thead>
 							<tbody>
 								<?php if($agendas): foreach ($agendas as $agenda) : ?>
-								<tr data-agenda-id="<?php e($agenda->agenda_id) ?>" data-confirm-status="<?php e($agenda->confirm_status) ?>">
+								<tr data-agenda-id="<?php e($agenda->agenda_id) ?>" data-confirm-status="<?php e($agenda->confirm_status) ?>" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
 									<td class='basis-10'><?php e($agenda->agenda_key) //anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->agenda_key)?></td>
 									<td class='basis-15'><?php e($agenda->name) //anchor(site_url('agenda/' . $agenda->agenda_key), $agenda->name)?></td>
 									<td class='basis-20'><?php echo word_limiter($agenda->description, 20)?></td>
@@ -144,7 +144,7 @@ if ($is_member && $is_owner) {
 										<span class="label label-bordered label-<?php e($agenda->confirm_status) ?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 									</td>
 									<?php endif ?>
-									<td class='basis-10 text-right'><i class="ion-close-circled close-btn"></i></td>
+									<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
@@ -180,7 +180,7 @@ if ($is_member && $is_owner) {
 							</thead>
 							<tbody>
 								<?php if($homeworks): foreach ($homeworks as $homework) : ?>
-								<tr data-homework-id="<?php e($homework->homework_id) ?>">
+								<tr data-homework-id="<?php e($homework->homework_id) ?>" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
 									<td class='basis-15'><?php e($homework->name) ?></td>
 									<td class='basis-20'><?php echo word_limiter($homework->description, 20)?></td>
 									<td class='basis-20'>
@@ -211,7 +211,7 @@ if ($is_member && $is_owner) {
 									<td class='basis-10 homework-status text-center'>
 										<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></span>
 									</td>
-									<td class='basis-10 text-right'><i class="ion-close-circled close-btn"></i></td>
+									<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
@@ -434,7 +434,7 @@ if ($is_member && $is_owner) {
 </div>
 
 <script type="text" id="agenda-row">
-	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="">
+	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
 		<td class="basis-10">{{:agenda_key}}</td>
 		<td class="basis-15">{{:name}}</td>
 		<td class="basis-20">{{:description}}</td>
@@ -446,12 +446,12 @@ if ($is_member && $is_owner) {
 		<td class="basis-10 agenda-status text-center">
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
-		<td class='basis-10 text-right'><i class="ion-close-circled close-btn"></i></td>
+		<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 	</tr>
 </script>
 
 <script type="text" id="homework-row">
-	<tr data-homework-id="{{:homework_id}}">
+	<tr data-homework-id="{{:homework_id}}" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
 		<td class='basis-15'>{{:name}}</td>
 		<td class='basis-20'>{{:short_description}}</td>
 		<td class='basis-20'>
@@ -472,7 +472,7 @@ if ($is_member && $is_owner) {
 		<td class='basis-10 homework-status text-center'>
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
-		<td class='basis-10 text-right'><i class="ion-close-circled close-btn"></i></td>
+		<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 	</tr>
 </script>
 
