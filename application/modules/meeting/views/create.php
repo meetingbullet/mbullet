@@ -98,9 +98,21 @@ $times = [
 						<div class="row">
 							<div class="col-md-9 col-sm-12">
 								<input type="checkbox" style="margin-top: 10px;" name="repeat" value="1" <?php echo set_value('repeat') == 1 ? 'checked' : '' ?> />
-								<span id="readble"><?php echo set_value('readable') ?></span>
 								<input type="text" class="hidden" name="readable" value="<?php echo set_value('readable') ?>" />
 								<textarea name="rrule_recurring" class="hidden"><?php echo set_value('rrule_recurring') ?></textarea> 
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-3 col-sm-12">
+						<label for="in" class="pull-right"><?php e(lang('st_current_state')) ?></label>
+					</div>
+					<div class="col-md-9 col-sm-12">
+						<div class="row">
+							<div class="col-md-9 col-sm-12">
+								<span id="readble" style="padding-top: 5px;display: inline-block;"><?php echo set_value('readable') ?></span>
 							</div>
 						</div>
 					</div>

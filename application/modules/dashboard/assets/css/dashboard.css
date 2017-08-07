@@ -1457,6 +1457,14 @@ div.popover .project-header {
 	display: inline-block;
 }
 
+#messagearea {
+	padding: 15px;
+	background: #eb547c;
+	color: #fff;
+	border-radius: 4px;
+	margin: 15px;
+}
+
 /*.riform .close {
 	width: 20px;
 	height: 20px;

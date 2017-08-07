@@ -362,6 +362,7 @@ $(document).ready(function() {
 				if (data.message_type) {
 					if (data.message_type == 'success') {
 						$('#calendar').fullCalendar('refetchEventSources', 'mbc');
+						$("textarea[name=recurring]").val('');
 					}
 					$.mbNotify(data.message, data.message_type);
 				}
@@ -419,13 +420,14 @@ $(document).ready(function() {
 		hasRepeatForeverButton: false
 	});
 
-	$(document).on('click', '.ributtons input', function() {
-		if ($('#messagearea').text() == '') {
+	$(document).on('click', '.ributtons .risavebutton', function() {
+		if ($('#messagearea').text() == '' || $('#messagearea').css('display') == 'none') {
 			$('#calendar-create-event-modal').fadeToggle();
 		}
 	});
 
 	$(document).on('click', '.ributtons .ricancelbutton', function() {
+		$('#calendar-create-event-modal').fadeIn();
 		if ($('#calendar-create-event-modal textarea[name=rrule_recurring]').val() == '') {
 			$('#calendar-create-event-modal input[name="repeat"]').removeAttr('checked');
 			$('#calendar-create-event-modal input[name="repeat"]').prop("checked", false);
