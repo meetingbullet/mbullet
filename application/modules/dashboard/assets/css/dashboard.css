@@ -1532,3 +1532,8 @@ div.popover .project-header {
 	font-size: 18px;
 	color: orange;
 }
+
+#private-meeting-list {
+	text-transform: uppercase;
+	cursor: pointer;
+}

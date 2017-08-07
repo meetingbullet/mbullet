@@ -109,6 +109,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</a>
 
 				<ul class="an-child-nav js-open-nav" style="display: none;">
+					<li class='project'>
+						<a id="private-meeting-list"><i class="ion-help-circled"></i>&nbsp;Unspecified meetings</a>
+					</li>
 					<?php foreach ($my_projects AS $project): ?>
 					<li class='project' data-project-id="<?php echo $project->project_id ?>">
 						<a 	href="<?php echo site_url('project/' . $project->cost_code)?>" 
@@ -503,7 +506,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	</div> <!-- #popover-rate -->
 </div> <!-- #template -->
 
-<script typ="text/vit" id="popover-project">
+<script type="text/vit" id="popover-project">
 	<div class="project-header">
 		<div class='project-header-content'>
 			<h4>
@@ -964,6 +967,101 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</div>
 			</div> 
 		</div> <!-- Team members -->
+	</div>
+</script>
+
+<script type="text/bao" id="popover-private-meetings">
+	<div class="project-header">
+		<div class='project-header-content'>
+			<h4>Unspecified meetings</h4>
+		</div>
+	</div>
+
+	<div class="mb-popover-content">
+		<div class="project-body order-1">
+			<div class="panel panel-default panel-overview">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#overview-body" role="button" data-toggle="collapse">
+							<?php echo lang('db_overview') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="overview-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="panel-body">
+						<div class="row number-container">
+							<div class="col-md-3">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_meeting') ?><br/>
+								<b class='number'>{{:no_of_meeting}}</b>
+							</div>
+							<div class="col-md-3 team-wrapper">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_team') ?><br/>
+								<b class='number'>{{:team}}</b>
+							</div>
+							<div class="col-md-3 time-wrapper">
+								<i class="ion-ios-alarm-outline"></i>
+								<?php echo lang('db_time') ?><br/>
+								<b class='number'>N/A</b>
+							</div>
+							<div class="col-md-3">
+								<i class="ion-android-people"></i>
+								<?php echo lang('db_points') ?><br/>
+								<b class='number'>N/A</b>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!-- Overview -->
+
+			<div class="panel panel-default panel-unscheduled-meeting">
+				<div class="panel-heading" role="tab">
+					<h4 class="panel-title">
+						<a href="#unscheduled-meeting-body" role="button" data-toggle="collapse">
+							<?php echo lang('st_meetings') ?>
+						</a>
+					</h4>
+				</div>
+				<div id="unscheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
+					<div class="an-user-lists">
+						<div class="list-title">
+							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
+							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
+						</div>
+
+						<div class="an-lists-body">
+						{{if meetings}}
+							{{for meetings}}
+								<div class="list-user-single">
+									<div class="list-date number basis-30">
+										<a href="#">N/A</a>
+									</div>
+									<div class="list-name basis-50">
+										<a href="#">{{:name}}</a>
+									</div>
+									<div class="list-action basis-50">
+										<span class="msg-tag label label-bordered label-inactive">N/A</span>
+									</div>
+								</div> <!-- end .USER-LIST-SINGLE -->
+							{{/for}}
+						{{else}}
+							<div id="no-meeting" class="list-user-single">
+								<div class="list-text basis-30">
+								</div>
+								<div class="list-date email approve basis-40">
+									<?php e(lang('pj_no_meeting')) ?>
+								</div>
+								<div class="list-text basis-30">
+								</div>
+							</div>
+						{{/if}}
+						</div>
+					</div>
+				</div>
+			</div> <!-- Unspecified Meeting -->
+		</div>
 	</div>
 </script>
 

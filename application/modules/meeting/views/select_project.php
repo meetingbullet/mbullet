@@ -15,11 +15,11 @@
 					<option value="">Unspecified Project</option>
 					<optgroup label="My projects">
 					<?php foreach ($my_projects as $project) : ?>
-						<option value="<?php echo $project->cost_code ?>"><?php echo $project->name ?></option>
+						<option value="<?php echo $project['cost_code'] ?>"><?php echo $project['name'] ?></option>
 					<?php endforeach ?>
 					<optgroup label="Other projects">
 					<?php foreach ($other_projects as $project) : ?>
-						<option value="<?php echo $project->cost_code ?>"><?php echo $project->name ?></option>
+						<option value="<?php echo $project['cost_code'] ?>"><?php echo $project['name'] ?></option>
 					<?php endforeach ?>
 					</select>
 				<input name="in" type="hidden" value="<?php echo (strtotime($this->input->get('end')) - strtotime($this->input->get('start'))) / 60 ?>"/>
