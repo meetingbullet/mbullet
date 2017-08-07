@@ -97,6 +97,7 @@ $lang['st_meeting_successfully_created'] = 'Meeting successfully created';
 $lang['st_meeting_successfully_updated'] = 'Meeting successfully updated';
 $lang['st_schedule_time_saved'] = 'Schedule time saved';
 $lang['st_there_was_a_problem_while_creating_meeting'] = 'There was a problem while creating meeting';
+$lang['st_there_was_a_problem_while_updating_meeting'] = 'There was a problem while updating meeting';
 $lang['st_invalid_meeting_key'] = 'Invalid meeting key';
 $lang['st_invalid_schedule_time'] = 'Invalid Schedule Time';
 $lang['st_invalid_assigned_time'] = 'Please assign Time for all agendas';
@@ -113,7 +114,9 @@ $lang['st_time_alotted'] = 'Time alotted for %s has been reached.';
 $lang['st_please_finish_other_agenda'] = 'Please finish other agenda before start a new agenda';
 $lang['st_agenda_placed'] = 'agenda is placed in parking lot';
 $lang['st_invalid_action'] = 'Invalid Action';
+$lang['st_you_have_not_earned_permission_to_create_meeting'] = 'You have not earned permission to create meeting';
 $lang['st_cannot_start_meeting_without_any_agenda'] = 'Cannot start meeting without any agenda';
+$lang['st_cannot_start_meeting_without_any_member'] = 'Cannot start meeting without any member';
 $lang['st_waiting_for_start'] = 'Waiting for start';
 $lang['st_please_resolve_all_agenda_before_finish'] = 'Please resolve all agendas before finish';
 $lang['st_action_key_does_not_exist'] = 'Action key does not exist';
@@ -136,6 +139,7 @@ $lang['st_this_member_has_not_finished_his_homework_yet'] = 'This member has not
 $lang['st_this_member_has_finished_his_homework'] = 'This member has finished his homework';
 $lang['mt_do_you_want_to_start_next_agenda'] = 'Do you want to start next agenda?';
 $lang['mt_do_you_want_to_finish_meeting'] = 'Do you want to finish the meeting';
+$lang['st_please_add_team_member'] = 'Please add team member';
 
 // Field
 $lang['st_detail'] = 'Detail';

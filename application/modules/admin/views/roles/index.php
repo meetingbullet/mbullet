@@ -59,7 +59,7 @@ $can_delete = has_permission('Role.Team.Delete');
 									<h6 class="basis-20"><?php echo lang('rl_action') ?></h6>
 								</div>
 
-								<div class="an-lists-body an-customScrollbar ps-container ps-theme-default" style="max-height:none">
+								<div class="an-lists-body">
 									<?php foreach ($roles as $role) :?>
 									<div id="role-<?php e($role->role_id) ?>" class="list-user-single <?php echo $role->join_default == 1 ? 'div-join-default' : '' ?>">
 										<div class="list-name basis-20">

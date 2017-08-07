@@ -56,13 +56,19 @@ $(document).ready(function() {
 						// New project created, insert to project list
 						// $('#project-list .an-lists-body').append($.templates('#project-row').render(data.data));
 						// $('#project-list .an-lists-body > div:last-child').effect("highlight", {}, 3000);
-						$.get($('.my-projects').data('my-projects-url')).done(function(data) {
-							data = JSON.parse(data);
-							$('.my-projects .project-list').html(data.modal_content);
-						})
+						// $.get($('.my-projects').data('my-projects-url')).done(function(data) {
+						// 	data = JSON.parse(data);
+						// 	$('.my-projects .project-list').html(data.modal_content);
+						// })
 
 						if ($(e.target).attr('id') == 'create-project') {
 							location.reload();
+						}
+
+						if ($(e.target).attr('id') == 'create-meeting') {
+							$( $('#unscheduledSingle').render(data.data) )
+							.appendTo('#unscheduled-meeting-body .an-lists-body')
+							.effect('highlight', 500);
 						}
 					}
 				}

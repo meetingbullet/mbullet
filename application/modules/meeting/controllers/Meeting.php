@@ -61,18 +61,26 @@ class Meeting extends Authenticated_Controller
 	public function create($project_key = null)
 	{
 		if (empty($project_key)) {
-			redirect(DEFAULT_LOGIN_LOCATION);
+			Template::set('close_modal', 0);
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_project_key_does_not_exist'));
+			return;
 		}
 
 		$project_id = $this->mb_project->get_object_id('project', $project_key);
 
 		if (empty($project_id)) {
-			Template::set_message(lang('st_project_key_does_not_exist'), 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
+			Template::set('close_modal', 0);
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_project_key_does_not_exist'));
+			return;
 		}
 
 		if (! $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All')) {
-			$this->auth->restrict();
+			Template::set('close_modal', 0);
+			Template::set('message_type', 'danger');
+			Template::set('message', lang('st_you_have_not_earned_permission_to_create_meeting'));
+			return;
 		}
 
 		$action = $this->action_model->select('action_id, action_key, p.project_id')
@@ -211,6 +219,7 @@ class Meeting extends Authenticated_Controller
 								}
 							}
 
+							Template::set('data', $data);
 							Template::set('close_modal', 1);
 							Template::set('message_type', 'success');
 							Template::set('message', lang('st_meeting_successfully_created'));
@@ -404,7 +413,7 @@ class Meeting extends Authenticated_Controller
 							} else {
 								Template::set('close_modal', 0);
 								Template::set('message_type', 'danger');
-								Template::set('message', lang('st_there_was_a_problem_while_creating_meeting'));
+								Template::set('message', lang('st_please_add_team_member'));
 							}
 						} else {
 							Template::set('close_modal', 0);
@@ -416,7 +425,7 @@ class Meeting extends Authenticated_Controller
 			} else {
 				Template::set('close_modal', 0);
 				Template::set('message_type', 'danger');
-				Template::set('message', lang('st_there_was_a_problem_while_creating_meeting'));
+				Template::set('message', lang('st_please_add_team_member'));
 			}
 
 			Template::render();
@@ -569,6 +578,14 @@ class Meeting extends Authenticated_Controller
 
 		$meeting->members = $this->meeting_member_model->get_meeting_member($meeting_id);
 
+		// We can't start without members
+		if (count($meeting->members) === 0) {
+			Template::set('message_type', 'warning');
+			Template::set('message', lang('st_cannot_start_meeting_without_any_member'));
+			Template::set('content', '');
+			Template::render();
+			return;
+		}
 		$agendas = $this->agenda_model->select('agendas.*, 
 											IF((SELECT tv.user_id FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id AND tv.user_id = "'. $this->current_user->user_id .'") IS NOT NULL, 1, 0) AS voted_skip,
 											(SELECT COUNT(*) FROM mb_agenda_votes tv WHERE mb_agendas.agenda_id = tv.agenda_id) AS skip_votes', false)

@@ -99,7 +99,7 @@
 						<h6 class="basis-20"><?php e(lang('pj_contributor')) ?></h6>
 					</div>
 
-					<div class="an-lists-body an-customScrollbar ps-container ps-theme-default">
+					<div class="an-lists-body">
 						<div class="list-user-single">
 							<div class="list-name basis-40">
 								<?php echo lang('pj_no_hours') ?>
