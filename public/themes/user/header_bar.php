@@ -9,7 +9,7 @@ $projects = $this->mb_project->get_project_list();
 				</h3>
 
 				<div class="topbar-action">
-					<div class="btn-group">
+					<div class="btn-group" style="display: none">
 						<button type="button" class="an-btn an-btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<?php e($projects['current_project_name']) ?> <span class="caret"></span>
 						</button>
