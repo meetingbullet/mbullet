@@ -2500,7 +2500,7 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$types = ['ggc', 'mbc'];
+		$types = ['ggc', 'mbc', 'mbcp'];
 		$event_list = [];
 
 		if (empty($type) || empty($this->input->get('start')) || empty($this->input->get('end')) || ! in_array($type, $types)) {
@@ -2661,6 +2661,7 @@ class Meeting extends Authenticated_Controller
 												->where('organization_id', $this->current_user->current_organization_id)
 												->where('(sm.user_id = "' . $this->current_user->user_id . '" OR meetings.owner_id = "' . $this->current_user->user_id . '")')
 												->where('meetings.scheduled_start_time IS NOT NULL')
+												//->where('meetings.scheduled_start_time BETWEEN "' . $this->input->get('start') . '" AND "' . $this->input->get('end') . '"')
 												->group_by('meetings.meeting_id')
 												->find_all();
 			$events = $events && count($events) > 0 ? $events : [];
@@ -2672,6 +2673,24 @@ class Meeting extends Authenticated_Controller
 					'title' => "{$event->meeting_key}: {$event->name}",
 					'url' => site_url('/meeting/' . $event->meeting_key),
 					'meeting_id' => $event->meeting_id
+				];
+			}
+		}
+
+		if ($type == 'mbcp') {
+			$events = $this->private_meeting_model->where('organization_id', $this->current_user->current_organization_id)
+												->where('created_by', $this->current_user->user_id)
+												//->where('scheduled_start_time BETWEEN "' . $this->input->get('start') . '" AND "' . $this->input->get('end') . '"')
+												->find_all();
+			$events = $events && count($events) > 0 ? $events : [];
+
+			foreach ($events as $event) {
+				$event_list[] = [
+					'start' => $event->scheduled_start_time,
+					'end' => date('Y-m-d H:i:s', strtotime($event->scheduled_start_time . ' + ' . $event->in . ' ' . $event->in_type)),
+					'title' => "Unspecified: {$event->name}",
+					'url' => null,
+					'private_meeting_id' => $event->private_meeting_id
 				];
 			}
 		}
@@ -3145,21 +3164,24 @@ class Meeting extends Authenticated_Controller
 		}
 
 		$meeting_id = $this->input->post('meeting_id');
+		$private_meeting_id = $this->input->post('private_meeting_id');
 		$start = $this->input->post('start');
 		$end = $this->input->post('end');
 
-		if (empty($meeting_id) || empty($start) || empty($end)) {
+		if ((empty($meeting_id) && empty($private_meeting_id)) || empty($start) || empty($end)) {
 			echo json_encode([
 				'status' => 0
 			]); exit;
 		}
+		
+		if (! empty($meeting_id)) {
+			$meeting = $this->meeting_model->find($meeting_id);
 
-		$meeting = $this->meeting_model->find($meeting_id);
-
-		if (empty($meeting) || $meeting->status != 'open' || $meeting->manage_state != 'setup') {
-			echo json_encode([
-				'status' => 0
-			]); exit;
+			if (empty($meeting) || $meeting->status != 'open' || $meeting->manage_state != 'setup') {
+				echo json_encode([
+					'status' => 0
+				]); exit;
+			}
 		}
 
 		$data = [
@@ -3168,7 +3190,11 @@ class Meeting extends Authenticated_Controller
 			'in_type' => 'minutes'
 		];
 
-		$updated = $this->meeting_model->skip_validation(true)->update($meeting_id, $data);
+		if (! empty($meeting_id)) {
+			$updated = $this->meeting_model->skip_validation(true)->update($meeting_id, $data);
+		} else {
+			$updated = $this->private_meeting_model->skip_validation(true)->update($private_meeting_id, $data);
+		}
 
 		if (! $updated) {
 			echo json_encode([

@@ -135,6 +135,13 @@ class Dashboard extends Authenticated_Controller
 				'color' => '#999',
 				'textColor' => 'white',
 				'className' => 'ggc-event'
+			],
+			[
+				'id' => 'mbcp',
+				'url' => site_url('meeting/get_events/mbcp'),
+				'color' => '#eb547c',
+				'textColor' => 'white',
+				'className' => 'mbcp-event'
 			]
 		];
 

@@ -3,7 +3,7 @@
 class Private_meeting_model extends BF_Model
 {
 	protected $table_name	= 'private_meetings';
-	protected $key			= 'meeting_id';
+	protected $key			= 'private_meeting_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= true;
