@@ -34,9 +34,14 @@ if (! is_null($this->uri->segment(1))) {
 			$action = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
 			$project = substr($action, 0, strrpos($action, '-'));
 
+			// $breadcrumb_arr[] = [
+			// 	'name' => $project,
+			// 	'path' => 'project/' . $project
+			// ];
+
 			$breadcrumb_arr[] = [
 				'name' => $project,
-				'path' => 'project/' . $project
+				'path' => 'dashboard?selected_project=' . $project
 			];
 
 			// $breadcrumb_arr[] = [

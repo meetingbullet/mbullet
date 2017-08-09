@@ -3194,7 +3194,13 @@ class Meeting extends Authenticated_Controller
 				'status' => 0
 			]); exit;
 		}
-		
+
+		if (strtotime($start) < strtotime('now') || strtotime($end) < strtotime($start)) {
+			echo json_encode([
+				'status' => 0
+			]); exit;
+		}
+
 		if (! empty($meeting_id)) {
 			$meeting = $this->meeting_model->find($meeting_id);
 
