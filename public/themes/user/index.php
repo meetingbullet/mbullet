@@ -9,6 +9,7 @@ echo Template::message();
 ?>
 
 			<div class="an-content-body">
+<?php echo $this->mb_project->meeting_invitations(); ?>
 <?php
 echo theme_view('_breadcrumb');
 echo isset($content) ? $content : Template::content();

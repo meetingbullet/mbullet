@@ -286,7 +286,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		</header> <!-- end .AN-HEADER -->
 
 		<div class="an-content-body">
-			<div class="alert-wrapper">
+			<!--div class="alert-wrapper">
 				<?php foreach ($meeting_invites as $invite): ?>
 				<div class="alert alert-info" role="alert">
 					<?php echo sprintf(
@@ -318,6 +318,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</div>
 				<?php endforeach; ?>
 			</div> <!-- .alert-wrapper -->
+			<div class="alert-wrapper">
+				<?php echo $this->mb_project->meeting_invitations(); ?>
+			</div>
 			<div class="calendar-wrapper">
 				<div class="heading-wrapper">
 					<h1 class="db-h1">

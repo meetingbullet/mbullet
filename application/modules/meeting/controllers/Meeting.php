@@ -2115,27 +2115,29 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		if (empty($meeting_id) || empty($invite_code) || empty($decision) || ! in_array($decision, $decisions)) { echo 2;
+		if (empty($meeting_id) || empty($invite_code) || empty($decision) || ! in_array($decision, $decisions)) {
 			if (IS_AJAX) {
 				echo json_encode([
 					'message' => lang('st_something_went_wrong'),
 					'message_type' => 'danger'
 				]);
 				return;
+			} else {
+				Template::set_message(lang('st_something_went_wrong'), 'danger');
+				redirect(DEFAULT_LOGIN_LOCATION);
 			}
-
-			Template::set_message(lang('st_something_went_wrong'), 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
 		} else {
 			if ($meeting_invite->status != 'NEEDS-ACTION') {
-				echo json_encode([
-					'message' => lang('st_decided'),
-					'message_type' => 'warning'
-				]);
-				return;
-
-				Template::set_message(lang('st_decided'), 'warning');
-				redirect('meeting/' . $meeting->meeting_key);
+				if (IS_AJAX) {
+					echo json_encode([
+						'message' => lang('st_decided'),
+						'message_type' => 'warning'
+					]);
+					return;
+				} else {
+					Template::set_message(lang('st_decided'), 'warning');
+					redirect('meeting/' . $meeting->meeting_key);
+				}
 
 			} elseif ($decision == 'accept' || $decision == 'maybe') {
 				if ($decision == 'accept') {
@@ -2143,8 +2145,6 @@ class Meeting extends Authenticated_Controller
 				} else {
 					$status = 'TENTATIVE';
 				}
-
-				Template::set_message(lang('st_welcome_to_meeting'), 'success');
 
 				$this->load->model('organization/organization_model');
 				$organization = $this->meeting_model->select('s.*')
@@ -2159,10 +2159,10 @@ class Meeting extends Authenticated_Controller
 							'message_type' => 'danger'
 						]);
 						return;
+					} else {
+						Template::set_message(lang('st_something_went_wrong'), 'danger');
+						redirect('meeting/' . $meeting->meeting_key);
 					}
-
-					Template::set_message(lang('st_something_went_wrong'), 'danger');
-					redirect('meeting/' . $meeting->meeting_key);
 				}
 				$in_organization = $this->user_model->join('user_to_organizations uto', 'uto.user_id = users.user_id')
 													->where('organization_id', $organization->organization_id)
@@ -2184,9 +2184,10 @@ class Meeting extends Authenticated_Controller
 								'message_type' => 'danger'
 							]);
 							return;
+						} else {
+							Template::set_message(lang('st_something_went_wrong'), 'danger');
+							redirect('meeting/' . $meeting->meeting_key);
 						}
-						Template::set_message(lang('st_something_went_wrong'), 'danger');
-						redirect('meeting/' . $meeting->meeting_key);
 					}
 				}
 
@@ -2201,10 +2202,10 @@ class Meeting extends Authenticated_Controller
 							'message_type' => 'danger'
 						]);
 						return;
+					} else {
+						Template::set_message(lang('st_something_went_wrong'), 'danger');
+						redirect('meeting/' . $meeting->meeting_key);
 					}
-
-					Template::set_message(lang('st_something_went_wrong'), 'danger');
-					redirect('meeting/' . $meeting->meeting_key);
 				}
 				$this->mb_project->update_parent_objects('meeting', $meeting_id);
 			} else {
@@ -2217,19 +2218,39 @@ class Meeting extends Authenticated_Controller
 				]);
 
 			if (! $decided) {
-				Template::set_message(lang('st_something_went_wrong'), 'danger');
+				if (IS_AJAX) {
+					echo json_encode([
+						'message' => lang('st_something_went_wrong'),
+						'message_type' => 'danger'
+					]);
+					return;
+				} else {
+					Template::set_message(lang('st_something_went_wrong'), 'danger');
+				}
 			}
 		}
 
 		if (IS_AJAX) {
-			echo json_encode([
-				'message' => lang('st_invitation_accepted'),
-				'message_type' => 'success'
-			]);
+			if ($decision != 'decline') {
+				echo json_encode([
+					'message' => lang('st_welcome_to_meeting'),
+					'message_type' => 'success'
+				]);
+			} else {
+				echo json_encode([
+					'message' => lang('st_declined_successfully'),
+					'message_type' => 'success'
+				]);
+			}
 			return;
+		} else {
+			if ($decision != 'decline') {
+				Template::set_message(lang('st_welcome_to_meeting'), 'success');
+			} else {
+				Template::set_message(lang('st_declined_successfully'), 'success');
+			}
+			redirect('meeting/' . $meeting->meeting_key);
 		}
-
-		redirect('meeting/' . $meeting->meeting_key);
 	}
 
 	public function import()

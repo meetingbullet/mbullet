@@ -1216,6 +1216,41 @@ class Mb_project
 		$this->ci->db->where('organization_id', $current_user->current_organization_id);
 		return $this->ci->db->update('user_to_organizations');
 	}
+
+	/**
+	 * Show meeting invitation
+	 *
+	 * @return string html of invitations
+	 */
+	public function meeting_invitations()
+	{
+		$this->ci->load->model('meeting/meeting_member_invite_model');
+
+		$invitations = $this->ci->meeting_member_invite_model->select('meeting_member_invites.*, s.meeting_key, s.name')
+								->join('meetings s', 's.meeting_id = meeting_member_invites.meeting_id')
+								->join('actions a', 'a.action_id = s.action_id')
+								->join('projects p', 'a.project_id = p.project_id')
+								->where('organization_id', $this->current_user->current_organization_id)
+								->where('invite_email', $this->current_user->email)
+								->where('meeting_member_invites.status', 'NEEDS-ACTION')
+								->find_all();
+
+		$html = "";
+		if (! empty($invitations)) {
+			$html .= "<div class='invitations'>";
+			foreach ($invitations as $invitation) {
+				$html .= "
+					<div class='alert alert-info alert-dismissible fade in' role='alert'>
+						<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>×</span></button>
+						<h4>You got an invitation to join a meeting <a target='_blank' href='" . site_url('meeting/' . $invitation->meeting_key) . "'>({$invitation->meeting_key} - {$invitation->name}).</a></h4>
+						<p>Your decision: <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/accept') . "'>Accept</a> - <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/maybe') . "'>Maybe</a> - <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/decline') . "'>Decline</a></p>
+					</div>";
+			}
+			$html .= "</div>";
+		}
+
+		return $html;
+	}
 }
 /**
  * Similar to function array_unique() but apply for multidimensional array
