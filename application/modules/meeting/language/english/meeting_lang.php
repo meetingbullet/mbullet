@@ -221,3 +221,4 @@ $lang['st_new_meeting'] = 'New Meeting';
 $lang['st_repeat'] = 'Repeat';
 $lang['st_current_state'] = 'Current Repeat State';
 $lang['st_invitation_accepted'] = 'Invitation accepted';
+$lang['st_declined_successfully'] = 'Invitation declined';

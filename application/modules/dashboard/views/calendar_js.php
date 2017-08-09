@@ -84,7 +84,7 @@ $(document).ready(function() {
 		firstDay: 1, // Monday
 		// aspectRatio: 1, // content Width-to-Height
 		editable: false,
-		height: ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight()) + $('.alert-wrapper').height(), /* 2 = calendar table border,  30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */ 
+		height: ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()), /* 2 = calendar table border,  30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */ 
 		eventLimit: true, // allow "more" link when too many events
 		eventSources: <?php echo json_encode($event_sources) ?>,
 		editable: true,
@@ -157,7 +157,7 @@ $(document).ready(function() {
 				}
 			}
 		},
-		defaultView: 'agendaWeek'
+		defaultView: 'agendaWeek',
 	});
 
 	$('#calendar .fc-ggcToggle-button, #calendar .fc-mbcToggle-button').addClass('fc-state-active');
@@ -479,4 +479,57 @@ $(document).ready(function() {
 			$('#calendar-create-event-modal #readble').html('Does not repeat');
 		}
 	});
+
+	// var $element = $(".main-wrapper");
+	// var lastHeight = $(".main-wrapper").css('height');
+	// function checkForChanges()
+	// {
+	// 	if ($element.css('height') != lastHeight)
+	// 	{
+	// 		console.log('body height changed');
+	// 		$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
+	// 		/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+	// 		lastHeight = $element.css('height');
+	// 	}
+
+	// 	setTimeout(checkForChanges, 500);
+	// }
+
+	$('.invitations .alert').on('closed.bs.alert', function() {console.log('closed');
+		$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
+		/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+	});
+
+	$('.an-sidebar-nav.js-sidebar-toggle-with-click *').on('hidden.bs.collapse, shown.bs.collapse', function() {console.log('toggled');
+		$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
+		/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+	});
+
+	/**
+	 * Resize end event
+	 * https://stackoverflow.com/questions/5489946/jquery-how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-ac
+	 */
+
+	var rtime;
+	var timeout = false;
+	var delta = 200;
+
+	$(window).resize(function() {
+		rtime = new Date(-1E12);
+		if (timeout === false) {
+			timeout = true;
+			setTimeout(resizeend, delta);
+		}
+	});
+
+	function resizeend() {
+		if (new Date() - rtime < delta) {
+			setTimeout(resizeend, delta);
+		} else {
+			timeout = false;
+			console.log('Done resizing');
+			$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
+			/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+		}
+	}
 });
