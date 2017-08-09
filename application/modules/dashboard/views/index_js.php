@@ -274,7 +274,9 @@ $(document).click(function(e) {
 	if ($('.an-sidebar-nav .popover.in').length > 0
 		&& $(e.target).closest('.an-page-content').length > 0) {
 
-		$('.mb-popover-project').popover('hide');
+		//$('.mb-popover-project, #private-meeting-list').popover('hide');
+		$('#private-meeting-list').popover('hide');
+		$('.project .js-show-child-nav.mb-popover-project.nav-open').click();
 	}
 });
 
@@ -545,3 +547,21 @@ $('.invitations a.decision').click(function(e) {
 		}
 	})
 });
+
+// get query string value
+function getParameterByName(name, url) {
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, "\\$&");
+	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+		results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+// focus to project on side menu
+var selected_project = getParameterByName('selected_project');
+if (selected_project) {
+	$('#my-project').click();
+	$('.project a[data-cost-code="' + selected_project + '"]').click();
+}
