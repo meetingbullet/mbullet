@@ -559,9 +559,25 @@ function getParameterByName(name, url) {
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+// get anchor value
+function getAnchor(url) {
+	if (!url) url = window.location.href;
+	var index = url.indexOf("#");
+
+	if (index == -1) {
+		return null;
+	}
+
+	var anchor = url.substring(url.indexOf("#") + 1);
+	return anchor;
+}
+
 // focus to project on side menu
-var selected_project = getParameterByName('selected_project');
-if (selected_project) {
-	$('#my-project').click();
-	$('.project a[data-cost-code="' + selected_project + '"]').click();
+var anchor = getAnchor();
+if (anchor) {
+	var selected_project = anchor.substring(anchor.indexOf("/") + 1);
+	if (selected_project != anchor && selected_project != '') {
+		$('#my-project').click();
+		$('.project a[data-cost-code="' + selected_project + '"]').click();
+	}
 }
