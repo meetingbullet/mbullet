@@ -104,21 +104,19 @@ class Organization extends Authenticated_Controller
 														->where('role_id', $role_id)
 														->get('role_to_permissions')
 														->result();
-							if (($role_permissions === false) || (is_array($role_permissions) && count($role_permissions) == 0)) {
-								logit('line 94: unable to get system default role permissions.');
-								throw new Exception(lang('org_error_position_5'));
-							}
 
-							$organization_role_permissions = [];
-							foreach ($role_permissions as $permission) {
-								$permission->role_id = $organization_role_id;
-								$organization_role_permissions[] = (array) $permission;
-							}
-							// clone system default role permission to new organization
-							$organization_role_permissions_added = $this->db->insert_batch('role_to_permissions', $organization_role_permissions);
-							if (! $organization_role_permissions_added) {
-								logit('line 106: unable to set organization role permissions.');
-								throw new Exceptionlang(lang('org_error_position_6'));
+							if ($role_permissions && count($role_permissions) > 0) {
+								$organization_role_permissions = [];
+								foreach ($role_permissions as $permission) {
+									$permission->role_id = $organization_role_id;
+									$organization_role_permissions[] = (array) $permission;
+								}
+								// clone system default role permission to new organization
+								$organization_role_permissions_added = $this->db->insert_batch('role_to_permissions', $organization_role_permissions);
+								if (! $organization_role_permissions_added) {
+									logit('line 106: unable to set organization role permissions.');
+									throw new Exceptionlang(lang('org_error_position_6'));
+								}
 							}
 						}
 						// if not public domain name email, insert organization domain name
