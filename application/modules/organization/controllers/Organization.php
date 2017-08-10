@@ -37,6 +37,9 @@ class Organization extends Authenticated_Controller
 			$this->form_validation->set_rules($rules['create_organization']);
 			// validate
 			if ($this->form_validation->run() !== false) {
+				// Avoid conflict validation rules
+				$this->form_validation->reset_validation();
+
 				$this->load->helper('text');
 				// filter the url
 				$url = convert_accented_characters($this->input->post('url'));
