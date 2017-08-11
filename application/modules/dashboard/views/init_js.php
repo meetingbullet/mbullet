@@ -1045,6 +1045,7 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 		if (typeof isFinished !== undefined && isFinished == true) {
 			swal.close();
 			$('#init').modal('hide');
+			$('.calendar-wrapper').removeClass('blur');
 			$.mbNotify('Import successfully', 'success');
 		}
 	}).fail(function() {
