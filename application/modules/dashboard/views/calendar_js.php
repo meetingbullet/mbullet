@@ -150,8 +150,8 @@ $(document).ready(function() {
 
 				$.mbNotify('<?php echo lang("db_select_from_today_to_future") ?>', 'warning');
 			} else {
-				if ($('#calendar').fullCalendar('getView') == 'month') {
-					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD HH:mm:ss')) + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');
+				if ($('#calendar').fullCalendar('getView').type == 'month') {
+					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD')) + ' 09:00:00' + '&end=' + encodeURIComponent(moment(start).format('YYYY-MM-DD')) + ' 10:00:00', 'modal-sm');
 				} else {
 					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD HH:mm:ss')) + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');
 				}
@@ -381,7 +381,7 @@ $(document).ready(function() {
 
 				if (data.message_type) {
 					if (data.message_type == 'success') {
-						$('#calendar').fullCalendar('refetchEventSources', 'mbc');
+						$('#calendar').fullCalendar('refetchEventSources', ['mbc', 'mbcp']);
 						$("textarea[name=recurring]").val('');
 					}
 					$.mbNotify(data.message, data.message_type);
