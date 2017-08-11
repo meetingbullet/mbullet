@@ -151,7 +151,11 @@ $(document).ready(function() {
 				$.mbNotify('<?php echo lang("db_select_from_today_to_future") ?>', 'warning');
 			} else {
 				if ($('#calendar').fullCalendar('getView').type == 'month') {
-					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD')) + ' 09:00:00' + '&end=' + encodeURIComponent(moment(start).format('YYYY-MM-DD')) + ' 10:00:00', 'modal-sm');
+					if (moment(end).unix() - moment(start).unix() >= 172800) {
+						$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD HH:mm:ss')) + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');
+					} else {
+						$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD')) + ' 09:00:00' + '&end=' + encodeURIComponent(moment(start).format('YYYY-MM-DD')) + ' 10:00:00', 'modal-sm');
+					}
 				} else {
 					$.mbOpenModalViaUrl('calendar-create-event-modal', '<?php echo site_url('meeting/select_project') ?>' + '?start=' + encodeURIComponent(moment(start).format('YYYY-MM-DD HH:mm:ss')) + '&end=' + encodeURIComponent(moment(end).format('YYYY-MM-DD HH:mm:ss')), 'modal-sm');
 				}

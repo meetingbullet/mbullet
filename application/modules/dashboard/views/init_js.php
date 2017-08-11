@@ -30,6 +30,20 @@ $('#calendar-init').fullCalendar({
 		if (event.end.format('M') != $('#calendar-init').fullCalendar('getDate').format('M')) {
 			$(element).addClass('fc-other-month');
 		}
+
+		if (INIT_DATA.path) {
+			if (INIT_DATA.path == 'guest') {
+				// Remove all Owner meeting
+				if (event.isOwner == true && event._id !== undefined) {
+					if(! element.hasClass('hidden')) element.addClass('hidden');
+				}
+			} else {
+				// Remove all Guest meeting
+				if (event.isOwner == false && event._id !== undefined) {
+					if(! element.hasClass('hidden')) element.addClass('hidden');
+				}
+			}
+		}
 	},
 	viewRender: function(view) {
 		var title = view.title;
@@ -233,12 +247,8 @@ $('.btn-underdog').click(function() {
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
 	//console.log('STEP:', INIT_DATA.currentStep, '\nIndex: ', INIT_DATA.currentStepIndex)
 
-	// Remove all Owner meeting
-	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
-		if (item.isOwner == true && item._id !== undefined) {
-			$('#calendar-init').fullCalendar('removeEvents', item._id);
-		}
-	});
+	// Remove all Owner meeting -> move to eventRender
+	$('#calendar-init').fullCalendar('refetchEvents');
 
 	$('#init .step-10').slideUp();
 	$('#init .step-30 .guest').slideDown();
@@ -253,12 +263,8 @@ $('.btn-like-a-boss').click(function() {
 	INIT_DATA.currentStep = STEPS[++INIT_DATA.currentStepIndex];
 	//console.log('STEP:', INIT_DATA.currentStep)
 
-	// Remove all Guest meeting
-	$('#calendar-init').fullCalendar('clientEvents').forEach(function(item) {
-		if (item.isOwner == false && item.id !== undefined) {
-			$('#calendar-init').fullCalendar('removeEvents', item._id);
-		}
-	});
+	// Remove all Guest meeting -> move to eventRender
+	$('#calendar-init').fullCalendar('refetchEvents');
 
 	$('#init .step-10').slideUp();
 	$('#init .step-30 .owner').slideDown();
@@ -670,6 +676,7 @@ $(document).on('click', '.init .fc-event', function(e){
 
 			// Don't show yourself
 			if (event.attendees[i].email != event.ownerEmail) {
+				$('.table-team tbody').html('');
 				$(`
 					<tr data-email="${event.attendees[i].email}">
 						<td>${event.attendees[i].email}</td>
