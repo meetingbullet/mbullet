@@ -299,6 +299,14 @@ $confirmation_status = [
 	<?php echo form_close() ?>
 </div>
 
+<style>
+.an-body-topbar,
+.decider-meeting-container {
+	padding-left: 15px;
+	padding-right: 15px;
+}
+</style>
+
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('decider_js', [
 		'project_key' => $project_key,

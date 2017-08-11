@@ -3,10 +3,6 @@
 	$can_edit = has_permission('Permissions.Team.Edit');
 	$can_delete = has_permission('Permissions.Team.Edit');
 	$can_create = true;
-	$divide = 5 * round(20/(count($roles) + 1));
-	if ($divide < 10) {
-		$divide = 10;
-	}
 ?>
 
 
@@ -59,20 +55,20 @@
 						
 							<div class="an-user-lists tables messages">
 								<div class="list-title">
-									<h6 class="basis-<?php echo 2 * $divide; ?> "><?php e(lang('pm_role_to_edit'))?>
+									<h6 class="basis-40 ?> "><?php e(lang('pm_role_to_edit'))?>
 									<?php foreach ($roles as $role): ?>
-										<h6 class="basis-<?php echo $divide; ?> text-center" style="text-align:center"><strong><?php echo $role->name; ?></strong></h6>
+										<h6 class="basis-20 text-center" style="text-align:center"><strong><?php echo $role->name; ?></strong></h6>
 									<?php endforeach; ?>
 								</div>
 
 								<div class="an-lists-body an-customScrollbar ps-container ps-theme-default" style="max-height:none">
 								<?php foreach ($roles as $manage_role): ?>
 									<div class="list-user-single">
-										<div class="list-name basis-<?php echo 2 * $divide; ?> text-center">
+										<div class="list-name basis-40 text-center">
 											<strong><?php e($manage_role->name)?></strong>
 										</div>
 										<?php foreach($roles as $role): ?>
-											<div class="list-number-users basis-<?php echo $divide; ?> text-center">
+											<div class="list-number-users basis-20 text-center">
 												<?php 
 												if( $role->is_public == 1 && $role->organization_id == null) {
 													echo "<input type='checkbox' value='role-" . $role->role_id . "-role-" . $manage_role->role_id . "' checked disabled >";
@@ -107,19 +103,19 @@
 								</blockquote>
 							<div class="an-user-lists tables messages">
 								<div class="list-title">
-									<h6 class="basis-<?php echo 2 * $divide; ?>"><?php e(lang('pm_permissions'))?></h6>
+									<h6 class="basis-40"><?php e(lang('pm_permissions'))?></h6>
 									<?php foreach ($roles as $role): ?>
-										<h6 class="basis-<?php echo $divide; ?> text-center" style="text-align:center"><strong><?php echo $role->name; ?></strong></h6>
+										<h6 class="basis-20 text-center" style="text-align:center"><strong><?php echo $role->name; ?></strong></h6>
 									<?php endforeach; ?>
 								</div>
 								<div class="an-lists-body an-customScrollbar ps-container ps-theme-default" style="max-height:none">
 									<?php foreach ($permissions as $permission): ?>
 										<div class="list-user-single">
-											<div class="list-name basis-<?php echo 2 * $divide; ?>">
+											<div class="list-name basis-40">
 											<strong><?php e($permission->name)?></strong>
 											</div>
 											<?php foreach($roles as $role): ?>
-												<div class="list-number-users basis-<?php echo $divide; ?> text-center">
+												<div class="list-number-users basis-20 text-center">
 													<?php 
 													if ($role->is_public == 1) {
 														echo "<input type='checkbox' value='role-" . $role->role_id . "-permission-" . $permission->permission_id . "' checked disabled >";
@@ -154,9 +150,8 @@
 <style>
 
 @media only screen and (max-width: 767px) {
-    .an-user-lists .list-user-single {
+	.an-user-lists .list-user-single {
 		flex-direction: unset;
-		width
 	}
 	.an-user-lists .list-title {
 		display: flex;
@@ -168,13 +163,18 @@
 		width: auto;
 	}
 	.an-user-lists .list-user-single .list-number-users {
-		width: <?php echo $divide . "%" ?>;
+		width: 20%;
+		min-width: 72px;
 	}
-	 .an-user-lists .list-user-single .list-name {
+	.an-user-lists .list-user-single .list-name {
 		flex-direction: column;
-		width: <?php echo $divide*2 . "%" ?>;
+		width: 40%;
 		text-align: left;
-	} 
+		min-width: 100px;
+	}
+	.an-user-lists .list-user-single .list-name strong {
+		width: 100%;
+	}
 	.an-component-body {
 		overflow-x: auto;
 	}

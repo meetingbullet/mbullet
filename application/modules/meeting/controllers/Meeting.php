@@ -133,6 +133,9 @@ class Meeting extends Authenticated_Controller
 
 			if ($team = $this->input->post('team')) {
 				if ($team = explode(',', $team)) {
+					if ($data['owner_id'] != $this->current_user->user_id && ! in_array($this->current_user->user_id, $team)) {
+						$team[] = $this->current_user->user_id;
+					}
 					$member_data = [];
 					$members = $this->user_model->select('email, user_id')->where_in('user_id', $team)->as_array()->find_all();
 					if (! in_array($data['owner_id'], array_column($members, 'user_id'))) {
