@@ -1230,7 +1230,7 @@ class Mb_project
 								->join('meetings s', 's.meeting_id = meeting_member_invites.meeting_id')
 								->join('actions a', 'a.action_id = s.action_id')
 								->join('projects p', 'a.project_id = p.project_id')
-								->where('organization_id', $this->current_user->current_organization_id)
+								->where('p.organization_id', $this->current_user->current_organization_id)
 								->where('invite_email', $this->current_user->email)
 								->where('meeting_member_invites.status', 'NEEDS-ACTION')
 								->find_all();

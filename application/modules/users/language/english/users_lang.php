@@ -258,3 +258,4 @@ $lang['us_resend_confirm_mail'] = 'Resend Confirmation Email';
 $lang['us_confirm_change_email'] = 'Email Updating Confirm';
 $lang['us_resend_confirm_success'] = 'Resend confirmation email successfully.';
 $lang['us_resend_confirm_fail'] = 'Resend confirmation email not successfully.';
+$lang['us_reg_existed_email'] = 'This email are being used.';

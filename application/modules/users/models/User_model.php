@@ -45,7 +45,12 @@ class User_model extends BF_Model
 			array(
 				'field' => 'email',
 				'label' => 'lang:us_reg_email',
-				'rules' => 'trim|required|valid_email|max_length[255]|unique[users.email]',
+				'rules' => [
+					'trim',
+					'required',
+					'valid_email',
+					'max_length[255]',
+				] // unique email checking moved to controller
 			),
 			array(
 				'field' => 'confirm_terms',
@@ -136,7 +141,12 @@ class User_model extends BF_Model
 			array(
 				'field' => 'email',
 				'label' => 'lang:us_reg_email',
-				'rules' => 'trim|required|valid_email|max_length[255]|unique[users.email]',
+				'rules' => [
+					'trim',
+					'required',
+					'valid_email',
+					'max_length[255]',
+				] // unique email checking moved to controller
 			)
 		)
 	);
@@ -392,5 +402,10 @@ class User_model extends BF_Model
 		}
 
 		return array('message' => $message, 'error' => $error);
+	}
+
+	public function unique_email($email)
+	{
+		return $is_unique = $this->where('email', $email)->where('is_temporary', 0)->count_all() == 0;
 	}
 }
