@@ -127,7 +127,6 @@ $lang['st_write_a_note_here'] = 'Write a note here...';
 $lang['st_all_agenda_confirmed_meeting_closed_out'] = 'All agendas confirmed. Meeting is now closed';
 $lang['st_unknown_error'] = 'Unknown error';
 $lang['st_please_select_all_confirmation_status'] = 'Please select all confirmation status';
-$lang['st_waiting_evaluator'] = 'Waiting for Meeting owner evaluation.';
 $lang['st_agenda_x_was_place_in_open_parking_plot'] = 'Agenda <strong>%s - %s</strong> was placed in open parking lot. Please create a new meeting to finish it.';
 $lang['st_there_agendas_were_placed_in_open_parking_lot'] = 'These agendas were placed in open parking lot:';
 $lang['st_please_create_a_new_meeting_to_finish_it'] = 'Please create a new meeting to finish it.';

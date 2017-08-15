@@ -251,7 +251,11 @@ $(document).ready(function() {
 
 $(document).on('click', '#agenda-list tbody tr.editable', function() {
 	var that = $(this);
+	<?php if (empty($is_private)) : ?>
 	var url = '<?php echo site_url('agenda/edit/') ?>' + that.find('td:first-child').text().trim();
+	<?php else : ?>
+	var url = '<?php echo site_url('agenda/edit/') ?>' + that.data('agenda-id');
+	<?php endif; ?>
 	console.log(url);
 	$.mbOpenModalViaUrl('edit-agenda', url);
 });
@@ -318,8 +322,13 @@ $(document).on('click', '#agenda-list .close-btn', function(e) {
 		closeOnConfirm: false
 	},
 	function(){
+		<?php if (empty($is_private)) : ?>
 		var agenda_key = that.closest('tr').find('td:first-child').text();
 		var url = '<?php echo site_url('agenda/delete/') ?>' + agenda_key;
+		<?php else : ?>
+		var agenda_id = that.closest('tr').data('agenda-id');
+		var url = '<?php echo site_url('agenda/delete/') ?>' + agenda_id;
+		<?php endif; ?>
 		$.get({url}).done(function(data) {
 			swal.close();
 			data = JSON.parse(data);

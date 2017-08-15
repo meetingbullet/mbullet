@@ -280,7 +280,7 @@ class Homework extends Authenticated_Controller
 
 	public function edit($homework_id)
 	{
-		$test = $this->homework_model->select('homework.*, meetings.meeting_id')
+		$test = $this->homework_model->select('homework.*, s.meeting_id, s.status as meeting_status')
 									->join('homework_members hwm', 'hwm.homework_id = homework.homework_id AND hwm.user_id = ' . $this->current_user->user_id, 'LEFT')
 									->join('meetings s', 's.meeting_id = homework.meeting_id AND (s.status = "open" OR s.status = "ready" OR s.status = "inprogress")') // Can only edit when meeting is OPEN
 									->where('(homework.created_by = "' . $this->current_user->user_id . '" OR hwm.user_id = "' . $this->current_user->user_id . '")')
