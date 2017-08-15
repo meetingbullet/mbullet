@@ -1060,10 +1060,10 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							{{for meetings}}
 								<div class="list-user-single">
 									<div class="list-date number basis-30">
-										<a href="#">N/A</a>
+										<a href="<?php echo site_url('meeting/') ?>{{:meeting_id}}">N/A</a>
 									</div>
 									<div class="list-name basis-50">
-										<a href="#">{{:name}}</a>
+										<a href="<?php echo site_url('meeting/') ?>{{:meeting_id}}">{{:name}}</a>
 									</div>
 									<div class="list-action basis-50">
 										<span class="msg-tag label label-bordered label-inactive">N/A</span>

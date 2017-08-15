@@ -30,7 +30,6 @@ class Meeting extends Authenticated_Controller
 		$this->load->model('meeting_member_invite_model');
 		$this->load->model('meeting_comment_model');
 		$this->load->model('meeting/goal_model');
-		$this->load->model('private_meeting_model');
 
 		$this->load->model('action/action_model');
 		$this->load->model('action/action_member_model');
@@ -47,9 +46,17 @@ class Meeting extends Authenticated_Controller
 	{
 		if (method_exists($this, $method))
 		{
+			if ($method == 'edit' && is_numeric($params[0])) {
+				$method = 'edit_private';
+			}
+			
 			return call_user_func_array(array($this, $method), $params);
 		} else {
-			$this->detail($method);
+			if (is_numeric($method)) {
+				$this->detail_private($method);
+			} else {
+				$this->detail($method);
+			}
 		}
 	}
 
@@ -153,6 +160,12 @@ class Meeting extends Authenticated_Controller
 											'invite_code' => $this->invitation->generateRandomString(64),
 										];
 									} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+										$this->meeting_member_invite_model->insert([
+											'meeting_id' => $id,
+											'invite_email' => $member['email'],
+											'invite_code' => $this->invitation->generateRandomString(64),
+											'status' => 'accepted'
+										]);
 										$this->meeting_member_model->insert([
 											'meeting_id' => $id,
 											'user_id' => $member['user_id']
@@ -373,19 +386,36 @@ class Meeting extends Authenticated_Controller
 								// $this->meeting_member_model->delete_where(['meeting_id' => $meeting->meeting_id]);
 								$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
 								$meeting_members = $this->meeting_member_model->join('users', 'users.user_id = meeting_members.user_id')->where('meeting_id', $meeting->meeting_id)->as_array()->find_all();
-								$member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'emails');
+								$member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'email');
 								$member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
 								$invitee_emails = $meeting_invitee_emails;
+
+								if ($owner_email != $this->current_user->email && ! in_array($this->current_user->email, $team)) {
+									$team[] = $this->current_user->email;
+								}
 
 								$invite_data = [];
 								$this->load->library('invite/invitation');
 								foreach ($team as $email) {
-									if (array_search($email, $invitee_emails) === false) {
+									if (array_search($email, $invitee_emails) === false && $email != $this->current_user->email) {
 										$invite_data[] = [
 											'invite_email' => $email,
 											'meeting_id' => $meeting->meeting_id,
 											'invite_code' => $this->invitation->generateRandomString(64),
 										];
+									}
+
+									if ($email == $this->current_user->email && ! in_array($email, $member_emails)) {
+										$this->meeting_member_invite_model->insert([
+											'invite_email' => $email,
+											'meeting_id' => $meeting->meeting_id,
+											'invite_code' => $this->invitation->generateRandomString(64),
+											'status' => 'accepted'
+										]);
+										$this->meeting_member_model->insert([
+											'meeting_id' => $meeting->meeting_id,
+											'user_id' => $this->current_user->user_id
+										]);
 									}
 								}
 
@@ -2653,7 +2683,7 @@ class Meeting extends Authenticated_Controller
 																	->join('actions a', 'a.action_id = meetings.action_id')
 																	->join('projects p', 'p.project_id = a.project_id')
 																	->join('users u', 'u.user_id = meetings.owner_id')
-																	->where('organization_id', $this->current_user->current_organization_id)
+																	->where('p.organization_id', $this->current_user->current_organization_id)
 																	->where('google_event_id IS NOT NULL')
 																	->group_by('meetings.google_event_id')
 																	->as_array()
@@ -2682,7 +2712,7 @@ class Meeting extends Authenticated_Controller
 												->join('projects p', 'p.project_id = a.project_id')
 												->join('users u', 'u.user_id = meetings.owner_id')
 												->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = "' . $this->current_user->user_id . '"', 'LEFT')
-												->where('organization_id', $this->current_user->current_organization_id)
+												->where('p.organization_id', $this->current_user->current_organization_id)
 												->where('(sm.user_id = "' . $this->current_user->user_id . '" OR meetings.owner_id = "' . $this->current_user->user_id . '")')
 												->where('meetings.scheduled_start_time IS NOT NULL')
 												//->where('meetings.scheduled_start_time BETWEEN "' . $this->input->get('start') . '" AND "' . $this->input->get('end') . '"')
@@ -2702,8 +2732,9 @@ class Meeting extends Authenticated_Controller
 		}
 
 		if ($type == 'mbcp') {
-			$events = $this->private_meeting_model->where('organization_id', $this->current_user->current_organization_id)
+			$events = $this->meeting_model->where('organization_id', $this->current_user->current_organization_id)
 												->where('created_by', $this->current_user->user_id)
+												->where('is_private', 1)
 												//->where('scheduled_start_time BETWEEN "' . $this->input->get('start') . '" AND "' . $this->input->get('end') . '"')
 												->find_all();
 			$events = $events && count($events) > 0 ? $events : [];
@@ -2714,7 +2745,7 @@ class Meeting extends Authenticated_Controller
 					'end' => date('Y-m-d H:i:s', strtotime($event->scheduled_start_time . ' + ' . $event->in . ' ' . $event->in_type)),
 					'title' => "Unspecified: {$event->name}",
 					'url' => null,
-					'private_meeting_id' => $event->private_meeting_id
+					'meeting_id' => $event->meeting_id
 				];
 			}
 		}
@@ -3188,7 +3219,6 @@ class Meeting extends Authenticated_Controller
 		}
 
 		$meeting_id = $this->input->post('meeting_id');
-		$private_meeting_id = $this->input->post('private_meeting_id');
 		$start = $this->input->post('start');
 		$end = $this->input->post('end');
 
@@ -3220,11 +3250,7 @@ class Meeting extends Authenticated_Controller
 			'in_type' => 'minutes'
 		];
 
-		if (! empty($meeting_id)) {
-			$updated = $this->meeting_model->skip_validation(true)->update($meeting_id, $data);
-		} else {
-			$updated = $this->private_meeting_model->skip_validation(true)->update($private_meeting_id, $data);
-		}
+		$updated = $this->meeting_model->skip_validation(true)->update($meeting_id, $data);
 
 		if (! $updated) {
 			echo json_encode([
@@ -3303,6 +3329,9 @@ class Meeting extends Authenticated_Controller
 
 			if ($team = $this->input->post('team')) {
 				if ($team = explode(',', $team)) {
+					if ($data['owner_id'] != $this->current_user->user_id && ! in_array($this->current_user->user_id, $team)) {
+						$team[] = $this->current_user->user_id;
+					}
 					$member_data = [];
 					$members = $this->user_model->select('email, user_id')->where_in('user_id', $team)->as_array()->find_all();
 					if (! in_array($data['owner_id'], array_column($members, 'user_id'))) {
@@ -3318,10 +3347,14 @@ class Meeting extends Authenticated_Controller
 			}
 
 			if (! empty($this->input->post('rrule_recurring'))) {
-				$data['recurring_rule'] = $this->input->post('rrule_recurring');
+				$data['rrule'] = $this->input->post('rrule_recurring');
 			}
 
-			$id = $this->private_meeting_model->insert($data);
+			$data['action_id'] = 0;
+			$data['meeting_key'] = '';
+			$data['is_private'] = 1;
+
+			$id = $this->meeting_model->insert($data);
 			if ($id) {
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
@@ -3339,8 +3372,9 @@ class Meeting extends Authenticated_Controller
 
 	public function get_private_meetings()
 	{
-		$meetings = $this->private_meeting_model->where('organization_id', $this->current_user->current_organization_id)
+		$meetings = $this->meeting_model->where('organization_id', $this->current_user->current_organization_id)
 										->where('created_by', $this->current_user->user_id)
+										->where('is_private', 1)
 										->find_all();
 		if (empty($meetings)) $meetings = [];
 		
@@ -3364,5 +3398,189 @@ class Meeting extends Authenticated_Controller
 			'no_of_meeting' => count($meetings),
 			'team' => count($team)
 		]); exit;
+	}
+
+	public function detail_private($meeting_id = null)
+	{
+		if (empty($meeting_id)) {
+			Template::set_message(lang('st_meeting_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$meeting = $this->meeting_model->join('users u', 'u.user_id = meetings.owner_id', 'left')
+									->where('organization_id', $this->current_user->current_organization_id)
+									->where('created_by', $this->current_user->user_id)
+									->where('is_private', 1)
+									->find($meeting_id);
+
+		if (empty($meeting)) {
+			Template::set_message(lang('st_meeting_does_not_exist'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$invited_emails = json_decode($meeting->members);
+		if (! empty($invited_emails)) {
+			$invited_members = $this->user_model->select('user_id, email, first_name, last_name, avatar')->where_in('email', $invited_emails)->as_array()->find_all();
+		} else {
+			$invited_emails = [];
+			$invited_members = [];
+		}
+
+		$invited = [];
+		foreach($invited_emails as $email) {
+			$index = array_search($email, array_column($invited_members, 'email'));
+			if ($index !== false) {
+				$invited[] = $invited_members[$index];
+			} else {
+				$invited[count($invited)]['email'] = $email;
+			}
+		}
+		$invited_members = $invited;
+
+		$agendas = $this->agenda_model->select('agendas.*, u.email, u.first_name, u.last_name, u.avatar')
+								->join('users u', 'u.user_id = agendas.owner_id', 'left')
+								->where('meeting_id', $meeting_id)->find_all();
+
+		if ($agendas) {
+			foreach ($agendas as &$agenda) {
+				$agenda->members = $this->agenda_member_model->select('avatar, email, first_name, last_name')
+				->join('users u', 'u.user_id = agenda_members.user_id')
+				->where('agenda_id', $agenda->agenda_id)
+				->find_all();
+
+				if (! empty($this->input->get('agenda_key')) && $this->input->get('agenda_key') == $agenda->agenda_key) {
+					$chosen_agenda = $agenda;
+				}
+			}
+		}
+
+		$homeworks = $this->homework_model->where('meeting_id', $meeting_id)->find_all();
+
+		if ($homeworks) {
+			foreach ($homeworks as &$homework) {
+				$homework->members = $this->homework_member_model->select('u.user_id, avatar, email, last_name, first_name, CONCAT(first_name, " ", last_name) AS full_name')
+				->join('users u', 'u.user_id = homework_members.user_id')
+				->where('homework_id', $homework->homework_id)
+				->find_all();
+
+				$homework->members = $homework->members ? $homework->members : [];
+
+				$homework->attachments = $this->homework_attachment_model->where('homework_id', $homework->homework_id)->find_all();
+				$homework->attachments = $homework->attachments ? $homework->attachments : [];
+			}
+		}
+
+		if (IS_AJAX) {
+			echo json_encode([$invited_members, $meeting, $agendas, $homeworks]); exit;
+		}
+
+		Assets::add_js($this->load->view('detail_js', [
+			'meeting_key' => null,
+			'current_user' => $this->current_user,
+			'chosen_agenda' => ! empty($chosen_agenda) ? $chosen_agenda : null,
+			'is_private' => 1,
+			'meeting_id' => $meeting->meeting_id
+		], true), 'inline');
+		Template::set('agendas', $agendas);
+		Template::set('homeworks', $homeworks);
+		Template::set('current_user', $this->current_user);
+		Template::set('page_title', $meeting->name);
+		Template::set('invited_members', $invited_members);
+		Template::set('meeting', $meeting);
+		Template::set_view('detail_private');
+		Template::render();
+	}
+
+	public function edit_private($meeting_id)
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		Template::set_view('edit_private');
+
+		if (empty($meeting_id)) {
+			Template::set_message(lang('st_meeting_does_not_exist'), 'danger');
+			Template::set('close_modal', 0);
+			Template::render();
+			return;
+		}
+
+		$meeting = $this->meeting_model->join('users u', 'u.user_id = meetings.owner_id', 'left')
+									->where('organization_id', $this->current_user->current_organization_id)
+									->where('created_by', $this->current_user->user_id)
+									->where('is_private', 1)
+									->find($meeting_id);
+
+		if (empty($meeting)) {
+			Template::set_message(lang('st_meeting_does_not_exist'), 'danger');
+			Template::set('close_modal', 0);
+			Template::render();
+			return;
+		}
+
+		Template::set('meeting_members', json_decode($meeting->members));
+		Template::set('meeting', $meeting);
+
+		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+
+		Template::set('project_members', $project_members);
+		Assets::add_js($this->load->view('create_js', [
+			'project_members' => $project_members
+		], true), 'inline');
+
+		if ($data = $this->input->post()) {
+			$data = $this->meeting_model->prep_data($data);
+			$data['modified_by'] = $this->current_user->user_id;
+
+			if ($this->input->post('owner_id') == '') {
+				$data['owner_id'] = $this->current_user->user_id;
+			}
+
+
+			if ($team = $this->input->post('team')) {
+				if ($team = explode(',', $team)) {
+					$member_data = [];
+					$owner_email = $this->user_model->get_field($data['owner_id'], 'email');
+
+					if (! empty($team)) {
+						if (! in_array($owner_email, $team)) {
+							if ($owner_email != $this->current_user->email && ! in_array($this->current_user->email, $team)) {
+								$team[] = $this->current_user->email;
+							}
+							$data['members'] = json_encode($team);
+							if ($this->meeting_model->update($meeting->meeting_id, $data)) {
+								
+								Template::set('close_modal', 1);
+								Template::set('message_type', 'success');
+								Template::set('message', lang('st_meeting_successfully_updated'));
+
+								// Just to reduce AJAX request size
+								if (IS_AJAX) {
+									Template::set('content', '');
+								}
+							} else {
+								Template::set('close_modal', 0);
+								Template::set('message_type', 'danger');
+								Template::set('message', lang('st_please_add_team_member'));
+							}
+						} else {
+							Template::set('close_modal', 0);
+							Template::set('message_type', 'danger');
+							Template::set('message', lang('st_owner_can_not_be_member'));
+						}
+					}
+				}
+			} else {
+				Template::set('close_modal', 0);
+				Template::set('message_type', 'danger');
+				Template::set('message', lang('st_please_add_team_member'));
+			}
+
+			Template::render();
+			return;
+		}
+
+		Template::render();
 	}
 }

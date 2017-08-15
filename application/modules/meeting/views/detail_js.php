@@ -14,7 +14,7 @@ $('.detail-goal, .meeting-notes').readmore(rm_option);
 $('#edit-meeting').click((e) => {
 	e.preventDefault();
 
-	$.get('<?php e(site_url('meeting/edit/' . $meeting_key)) ?>', (data) => {
+	$.get('<?php e(site_url('meeting/edit/' . (empty($is_private) ? $meeting_key : $meeting_id))) ?>', (data) => {
 		data = JSON.parse(data);
 		$('.modal-edit .modal-content').html(data.modal_content);
 		$('.modal-edit').modal({backdrop: "static"});
@@ -118,6 +118,11 @@ $(document).on("submit", '.form-ajax', (e) => {
 						var team = $('#form-update-meeting input[name="team"]').val().split(',');
 						var owner_html = $('.meeting-detail .owner').html();
 						var resource_html = '';
+
+						if (team.indexOf('<?php echo $current_user->email ?>')) {
+							team.push('<?php echo $current_user->email ?>');
+						}
+
 						project_members.concat(anonymous_members).forEach((item) => {
 							var i = team.indexOf(item.email);
 							if (i >= 0) {
@@ -246,7 +251,11 @@ $(document).ready(function() {
 
 $(document).on('click', '#agenda-list tbody tr.editable', function() {
 	var that = $(this);
+	<?php if (empty($is_private)) : ?>
 	var url = '<?php echo site_url('agenda/edit/') ?>' + that.find('td:first-child').text().trim();
+	<?php else : ?>
+	var url = '<?php echo site_url('agenda/edit/') ?>' + that.data('agenda-id');
+	<?php endif; ?>
 	console.log(url);
 	$.mbOpenModalViaUrl('edit-agenda', url);
 });
@@ -313,8 +322,13 @@ $(document).on('click', '#agenda-list .close-btn', function(e) {
 		closeOnConfirm: false
 	},
 	function(){
+		<?php if (empty($is_private)) : ?>
 		var agenda_key = that.closest('tr').find('td:first-child').text();
 		var url = '<?php echo site_url('agenda/delete/') ?>' + agenda_key;
+		<?php else : ?>
+		var agenda_id = that.closest('tr').data('agenda-id');
+		var url = '<?php echo site_url('agenda/delete/') ?>' + agenda_id;
+		<?php endif; ?>
 		$.get({url}).done(function(data) {
 			swal.close();
 			data = JSON.parse(data);

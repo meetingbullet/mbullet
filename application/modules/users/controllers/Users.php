@@ -176,7 +176,8 @@ class Users extends Front_Controller
 						'last_name' => $google_user->family_name,
 						'avatar' => $google_user->picture,
 						'active' => 1,
-						'timezone' => $this->input->get('timezone')
+						'timezone' => $this->input->get('timezone'),
+						'is_temporary' => 0 // in case that the existed user is temporary
 					];
 
 					if (! empty($token['refresh_token'])) {
@@ -543,6 +544,17 @@ class Users extends Front_Controller
 
 		if ($this->input->post()) {
 			$rules = $this->user_model->get_validation_rules();
+			$rules['register'][0]['rules'][] = [
+				'unique_email',
+				function($email) {
+					$is_unique = $this->user_model->unique_email($email);
+					if (! $is_unique) {
+						$this->form_validation->set_message('unique_email', lang('us_reg_existed_email'));
+					}
+
+					return $is_unique;
+				}
+			];
 			$this->form_validation->set_rules($rules['register']);
 
 			if ($this->form_validation->run() !== false) {
@@ -581,6 +593,17 @@ class Users extends Front_Controller
 			$rules = $this->user_model->get_validation_rules();
 			// custom error message for confirm terms
 			$rules['create_profile'][1]['errors']['required'] = lang('form_validation_confirm_required');
+			$rules['create_profile'][0]['rules'][] = [
+				'unique_email',
+				function($email) {
+					$is_unique = $this->user_model->unique_email($email);
+					if (! $is_unique) {
+						$this->form_validation->set_message('unique_email', lang('us_reg_existed_email'));
+					}
+
+					return $is_unique;
+				}
+			];
 			$this->form_validation->set_rules($rules['create_profile']);
 
 			if ($this->form_validation->run() !== false) {
@@ -611,12 +634,23 @@ class Users extends Front_Controller
 						$data['timezone'] = $this->input->post('timezone');
 					}
 
-					$added = $this->user_model->insert($data);
+					$temp_user = $this->user_model->select('user_id')->where('is_temporary', 1)->find_by('email', $data['email']);
+					if ($temp_user) {
+						$data['is_temporary'] = 0;
+						$added = $this->user_model->update($temp_user->user_id, $data);
+					} else {
+						$added = $this->user_model->insert($data);
+					}
+
 					if (! $added) {
 						Template::set_message(lang('us_register_failed'), 'danger');
 						@unlink($upload_config['upload_path'] . $data['avatar']);
 					} else {
-						$user_id = $added;
+						if ($temp_user) {
+							$user_id = $temp_user->user_id;
+						} else {
+							$user_id = $added;
+						}
 						$activation = $this->user_model->set_activation($user_id);
 
 						$message = $activation['message'];

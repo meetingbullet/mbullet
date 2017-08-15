@@ -579,5 +579,8 @@ if (anchor) {
 	if (selected_project != anchor && selected_project != '') {
 		$('#my-project').click();
 		$('.project a[data-cost-code="' + selected_project + '"]').click();
+	} else {
+		$('#my-project').click();
+		$('.project:first-child > a:first-child').click();
 	}
 }
