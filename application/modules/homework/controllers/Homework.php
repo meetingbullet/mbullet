@@ -24,22 +24,53 @@ class Homework extends Authenticated_Controller
 
 	public function create($meeting_key)
 	{
-		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
-
-		if (empty($meeting_id)) {
-			Template::set_message(lang('hw_meeting_key_does_not_exist'), 'danger');
+		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$keys = explode('-', $meeting_key);
-		if (empty($keys) || count($keys) < 3) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		if (is_numeric($meeting_key)) {
+			$meeting_id = $meeting_key;
+			$meeting = $this->meeting_model->join('users u', 'u.user_id = meetings.owner_id', 'left')
+									->where('organization_id', $this->current_user->current_organization_id)
+									->where('created_by', $this->current_user->user_id)
+									->where('is_private', 1)
+									->find($meeting_id);
+			if (empty($meeting)) {
+				Template::set_message(lang('hw_meeting_key_does_not_exist'), 'danger');
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 1);
+				Template::render();
+				return;
+			}
+		} else {
+			$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		$project_key = $keys[0];
+			if (empty($meeting_id)) {
+				Template::set_message(lang('hw_meeting_key_does_not_exist'), 'danger');
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 1);
+				Template::render();
+				return;
+			}
 
-		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.Edit.All')) {
-			$this->auth->restrict();
+			$keys = explode('-', $meeting_key);
+			if (empty($keys) || count($keys) < 3) {
+				Template::set_message(lang('hw_meeting_key_does_not_exist'), 'danger');
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 1);
+				Template::render();
+				return;
+			}
+
+			$project_key = $keys[0];
+
+			if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.Edit.All')) {
+				Template::set('message_type', 'danger');
+				Template::set('message', lang('hw_not_have_permission'));
+				Template::set('close_modal', 1);
+				Template::render();
+				return;
+			}
 		}
 
 		$organization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);

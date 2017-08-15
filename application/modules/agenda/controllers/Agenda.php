@@ -30,22 +30,49 @@ class Agenda extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
+		if (is_numeric($meeting_key)) {
+			$meeting_id = $meeting_key;
+			$meeting = $this->meeting_model->join('users u', 'u.user_id = meetings.owner_id', 'left')
+									->where('organization_id', $this->current_user->current_organization_id)
+									->where('created_by', $this->current_user->user_id)
+									->where('is_private', 1)
+									->find($meeting_id);
+			if (empty($meeting)) {
+				Template::set_message(lang('ag_meeting_key_does_not_exist'), 'danger');
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 1);
+				Template::render();
+				return;
+			}
+		} else {
+			$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (empty($meeting_id)) {
-			Template::set_message(lang('ag_meeting_key_does_not_exist'), 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+			if (empty($meeting_id)) {
+				Template::set('message', lang('ag_meeting_key_does_not_exist'));
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 1);
+				Template::render();
+				return;
+			}
 
-		$keys = explode('-', $meeting_key);
-		if (empty($keys) || count($keys) < 3) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+			$keys = explode('-', $meeting_key);
+			if (empty($keys) || count($keys) < 3) {
+				Template::set('message', lang('ag_meeting_key_does_not_exist'));
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 1);
+				Template::render();
+				return;
+			}
 
-		$project_key = $keys[0];
+			$project_key = $keys[0];
 
-		if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.Edit.All')) {
-			$this->auth->restrict();
+			if (! $this->mb_project->has_permission('meeting', $meeting_id, 'Project.Edit.All')) {
+				Template::set('message', lang('ag_not_have_permission'));
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 1);
+				Template::render();
+				return;
+			}
 		}
 
 		$organization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
@@ -68,7 +95,11 @@ class Agenda extends Authenticated_Controller
 					$data['meeting_id'] = $meeting_id;
 					$data['owner_id'] = $this->current_user->user_id;
 					$data['created_by'] = $this->current_user->user_id;
-					$data['agenda_key'] = $this->mb_project->get_next_key($meeting_key);
+					if (is_numeric($meeting_key)) {
+						$data['agenda_key'] = '';
+					} else {
+						$data['agenda_key'] = $this->mb_project->get_next_key($meeting_key);
+					}
 
 					$agenda_id = $this->agenda_model->insert($data);
 

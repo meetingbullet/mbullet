@@ -14,7 +14,7 @@ $('.detail-goal, .meeting-notes').readmore(rm_option);
 $('#edit-meeting').click((e) => {
 	e.preventDefault();
 
-	$.get('<?php e(site_url('meeting/edit/' . $meeting_key)) ?>', (data) => {
+	$.get('<?php e(site_url('meeting/edit/' . (empty($is_private) ? $meeting_key : $meeting_id))) ?>', (data) => {
 		data = JSON.parse(data);
 		$('.modal-edit .modal-content').html(data.modal_content);
 		$('.modal-edit').modal({backdrop: "static"});
@@ -118,6 +118,11 @@ $(document).on("submit", '.form-ajax', (e) => {
 						var team = $('#form-update-meeting input[name="team"]').val().split(',');
 						var owner_html = $('.meeting-detail .owner').html();
 						var resource_html = '';
+
+						if (team.indexOf('<?php echo $current_user->email ?>')) {
+							team.push('<?php echo $current_user->email ?>');
+						}
+
 						project_members.concat(anonymous_members).forEach((item) => {
 							var i = team.indexOf(item.email);
 							if (i >= 0) {
