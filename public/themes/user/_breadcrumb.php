@@ -31,18 +31,25 @@ if (! is_null($this->uri->segment(1))) {
 			];
 			break;
 		case 'meeting':
-			$action = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
-			$project = substr($action, 0, strrpos($action, '-'));
+			if (! is_numeric($this->uri->segment(2))) {
+				$action = substr($this->uri->segment(2), 0, strrpos($this->uri->segment(2), '-'));
+				$project = substr($action, 0, strrpos($action, '-'));
 
-			// $breadcrumb_arr[] = [
-			// 	'name' => $project,
-			// 	'path' => 'project/' . $project
-			// ];
+				// $breadcrumb_arr[] = [
+				// 	'name' => $project,
+				// 	'path' => 'project/' . $project
+				// ];
 
-			$breadcrumb_arr[] = [
-				'name' => $project,
-				'path' => 'dashboard?selected_project=' . $project
-			];
+				$breadcrumb_arr[] = [
+					'name' => $project,
+					'path' => 'dashboard#project/' . $project
+				];
+			} else {
+				$breadcrumb_arr[] = [
+					'name' => 'Unspecified meeting',
+					'path' => 'dashboard#unspecified-meetings'
+				];
+			}
 
 			// $breadcrumb_arr[] = [
 			// 	'name' => $action,

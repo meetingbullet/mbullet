@@ -89,23 +89,13 @@ $(document).ready(function() {
 		eventSources: <?php echo json_encode($event_sources) ?>,
 		editable: true,
 		eventDrop: function(event, delta, revertFunc) {
-			if (typeof(event.meeting_id) != 'undefined') {
-				var ajax_data = {
+			$.post(
+				'<?php echo site_url('meeting/edit_calendar_event') ?>',
+				{
 					meeting_id: event.meeting_id,
 					start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
 					end: moment(event.end).format('YYYY-MM-DD HH:mm:ss')
-				};
-			} else {
-				var ajax_data = {
-					private_meeting_id: event.private_meeting_id,
-					start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-					end: moment(event.end).format('YYYY-MM-DD HH:mm:ss')
-				};
-			}
-
-			$.post(
-				'<?php echo site_url('meeting/edit_calendar_event') ?>',
-				ajax_data
+				}
 			).done(function(data) {
 				data = JSON.parse(data);
 				if (data.status == 0) {
@@ -116,23 +106,13 @@ $(document).ready(function() {
 			})
 		},
 		eventResize: function(event, delta, revertFunc) {
-			if (typeof(event.meeting_id) != 'undefined') {
-				var ajax_data = {
+			$.post(
+				'<?php echo site_url('meeting/edit_calendar_event') ?>',
+				{
 					meeting_id: event.meeting_id,
 					start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
 					end: moment(event.end).format('YYYY-MM-DD HH:mm:ss')
-				};
-			} else {
-				var ajax_data = {
-					private_meeting_id: event.private_meeting_id,
-					start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-					end: moment(event.end).format('YYYY-MM-DD HH:mm:ss')
-				};
-			}
-
-			$.post(
-				'<?php echo site_url('meeting/edit_calendar_event') ?>',
-				ajax_data
+				}
 			).done(function(data) {
 				data = JSON.parse(data);
 				if (data.status == 0) {
