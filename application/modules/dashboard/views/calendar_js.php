@@ -319,7 +319,7 @@ $(document).ready(function() {
 			url+= 'create_private/';
 		}
 
-		$.get(url + '?recurring=1&scheduled_start_time=' + encodeURIComponent(scheduled_start_time) + '&in=' + encodeURIComponent(duration), (data) => {
+		$.get(url + '?on_calendar=1&recurring=1&scheduled_start_time=' + encodeURIComponent(scheduled_start_time) + '&in=' + encodeURIComponent(duration), (data) => {
 			data = JSON.parse(data);
 
 			if (data.message_type != 'success' && data.message_type != null) {

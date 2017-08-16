@@ -134,8 +134,8 @@ class Meeting extends Authenticated_Controller
 
 			$data['meeting_key'] = $this->mb_project->get_next_key($action->action_key);
 			// only when create meeting on dashboard calendar
-			if (! empty($this->input->get('scheduled_start_time'))) {
-				$data['scheduled_start_time'] = $this->input->get('scheduled_start_time');
+			if (! empty($this->input->post_get('scheduled_start_time'))) {
+				$data['scheduled_start_time'] = $this->input->post_get('scheduled_start_time');
 			}
 
 			if ($team = $this->input->post('team')) {
@@ -2744,7 +2744,7 @@ class Meeting extends Authenticated_Controller
 					'start' => $event->scheduled_start_time,
 					'end' => date('Y-m-d H:i:s', strtotime($event->scheduled_start_time . ' + ' . $event->in . ' ' . $event->in_type)),
 					'title' => "Unspecified: {$event->name}",
-					'url' => null,
+					'url' => site_url('meeting/' . $event->meeting_id),
 					'meeting_id' => $event->meeting_id
 				];
 			}
@@ -3322,7 +3322,6 @@ class Meeting extends Authenticated_Controller
 				$data['owner_id'] = $this->current_user->user_id;
 			}
 
-			// only when create meeting on dashboard calendar
 			if (! empty($this->input->get('scheduled_start_time'))) {
 				$data['scheduled_start_time'] = $this->input->get('scheduled_start_time');
 			}
@@ -3581,6 +3580,14 @@ class Meeting extends Authenticated_Controller
 			return;
 		}
 
+		Template::render();
+	}
+
+	public function date_picker()
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
 		Template::render();
 	}
 }

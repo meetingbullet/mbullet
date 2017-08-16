@@ -121,6 +121,9 @@ $times = [
 				$('textarea[name=recurring]').change();
 				</script>
 				<?php endif ?>
+				<?php if (empty($this->input->get('on_calendar'))) : ?>
+				<input type="text" style="display: none;" name="scheduled_start_time" id="meeting-scheduled-start-time" value="<?php echo set_value('scheduled_start_time') ?>">
+				<?php endif ?>
 		</div>
 
 		<div class="<?php echo $this->input->is_ajax_request() ? 'modal-footer' : 'container-fluid pull-right' ?>">

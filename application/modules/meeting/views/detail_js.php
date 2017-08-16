@@ -438,3 +438,31 @@ $(document).on('click', '#homework-list .close-btn', function(e) {
 		});
 	});
 });
+
+<?php if (empty($is_private)) : ?>
+// add date time picker in normal modal
+$(document).on('click', '#update-meeting', function(e) {
+	e.preventDefault();
+	console.log('clicked');
+	var url = '<?php echo site_url('meeting/date_picker') ?>';
+	if ($('#update-meeting').closest('.form-ajax').find('input#meeting-scheduled-start-time').length) {
+		url += '?selected_date=' + encodeURIComponent($('#update-meeting').closest('.form-ajax').find('input#meeting-scheduled-start-time').val());
+	}
+	$.mbOpenModalViaUrl('meeting-date-time-picker', url, 'modal-sm');
+});
+
+// update scheduled start time from date picker
+$(document).on('dp.change', '#dt-picker', function() {
+	var scheduled_start_time = $(this).data("DateTimePicker").date().format('YYYY-MM-DD HH:mm:ss');
+	$('input#meeting-scheduled-start-time').val(scheduled_start_time);
+});
+
+$(document).on('click', '#meeting-date-time-picker .modal-footer button', function() {
+	if ($(this).attr('id') == 'dt-later') {
+		$('input#meeting-scheduled-start-time').val('');
+	}
+
+	$('#meeting-date-time-picker').modal('hide');
+	$('#update-meeting').closest('.form-ajax').submit();
+});
+<?php endif ?>
