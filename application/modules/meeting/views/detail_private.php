@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * deprecated
+ */
 $scheduled_start_time = null;
 $is_owner = $meeting->owner_id == $current_user->user_id;
 

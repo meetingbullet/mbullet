@@ -119,7 +119,7 @@ $(document).on("submit", '.form-ajax', (e) => {
 						var owner_html = $('.meeting-detail .owner').html();
 						var resource_html = '';
 
-						if (team.indexOf('<?php echo $current_user->email ?>')) {
+						if (team.indexOf('<?php echo $current_user->email ?>') == '-1') {
 							team.push('<?php echo $current_user->email ?>');
 						}
 

@@ -53,6 +53,15 @@ class Homework extends Authenticated_Controller
 				return;
 			}
 
+			$status = $this->meeting_model->get_field($meeting_id, 'status');
+
+			if (empty($status) || ($status != 'open' && $status !== 'ready')) {
+				Template::set('message_type', 'danger');
+				Template::set('message', lang('hw_not_have_permission'));
+				Template::set('close_modal', 1);
+				Template::render();
+			}
+
 			$keys = explode('-', $meeting_key);
 			if (empty($keys) || count($keys) < 3) {
 				Template::set_message(lang('hw_meeting_key_does_not_exist'), 'danger');

@@ -55,6 +55,15 @@ class Agenda extends Authenticated_Controller
 				return;
 			}
 
+			$status = $this->meeting_model->get_field($meeting_id, 'status');
+
+			if (empty($status) || ($status != 'open' && $status !== 'ready')) {
+				Template::set('message_type', 'danger');
+				Template::set('message', lang('hw_not_have_permission'));
+				Template::set('close_modal', 1);
+				Template::render();
+			}
+
 			$keys = explode('-', $meeting_key);
 			if (empty($keys) || count($keys) < 3) {
 				Template::set('message', lang('ag_meeting_key_does_not_exist'));
@@ -285,6 +294,16 @@ class Agenda extends Authenticated_Controller
 			Template::set('close_modal', 0);
 
 			$agenda = $this->agenda_model->find($agenda_id);
+			$status = $this->meeting_model->get_field($agenda->meeting_id, 'status');
+
+			if (empty($status) || ($status != 'open' && $status !== 'ready')) {
+				Template::set('message_type', 'danger');
+				Template::set('message', lang('hw_not_have_permission'));
+				Template::set('close_modal', 1);
+				Template::render();
+			}
+
+
 			$selected_members = $this->agenda_member_model->select('user_id')->where('agenda_id', $agenda_id)->as_array()->find_all();
 			if (empty($selected_members)) {
 				$selected_members = [];
@@ -370,23 +389,24 @@ class Agenda extends Authenticated_Controller
 			$agenda_id = $agenda_key;
 		} else {
 			$agenda_id = $this->mb_project->get_object_id('agenda', $agenda_key);
-			$agenda_count = $this->agenda_model->join('meetings', 'meetings.meeting_id = agendas.meeting_id AND (meetings.status = "open" OR meetings.status = "ready")', 'LEFT')
-										->where('agendas.agenda_id', $agenda_id)
-										->count_all();
+		}
 
-			if (empty($agenda_id) || $agenda_count == 0) {
-				Template::set_message(lang('ag_agenda_key_does_not_exist'), 'danger');
-				Template::set('message_type', 'danger');
-				Template::set('close_modal', 1);
-				Template::render();
-			}
+		$agenda_count = $this->agenda_model->join('meetings', 'meetings.meeting_id = agendas.meeting_id AND (meetings.status = "open" OR meetings.status = "ready")', 'LEFT')
+									->where('agendas.agenda_id', $agenda_id)
+									->count_all();
 
-			if (! $this->mb_project->has_permission('agenda', $agenda_id, 'Project.Edit.All')) {
-				Template::set_message(lang('ag_not_have_permission'), 'danger');
-				Template::set('message_type', 'danger');
-				Template::set('close_modal', 1);
-				Template::render();
-			}
+		if (empty($agenda_id) || $agenda_count == 0) {
+			Template::set_message(lang('ag_agenda_key_does_not_exist'), 'danger');
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 1);
+			Template::render();
+		}
+
+		if (! $this->mb_project->has_permission('agenda', $agenda_id, 'Project.Edit.All')) {
+			Template::set_message(lang('ag_not_have_permission'), 'danger');
+			Template::set('message_type', 'danger');
+			Template::set('close_modal', 1);
+			Template::render();
 		}
 
 		$deleted = $this->agenda_model->delete($agenda_id);

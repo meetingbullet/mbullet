@@ -52,11 +52,13 @@ class Meeting extends Authenticated_Controller
 			
 			return call_user_func_array(array($this, $method), $params);
 		} else {
-			if (is_numeric($method)) {
-				$this->detail_private($method);
-			} else {
-				$this->detail($method);
-			}
+			// if (is_numeric($method)) {
+			// 	$this->detail_private($method);
+			// } else {
+			// 	$this->detail($method);
+			// }
+
+			$this->detail($method);
 		}
 	}
 
@@ -477,58 +479,93 @@ class Meeting extends Authenticated_Controller
 	public function detail($meeting_key = null)
 	{
 		if (empty($meeting_key)) {
-			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
+			Template::set_message(lang('st_meeting_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$keys = explode('-', $meeting_key);
-		if (empty($keys) || count($keys) < 3) {
-			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		if (is_numeric($meeting_key)) {
+			$meeting_id = $meeting_key;
 
-		$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
+			$meeting = $this->meeting_model->join('users u', 'u.user_id = meetings.owner_id', 'left')
+										->where('organization_id', $this->current_user->current_organization_id)
+										->where('created_by', $this->current_user->user_id)
+										->where('is_private', 1)
+										->find($meeting_id);
 
-		if (empty($meeting_id)) {
-			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+			if (empty($meeting)) {
+				Template::set_message(lang('st_meeting_does_not_exist'), 'danger');
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
 
-		if (! $can_view = $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
-			Template::set_message(lang('st_you_have_no_permission_to_view_this_meeting'), 'warning');
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+			$invited_emails = json_decode($meeting->members);
+			if (! empty($invited_emails)) {
+				$invited_members = $this->user_model->select('user_id, email, first_name, last_name, avatar')->where_in('email', $invited_emails)->as_array()->find_all();
+			} else {
+				$invited_emails = [];
+				$invited_members = [];
+			}
 
-		$project_key = $keys[0];
-		$action_key = $keys[0] . '-' . $keys[1];
+			$invited = [];
+			foreach($invited_emails as $email) {
+				$index = array_search($email, array_column($invited_members, 'email'));
+				if ($index !== false) {
+					$invited[] = $invited_members[$index];
+				} else {
+					$invited[count($invited)]['email'] = $email;
+				}
+			}
+			$invited_members = $invited;
+		} else {
 
-		$project_id = $this->mb_project->get_object_id('project', $project_key);
-		if (empty($project_id)) {
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+			$keys = explode('-', $meeting_key);
+			if (empty($keys) || count($keys) < 3) {
+				Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
 
-		$meeting = $this->meeting_model->get_meeting_by_key(
-			$meeting_key, 
-			$this->current_user->current_organization_id, 
-			'meetings.*, u.email, u.first_name, u.last_name, u.avatar'
-			);
+			$meeting_id = $this->mb_project->get_object_id('meeting', $meeting_key);
 
-		if (! $meeting) {
-			Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
-			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+			if (empty($meeting_id)) {
+				Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
 
-		// Only invited member or owner (even project or organization) can view
-		$invited_members = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
+			if (! $can_view = $this->mb_project->has_permission('meeting', $meeting_id, 'Project.View.All')) {
+				Template::set_message(lang('st_you_have_no_permission_to_view_this_meeting'), 'warning');
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
 
-		if ( !$can_view && $meeting->owner_id != $this->current_user->user_id
-				&& ! in_array(
-					$this->current_user->user_id, 
-					array_column($invited_members, 'user_id'))
-			) {
+			$project_key = $keys[0];
+			$action_key = $keys[0] . '-' . $keys[1];
 
-			Template::set_message(lang('st_you_have_no_permission_to_view_this_meeting'), 'warning');
-			redirect(DEFAULT_LOGIN_LOCATION);
+			$project_id = $this->mb_project->get_object_id('project', $project_key);
+			if (empty($project_id)) {
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
+
+			$meeting = $this->meeting_model->get_meeting_by_key(
+				$meeting_key, 
+				$this->current_user->current_organization_id, 
+				'meetings.*, u.email, u.first_name, u.last_name, u.avatar'
+				);
+
+			if (! $meeting) {
+				Template::set_message(lang('st_meeting_key_does_not_exist'), 'danger');
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
+
+			// Only invited member or owner (even project or organization) can view
+			$invited_members = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
+
+			if ( !$can_view && $meeting->owner_id != $this->current_user->user_id
+					&& ! in_array(
+						$this->current_user->user_id, 
+						array_column($invited_members, 'user_id'))
+				) {
+
+				Template::set_message(lang('st_you_have_no_permission_to_view_this_meeting'), 'warning');
+				redirect(DEFAULT_LOGIN_LOCATION);
+			}
 		}
 
 		$agendas = $this->agenda_model->select('agendas.*, u.email, u.first_name, u.last_name, u.avatar')
@@ -576,26 +613,39 @@ class Meeting extends Authenticated_Controller
 			Template::set('owner_evaluated', $owner_evaluated);
 		}
 
-		if (IS_AJAX) {
-			echo json_encode([$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks]); exit;
-		}
+		if (empty($meeting->is_private)) {
+			if (IS_AJAX) {
+				echo json_encode([$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks]); exit;
+			}
+			Assets::add_js($this->load->view('detail_js', [
+				'meeting_key' => $meeting_key,
+				'current_user' => $this->current_user,
+				'chosen_agenda' => ! empty($chosen_agenda) ? $chosen_agenda : null,
+			], true), 'inline');
+			Template::set('evaluated', $evaluated);
+			Template::set('point_used', $point_used);
+			Template::set('project_key', $project_key);
+			Template::set('action_key', $action_key);
+			Template::set('meeting_key', $meeting_key);
+		} else {
+			if (IS_AJAX) {
+				echo json_encode([$invited_members, $meeting, $agendas, $homeworks]); exit;
+			}
 
-		Assets::add_js($this->load->view('detail_js', [
-			'meeting_key' => $meeting_key,
-			'current_user' => $this->current_user,
-			'chosen_agenda' => ! empty($chosen_agenda) ? $chosen_agenda : null
-		], true), 'inline');
-		Template::set('evaluated', $evaluated);
+			Assets::add_js($this->load->view('detail_js', [
+				'meeting_key' => null,
+				'current_user' => $this->current_user,
+				'chosen_agenda' => ! empty($chosen_agenda) ? $chosen_agenda : null,
+				'is_private' => 1,
+				'meeting_id' => $meeting->meeting_id
+			], true), 'inline');
+		}
 		Template::set('invited_members', $invited_members);
-		Template::set('point_used', $point_used);
-		Template::set('meeting', $meeting);
+		Template::set('page_title', $meeting->name);
+		Template::set('current_user', $this->current_user);
 		Template::set('agendas', $agendas);
 		Template::set('homeworks', $homeworks);
-		Template::set('project_key', $project_key);
-		Template::set('action_key', $action_key);
-		Template::set('meeting_key', $meeting_key);
-		Template::set('current_user', $this->current_user);
-		Template::set('page_title', $meeting->name);
+		Template::set('meeting', $meeting);
 		Template::set_view('detail');
 		Template::render();
 	}
@@ -3398,7 +3448,9 @@ class Meeting extends Authenticated_Controller
 			'team' => count($team)
 		]); exit;
 	}
-
+	/**
+	 * deprecated function
+	 */
 	public function detail_private($meeting_id = null)
 	{
 		if (empty($meeting_id)) {

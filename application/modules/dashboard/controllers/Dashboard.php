@@ -335,7 +335,8 @@ class Dashboard extends Authenticated_Controller
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
 		->join('users u', 'u.user_id = meetings.owner_id')
-		->where('meetings.status', 'ready')
+		->where('(meetings.status = "open" OR meetings.status = "ready" OR meetings.status = "inprogress")')
+		->where('scheduled_start_time IS NOT NULL', null, false)
 		->where('p.project_id', $project_id);
 
 		if ($result['next_meeting']) {
