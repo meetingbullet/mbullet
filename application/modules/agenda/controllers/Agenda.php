@@ -370,7 +370,7 @@ class Agenda extends Authenticated_Controller
 			$agenda_id = $agenda_key;
 		} else {
 			$agenda_id = $this->mb_project->get_object_id('agenda', $agenda_key);
-			$agenda_count = $this->agenda_model->join('meetings', 'meetings.meeting_id = agendas.meeting_id AND meetings.status = "open"', 'LEFT')
+			$agenda_count = $this->agenda_model->join('meetings', 'meetings.meeting_id = agendas.meeting_id AND (meetings.status = "open" OR meetings.status = "ready")', 'LEFT')
 										->where('agendas.agenda_id', $agenda_id)
 										->count_all();
 

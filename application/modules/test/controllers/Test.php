@@ -98,4 +98,11 @@ class Test extends Authenticated_Controller
 		dump($_FILES);
 		Template::render();
 	}
+
+	function form() {
+		Assets::add_js($this->load->view('calendar_js', [
+		], true), 'inline');
+		Template::set_view('upload');
+		Template::render();
+	}
 }

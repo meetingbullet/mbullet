@@ -222,3 +222,5 @@ $lang['st_current_state'] = 'Current Repeat State';
 $lang['st_invitation_accepted'] = 'Invitation accepted';
 $lang['st_declined_successfully'] = 'Invitation declined';
 $lang['st_meeting_does_not_exist'] = 'Meeting does not exist';
+$lang['st_pick'] = 'Pick';
+$lang['st_later'] = 'Later';
