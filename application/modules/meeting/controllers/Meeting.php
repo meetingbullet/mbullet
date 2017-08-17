@@ -349,6 +349,12 @@ class Meeting extends Authenticated_Controller
 				$data['owner_id'] = $this->current_user->user_id;
 			}
 
+			if (! empty($this->input->post_get('scheduled_start_time'))) {
+				$data['scheduled_start_time'] = $this->input->post_get('scheduled_start_time');
+			} else {
+				unset($data['scheduled_start_time']);
+			}
+
 			// Add to project members if not in
 			// Prevent duplicate row by MySQL Insert Ignore
 			$query = $this->db->insert_string('project_members', [

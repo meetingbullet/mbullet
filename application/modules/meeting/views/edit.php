@@ -86,7 +86,7 @@
 						</div>
 					</div>
 				</div>
-				<input type="text" style="display: none;" name="scheduled_start_time" id="meeting-scheduled-start-time" value="<?php echo set_value('scheduled_start_time') ?>">
+				<input type="text" style="display: none;" name="scheduled_start_time" id="meeting-scheduled-start-time" value="<?php echo set_value('scheduled_start_time', ! empty($meeting->scheduled_start_time) ? $meeting->scheduled_start_time : '') ?>">
 		</div>
 
 		<div class="<?php echo IS_AJAX ? 'modal-footer' : 'container-fluid pull-right' ?>">
