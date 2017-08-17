@@ -144,14 +144,14 @@ if ($is_member && $is_owner) {
 										<span class="label label-bordered label-<?php e($agenda->confirm_status) ?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 									</td>
 									<?php endif ?>
-									<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
+									<td class='basis-10 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
 						</table>
 					</div>
 
-					<?php if ($meeting->status == 'open'): ?>
+					<?php if ($meeting->status == 'open' || $meeting->status == 'ready'): ?>
 					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-agenda-url="<?php echo site_url('agenda/create/' . $meeting_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-agenda"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_agenda')?></button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
@@ -180,7 +180,7 @@ if ($is_member && $is_owner) {
 							</thead>
 							<tbody>
 								<?php if($homeworks): foreach ($homeworks as $homework) : ?>
-								<tr data-homework-id="<?php e($homework->homework_id) ?>" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
+								<tr data-homework-id="<?php e($homework->homework_id) ?>" class="<?php if ($meeting->status == 'open' || $meeting->status == 'ready') echo 'editable' ?>">
 									<td class='basis-15'><?php e($homework->name) ?></td>
 									<td class='basis-20'><?php echo word_limiter($homework->description, 20)?></td>
 									<td class='basis-20'>
@@ -211,14 +211,14 @@ if ($is_member && $is_owner) {
 									<td class='basis-10 homework-status text-center'>
 										<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></span>
 									</td>
-									<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
+									<td class='basis-10 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
 						</table>
 					</div>
 
-					<?php if ($meeting->status == 'open'): ?>
+					<?php if ($meeting->status == 'open' || $meeting->status == 'ready'): ?>
 					<button class="an-btn an-btn-primary mb-open-modal" 
 						data-modal-id="create-homework-modal" 
 						data-url="<?php echo site_url('homework/create/' . $meeting->meeting_key) ?>" >
@@ -434,7 +434,7 @@ if ($is_member && $is_owner) {
 </div>
 
 <script type="text" id="agenda-row">
-	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
+	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="" class="<?php if ($meeting->status == 'open' || $meeting->status == 'ready') echo 'editable' ?>">
 		<td class="basis-10">{{:agenda_key}}</td>
 		<td class="basis-15">{{:name}}</td>
 		<td class="basis-20">{{:description}}</td>
@@ -446,12 +446,12 @@ if ($is_member && $is_owner) {
 		<td class="basis-10 agenda-status text-center">
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
-		<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
+		<td class='basis-10 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 	</tr>
 </script>
 
 <script type="text" id="homework-row">
-	<tr data-homework-id="{{:homework_id}}" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
+	<tr data-homework-id="{{:homework_id}}" class="<?php if ($meeting->status == 'open' || $meeting->status == 'ready') echo 'editable' ?>">
 		<td class='basis-15'>{{:name}}</td>
 		<td class='basis-20'>{{:short_description}}</td>
 		<td class='basis-20'>
@@ -472,7 +472,7 @@ if ($is_member && $is_owner) {
 		<td class='basis-10 homework-status text-center'>
 			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</td>
-		<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
+		<td class='basis-10 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 	</tr>
 </script>
 

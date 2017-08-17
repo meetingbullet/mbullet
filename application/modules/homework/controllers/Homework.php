@@ -286,7 +286,7 @@ class Homework extends Authenticated_Controller
 									->where('(homework.created_by = "' . $this->current_user->user_id . '" OR hwm.user_id = "' . $this->current_user->user_id . '")')
 									->find($homework_id);
 
-		if ($test === false || ! has_permission('Project.Edit.All') || $test->meeting_status != 'open') {
+		if ($test === false || ! has_permission('Project.Edit.All') || ($test->meeting_status != 'open' && $test->meeting_status != 'ready')) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('hw_no_permission_to_edit')
@@ -405,7 +405,7 @@ class Homework extends Authenticated_Controller
 
 		$test = $this->homework_model->select('homework.*')
 									->join('homework_members hwm', 'hwm.homework_id = homework.homework_id AND hwm.user_id = ' . $this->current_user->user_id, 'LEFT')
-									->join('meetings s', 's.meeting_id = homework.meeting_id AND s.status = "open"') // Can only edit when meeting is OPEN
+									->join('meetings s', 's.meeting_id = homework.meeting_id AND (s.status = "open" OR s.status = "ready")') // Can only edit when meeting is OPEN
 									->where('(homework.created_by = "' . $this->current_user->user_id . '" OR hwm.user_id = "' . $this->current_user->user_id . '")')
 									->find($homework_id);
 
