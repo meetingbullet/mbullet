@@ -11,12 +11,14 @@ if ($meeting->scheduled_start_time) {
 	$scheduled_end_time = gmdate('Y-m-d H:i:s', $scheduled_end_time);
 }
 
-$action_key = explode('-', $meeting_key);
-$action_key = $action_key['0'] . '-' . $action_key[1];
-$members = array_column($invited_members, 'user_id');
-$is_member = in_array($current_user->user_id, $members);
-if ($is_member && $is_owner) {
-	$is_member = false;
+if (empty($meeting->is_private)) {
+	$action_key = explode('-', $meeting_key);
+	$action_key = $action_key['0'] . '-' . $action_key[1];
+	$members = array_column($invited_members, 'user_id');
+	$is_member = in_array($current_user->user_id, $members);
+	if ($is_member && $is_owner) {
+		$is_member = false;
+	}
 }
 
 ?>
@@ -27,46 +29,48 @@ if ($is_member && $is_owner) {
 </div> <!-- end AN-BODY-TOPBAR -->
 
 <div class="btn-block">
-	<?php echo anchor(site_url('action/' . $action_key), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
+	<?php echo anchor(empty($meeting->is_private) ? site_url('action/' . $action_key) : site_url('dashboard'), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a href='#' id="edit-meeting" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
-	<?php if ($meeting->status == 'open'): ?>
-		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger meeting-open<?php echo ($is_owner ? '' : ' hidden')?>'
-			data-modal-id="meeting-monitor-modal"
-			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
+	<?php if (empty($meeting->is_private)) : ?>
+		<?php if ($meeting->status == 'open'): ?>
+			<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger meeting-open<?php echo ($is_owner ? '' : ' hidden')?>'
+				data-modal-id="meeting-monitor-modal"
+				data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
+				data-modal-dialog-class="modal-80"
+			>
+				<i class="ion-ios-play"></i> <?php e(lang('st_set_up')); ?>
+			</a>
+		<?php elseif ($meeting->status == 'ready' || $meeting->status == 'inprogress'): ?>
+			<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger<?php echo ($is_owner ? '' : ' hidden')?>'
+				data-modal-id="meeting-monitor-modal"
+				data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
+				data-modal-dialog-class="modal-80"
+			>
+				<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
+			</a>
+			<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger<?php echo (!$is_owner && $meeting->status == 'inprogress'? '' : ' hidden')?>'
+				data-modal-id="meeting-monitor-modal"
+				data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
+				data-modal-dialog-class="modal-80"
+			>
+				<i class="ion-ios-play"></i> <?php e(lang('st_join')); ?>
+			</a>
+		<?php endif; ?>
+
+		<?php if ($meeting->manage_state == 'decide' && $is_owner): ?>
+
+		<a href='#' class='an-btn an-btn-danger mb-open-modal'
+			data-modal-id="meeting-decider-modal"
+			data-url="<?php e(site_url('meeting/decider/' . $meeting_key)) ?>" 
 			data-modal-dialog-class="modal-80"
-		>
-			<i class="ion-ios-play"></i> <?php e(lang('st_set_up')); ?>
-		</a>
-	<?php elseif ($meeting->status == 'ready' || $meeting->status == 'inprogress'): ?>
-		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger<?php echo ($is_owner ? '' : ' hidden')?>'
-			data-modal-id="meeting-monitor-modal"
-			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
-			data-modal-dialog-class="modal-80"
-		>
-			<i class="ion-ios-play"></i> <?php e(lang('st_monitor')); ?>
-		</a>
-		<a href='#' class='mb-open-modal open-meeting-monitor an-btn an-btn-danger<?php echo (!$is_owner && $meeting->status == 'inprogress'? '' : ' hidden')?>'
-			data-modal-id="meeting-monitor-modal"
-			data-url="<?php e(site_url('meeting/monitor/' . $meeting_key)) ?>" 
-			data-modal-dialog-class="modal-80"
-		>
-			<i class="ion-ios-play"></i> <?php e(lang('st_join')); ?>
-		</a>
-	<?php endif; ?>
+		><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
 
-	<?php if ($meeting->manage_state == 'decide' && $is_owner): ?>
+		<?php endif; ?>
 
-	<a href='#' class='an-btn an-btn-danger mb-open-modal'
-		data-modal-id="meeting-decider-modal"
-		data-url="<?php e(site_url('meeting/decider/' . $meeting_key)) ?>" 
-		data-modal-dialog-class="modal-80"
-	><i class="ion-play"></i> <?php echo lang('st_decider')?></a>
-
-	<?php endif; ?>
-
-	<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false && (($is_member /*&& ! empty($owner_evaluated)*/) || $is_owner)) : ?>
-	<a href='#' id="open-meeting-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-danger'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
-	<?php endif; ?>
+		<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false && (($is_member /*&& ! empty($owner_evaluated)*/) || $is_owner)) : ?>
+		<a href='#' id="open-meeting-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-danger'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
+		<?php endif; ?>
+	<?php endif ?>
 </div>
 
 <div class="row">
@@ -152,7 +156,7 @@ if ($is_member && $is_owner) {
 					</div>
 
 					<?php if ($meeting->status == 'open' || $meeting->status == 'ready'): ?>
-					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-agenda-url="<?php echo site_url('agenda/create/' . $meeting_key) ?>" data-target="#bigModal" data-backdrop="static" id="add-agenda"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_agenda')?></button>
+					<button class="an-btn an-btn-primary" data-toggle="modal" data-add-agenda-url="<?php echo site_url('agenda/create/' . (empty($meeting->is_private) ? $meeting_key : $meeting->meeting_id)) ?>" data-target="#bigModal" data-backdrop="static" id="add-agenda"><?php echo '<i class="ion-android-add"></i> ' . lang('st_add_agenda')?></button>
 					<?php endif; ?>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
@@ -221,7 +225,7 @@ if ($is_member && $is_owner) {
 					<?php if ($meeting->status == 'open' || $meeting->status == 'ready'): ?>
 					<button class="an-btn an-btn-primary mb-open-modal" 
 						data-modal-id="create-homework-modal" 
-						data-url="<?php echo site_url('homework/create/' . $meeting->meeting_key) ?>" >
+						data-url="<?php echo site_url('homework/create/' . (empty($meeting->is_private) ? $meeting_key : $meeting->meeting_id)) ?>" >
 						<?php echo '<i class="ion-android-add"></i> ' . lang('hw_add_homework')?>
 					</button>
 					<?php endif; ?>
@@ -250,7 +254,7 @@ if ($is_member && $is_owner) {
 					</div>
 					<div class="row">
 						<div class="col-xs-4"><?php e(lang('st_point_used')) ?></div>
-						<div class="col-xs-8 point-used"><?php e($point_used) ?></div>
+						<div class="col-xs-8 point-used"><?php e(empty($meeting->is_private) ? $point_used : 'N/A') ?></div>
 					</div>
 					<?php if ($meeting->scheduled_start_time): ?>
 					<div class="row">
@@ -279,19 +283,31 @@ if ($is_member && $is_owner) {
 						<ul id="meeting-resource" class="list-unstyled list-member">
 							<?php if ($invited_members) { foreach ($invited_members as $user) { ?>
 							<li>
-								<?php echo display_user($user['invite_email'], $user['first_name'] ? $user['first_name'] : $user['invite_email'], $user['last_name'] ? $user['last_name'] : null, $user['avatar'] ? $user['avatar'] : null); ?>
+								<?php if (! empty($meeting->is_private)) : ?>
+									<?php echo display_user($user['email'], ! empty($user['first_name']) ? $user['first_name'] : $user['email'], ! empty($user['last_name']) ? $user['last_name'] : null, ! empty($user['avatar']) ? $user['avatar'] : null); ?>
 
-								<?php if ($user['status'] == 'ACCEPTED') : ?>
-								<i class="decision ion-checkmark-circled"></i>
-								<?php elseif ($user['status'] == 'DECLINED') : ?>
-								<i class="decision ion-close-circled"></i>
-								<?php elseif ($user['status'] == 'TENTATIVE') : ?>
-								<i class="decision ion-help-circled"></i>
-								<?php elseif ($user['status'] == 'NEEDS-ACTION') : ?>
-								<i class="decision ion-help-circled"></i>
+									<?php if (! empty($user['user_id']) && $user['user_id'] == $current_user->user_id) : ?>
+									<i class="decision ion-checkmark-circled"></i>
+									<?php else : ?>
+									<i class="decision ion-help-circled"></i>
+									<?php endif ?>
+
+									<span class="badge badge-bordered pull-right">N/A</span>
+								<?php else : ?>
+									<?php echo display_user($user['invite_email'], $user['first_name'] ? $user['first_name'] : $user['invite_email'], $user['last_name'] ? $user['last_name'] : null, $user['avatar'] ? $user['avatar'] : null); ?>
+
+									<?php if ($user['status'] == 'ACCEPTED') : ?>
+									<i class="decision ion-checkmark-circled"></i>
+									<?php elseif ($user['status'] == 'DECLINED') : ?>
+									<i class="decision ion-close-circled"></i>
+									<?php elseif ($user['status'] == 'TENTATIVE') : ?>
+									<i class="decision ion-help-circled"></i>
+									<?php elseif ($user['status'] == 'NEEDS-ACTION') : ?>
+									<i class="decision ion-help-circled"></i>
+									<?php endif ?>
+
+									<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
 								<?php endif ?>
-
-								<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
 							</li>
 							<?php } } ?>
 						</ul>
@@ -427,12 +443,13 @@ if ($is_member && $is_owner) {
 </div>
 <?php endif ?>
 
-<div id="current-data" style="display: none;"><?php echo json_encode([$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks]); ?></div>
+<div id="current-data" style="display: none;"><?php echo json_encode(empty($meeting->is_private) ? [$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks] : [$invited_members, $meeting, $agendas, $homeworks]); ?></div>
 
 <div class="refresh-asking" style="display: none;">
 	<?php echo lang('refresh_asking') ?>
 </div>
 
+<?php if (empty($meeting->is_private)) : ?>
 <script type="text" id="agenda-row">
 	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="" class="<?php if ($meeting->status == 'open' || $meeting->status == 'ready') echo 'editable' ?>">
 		<td class="basis-10">{{:agenda_key}}</td>
@@ -528,3 +545,100 @@ if ($is_member && $is_owner) {
 		</td>
 	</tr>
 </script>
+<?php else : ?>
+<script type="text" id="agenda-row">
+	<tr data-agenda-id="{{:agenda_id}}" data-confirm-status="" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
+		<td class="basis-10">{{:agenda_key}}</td>
+		<td class="basis-15">{{:name}}</td>
+		<td class="basis-20">{{:description}}</td>
+		<td class="basis-20">
+			{{for assignees}}
+				{{:html}}
+			{{/for}}
+		</td>
+		<td class="basis-10 agenda-status text-center">
+			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
+		</td>
+		<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
+	</tr>
+</script>
+
+<script type="text" id="homework-row">
+	<tr data-homework-id="{{:homework_id}}" class="<?php if ($meeting->status == 'open') echo 'editable' ?>">
+		<td class='basis-15'>{{:name}}</td>
+		<td class='basis-20'>{{:short_description}}</td>
+		<td class='basis-20'>
+			{{for members}}
+				{{:html}}
+			{{/for}}
+		</td>
+		<td class='basis-20 text-center'>{{:time_spent}}</td>
+		<td>
+			{{if attachments}}
+				<div class="attachment">
+					{{for attachments}}
+						{{:html}}
+					{{/for}}
+				</div>
+			{{/if}}
+		</td>
+		<td class='basis-10 homework-status text-center'>
+			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
+		</td>
+		<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
+	</tr>
+</script>
+
+<script id="monitor-homework-row" type="text">
+	<tr id="homework-{{:homework_id}}" data-homework-id="{{:homework_id}}" class="homework">
+		<td class="name"><a href="<?php echo site_url('/homework/') ?>{{:homework_id}}" target="_blank">{{:name}}</a></td>
+		<td>
+			<a href="#" class="description" 
+			data-type="textarea" 
+			data-name="description" 
+			data-pk="{{:homework_id}}" 
+			data-url="<?php echo site_url('homework/ajax_edit') ?>" 
+			data-value="{{:description}}" 
+			data-emptytext="<?php e(lang('hw_no_description')) ?>" 
+			data-emptyclass="text-muted">{{:short_description}}</a>
+		</td>
+		<td>
+			{{for members}}
+				{{:html}}
+			{{/for}}
+		<td class='text-center'>
+			<a href="#" class="time-spent" 
+			data-type="text" 
+			data-tpl="<input type='number' meeting='0.01'>" 
+			data-name="time_spent" 
+			data-pk="{{:homework_id}}" 
+			data-url="<?php echo site_url('homework/ajax_edit') ?>" 
+			data-emptytext="<i class='ion-edit'></i>" 
+			data-emptyclass="text-muted">{{:time_spent}}</a>
+		</td>
+		<td>
+			{{if attachments}}
+				<div class="attachment">
+					{{for attachments}}
+						{{:html}}
+					{{/for}}
+				</div>
+			{{/if}}
+		</td>
+		<td class="status">
+			<!-- Update homework status button -->
+			<div class="btn-group">
+				<button type="button" class="btn btn-status label-open"><?php e(lang('hw_open')) ?></button>
+				<button type="button" class="btn dropdown-toggle label-open" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#" class="btn-update-homework-status hidden" data-pk="{{:homework_id}}" data-value="open"><?php e(lang('hw_open')) ?></a></li>
+					<li><a href="#" class="btn-update-homework-status " data-pk="{{:homework_id}}" data-value="done"><?php e(lang('hw_done')) ?></a></li>
+					<li><a href="#" class="btn-update-homework-status " data-pk="{{:homework_id}}" data-value="undone"><?php e(lang('hw_undone')) ?></a></li>
+				</ul>
+			</div>
+		</td>
+	</tr>
+</script>
+<?php endif ?>
