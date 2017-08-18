@@ -57,7 +57,8 @@ if ($('#scheduled-timer').data('actual-start-time')) {
 }
 
 $('#datetimepicker1').datetimepicker({
-	format: 'MMM DD, YYYY hh:mm A'
+	format: 'MMM DD, YYYY hh:mm A',
+	sideBySide: true
 }).on('dp.change', function (ev) {
 	// console.log('Client set:', ev.date.format('YYYY-MM-DD HH:mm:ss'));
 	// console.log('Server set:', ev.date.utc().format('YYYY-MM-DD HH:mm:ss'));

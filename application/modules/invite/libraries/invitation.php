@@ -61,7 +61,7 @@ class Invitation
 		$invitation = $this->ci->user_model
 		->select('o.name AS organization_name, CONCAT(first_name, " ", last_name) AS inviter_name, avatar', false)
 		->join('user_to_organizations uto', 'users.user_id = uto.user_id')
-		->join('organizations o', 'uto.organization_id = o.organization_id')
+		->join('organizations o', 'uto.organization_id = o.organization_id AND o.organization_id = "' . $this->current_user->current_organization_id . '"')
 		->limit(1)
 		->find($this->current_user->user_id);
 

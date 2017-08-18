@@ -9,6 +9,7 @@ class Meeting extends Authenticated_Controller
 		$this->load->helper('mb_form');
 		$this->load->helper('text');
 		$this->load->helper('date');
+		$this->load->helper('mb_general');
 		$this->load->library('mb_project');
 		
 		$this->load->model('users/user_model');
@@ -137,7 +138,7 @@ class Meeting extends Authenticated_Controller
 			$data['meeting_key'] = $this->mb_project->get_next_key($action->action_key);
 			// only when create meeting on dashboard calendar
 			if (! empty($this->input->post_get('scheduled_start_time'))) {
-				$data['scheduled_start_time'] = $this->input->post_get('scheduled_start_time');
+				$data['scheduled_start_time'] = get_utc_time($this->input->post_get('scheduled_start_time'));
 			}
 
 			if ($team = $this->input->post('team')) {
@@ -350,7 +351,7 @@ class Meeting extends Authenticated_Controller
 			}
 
 			if (! empty($this->input->post_get('scheduled_start_time'))) {
-				$data['scheduled_start_time'] = $this->input->post_get('scheduled_start_time');
+				$data['scheduled_start_time'] = get_utc_time($this->input->post_get('scheduled_start_time'));
 			} else {
 				unset($data['scheduled_start_time']);
 			}
@@ -2660,10 +2661,13 @@ class Meeting extends Authenticated_Controller
 			];
 
 			foreach ($calendar_list as $calendar_id => $calendar) {
+				$time_min = new DateTime($this->input->get('start'), new DateTimeZone(standard_timezone($this->current_user->timezone)));
+				$time_max = new DateTime($this->input->get('end'), new DateTimeZone(standard_timezone($this->current_user->timezone)));
 				$event_options = [
-					'timeMin' => date('c', strtotime($this->input->get('start'))),
-					'timeMax' => date('c', strtotime($this->input->get('end'))),
-					'singleEvents' => true
+					'timeMin' => $time_min->format('c'),
+					'timeMax' => $time_max->format('c'),
+					'singleEvents' => true,
+					'timeZone' => 'UTC'
 				];
 
 				$events = $service->events->listEvents($calendar_id, $event_options);
@@ -2804,6 +2808,11 @@ class Meeting extends Authenticated_Controller
 					'meeting_id' => $event->meeting_id
 				];
 			}
+		}
+
+		foreach($event_list as &$event) {
+			$event['start'] = display_time($event['start']);
+			$event['end'] = display_time($event['end']);
 		}
 
 		echo json_encode($event_list); exit;
@@ -3275,8 +3284,8 @@ class Meeting extends Authenticated_Controller
 		}
 
 		$meeting_id = $this->input->post('meeting_id');
-		$start = $this->input->post('start');
-		$end = $this->input->post('end');
+		$start = get_utc_time($this->input->post('start'));
+		$end = get_utc_time($this->input->post('end'));
 
 		if ((empty($meeting_id) && empty($private_meeting_id)) || empty($start) || empty($end)) {
 			echo json_encode([
@@ -3379,7 +3388,7 @@ class Meeting extends Authenticated_Controller
 			}
 
 			if (! empty($this->input->get('scheduled_start_time'))) {
-				$data['scheduled_start_time'] = $this->input->get('scheduled_start_time');
+				$data['scheduled_start_time'] = get_utc_time($this->input->get('scheduled_start_time'));
 			}
 
 			if ($team = $this->input->post('team')) {
