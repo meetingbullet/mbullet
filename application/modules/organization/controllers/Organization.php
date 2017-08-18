@@ -10,6 +10,7 @@ class Organization extends Authenticated_Controller
 		$this->load->library('form_validation');
 		$this->load->model('organization_model');
 		$this->lang->load('organization');
+		$this->load->model('admin/permission_manage_model');
 	}
 
 	public function create()
@@ -66,7 +67,7 @@ class Organization extends Authenticated_Controller
 							$this->load->model('roles/role_model');
 						}
 						// add owner role for this user
-						$owner_role = $this->role_model->select('role_id')->find_by('is_public', 1);
+						$owner_role = $this->role_model->select('role_id')->where('system_default', 0)->where('join_default', 0)->find_by('is_public', 1);
 						if (! $owner_role) {
 							logit('line 57: unable to get owner role.');
 							throw new Exception(lang('org_error_position_1'));
@@ -88,6 +89,14 @@ class Organization extends Authenticated_Controller
 							throw new Exception(lang('org_error_position_3'));
 						}
 
+						$system_default_permission_manage = $this->permission_manage_model->select('role_id, manage_role_id')->where('system_default', 1)->where('role_id !=', $owner_role->role_id)->find_all();
+						if (($system_default_roles === false) || (is_array($system_default_roles) && count($system_default_roles) == 0)) {
+							logit('line 73: unable to get system default roles.');
+							throw new Exception(lang('org_error_position_3'));
+						}
+
+						$organization_permission_manage = [];
+						$clone_info = [];
 						foreach ($system_default_roles as $role) {
 							$role_id = $role->role_id;
 							unset($role->role_id);
@@ -99,6 +108,10 @@ class Organization extends Authenticated_Controller
 								throw new Exception(lang('org_error_position_4'));
 							}
 							$organization_role_id = $organization_role_added;
+							$clone_info[] = [
+								'role_id' => $organization_role_id,
+								'source_id' => $role_id
+							];
 							// get system default role permissions
 							$role_permissions = $this->db->select('permission_id')
 														->where('role_id', $role_id)
@@ -115,10 +128,38 @@ class Organization extends Authenticated_Controller
 								$organization_role_permissions_added = $this->db->insert_batch('role_to_permissions', $organization_role_permissions);
 								if (! $organization_role_permissions_added) {
 									logit('line 106: unable to set organization role permissions.');
-									throw new Exceptionlang(lang('org_error_position_6'));
+									throw new Exception(lang('org_error_position_6'));
 								}
 							}
+
+							// $organization_permission_manage[] = [
+							// 	'role_id' => $owner_role->role_id,
+							// 	'manage_role_id' => $organization_role_id
+							// ]; --> change to trigger
 						}
+
+						
+						foreach ($system_default_permission_manage as $permission_manage) {
+							$temp = (array) $permission_manage;
+							foreach ($clone_info as $info) {
+								if ($temp['role_id'] == $info['source_id']) {
+									$temp['role_id'] = $info['role_id'];
+								}
+
+								if ($temp['manage_role_id'] == $info['source_id']) {
+									$temp['manage_role_id'] = $info['role_id'];
+								}
+
+							}
+							$organization_permission_manage[] = $temp;
+						}
+
+						$organization_permission_manage_added = $this->permission_manage_model->insert_batch($organization_permission_manage);
+						if (! $organization_permission_manage_added) {
+							logit('line 117: unable to set organization permission manage.');
+							throw new Exception(lang('org_error_position_9'));
+						}
+
 						// if not public domain name email, insert organization domain name
 						if ($result['public_domain'] === false) {
 							$organization_domain_added = $this->db->insert('organization_domains', [

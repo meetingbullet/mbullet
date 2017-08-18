@@ -80,3 +80,29 @@ if (! function_exists('display_time')) {
 		return user_time($timestamp, $timezone, $format);
 	}
 }
+
+if (! function_exists('get_utc_time')) {
+	/**
+	 * Return time converted from user timezone to UTC
+	 *
+	 * @param string $time (Y-m-d H:i:s)
+	 * @param string $timezone
+	 * @return string time in UTC
+	 */
+	function get_utc_time($time, $timezone = null)
+	{
+		$ci =& get_instance();
+		$ci->load->helper('date');
+
+		if (! $timezone) {
+			$CI =& get_instance();
+			$CI->load->library('users/auth');
+			if ($CI->auth->is_logged_in()) {
+				$timezone = standard_timezone($CI->auth->user()->timezone);
+			}
+		}
+
+		$dtime = new DateTime($time, new DateTimeZone($timezone));
+		return $dtime->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+	}
+}

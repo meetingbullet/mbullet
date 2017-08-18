@@ -13,6 +13,7 @@ if ($meeting->scheduled_start_time) {
 
 if (empty($meeting->is_private)) {
 	$action_key = explode('-', $meeting_key);
+	$cost_code = $action_key['0'];
 	$action_key = $action_key['0'] . '-' . $action_key[1];
 	$members = array_column($invited_members, 'user_id');
 	$is_member = in_array($current_user->user_id, $members);
@@ -29,7 +30,7 @@ if (empty($meeting->is_private)) {
 </div> <!-- end AN-BODY-TOPBAR -->
 
 <div class="btn-block">
-	<?php echo anchor(empty($meeting->is_private) ? site_url('action/' . $action_key) : site_url('dashboard'), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
+	<?php echo anchor(empty($meeting->is_private) ? site_url('dashboard#project/' . $cost_code) : site_url('dashboard#unspecified-meetings'), '<i class="ion-android-arrow-back"></i> ' . lang('st_back'), ['class' => 'an-btn an-btn-primary' ]) ?>
 	<a href='#' id="edit-meeting" class='an-btn an-btn-primary'><i class="ion-edit"></i> <?php echo lang('st_edit')?></a>
 	<?php if (empty($meeting->is_private)) : ?>
 		<?php if ($meeting->status == 'open'): ?>
