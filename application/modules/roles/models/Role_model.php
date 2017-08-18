@@ -100,7 +100,7 @@ class Role_model extends BF_Model
 			'manage_role_id' => $role_id
 		]);
 
-		if ($added === fasle) {
+		if ($added === false) {
 			return false;
 		}
 
@@ -118,7 +118,7 @@ class Role_model extends BF_Model
 			'system_default' => 0
 		]);
 
-		if ($deleted === fasle) {
+		if ($deleted === false) {
 			return false;
 		}
 
