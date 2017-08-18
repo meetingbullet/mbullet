@@ -114,8 +114,14 @@ class Role_model extends BF_Model
 	 */
 	public function delete_permission_manage($role_id) {
 		$this->load->model('admin/permission_manage_model');
-		$this->permission_manage_model->where('(role_id = "' . $role_id . '" OR manage_role_id = "' . $role_id . '")')->delete_where([
+		$deleted = $this->permission_manage_model->where('(role_id = "' . $role_id . '" OR manage_role_id = "' . $role_id . '")')->delete_where([
 			'system_default' => 0
 		]);
+
+		if ($deleted === fasle) {
+			return false;
+		}
+
+		return true;
 	}
 }
