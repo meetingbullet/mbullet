@@ -67,7 +67,7 @@ class Organization extends Authenticated_Controller
 							$this->load->model('roles/role_model');
 						}
 						// add owner role for this user
-						$owner_role = $this->role_model->select('role_id')->find_by('is_public', 1);
+						$owner_role = $this->role_model->select('role_id')->where('system_default', 0)->where('join_default', 0)->find_by('is_public', 1);
 						if (! $owner_role) {
 							logit('line 57: unable to get owner role.');
 							throw new Exception(lang('org_error_position_1'));
@@ -132,10 +132,10 @@ class Organization extends Authenticated_Controller
 								}
 							}
 
-							$organization_permission_manage[] = [
-								'role_id' => $owner_role->role_id,
-								'manage_role_id' => $organization_role_id
-							];
+							// $organization_permission_manage[] = [
+							// 	'role_id' => $owner_role->role_id,
+							// 	'manage_role_id' => $organization_role_id
+							// ]; --> change to trigger
 						}
 
 						

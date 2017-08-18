@@ -19,13 +19,13 @@ class Role_model extends BF_Model
 	// Customize the operations of the model without recreating the insert,
 	// update, etc. methods by adding the method names to act as callbacks here.
 	protected $before_insert	= array();
-	protected $after_insert	= array();
+	protected $after_insert	= array('set_permission_manage');
 	protected $before_update	= array();
 	protected $after_update	= array();
 	protected $before_find		= array();
 	protected $after_find		= array();
 	protected $before_delete	= array();
-	protected $after_delete	= array();
+	protected $after_delete	= array('delete_permission_manage');
 
 	// For performance reasons, you may require your model to NOT return the id
 	// of the last inserted row as it is a bit of a slow method. This is
@@ -85,5 +85,37 @@ class Role_model extends BF_Model
 		// 			->update('role_id', $role_id, ['role_id' => $default_role_id->role_id])
 		return $default_role_id;
 
+	}
+	/**
+	 * set permission manage - use for model trigger
+	 *
+	 * @param [int] $role_id
+	 * @return void
+	 */
+	public function set_permission_manage($role_id) {
+		$owner_role = $this->select('role_id')->where('system_default', 0)->where('join_default', 0)->find_by('is_public', 1);
+		$this->load->model('admin/permission_manage_model');
+		$added = $this->permission_manage_model->insert([
+			'role_id' => $owner_role->role_id,
+			'manage_role_id' => $role_id
+		]);
+
+		if ($added === fasle) {
+			return false;
+		}
+
+		return $role_id;
+	}
+	/**
+	 * delete permission manage - use for model trigger
+	 *
+	 * @param [int] $role_id
+	 * @return void
+	 */
+	public function delete_permission_manage($role_id) {
+		$this->load->model('admin/permission_manage_model');
+		$this->permission_manage_model->where('(role_id = "' . $role_id . '" OR manage_role_id = "' . $role_id . '")')->delete_where([
+			'system_default' => 0
+		]);
 	}
 }
