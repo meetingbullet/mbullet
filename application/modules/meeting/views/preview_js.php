@@ -25,31 +25,47 @@ $(document).on('hide.bs.modal.preview', '#meeting-preview-modal', function(){
 
 	<?php if ( isset($_GET['response']) ): ?>
 	// Wait for owner finish decider
-	swal({
-		title: '<?php echo lang('st_waiting') ?>',
-		text: '<?php echo lang('st_waiting_evaluator') ?>',
-		allowEscapeKey: false,
-		imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
-		showConfirmButton: false
-	});
+	// swal({
+	// 	title: '<?php echo lang('st_waiting') ?>',
+	// 	text: '<?php echo lang('st_waiting_evaluator') ?>',
+	// 	allowEscapeKey: false,
+	// 	imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
+	// 	showConfirmButton: false
+	// });
 
-	var check_state_interval = setInterval(function(){
-		$.get('<?php echo site_url('meeting/check_state/' . $meeting_key) ?>').done(function(data) {
-			if (data == 1) {
-				clearInterval(check_state_interval);
-				swal.close();
+	// var check_state_interval = setInterval(function(){
+	// 	$.get('<?php echo site_url('meeting/check_state/' . $meeting_key) ?>').done(function(data) {
+	// 		if (data == 1) {
+	// 			clearInterval(check_state_interval);
+	// 			swal.close();
 
-				$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-					data = JSON.parse(data);
-					$('#meeting-monitor-modal-evaluator .modal-content').html(data.modal_content);
-					$('#meeting-monitor-modal-evaluator').modal({
-						backdrop: 'static'
-					});
-				});
-			}
-		});
-	}, 3000);
+	// 			$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
+	// 				data = JSON.parse(data);
+	// 				$('#meeting-monitor-modal-evaluator .modal-content').html(data.modal_content);
+	// 				$('#meeting-monitor-modal-evaluator').modal({
+	// 					backdrop: 'static'
+	// 				});
+	// 			});
+	// 		}
+	// 	});
+	// }, 3000);
 	<?php endif; ?>
+
+	// dont need to wait for owner evaluator anymore
+	$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
+		data = JSON.parse(data);
+
+		if (data.close_modal === 0) {
+			$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+			$('.modal-monitor-evaluator').modal({
+				backdrop: 'static'
+			});
+		}
+
+		if (data.message_type) {
+			$.mbNotify(data.message, data.message_type);
+		}
+	});
 })
 
 $(document).on('mouseleave.preview', '#comment .list-user-single.unread', function() {
