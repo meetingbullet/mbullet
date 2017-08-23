@@ -605,8 +605,27 @@ class Dashboard extends Authenticated_Controller
 		$owner_meeting_ids = [];
 		$member_meeting_ids = [];
 
+		// foreach($evaluate_meetings as $key => $meeting) {
+		// 	if ($this->is_evaluated($meeting->meeting_id) || ! $this->is_evaluated($meeting->meeting_id, $meeting->owner_id)) {
+		// 		unset($evaluate_meetings[$key]);
+		// 	}
+
+		// 	if (! empty($meeting->rate)) {
+		// 		unset($evaluate_meetings[$key]);
+		// 	}
+
+		// 	if ($meeting->is_owner) {
+		// 		$owner_meeting_ids[] = $meeting->meeting_id;
+		// 	} elseif ($this->is_evaluated($meeting->meeting_id, $meeting->owner_id)) {
+		// 		$member_meeting_ids[] = $meeting->meeting_id;
+		// 	} else {
+		// 		//unset($evaluate_meetings[$key]);
+		// 	}
+		// }
+		
+		// dont need to wait for owner evaluator anymore
 		foreach($evaluate_meetings as $key => $meeting) {
-			if ($this->is_evaluated($meeting->meeting_id) || ! $this->is_evaluated($meeting->meeting_id, $meeting->owner_id)) {
+			if ($this->is_evaluated($meeting->meeting_id)) {
 				unset($evaluate_meetings[$key]);
 			}
 
@@ -616,11 +635,10 @@ class Dashboard extends Authenticated_Controller
 
 			if ($meeting->is_owner) {
 				$owner_meeting_ids[] = $meeting->meeting_id;
-			} elseif ($this->is_evaluated($meeting->meeting_id, $meeting->owner_id)) {
-				$member_meeting_ids[] = $meeting->meeting_id;
 			} else {
-				//unset($evaluate_meetings[$key]);
+				$member_meeting_ids[] = $meeting->meeting_id;
 			}
+
 		}
 
 		$evaluate_agendas = [];

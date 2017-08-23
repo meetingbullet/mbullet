@@ -185,41 +185,57 @@ $(document).on("submit", '.form-ajax', (e) => {
 // open meeting evaluator
 $('#open-meeting-evaluator').click((e) => {
 	e.preventDefault();
-	var is_owner = $('#open-meeting-evaluator').data('is-owner');
-	if (is_owner == 0) {
-		swal({
-			title: '<?php echo lang('st_waiting') ?>',
-			text: '<?php echo lang('st_waiting_evaluator') ?>',
-			allowEscapeKey: false,
-			imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
-			showConfirmButton: false
-		});
+	// var is_owner = $('#open-meeting-evaluator').data('is-owner');
+	// if (is_owner == 0) {
+	// 	swal({
+	// 		title: '<?php echo lang('st_waiting') ?>',
+	// 		text: '<?php echo lang('st_waiting_evaluator') ?>',
+	// 		allowEscapeKey: false,
+	// 		imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
+	// 		showConfirmButton: false
+	// 	});
 
-		var interval = setInterval(function(){
-			$.get('<?php echo site_url('meeting/check_state/' . $meeting_key) ?>').done(function(data) {
-				if (data == 1) {
-					clearInterval(interval);
-					swal.close();
+	// 	var interval = setInterval(function(){
+	// 		$.get('<?php echo site_url('meeting/check_state/' . $meeting_key) ?>').done(function(data) {
+	// 			if (data == 1) {
+	// 				clearInterval(interval);
+	// 				swal.close();
 
-					$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-						data = JSON.parse(data);
-						$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
-						$('.modal-monitor-evaluator').modal({
-							backdrop: 'static'
-						});
-					});
-				}
-			});
-		}, 3000);
-	} else {
-		$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-			data = JSON.parse(data);
+	// 				$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
+	// 					data = JSON.parse(data);
+	// 					$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+	// 					$('.modal-monitor-evaluator').modal({
+	// 						backdrop: 'static'
+	// 					});
+	// 				});
+	// 			}
+	// 		});
+	// 	}, 3000);
+	// } else {
+	// 	$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
+	// 		data = JSON.parse(data);
+	// 		$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+	// 		$('.modal-monitor-evaluator').modal({
+	// 			backdrop: 'static'
+	// 		});
+	// 	});
+	// }
+
+	// dont need to wait for owner evaluate any more
+	$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
+		data = JSON.parse(data);
+
+		if (data.close_modal === 0) {
 			$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
 			$('.modal-monitor-evaluator').modal({
 				backdrop: 'static'
 			});
-		});
-	}
+		}
+
+		if (data.message_type) {
+			$.mbNotify(data.message, data.message_type);
+		}
+	});
 });
 
 $(document).ready(function() {

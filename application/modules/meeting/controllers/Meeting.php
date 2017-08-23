@@ -139,6 +139,8 @@ class Meeting extends Authenticated_Controller
 			// only when create meeting on dashboard calendar
 			if (! empty($this->input->post_get('scheduled_start_time'))) {
 				$data['scheduled_start_time'] = get_utc_time($this->input->post_get('scheduled_start_time'));
+			} else {
+				unset($data['scheduled_start_time']);
 			}
 
 			if ($team = $this->input->post('team')) {
@@ -156,17 +158,21 @@ class Meeting extends Authenticated_Controller
 								$user_ids = [$data['owner_id']];
 								$this->load->library('invite/invitation');
 								foreach ($members as $member) {
+									do {
+										$invite_code = $this->invitation->generateRandomString(64);
+									} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
 									if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
 										$member_data[] = [
 											'meeting_id' => $id,
 											'invite_email' => $member['email'],
-											'invite_code' => $this->invitation->generateRandomString(64),
+											'invite_code' => $invite_code,
 										];
 									} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
 										$this->meeting_member_invite_model->insert([
 											'meeting_id' => $id,
 											'invite_email' => $member['email'],
-											'invite_code' => $this->invitation->generateRandomString(64),
+											'invite_code' => $invite_code,
 											'status' => 'accepted'
 										]);
 										$this->meeting_member_model->insert([
@@ -219,11 +225,15 @@ class Meeting extends Authenticated_Controller
 									$this->mb_project->update_parent_objects('meeting', $id);
 									$user_ids = [$data['owner_id']];
 									foreach ($members as $member) {
+										do {
+											$invite_code = $this->invitation->generateRandomString(64);
+										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
 										if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
 											$member_data[] = [
 												'meeting_id' => $id,
 												'invite_email' => $member['email'],
-												'invite_code' => $this->invitation->generateRandomString(64),
+												'invite_code' => $invite_code,
 											];
 										} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
 											$this->meeting_member_model->insert([
@@ -407,18 +417,26 @@ class Meeting extends Authenticated_Controller
 								$this->load->library('invite/invitation');
 								foreach ($team as $email) {
 									if (array_search($email, $invitee_emails) === false && $email != $this->current_user->email) {
+										do {
+											$invite_code = $this->invitation->generateRandomString(64);
+										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
 										$invite_data[] = [
 											'invite_email' => $email,
 											'meeting_id' => $meeting->meeting_id,
-											'invite_code' => $this->invitation->generateRandomString(64),
+											'invite_code' => $invite_code,
 										];
 									}
 
 									if ($email == $this->current_user->email && ! in_array($email, $member_emails)) {
+										do {
+											$invite_code = $this->invitation->generateRandomString(64);
+										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
 										$this->meeting_member_invite_model->insert([
 											'invite_email' => $email,
 											'meeting_id' => $meeting->meeting_id,
-											'invite_code' => $this->invitation->generateRandomString(64),
+											'invite_code' => $invite_code,
 											'status' => 'accepted'
 										]);
 										$this->meeting_member_model->insert([
@@ -2101,6 +2119,7 @@ class Meeting extends Authenticated_Controller
 		if ($owner_evaluated && $members_evaluated) {
 			$this->meeting_model->skip_validation(true)->update($meeting->meeting_id, ['manage_state' => 'done']);
 			$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
+			$this->send_meeting_result($meeting->meeting_id);
 		}
 	}
 
@@ -2189,7 +2208,7 @@ class Meeting extends Authenticated_Controller
 		$meeting = $this->meeting_model->find($meeting_id);
 		$meeting_invite = $this->meeting_member_invite_model
 			->where('invite_email', $this->current_user->email)
-			->where('invite_code', $invite_code)
+			->where("BINARY(invite_code) = BINARY('$invite_code')", null, false)
 			->find_by('meeting_id', $meeting_id);
 
 		if (empty($meeting) || empty($meeting_invite)) {
@@ -2507,10 +2526,14 @@ class Meeting extends Authenticated_Controller
 						if (! empty($user_emails)) {
 							foreach ($user_emails as $email) {
 								if ($email != $this->current_user->email) {
+									do {
+										$invite_code = $this->invitation->generateRandomString(64);
+									} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
 									$member_data[] = [
 										'meeting_id' => $meeting_id,
 										'invite_email' => $email,
-										'invite_code' => $this->invitation->generateRandomString(64),
+										'invite_code' => $invite_code,
 									];
 								} else {
 									$this->meeting_member_model->insert([
@@ -2556,10 +2579,14 @@ class Meeting extends Authenticated_Controller
 							if (! empty($user_emails)) {
 								foreach ($user_emails as $email) {
 									if ($email != $this->current_user->email) {
+										do {
+											$invite_code = $this->invitation->generateRandomString(64);
+										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
 										$member_data[] = [
 											'meeting_id' => $meeting_id,
 											'invite_email' => $email,
-											'invite_code' => $this->invitation->generateRandomString(64),
+											'invite_code' => $invite_code,
 										];
 									} else {
 										$this->meeting_member_model->insert([
@@ -3054,10 +3081,14 @@ class Meeting extends Authenticated_Controller
 					$meeting_users = [];
 					foreach ($user_emails as $email) {
 						if ($email != $this->current_user->email) {
+							do {
+								$invite_code = $this->invitation->generateRandomString(64);
+							} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
 							$member_data[] = [
 								'meeting_id' => $meeting_id,
 								'invite_email' => $email,
-								'invite_code' => $this->invitation->generateRandomString(64),
+								'invite_code' => $invite_code,
 							];
 
 							if (! in_array($email, $in_system_emails)) {
@@ -3389,6 +3420,8 @@ class Meeting extends Authenticated_Controller
 
 			if (! empty($this->input->get('scheduled_start_time'))) {
 				$data['scheduled_start_time'] = get_utc_time($this->input->get('scheduled_start_time'));
+			} else {
+				unset($data['scheduled_start_time']);
 			}
 
 			if ($team = $this->input->post('team')) {
@@ -3656,5 +3689,123 @@ class Meeting extends Authenticated_Controller
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 		Template::render();
+	}
+
+	private function send_meeting_result($meeting_id)
+	{
+		$meeting = $this->meeting_model->select('meetings.*, o.name as org_name,
+										u.email AS owner_email, u.first_name AS owner_first_name, u.last_name AS owner_last_name, u.avatar AS owner_avatar,
+										(SELECT (SUM(mm.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('meeting_members') . ' mm WHERE mm.meeting_id="' . $meeting_id . '" AND mm.rate IS NOT NULL) AS average_rate')
+									->join('users u', 'u.user_id = meetings.owner_id')
+									->join('actions a', 'a.action_id = meetings.action_id')
+									->join('projects p', 'p.project_id = a.project_id')
+									->join('organizations o', 'o.organization_id = p.organization_id')
+									->as_array()
+									->find($meeting_id);
+
+		$meeting_members = $this->meeting_member_model->select('(SELECT (SUM(mmr.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('meeting_member_rates') . ' mmr WHERE mmr.meeting_id="' . $meeting_id . '" AND mmr.rate IS NOT NULL AND mmr.attendee_id=' . $this->db->dbprefix('meeting_members') . '.user_id) AS average_rate,
+														a.email AS attendee_email, a.first_name AS attendee_first_name, a.last_name AS attendee_last_name, a.avatar AS attendee_avatar')
+													->join('users a', 'a.user_id = meeting_members.user_id')
+													->where('meeting_members.meeting_id', $meeting_id)
+													->as_array()
+													->find_all();
+
+		$meeting_agendas = $this->agenda_model->select('agendas.*,
+												o.email AS owner_email, o.first_name AS owner_first_name, o.last_name AS owner_last_name, o.avatar AS owner_avatar,
+												(SELECT (SUM(ar.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('agenda_rates') . ' ar WHERE ar.agenda_id=' . $this->db->dbprefix('agendas') . '.agenda_id AND ar.rate IS NOT NULL) AS average_rate')
+											->join('users o', 'o.user_id = agendas.owner_id')
+											->where('meeting_id', $meeting_id)
+											->order_by('agendas.agenda_id')
+											->as_array()
+											->find_all();
+		if (empty($meeting_agendas)) {
+			$meeting_agendas = [];
+			$email_data['AGENDAS'][] = [
+				'AGENDA_NAME' => 'N/A',
+				'AGENDA_RATE' => 'N/A'
+			];
+		}
+
+		$meeting_homeworks = $this->homework_model->select('homework.*,
+													o.email AS owner_email, o.first_name AS owner_first_name, o.last_name AS owner_last_name, o.avatar AS owner_avatar,
+													(SELECT (SUM(hr.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('homework_rates') . ' hr WHERE hr.homework_id=' . $this->db->dbprefix('homework') . '.homework_id AND hr.rate IS NOT NULL) AS average_rate')
+												->join('homework_rates hr', 'homework.homework_id = hr.homework_id')
+												->join('users o', 'o.user_id = homework.created_by')
+												->where('meeting_id', $meeting_id)
+												->order_by('homework.homework_id')
+												->as_array()
+												->find_all();
+		if (empty($meeting_homeworks)) {
+			$meeting_homeworks = [];
+			$email_data['HOMEWORKS'][] = [
+				'HOMEWORK_NAME' => 'N/A',
+				'HOMEWORK_RATE' => 'N/A'
+			];
+		}
+
+		$template = $this->db->where('email_template_key', 'MEETING_SUMMARY')
+							->where('language_code', 'en_US')
+							->get('email_templates')->row();
+
+		if ($template) {
+			$email_data = [
+				'NAME' => $meeting['name'],
+				'ORG' => $meeting['org_name'],
+				'KEY' => $meeting['meeting_key'],
+				'OWNER' => display_user($meeting['owner_email'], $meeting['owner_first_name'], $meeting['owner_last_name'], $meeting['owner_avatar']),
+				'MEETING_RATE' => round($meeting['average_rate'], 2)
+			];
+
+			foreach ($meeting_members as $member) {
+				$email_data['MEMBERS'][] = [
+					'AVATAR' => display_user($member['attendee_email'], $member['attendee_first_name'], $member['attendee_last_name'], $member['attendee_avatar']),
+					'MEMBER_RATE' => round($member['average_rate'], 2)
+				];
+			}
+
+			foreach ($meeting_agendas as $agenda) {
+				$email_data['AGENDAS'][] = [
+					'AGENDA_NAME' => $agenda['name'],
+					'AGENDA_RATE' => round($agenda['average_rate'], 2)
+				];
+			}
+
+			foreach ($meeting_homeworks as $hw) {
+				$email_data['HOMEWORKS'][] = [
+					'HOMEWORK_NAME' => $hw['name'],
+					'HOMEWORK_RATE' => round($hw['average_rate'], 2)
+				];
+			}
+
+			$header = $this->load->view('emailer/email/_header', null, true);
+			$footer = $this->load->view('emailer/email/_footer', null, true);
+			$this->load->library('parser');
+
+			$email_data['USER_NAME'] = $meeting['owner_first_name'] . ' ' . $meeting['owner_last_name'];
+			$content = $header;
+			$content .= $this->parser->parse_string($template->email_template_content, $email_data, true);
+			$content .= $footer;
+
+			$queue_data[] = [
+				'to_email' => $meeting['owner_email'],
+				'subject' => $template->email_title,
+				'message' => $content,
+			];
+
+			foreach ($meeting_members as $index => $member) {
+				$email_data['USER_NAME'] = $member['attendee_first_name'] . ' ' . $member['attendee_last_name'];
+				$content = $header;
+				$content .= $this->parser->parse_string($template->email_template_content, $email_data, true);
+				$content .= $footer;
+
+				$queue_data[] = [
+					'to_email' => $member['attendee_email'],
+					'subject' => $template->email_title,
+					'message' => $content,
+				];
+			}
+		}
+
+		$this->db->insert_batch('email_queue', $queue_data);
 	}
 }
