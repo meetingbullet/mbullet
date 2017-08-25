@@ -3808,4 +3808,90 @@ class Meeting extends Authenticated_Controller
 
 		$this->db->insert_batch('email_queue', $queue_data);
 	}
+
+	public function check_done_meeting($meeting_id)
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$done = $this->meeting_model
+									->join('users u', 'u.user_id = meetings.owner_id')
+									->join('actions a', 'a.action_id = meetings.action_id')
+									->join('projects p', 'p.project_id = a.project_id')
+									->join('organizations o', 'o.organization_id = p.organization_id')
+									->where('meetings.manage_state', 'done')
+									->where('meetings.meeting_id', $meeting_id)
+									->as_array()
+									->count_all() > 0;
+		echo json_encode([
+			'done' => (int) $done
+		]); exit;
+	}
+
+	public function done_meeting_summary($meeting_id)
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$meeting = $this->meeting_model->select('meetings.*, o.name as org_name,
+										u.email AS owner_email, u.first_name AS owner_first_name, u.last_name AS owner_last_name, u.avatar AS owner_avatar,
+										(SELECT (SUM(mm.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('meeting_members') . ' mm WHERE mm.meeting_id="' . $meeting_id . '" AND mm.rate IS NOT NULL) AS average_rate')
+									->join('users u', 'u.user_id = meetings.owner_id')
+									->join('actions a', 'a.action_id = meetings.action_id')
+									->join('projects p', 'p.project_id = a.project_id')
+									->join('organizations o', 'o.organization_id = p.organization_id')
+									->where('meetings.manage_state', 'done')
+									->as_array()
+									->find($meeting_id);
+		if (empty($meeting)) {
+			Template::set('content', '');
+			Template::set('data', ['status' => 0]);
+			Template::set('message', lang('st_meeting_not_exist_or_not_done'));
+			Template::set('message_type', 'danger');
+			Template::render();
+			return;
+		}
+
+		$meeting_members = $this->meeting_member_model->select('(SELECT (SUM(mmr.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('meeting_member_rates') . ' mmr WHERE mmr.meeting_id="' . $meeting_id . '" AND mmr.rate IS NOT NULL AND mmr.attendee_id=' . $this->db->dbprefix('meeting_members') . '.user_id) AS average_rate,
+														a.email AS attendee_email, a.first_name AS attendee_first_name, a.last_name AS attendee_last_name, a.avatar AS attendee_avatar')
+													->join('users a', 'a.user_id = meeting_members.user_id')
+													->where('meeting_members.meeting_id', $meeting_id)
+													->as_array()
+													->find_all();
+
+		$meeting_agendas = $this->agenda_model->select('agendas.*,
+												o.email AS owner_email, o.first_name AS owner_first_name, o.last_name AS owner_last_name, o.avatar AS owner_avatar,
+												(SELECT (SUM(ar.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('agenda_rates') . ' ar WHERE ar.agenda_id=' . $this->db->dbprefix('agendas') . '.agenda_id AND ar.rate IS NOT NULL) AS average_rate')
+											->join('users o', 'o.user_id = agendas.owner_id')
+											->where('meeting_id', $meeting_id)
+											->order_by('agendas.agenda_id')
+											->as_array()
+											->find_all();
+		if (empty($meeting_agendas)) {
+			$meeting_agendas = [];
+		}
+
+		$meeting_homeworks = $this->homework_model->select('homework.*,
+													o.email AS owner_email, o.first_name AS owner_first_name, o.last_name AS owner_last_name, o.avatar AS owner_avatar,
+													(SELECT (SUM(hr.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('homework_rates') . ' hr WHERE hr.homework_id=' . $this->db->dbprefix('homework') . '.homework_id AND hr.rate IS NOT NULL) AS average_rate')
+												->join('homework_rates hr', 'homework.homework_id = hr.homework_id')
+												->join('users o', 'o.user_id = homework.created_by')
+												->where('meeting_id', $meeting_id)
+												->order_by('homework.homework_id')
+												->as_array()
+												->find_all();
+		if (empty($meeting_homeworks)) {
+			$meeting_homeworks = [];
+
+		}
+
+		Template::set('data', ['status' => 1]);
+		Template::set('meeting', $meeting);
+		Template::set('meeting_members', $meeting_members);
+		Template::set('meeting_agendas', $meeting_agendas);
+		Template::set('meeting_homeworks', $meeting_homeworks);
+		Template::render();
+	}
 }

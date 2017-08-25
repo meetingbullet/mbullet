@@ -122,6 +122,21 @@ $(document).ready(function() {
 				revertFunc();
 			})
 		},
+		eventClick: function(event, jsEvent, view) {
+			if ($(this).hasClass('mbc-event')) {
+				var that = this;
+				$.get('<?php echo site_url('meeting/check_done_meeting/') ?>' + event.meeting_id)
+				.done(function(data) {
+					data = JSON.parse(data);console.log(data);
+					if (data.done == 1) {
+						$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/done_meeting_summary/') ?>' + event.meeting_id);
+					} else {
+						window.location.href = $(that).attr('href');
+					}
+				});
+				return false;
+			}
+		},
 		selectable: true,
 		select: function(start, end, jsEvent, view) {
 			var now = new Date();
@@ -516,4 +531,11 @@ $(document).ready(function() {
 			/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
 		}
 	}
+
+	/**
+	 * Show summary for done event or redirect to event detail page for undone
+	 */
+	//$('#calendar').on('click', 'a.fc-event.mbc-event', function(e) {
+	//	e.preventDefault();
+	//});
 });
