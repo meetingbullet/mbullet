@@ -77,32 +77,32 @@ $project_label = [
 			</div>
 			<div class="an-component-body pj-detail">
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min') . ' ' . lang('pj_hours') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->min_hour); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->min_hour); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_max') . ' ' . lang('pj_hours') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->max_hour); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->max_hour); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_no_of_meetings') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->no_meeting); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->no_meeting); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_no_of_attendees') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->no_attendee) ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->no_attendee) ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min') . ' ' . lang('pj_roi_rating') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->min_roi_rating); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->min_roi_rating); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min') . ' ' . lang('pj_roi_rating') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->max_roi_rating); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->max_roi_rating); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min') . ' ' . lang('pj_period') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->min_period . ' ' . $detail['constraint']->period_type); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->min_period . ' ' . $detail['constraint']->period_type); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min') . ' ' . lang('pj_period') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->max_period . ' ' . $detail['constraint']->period_type); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->max_period . ' ' . $detail['constraint']->period_type); ?></div>
 
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_point_project') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->total_point_project); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->total_point_project); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_point_action') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->total_point_action); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->total_point_action); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_total_point_resource') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->total_point_resource); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->total_point_resource); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min_value_cost_ratio_per_meeting') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->min_value_cost_ratio_per_meeting); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->min_value_cost_ratio_per_meeting); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_max_time_action') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['constraint']->max_time_action); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['constraint']) ? 'N/A': $detail['constraint']->max_time_action); ?></div>
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div>
 	</div>
@@ -113,17 +113,17 @@ $project_label = [
 			</div>
 			<div class="an-component-body pj-detail">
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_min') . ' ' . lang('pj_hours') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['expectation']->min_hour); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['expectation']) ? 'N/A' : $detail['expectation']->min_hour); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_max') . ' ' . lang('pj_hours') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['expectation']->max_hour); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['expectation']) ? 'N/A' : $detail['expectation']->max_hour); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_no_of_meetings') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['expectation']->no_meeting); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['expectation']) ? 'N/A' : $detail['expectation']->no_meeting); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_no_of_attendees') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['expectation']->no_attendee); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['expectation']) ? 'N/A' : $detail['expectation']->no_attendee); ?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_time_cost_to_milestone') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['expectation']->time_cost_to_milestone . ' ' . $detail['expectation']->period_type) ;?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['expectation']) ? 'N/A' : $detail['expectation']->time_cost_to_milestone . ' ' . $detail['expectation']->period_type) ;?></div>
 				<div class="col-md-6 pj-detail-item"><?php echo lang('pj_return_on_invested_hours') . ':'; ?></div>
-				<div class="col-md-6 pj-detail-item"><?php e($detail['expectation']->outcomes_per_period . ' ' . $detail['expectation']->period_type); ?></div>
+				<div class="col-md-6 pj-detail-item"><?php e(empty($detail['expectation']) ? 'N/A' : $detail['expectation']->outcomes_per_period . ' ' . $detail['expectation']->period_type); ?></div>
 			</div> <!-- end .AN-COMPONENT-BODY -->
 		</div>
 	</div>

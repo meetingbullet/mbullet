@@ -341,7 +341,7 @@ class Dashboard extends Authenticated_Controller
 
 		if ($result['next_meeting']) {
 			$result['next_meeting']->scheduled_start_time = display_time($result['next_meeting']->scheduled_start_time);
-			$this->meeting_model->where('meetings.meeting_id !=', $result['next_meeting']->meeting_id);
+			// $this->meeting_model->where('meetings.meeting_id !=', $result['next_meeting']->meeting_id);
 		}
 
 		$result['scheduled_meetings'] = $this->meeting_model->find_all();

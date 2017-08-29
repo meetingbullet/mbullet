@@ -3,7 +3,7 @@
 class User_invite_model extends BF_Model
 {
 	protected $table_name	= 'user_invite';
-	protected $key			= 'user_invite__id';
+	protected $key			= 'user_invite_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= false;

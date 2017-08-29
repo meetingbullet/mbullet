@@ -36,19 +36,19 @@
 				<label><?php echo lang('pj_value_unit_of_time') ?><span class="required">*</span></label>
 				<div class="inline-inputs">
 					<div class="input-20">
-						<input type="text" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_1')) ? 'danger' : '') ?>" name="value_of_time_1" value="<?php echo set_value('value_of_time_1', empty($project->value_of_time_1) ? '' : $project->value_of_time_1) ?>"/>
+						<input type="text" style="margin-bottom: 20px !important;" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_1')) ? 'danger' : '') ?>" name="value_of_time_1" value="<?php echo set_value('value_of_time_1', empty($project->value_of_time_1) ? '' : $project->value_of_time_1) ?>"/>
 					</div>
 					<div class="input-20">
-						<input type="text" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_2')) ? 'danger' : '') ?>" name="value_of_time_2" value="<?php echo set_value('value_of_time_2', empty($project->value_of_time_2) ? '' : $project->value_of_time_2) ?>"/>
+						<input type="text" style="margin-bottom: 20px !important;" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_2')) ? 'danger' : '') ?>" name="value_of_time_2" value="<?php echo set_value('value_of_time_2', empty($project->value_of_time_2) ? '' : $project->value_of_time_2) ?>"/>
 					</div>
 					<div class="input-20">
-						<input type="text" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_3')) ? 'danger' : '') ?>" name="value_of_time_3" value="<?php echo set_value('value_of_time_3', empty($project->value_of_time_3) ? '' : $project->value_of_time_3) ?>"/>
+						<input type="text" style="margin-bottom: 20px !important;" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_3')) ? 'danger' : '') ?>" name="value_of_time_3" value="<?php echo set_value('value_of_time_3', empty($project->value_of_time_3) ? '' : $project->value_of_time_3) ?>"/>
 					</div>
 					<div class="input-20">
-						<input type="text" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_4')) ? 'danger' : '') ?>" name="value_of_time_4" value="<?php echo set_value('value_of_time_4', empty($project->value_of_time_4) ? '' : $project->value_of_time_4) ?>"/>
+						<input type="text" style="margin-bottom: 20px !important;" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_4')) ? 'danger' : '') ?>" name="value_of_time_4" value="<?php echo set_value('value_of_time_4', empty($project->value_of_time_4) ? '' : $project->value_of_time_4) ?>"/>
 					</div>
 					<div class="input-20">
-						<input type="text" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_5')) ? 'danger' : '') ?>" name="value_of_time_5" value="<?php echo set_value('value_of_time_5', empty($project->value_of_time_5) ? '' : $project->value_of_time_5) ?>"/>
+						<input type="text" style="margin-bottom: 20px !important;" class="margin-0 an-form-control <?php echo (! empty(form_error('value_of_time_5')) ? 'danger' : '') ?>" name="value_of_time_5" value="<?php echo set_value('value_of_time_5', empty($project->value_of_time_5) ? '' : $project->value_of_time_5) ?>"/>
 					</div>
 					<div class="legend">
 						<?php echo lang('pj_value_of_time_legend') ?>

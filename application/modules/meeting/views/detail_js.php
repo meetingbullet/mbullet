@@ -482,3 +482,8 @@ $(document).on('click', '#meeting-date-time-picker .modal-footer button', functi
 	$('#update-meeting').closest('.form-ajax').submit();
 });
 <?php endif ?>
+
+// show message if evaluated
+<?php if (! empty($evaluated)) : ?>
+$.mbNotify('<?php echo lang('st_meeting_already_evaluated') ?>', 'info');
+<?php endif ?>

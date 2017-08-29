@@ -38,9 +38,14 @@ class Project extends Authenticated_Controller
 		// Get invite emails
 		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
 
-		if (isset($_POST['save'])) {
-			;
+		$draft = $this->project_model->where('organization_id', $this->current_user->current_organization_id)
+									->where('created_by', $this->current_user->user_id)
+									->find_by('status', 'draft');
+		if (! empty($draft)) {
+			Template::set('draft', $draft);
+		}
 
+		if (isset($_POST['save']) || isset($_POST['save-draft'])) {
 			if ($project = $this->save_project()) {
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
@@ -53,9 +58,10 @@ class Project extends Authenticated_Controller
 			Template::render();
 			return;
 		}
-
+		
 		Template::set('message_type', null);
 		Template::set('message', '');
+		Template::set_view('new_create');
 		Template::render();
 	}
 
@@ -117,6 +123,7 @@ class Project extends Authenticated_Controller
 		Template::set('close_modal', 0);
 		Template::set('message_type', null);
 		Template::set('message', '');
+		Template::set_view('new_update');
 		Template::render();
 	}
 
@@ -150,22 +157,28 @@ class Project extends Authenticated_Controller
 	{
 		$data = $this->input->post();
 		$project_data = $this->project_model->prep_data($data);
-
-		$constraint_rules = $this->project_constraint_model->project_validation_rules;
-		foreach ($constraint_rules as &$rule) {
-			$rule['field'] = "constraints[{$rule['field']}]";
+		if (! empty($project_data['deadline'])) {
+			$project_data['deadline'] = get_utc_time($project_data['deadline']);
 		}
 
-		$expectation_rules = $this->project_expectation_model->project_validation_rules;
-		foreach ($expectation_rules as &$rule) {
-			$rule['field'] = "expectations[{$rule['field']}]";
-		}
+		// remove constraint and expectation data temporary
+		// $constraint_rules = $this->project_constraint_model->project_validation_rules;
+		// foreach ($constraint_rules as &$rule) {
+		// 	$rule['field'] = "constraints[{$rule['field']}]";
+		// }
 
-		$this->form_validation->set_rules(array_merge(
-			$this->project_model->project_validation_rules,
-			$constraint_rules,
-			$expectation_rules
-		));
+		// $expectation_rules = $this->project_expectation_model->project_validation_rules;
+		// foreach ($expectation_rules as &$rule) {
+		// 	$rule['field'] = "expectations[{$rule['field']}]";
+		// }
+
+		// $this->form_validation->set_rules(array_merge(
+		// 	$this->project_model->project_validation_rules,
+		// 	$constraint_rules,
+		// 	$expectation_rules
+		// ));
+
+		$this->form_validation->set_rules($this->project_model->project_validation_rules);
 
 		if ($this->form_validation->run() === false) {
 			logit('form_validation false');
@@ -271,12 +284,12 @@ class Project extends Authenticated_Controller
 				return $message;
 			}
 
+			// remove constraint and expectation data temporary
+			// $data['constraints']['project_id'] = $project_id;
+			// $data['expectations']['project_id'] = $project_id;
 
-			$data['constraints']['project_id'] = $project_id;
-			$data['expectations']['project_id'] = $project_id;
-
-			$this->project_constraint_model->insert($data['constraints']);
-			$this->project_expectation_model->insert($data['expectations']);
+			// $this->project_constraint_model->insert($data['constraints']);
+			// $this->project_expectation_model->insert($data['expectations']);
 
 			/*
 				Temporary disable Action functionality, auto create an Action after creating Project 
@@ -315,9 +328,9 @@ class Project extends Authenticated_Controller
 			if ($project_data['cost_code'] != $project_old_cost_code) {
 				$this->update_childs($project_data['cost_code'], $project_id);
 			}
-
-			$this->project_constraint_model->update($project_id, $data['constraints']);
-			$this->project_expectation_model->update($project_id, $data['expectations']);
+			// remove constraint and expectation data temporary
+			// $this->project_constraint_model->update($project_id, $data['constraints']);
+			// $this->project_expectation_model->update($project_id, $data['expectations']);
 
 			/*
 				For now, we're going to add invited members immediately into project members

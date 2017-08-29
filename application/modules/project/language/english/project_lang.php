@@ -65,6 +65,10 @@ $lang['pj_total_point_action'] = 'Total Points/Action';
 $lang['pj_total_point_resource'] = 'Total Points/Resource';
 $lang['pj_min_value_cost_ratio_per_meeting'] = 'Min Value/Cost Ratio Per Meeting';
 $lang['pj_max_time_action'] = 'Max Time/Action';
+$lang['pj_project_deadline'] = 'Deadline';
+$lang['pj_project_cost'] = "Cost";
+$lang['pj_project_team_hours'] = "Team hours";
+$lang['pj_save_draft'] = 'Save draft';
 
 // Validation
 $lang['pj_min_investment_hour'] = 'Min investment hour';
