@@ -629,15 +629,12 @@ class Meeting extends Authenticated_Controller
 		$point_used = number_format($this->mb_project->total_point_used('meeting', $meeting->meeting_id), 2);
 
 		$evaluated = $this->is_evaluated($meeting_id);
-		if ($evaluated === true) {
-			Template::set_message(lang('st_meeting_already_evaluated'), 'info');
-		}
 
 		if ($meeting->owner_id != $this->current_user->user_id) {
 			$owner_evaluated = $this->is_evaluated($meeting_id, $meeting->owner_id);
 			Template::set('owner_evaluated', $owner_evaluated);
 		}
-
+		// if not a private meeting
 		if (empty($meeting->is_private)) {
 			if (IS_AJAX) {
 				echo json_encode([$evaluated, $invited_members , $point_used, $meeting, $agendas, $homeworks]); exit;
@@ -646,6 +643,7 @@ class Meeting extends Authenticated_Controller
 				'meeting_key' => $meeting_key,
 				'current_user' => $this->current_user,
 				'chosen_agenda' => ! empty($chosen_agenda) ? $chosen_agenda : null,
+				'evaluated' => ! empty($evaluated)
 			], true), 'inline');
 			Template::set('evaluated', $evaluated);
 			Template::set('point_used', $point_used);
@@ -2448,6 +2446,7 @@ class Meeting extends Authenticated_Controller
 			if (has_permission('Project.Edit.All')) {
 				$projects = $this->project_model->select('projects.project_id, projects.name')
 												->where('projects.organization_id', $this->current_user->current_organization_id)
+												->where('projects.status !=', 'draft') // exclude draft
 												->order_by('projects.modified_on', 'desc')
 												->find_all();
 			} else {
@@ -2455,6 +2454,7 @@ class Meeting extends Authenticated_Controller
 												->join('users u', 'u.user_id = projects.owner_id')
 												->join('project_members pm', 'projects.project_id = pm.project_id')
 												->where('projects.status !=', 'archive')
+												->where('projects.status !=', 'draft') // exclude draft
 												->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
 												->where('organization_id', $this->current_user->current_organization_id)
 												->order_by('projects.modified_on', 'desc')
@@ -2868,6 +2868,7 @@ class Meeting extends Authenticated_Controller
 
 		$projects = $this->project_model->select('project_id, name')
 										->where('organization_id', $this->current_user->current_organization_id)
+										->where('status !=', 'draft')
 										->find_all();
 
 		Template::set('data', $data);

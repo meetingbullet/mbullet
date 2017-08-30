@@ -610,3 +610,43 @@ $(document).on('click', '#meeting-date-time-picker .modal-footer button', functi
 	$('#meeting-date-time-picker').modal('hide');
 	$('.modal#create-meeting .form-ajax').submit();
 });
+// create project on dashboard side menu
+$(document).on("click", '#create-project-modal .form-ajax [type="submit"]', function(e) {
+	e.preventDefault();
+	var that = $(this);
+	var data = $('#create-project-modal .form-ajax').serialize();
+
+	// Temporary disable form's buttons to prevent duplicate requests
+	$('#create-project-modal .form-ajax button').prop('disabled', true);
+
+	// Since serialize does not include form's action button, 
+	// we need to add it on our own.
+	data += '&' + $(this).attr('name') + '=';
+	$.ajax({
+		type: "POST",
+		url: $('#create-project-modal .form-ajax').attr('action'),
+		data: data,
+		success: (data) => {
+			data = JSON.parse(data);
+
+			if (data.close_modal === 0) {
+				$('.modal .modal-content').html(data.modal_content);
+			} else {
+				$('.modal').modal('hide');
+			}
+
+			if (data.message_type) {
+				$.mbNotify(data.message, data.message_type);
+
+				if (data.message_type == 'success') {
+					if (that.attr('name') == 'save') {
+						location.reload();
+					}
+				}
+			}
+		},
+		complete: function() {
+			$('#create-project-modal .form-ajax button').prop('disabled', false);
+		}
+	});
+});

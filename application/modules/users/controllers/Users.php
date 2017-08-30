@@ -1165,11 +1165,31 @@ class Users extends Front_Controller
 											->where('user_id', $current_user->user_id)
 											->get()->row()->count > 0 ? true : false;
 				if (! $in_organization) {
+					$user_role_id = $existed_domain_name->role_id;
+					// check user_invite for correct user's organization role
+					$this->load->model('invite/user_invite_model');
+					$user_invite = $this->user_invite_model->select('user_invite.*, IF(r.role_id IS NULL, 0, 1) AS role_exist')
+											->join('roles r', 'r.role_id = user_invite.invite_role AND (r.organization_id = "' . $existed_domain_name->organization_id . '" OR (r.organization_id IS NULL AND r.is_public = "1"))', 'left')
+											->find_by('user_invite.invite_email', $current_user->email);
+					if (! empty($user_invite)) {
+						$invite_update_data['status'] = 'accepted';
+
+						if ($user_invite->role_exist) {
+							$user_role_id = $user_invite->invite_role;
+						} else {
+							$invite_update_data['invite_role'] = $user_role_id;
+						}
+					}
+
 					$this->db->insert('user_to_organizations', [
 						'user_id' => $current_user->user_id,
 						'organization_id' => $existed_domain_name->organization_id,
-						'role_id' => $existed_domain_name->role_id
+						'role_id' => $user_role_id
 					]);
+
+					if (! empty($invite_update_data)) {
+						$this->user_invite_model->skip_validation(true)->update($user_invite->user_invite_id, $invite_update_data);
+					}
 				}
 
 				redirect(DEFAULT_LOGIN_LOCATION);

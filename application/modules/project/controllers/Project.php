@@ -37,11 +37,31 @@ class Project extends Authenticated_Controller
 		Template::set('close_modal', 0);
 		// Get invite emails
 		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
+		Template::set_view('new_create');
 
-		if (isset($_POST['save'])) {
-			;
+		$draft = $this->project_model->select('*, members AS invite_team')
+									->where('organization_id', $this->current_user->current_organization_id)
+									->where('created_by', $this->current_user->user_id)
+									->find_by('status', 'draft');
+		if (! empty($draft)) {
+			if (! empty($draft->invite_team)) {
+				$draft->invite_team = json_decode($draft->invite_team);
+				$draft->invite_team = implode(',', $draft->invite_team);
+			}
 
-			if ($project = $this->save_project()) {
+			Template::set('draft', $draft);
+		}
+
+		if (isset($_POST['save']) || isset($_POST['save-draft'])) {
+			if (isset($_POST['save']) ) {
+				$project = $this->save_project();
+			}
+
+			if (isset($_POST['save-draft']) ) {
+				$project = $this->save_project('save-draft');
+			}
+
+			if ($project) {
 				Template::set('close_modal', 1);
 				Template::set('message_type', 'success');
 				Template::set('message', lang('pj_project_successfully_created'));
@@ -53,7 +73,7 @@ class Project extends Authenticated_Controller
 			Template::render();
 			return;
 		}
-
+		
 		Template::set('message_type', null);
 		Template::set('message', '');
 		Template::render();
@@ -117,6 +137,7 @@ class Project extends Authenticated_Controller
 		Template::set('close_modal', 0);
 		Template::set('message_type', null);
 		Template::set('message', '');
+		Template::set_view('new_update');
 		Template::render();
 	}
 
@@ -150,34 +171,46 @@ class Project extends Authenticated_Controller
 	{
 		$data = $this->input->post();
 		$project_data = $this->project_model->prep_data($data);
-
-		$constraint_rules = $this->project_constraint_model->project_validation_rules;
-		foreach ($constraint_rules as &$rule) {
-			$rule['field'] = "constraints[{$rule['field']}]";
+		if (! empty($project_data['deadline'])) {
+			$project_data['deadline'] = get_utc_time($project_data['deadline']);
 		}
 
-		$expectation_rules = $this->project_expectation_model->project_validation_rules;
-		foreach ($expectation_rules as &$rule) {
-			$rule['field'] = "expectations[{$rule['field']}]";
-		}
+		$draft = $this->project_model->where('organization_id', $this->current_user->current_organization_id)
+									->where('created_by', $this->current_user->user_id)
+									->find_by('status', 'draft');
 
-		$this->form_validation->set_rules(array_merge(
-			$this->project_model->project_validation_rules,
-			$constraint_rules,
-			$expectation_rules
-		));
+		// remove constraint and expectation data temporary
+		// $constraint_rules = $this->project_constraint_model->project_validation_rules;
+		// foreach ($constraint_rules as &$rule) {
+		// 	$rule['field'] = "constraints[{$rule['field']}]";
+		// }
 
-		if ($this->form_validation->run() === false) {
-			logit('form_validation false');
-			Template::set('message', validation_errors() /*lang('pj_there_was_a_problem_while_creating_project')*/);
-			return false;
-		}
+		// $expectation_rules = $this->project_expectation_model->project_validation_rules;
+		// foreach ($expectation_rules as &$rule) {
+		// 	$rule['field'] = "expectations[{$rule['field']}]";
+		// }
 
-		$check_cost_code = $this->project_model->where('organization_id', $this->current_user->current_organization_id)->find_by('cost_code', $project_data['cost_code']);
+		// $this->form_validation->set_rules(array_merge(
+		// 	$this->project_model->project_validation_rules,
+		// 	$constraint_rules,
+		// 	$expectation_rules
+		// ));
+		
+		if ($type != 'save-draft') {
+			$this->form_validation->set_rules($this->project_model->project_validation_rules);
 
-		if ($check_cost_code !== false && ($type == 'insert' || ($type == 'update' && $check_cost_code->project_id != $project_id))) {
-			Template::set('message', lang('pj_duplicated_cost_code'));
-			return false;
+			if ($this->form_validation->run() === false) {
+				logit('form_validation false');
+				Template::set('message', validation_errors() /*lang('pj_there_was_a_problem_while_creating_project')*/);
+				return false;
+			}
+
+			$check_cost_code = $this->project_model->where('organization_id', $this->current_user->current_organization_id)->find_by('cost_code', $project_data['cost_code']);
+
+			if ($check_cost_code !== false && ($type == 'insert' || ($type == 'update' && $check_cost_code->project_id != $project_id))) {
+				Template::set('message', lang('pj_duplicated_cost_code'));
+				return false;
+			}
 		}
 
 
@@ -186,7 +219,19 @@ class Project extends Authenticated_Controller
 			$project_data['owner_id'] = $project_data['created_by'] = $this->current_user->user_id;
 			$project_data['cost_code'] = strtoupper($project_data['cost_code']);
 
-			$project_id = $this->project_model->insert($project_data);
+			if (! empty($draft)) {
+				$project_data['members'] = null;
+				$project_data['status'] = 'open';
+				$updated = $this->project_model->update($draft->project_id, $project_data);
+
+				if ($updated) {
+					$project_id = $draft->project_id;
+				} else {
+					$project_id = false;
+				}
+			} else {
+				$project_id = $this->project_model->insert($project_data);
+			}
 
 			if ($project_id === false) {
 				logit('project_id false');
@@ -271,12 +316,12 @@ class Project extends Authenticated_Controller
 				return $message;
 			}
 
+			// remove constraint and expectation data temporary
+			// $data['constraints']['project_id'] = $project_id;
+			// $data['expectations']['project_id'] = $project_id;
 
-			$data['constraints']['project_id'] = $project_id;
-			$data['expectations']['project_id'] = $project_id;
-
-			$this->project_constraint_model->insert($data['constraints']);
-			$this->project_expectation_model->insert($data['expectations']);
+			// $this->project_constraint_model->insert($data['constraints']);
+			// $this->project_expectation_model->insert($data['expectations']);
 
 			/*
 				Temporary disable Action functionality, auto create an Action after creating Project 
@@ -294,7 +339,7 @@ class Project extends Authenticated_Controller
 			]);
 
 			return $this->ajax_project_data($project_id);
-		} else {
+		} elseif ($type == 'update') {
 			if (empty($project_id)) {
 				return false;
 			}
@@ -315,9 +360,9 @@ class Project extends Authenticated_Controller
 			if ($project_data['cost_code'] != $project_old_cost_code) {
 				$this->update_childs($project_data['cost_code'], $project_id);
 			}
-
-			$this->project_constraint_model->update($project_id, $data['constraints']);
-			$this->project_expectation_model->update($project_id, $data['expectations']);
+			// remove constraint and expectation data temporary
+			// $this->project_constraint_model->update($project_id, $data['constraints']);
+			// $this->project_expectation_model->update($project_id, $data['expectations']);
 
 			/*
 				For now, we're going to add invited members immediately into project members
@@ -371,11 +416,37 @@ class Project extends Authenticated_Controller
 			$this->project_member_model->delete_where(['project_id' => $project_id]);
 			$this->project_member_model->insert_batch($project_members);
 			return $this->ajax_project_data($project_id);
+		} else {
+			$project_data['organization_id'] = $this->current_user->current_organization_id;
+			$project_data['owner_id'] = $project_data['created_by'] = $this->current_user->user_id;
+			$project_data['cost_code'] = empty($project_data['cost_code']) ? '' : strtoupper($project_data['cost_code']);
+			$project_data['deadline'] = empty($project_data['deadline']) ? null : $project_data['deadline'];
+			$project_data['team_point'] = empty($project_data['team_point']) ? null : $project_data['team_point'];
+			$project_data['status'] = 'draft';
+
+			$invited_team = $this->input->post('invite_team');
+			if (! empty(trim($invited_team))) {
+				$invited_team = explode(',', $invited_team);
+				$project_data['members'] = json_encode($invited_team);
+			}
+
+			if (! empty($draft)) {
+				$project_data['status'] = 'draft';
+				$draft_id = $this->project_model->skip_validation(true)->update($draft->project_id, $project_data);
+			} else {
+				$draft_id = $this->project_model->skip_validation(true)->insert($project_data);
+			}
+
+			if ($draft_id) {
+				return $this->ajax_project_data($draft_id);
+			}
+
+			return false;
 		}
 
-		if ($type = 'insert') {
+		if ($type == 'insert') {
 			$this->mb_project->notify_members($id, 'project', $this->current_user, 'insert');
-		} else {
+		} elseif ($type == 'update') {
 			if ((! empty($project_data['status'])) && $project_data['status'] != $project_old_status) {
 				$this->mb_project->notify_members($id, 'project', $this->current_user, 'update_status');
 			}
