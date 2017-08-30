@@ -269,6 +269,7 @@ class Dashboard extends Authenticated_Controller
 		->join('project_members pm', 'projects.project_id = pm.project_id AND pm.user_id =' . $this->current_user->user_id, 'LEFT')
 		->join('project_reads pr', 'projects.project_id = pr.project_id AND pr.user_id =' . $this->current_user->user_id, 'LEFT')
 		->where('projects.status !=', 'archive')
+		->where('projects.status !=', 'draft') //exclude draft
 		->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
 		->where('organization_id', $this->current_user->current_organization_id)
 		->order_by('projects.name')
@@ -534,6 +535,7 @@ class Dashboard extends Authenticated_Controller
 
 		->join('users u', 'u.user_id = projects.owner_id')
 		->where('projects.status !=', 'archive')
+		->where('projects.status !=', 'draft') //exclude draft
 		->where_not_in('project_id', count($my_project_ids) > 0 ? $my_project_ids : -1)
 		->where('organization_id', $this->current_user->current_organization_id)
 		->order_by('projects.name')

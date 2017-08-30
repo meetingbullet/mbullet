@@ -2446,6 +2446,7 @@ class Meeting extends Authenticated_Controller
 			if (has_permission('Project.Edit.All')) {
 				$projects = $this->project_model->select('projects.project_id, projects.name')
 												->where('projects.organization_id', $this->current_user->current_organization_id)
+												->where('projects.status !=', 'draft') // exclude draft
 												->order_by('projects.modified_on', 'desc')
 												->find_all();
 			} else {
@@ -2453,6 +2454,7 @@ class Meeting extends Authenticated_Controller
 												->join('users u', 'u.user_id = projects.owner_id')
 												->join('project_members pm', 'projects.project_id = pm.project_id')
 												->where('projects.status !=', 'archive')
+												->where('projects.status !=', 'draft') // exclude draft
 												->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
 												->where('organization_id', $this->current_user->current_organization_id)
 												->order_by('projects.modified_on', 'desc')
@@ -2866,6 +2868,7 @@ class Meeting extends Authenticated_Controller
 
 		$projects = $this->project_model->select('project_id, name')
 										->where('organization_id', $this->current_user->current_organization_id)
+										->where('status !=', 'draft')
 										->find_all();
 
 		Template::set('data', $data);
