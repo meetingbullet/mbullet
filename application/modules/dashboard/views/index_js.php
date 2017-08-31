@@ -146,7 +146,7 @@ $(document).on("click", "#rate-content .submit", function(e) {
 	data.rate = submit_btn.closest('.child').find('.data').find('input[type=radio]:checked').val();
 
 	if (typeof(data.rate) != 'undefined') {
-		data.meeting_id = submit_btn.closest('.child').find('.data').data('id');
+		data.meeting_id = submit_btn.closest('.child').find('.data').data('meeting-id');
 
 		if (submit_btn.closest('.child').hasClass('user')) {
 			data.user_id = submit_btn.closest('.child').find('.data').data('id');
