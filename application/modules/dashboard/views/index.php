@@ -466,7 +466,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						<th class="text-center">Rate</th>
 						<th class="text-center">Confirm</th>
 					</tr>
-					<?php $j = 1; foreach ($meeting->evaluates as $evaluate):?>
+					<?php $j = 1; foreach ($meeting->evaluates as $evaluate): if ($meeting->owner_id == $current_user->user_id && $evaluate->evaluate_mode == 'meeting') continue; ?>
 					<tr class='child <?php echo $evaluate->evaluate_mode; echo iif ( ! $evaluate->is_read, ' new') ?>' 
 					data-mode="<?php echo $evaluate->evaluate_mode ?>"
 					<?php
