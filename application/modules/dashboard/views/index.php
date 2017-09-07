@@ -42,6 +42,13 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		</h3>
 
 		<ul class="an-main-nav">
+			<?php if (has_permission('Project.Create')) : ?>
+			<li class="an-nav-item">
+				<a href="#" class="mb-open-modal" data-modal-id="create-project-modal" data-url="<?php echo site_url('project/create') ?>">
+					<i class="ion-ios-plus-outline"></i> <?php echo lang('db_create_project') ?>
+				</a>
+			</li>
+			<?php endif ?>
 			<li class="an-nav-item">
 				<a id="my-todo" class="js-show-child-nav nav-open" href="#">
 					<i class="ion-ios-copy-outline"></i>
@@ -50,8 +57,8 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 					<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
 					<?php endif; ?>
 
-					<?php if ($my_todo['homeworks_count'] + $evaluates_count > 0): ?>
-					<span class="count"><?php echo $my_todo['homeworks_count'] + $evaluates_count ?></span>
+					<?php if ($my_todo['homeworks_count'] + $evaluates_count + count($my_todo['today_meetings']) > 0): ?>
+					<span class="count"><?php echo $my_todo['homeworks_count'] + $evaluates_count + count($my_todo['today_meetings']) ?></span>
 					<?php endif; ?>
 					</span>
 				</a>
@@ -87,6 +94,19 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							<?php endif; ?>
 							<?php if ($evaluates_count > 0): ?>
 							<span class="badge badge-primary pull-right"><?php echo $evaluates_count ?></span>
+							<?php endif; ?>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="js-show-child-nav" 
+							data-toggle="popover" 
+							data-placement="right" 
+							title="<?php echo lang('db_today_meetings') ?>" 
+							id="today-meetings">
+							<i class="ion-chatbox-working"></i>
+							<?php echo lang('db_today_meetings') ?>
+							<?php if (count($my_todo['today_meetings']) > 0): ?>
+							<span class="badge badge-primary pull-right"><?php echo count($my_todo['today_meetings']) ?></span>
 							<?php endif; ?>
 						</a>
 					</li>
@@ -186,15 +206,15 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 
 		</ul> <!-- end .AN-MAIN-NAV -->
 
-		<?php if (has_permission('Project.Create')) : ?>
-		<ul class="an-main-nav bottom">
+		<?php //if (has_permission('Project.Create')) : ?>
+		<!--ul class="an-main-nav bottom">
 			<li class="an-nav-item">
 				<a href="#" class="mb-open-modal" data-modal-id="create-project-modal" data-url="<?php echo site_url('project/create') ?>">
 					<i class="ion-ios-plus-outline"></i> <?php echo lang('db_create_project') ?>
 				</a>
 			</li>
 		</ul> <!-- end .AN-MAIN-NAV.BOTTOM -->
-		<?php endif; ?>
+		<?php //endif; ?>
 	</div> <!-- /.an-sidebar-nav -->
 
 	<div class="an-page-content">
@@ -286,39 +306,8 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 		</header> <!-- end .AN-HEADER -->
 
 		<div class="an-content-body">
-			<!--div class="alert-wrapper">
-				<?php foreach ($meeting_invites as $invite): ?>
-				<div class="alert alert-info" role="alert">
-					<?php echo sprintf(
-									lang('db_x_invited_you_to_meeting_y'),
-									display_user(
-										$invite->email, 
-										$invite->first_name, 
-										$invite->last_name, 
-										$invite->avatar 
-										),
-									$invite->name
-								);
-					?>
-
-					<div class="pull-right meeting-invite-action"
-						data-meeting-id="<?php echo $invite->meeting_id ?>"
-						data-invite-code="<?php echo $invite->invite_code ?>"
-						>
-						<button class="an-btn an-btn-success an-btn-small" data-action="accept">
-							<?php echo lang('db_accept') ?>
-						</button> 
-						<button class="an-btn an-btn-danger-transparent an-btn-small" data-action="decline">
-							<?php echo lang('db_decline') ?>
-						</button>
-						<button class="an-btn an-btn-transparent an-btn-small" data-action="maybe">
-							<?php echo lang('db_perhaps') ?>
-						</button>
-					</div>
-				</div>
-				<?php endforeach; ?>
-			</div> <!-- .alert-wrapper -->
 			<div class="alert-wrapper">
+				<?php echo $this->mb_project->meeting_alert(); ?>
 				<?php echo $this->mb_project->meeting_invitations(); ?>
 			</div>
 			<div class="calendar-wrapper">
@@ -539,6 +528,41 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 			</table>
 		</div>
 	</div> <!-- #popover-rate -->
+
+	<div id="popover-today-meetings" style="display: none">
+		<div id="rate-content" class="mb-popover-content">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Key</th>
+						<th>ID</th>
+						<th>Meeting</th>
+						<th colspan="2" class="text-center">Scheduled start time</th>
+						<th colspan="2" class="text-center">Duration</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i = 0; foreach ($my_todo['today_meetings'] as $meeting) : $i++ ?>
+					<tr>
+						<td><?php echo $meeting->meeting_key ?></td>
+						<td><?php echo $i ?></td>
+						<td><?php echo $meeting->name ?></td>
+						<td><?php echo display_time($meeting->scheduled_start_time) ?></td>
+						<td><?php echo relative_time(strtotime($meeting->scheduled_start_time)) ?></td>
+						<td><?php echo $meeting->in ?></td>
+						<td><?php echo $meeting->in_type ?></td>
+						<td>
+						<?php if ($meeting->status == 'inprogress') : ?>
+							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key . '#join_meeting' ) ?>" target="_blank" class="an-btn an-btn-primary-transparent an-btn-small">Join</button>
+						<?php endif ?>
+						</td>
+					</tr>
+					<?php endforeach ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div> <!-- #template -->
 
 <script type="text/vit" id="popover-project">

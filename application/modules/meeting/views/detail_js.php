@@ -487,3 +487,21 @@ $(document).on('click', '#meeting-date-time-picker .modal-footer button', functi
 <?php if (! empty($evaluated)) : ?>
 $.mbNotify('<?php echo lang('st_meeting_already_evaluated') ?>', 'info');
 <?php endif ?>
+
+// get anchor value
+function getAnchor(url) {
+	if (!url) url = window.location.href;
+	var index = url.indexOf("#");
+
+	if (index == -1) {
+		return null;
+	}
+
+	var anchor = url.substring(url.indexOf("#") + 1);
+	return anchor;
+}
+
+var anchor = getAnchor();
+if (anchor == 'join_meeting') {
+	$('a.mb-open-modal.open-meeting-monitor').click();
+}

@@ -486,8 +486,7 @@ $(document).ready(function() {
 	// 	if ($element.css('height') != lastHeight)
 	// 	{
 	// 		console.log('body height changed');
-	// 		$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
-	// 		/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+	// 		$(window).trigger('mbChangeHeight');
 	// 		lastHeight = $element.css('height');
 	// 	}
 
@@ -495,13 +494,11 @@ $(document).ready(function() {
 	// }
 
 	$('.invitations .alert').on('closed.bs.alert', function() {console.log('closed');
-		$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
-		/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+		$(window).trigger('mbChangeHeight');
 	});
 
 	$('.an-sidebar-nav.js-sidebar-toggle-with-click *').on('hidden.bs.collapse, shown.bs.collapse', function() {console.log('toggled');
-		$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
-		/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+		$(window).trigger('mbChangeHeight');
 	});
 
 	/**
@@ -527,8 +524,7 @@ $(document).ready(function() {
 		} else {
 			timeout = false;
 			console.log('Done resizing');
-			$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
-			/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+			$(window).trigger('mbChangeHeight');
 		}
 	}
 
@@ -538,4 +534,16 @@ $(document).ready(function() {
 	//$('#calendar').on('click', 'a.fc-event.mbc-event', function(e) {
 	//	e.preventDefault();
 	//});
+
+	$(document).on('click', '.meeting-alert .alert .close', function() {
+		setTimeout(function() {
+			$(window).trigger('mbChangeHeight');
+		}, 1000);
+	});
+
+	$(window).on('mbChangeHeight', function () {
+		$('#calendar').fullCalendar('option', 'height', ($('.an-page-content').outerHeight() - $('.an-page-content .an-header').outerHeight() - 78 - $('.an-page-content .heading-wrapper .db-h1').outerHeight() - 30 - 2 - $('.an-page-content .an-footer').outerHeight() - $('.alert-wrapper').outerHeight()));
+		/* 2 = calendar table border, 30 = calendar-wrapper padding top + bottom, 78 = an-content-body paading top + bottom + alert-warpper */
+		console.log('height changed');
+	});
 });

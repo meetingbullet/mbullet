@@ -663,6 +663,8 @@ class Meeting extends Authenticated_Controller
 				'meeting_id' => $meeting->meeting_id
 			], true), 'inline');
 		}
+
+		Assets::add_js($this->load->view('get_meeting_alert_js', [], true), 'inline');
 		Template::set('invited_members', $invited_members);
 		Template::set('page_title', $meeting->name);
 		Template::set('current_user', $this->current_user);
@@ -3894,5 +3896,14 @@ class Meeting extends Authenticated_Controller
 		Template::set('meeting_agendas', $meeting_agendas);
 		Template::set('meeting_homeworks', $meeting_homeworks);
 		Template::render();
+	}
+
+	public function get_meeting_alert()
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		echo json_encode(['html' => $this->mb_project->meeting_alert(false)]);exit;
 	}
 }

@@ -83,3 +83,4 @@ $lang['db_accept'] = 'Accept';
 $lang['db_decline'] = 'Decline';
 $lang['db_invitation_accepted'] = 'Invitation accepted';
 $lang['db_perhaps'] = 'Perhaps';
+$lang['db_today_meetings'] = 'Upcoming Meetings';

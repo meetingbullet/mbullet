@@ -19,7 +19,7 @@
 			<?php echo mb_form_input('text', 'name', lang('pj_project_name'), true, set_value('name', empty($project->name) ? '' : $project->name)) ?>
 			<?php echo mb_form_input('text', 'cost_code', lang('pj_cost_code'), true, set_value('cost_code', empty($project->cost_code) ? '' : $project->cost_code), 'an-form-control auto-cost-code', '', lang('pj_ex_pjn')) ?>
 			<?php echo mb_form_input('text', 'deadline', lang('pj_project_deadline'), false, set_value('deadline', empty($project->deadline) ? '' : display_time($project->deadline, null, 'Y-m-d H:i:s')), 'an-form-control', '', '', '', 'id="project-deadline"') ?>
-			<?php echo mb_form_input('text', 'team_point', lang('pj_project_cost'), false, set_value('team_point', empty($project->team_point) ? '' : $project->team_point), 'an-form-control', '', lang('pj_project_team_hours')) ?>
+			<?php echo mb_form_input('number', 'team_point', lang('pj_project_cost'), false, set_value('team_point', empty($project->team_point) ? '' : $project->team_point), 'an-form-control', '', lang('pj_project_team_hours'), '', 'step="0.01" min="0"') ?>
 			<?php echo mb_form_input('text', 'invite_team', lang('pj_invite_team'), false, set_value('invite_team', empty($project->invite_team) ? '' : $project->invite_team), 'an-tags-input js-input-tags', '', lang('pj_member_email')) ?>
 
 			<div class="row">

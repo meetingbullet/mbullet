@@ -146,19 +146,19 @@ class Dashboard extends Authenticated_Controller
 		];
 
 		// Meeting invites
-		$meeting_invites = $this->meeting_member_invite_model
-			->select('m.name, m.meeting_key, m.meeting_id, invite_code,
-			u.first_name, u.last_name, u.email, u.avatar')
-			->join('meetings m', 'm.meeting_id = meeting_member_invites.meeting_id')
-			->join('actions a', 'm.action_id = a.action_id')
-			->join('projects p', 'p.project_id = a.project_id')
-			->join('users u', 'u.user_id = m.created_by')
-			->where('meeting_member_invites.status', 'NEEDS-ACTION')
-			->where('invite_email', $this->current_user->email)
-			->where('p.organization_id', $this->current_user->current_organization_id)
-			->find_all();
+		// $meeting_invites = $this->meeting_member_invite_model
+		// 	->select('m.name, m.meeting_key, m.meeting_id, invite_code,
+		// 	u.first_name, u.last_name, u.email, u.avatar')
+		// 	->join('meetings m', 'm.meeting_id = meeting_member_invites.meeting_id')
+		// 	->join('actions a', 'm.action_id = a.action_id')
+		// 	->join('projects p', 'p.project_id = a.project_id')
+		// 	->join('users u', 'u.user_id = m.created_by')
+		// 	->where('meeting_member_invites.status', 'NEEDS-ACTION')
+		// 	->where('invite_email', $this->current_user->email)
+		// 	->where('p.organization_id', $this->current_user->current_organization_id)
+		// 	->find_all();
 
-		$meeting_invites || $meeting_invites = [];
+		// $meeting_invites || $meeting_invites = [];
 
 		Assets::add_js($this->load->view('calendar_js', [
 			'event_sources' => $event_sources
@@ -170,8 +170,10 @@ class Dashboard extends Authenticated_Controller
 			'current_user' => $this->current_user
 		], true), 'inline');
 
+		Assets::add_js($this->load->view('meeting/get_meeting_alert_js', [], true), 'inline');
+
 		Template::set('my_projects', $my_projects);
-		Template::set('meeting_invites', $meeting_invites);
+		//Template::set('meeting_invites', $meeting_invites);
 		Template::set('other_projects', $other_projects);
 		Template::set('my_todo', $my_todo && count($my_todo) > 0 ? $my_todo : []);
 		Template::set('current_user', $this->current_user);
@@ -536,7 +538,7 @@ class Dashboard extends Authenticated_Controller
 		->join('users u', 'u.user_id = projects.owner_id')
 		->where('projects.status !=', 'archive')
 		->where('projects.status !=', 'draft') //exclude draft
-		->where_not_in('project_id', count($my_project_ids) > 0 ? $my_project_ids : -1)
+		->where_not_in('project_id', count($my_project_ids) > 0 ? $my_project_ids : [-1])
 		->where('organization_id', $this->current_user->current_organization_id)
 		->order_by('projects.name')
 		->find_all();
@@ -709,12 +711,29 @@ class Dashboard extends Authenticated_Controller
 			$decides = [];
 		}
 
+		$today = display_time(date('Y-m-d H:i:s'), null, 'Y-m-d');
+		$today_meetings = $this->meeting_model->select('meetings.*')
+		->join('actions a', 'a.action_id = meetings.action_id')
+		->join('projects p', 'p.project_id = a.project_id')
+		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = "' . $this->current_user->user_id . '"', 'LEFT')
+		->where('p.organization_id', $this->current_user->current_organization_id)
+		->where('(sm.user_id = "' . $this->current_user->user_id . '" OR meetings.owner_id = "' . $this->current_user->user_id . '")')
+		->where('meetings.scheduled_start_time BETWEEN "' . get_utc_time($today . ' 00:00:00') . '" AND "' . get_utc_time($today . ' 23:59:59') . '"')
+		->where('meetings.is_private IS NULL')
+		->order_by('meetings.scheduled_start_time', 'asc')
+		->group_by('meetings.meeting_id')
+		->find_all();
+		if (empty($today_meetings)) {
+			$today_meetings = [];
+		}
+
 		return [
 			'homeworks_count' => count($homeworks_query),
 			'homeworks' => $homeworks,
 			'evaluates' => $evaluates,
 			'decides' => $decides,
-			'meetings' => $meetings
+			'meetings' => $meetings,
+			'today_meetings' => $today_meetings
 		];
 	}
 
