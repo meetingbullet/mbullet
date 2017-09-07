@@ -106,6 +106,18 @@ $('#open-rate').click(function(e) {
 	$('[data-toggle="popover"]').not(this).popover('hide');
 })
 
+$('#today-meetings').click(function(e) {
+	e.preventDefault();
+	$(this).popover({
+		html: true, 
+		content: function() {
+			return $('#popover-today-meetings').html();
+		}
+	}).popover('show');
+
+	$('[data-toggle="popover"]').not(this).popover('hide');
+})
+
 $(document).on('click', '.btn-time + ul > li > a', function(e) {
 	e.preventDefault();
 	var time = parseFloat( $(this).parent().parent().data('minute') );

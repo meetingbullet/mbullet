@@ -205,7 +205,7 @@ class Project extends Authenticated_Controller
 				return false;
 			}
 
-			$check_cost_code = $this->project_model->where('organization_id', $this->current_user->current_organization_id)->find_by('cost_code', $project_data['cost_code']);
+			$check_cost_code = $this->project_model->where('organization_id', $this->current_user->current_organization_id)->where('status !=', 'draft')->find_by('cost_code', $project_data['cost_code']);
 
 			if ($check_cost_code !== false && ($type == 'insert' || ($type == 'update' && $check_cost_code->project_id != $project_id))) {
 				Template::set('message', lang('pj_duplicated_cost_code'));
