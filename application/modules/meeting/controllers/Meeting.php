@@ -2030,6 +2030,7 @@ class Meeting extends Authenticated_Controller
 									->find($meeting_id);
 
 		if ($data) {
+			$data->display_scheduled_start_time = empty($data->scheduled_start_time) ? null : display_time($data->scheduled_start_time);
 			$data->display_user = display_user($data->email, $data->first_name, $data->last_name, $data->avatar);
 			$data->lang_status = lang('st_' . $data->status);
 		}

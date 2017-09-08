@@ -640,6 +640,9 @@ $(document).on("click", '#create-project-modal .form-ajax [type="submit"]', func
 
 				if (data.message_type == 'success') {
 					if (that.attr('name') == 'save') {
+						var url_elements = location.href.split("#");
+						var url_without_anchor = url_elements[0];
+						location.href = url_without_anchor + '#project/' + data.data.cost_code;
 						location.reload();
 					}
 				}
@@ -649,4 +652,46 @@ $(document).on("click", '#create-project-modal .form-ajax [type="submit"]', func
 			$('#create-project-modal .form-ajax button').prop('disabled', false);
 		}
 	});
+});
+
+// add project member
+$(document).on('click', '#add-project-member-modal [type="submit"]', function(e) {
+	e.preventDefault();
+	var that = $(this);
+	var form = that.closest('.form-ajax');
+	var this_modal = that.closest('#add-project-member-modal');
+
+	$.post(form.attr('action'), form.serialize(), (data) => {
+		data = JSON.parse(data);console.log(data);
+		
+		$.mbNotify(data.message, data.message_type);
+
+		if (data.close_modal == 1) {
+			this_modal.modal('hide');
+		}
+
+		if (data.message_type == 'success' && data.data) {console.log(data.data);
+			$( $('#projectTeamSingle').render(data.data, {
+				round: function(a, b) {
+					if (typeof a !== "number") {
+						return 0;
+					}
+
+					return Math.round(a * b) / b
+				},
+				parseFloat,
+				countingStars: function(n, icon = "ion-ios-star") {
+					str = "";
+
+					for (var i=0; i<n; i++) {
+						str+= `<i class="${icon}"></i>\n`;
+					}
+
+					return str;
+				}
+			}) )
+			.appendTo('.project-body.order-3 #team-body')
+			.effect('highlight', 500);
+		}
+	})
 });

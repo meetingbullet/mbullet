@@ -535,7 +535,7 @@ $(document).ready(function() {
 	//	e.preventDefault();
 	//});
 
-	$(document).on('click', '.meeting-alert .alert .close', function() {
+	$(document).on('click', '.meeting-alert .alert .close, .an-sidebar-nav .js-show-child-nav', function() {
 		setTimeout(function() {
 			$(window).trigger('mbChangeHeight');
 		}, 1000);

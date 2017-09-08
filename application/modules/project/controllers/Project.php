@@ -289,26 +289,30 @@ class Project extends Authenticated_Controller
 
 				$this->project_member_model->insert_batch($project_members);
 
-				foreach ($invited_team as $email) {
-					if (! $registered_users) {
-						$message = $this->invitation->send_invitation('project', $project_id, $email, $new_invite_emails);
-						continue;
-					}
+				// foreach ($invited_team as $email) {
+				// 	if (! $registered_users) {
+				// 		$message = $this->invitation->send_invitation('project', $project_id, $email, $new_invite_emails);
+				// 		continue;
+				// 	}
 
-					$is_found = false;
-					foreach ($registered_users as $user) {
+				// 	$is_found = false;
+				// 	foreach ($registered_users as $user) {
 
-						if ($user->email == $email) {
-							$is_found = true;
-							break;
-						}
+				// 		if ($user->email == $email) {
+				// 			$is_found = true;
+				// 			break;
+				// 		}
 
-					}
+				// 	}
 
-					// Invite to the party
-					if ( ! $is_found) {
-						$message = $this->invitation->send_invitation('project', $project_id, $email, $new_invite_emails);
-					}
+				// 	// Invite to the party
+				// 	if ( ! $is_found) {
+				// 		$message = $this->invitation->send_invitation('project', $project_id, $email, $new_invite_emails);
+				// 	}
+				// }
+
+				foreach ($new_invite_emails as $email) {
+					$message = $this->invitation->send_invitation('project', $project_id, $email);
 				}
 			}
 
@@ -1073,5 +1077,115 @@ class Project extends Authenticated_Controller
 		}
 
 		return $project;
+	}
+
+	public function add_project_member($project_id = null) {
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		if (empty($project_id)) {
+			Template::set('close_modal', 1);
+			Template::set('message', lang('pj_missing_data'));
+			Template::set('message_type', 'danger');
+			Template::render();return;
+		}
+
+		if (! $this->mb_project->has_permission('project', $project_id, 'Project.Edit.All')) {
+			Template::set('close_modal', 1);
+			Template::set('message', lang('pj_not_have_permission'));
+			Template::set('message_type', 'danger');
+			Template::render();return;
+		}
+
+		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
+
+		if ($this->input->post()) {
+			$email = trim($this->input->post('email'));
+			if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+				Template::set('close_modal', 1);
+				Template::set('message', lang('pj_email_problem'));
+				Template::set('message_type', 'danger');
+				Template::render();return;
+			}
+
+			$registered_user = $this->user_model->select('users.*')
+												->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $this->current_user->current_organization_id, 'RIGHT')
+												->find_by('email', $email);
+
+			if ($registered_user) {
+				$is_project_member = $this->project_member_model->where('project_id', $project_id)->where('user_id', $registered_user->user_id)->count_all() > 0;
+				if ($is_project_member) {
+					Template::set('close_modal', 0);
+					Template::set('message', lang('pj_already_project_member'));
+					Template::set('message_type', 'danger');
+					Template::render();return;
+				}
+
+				$added = $this->project_member_model->insert([
+					'user_id' => $registered_user->user_id,
+					'project_id' => $project_id
+				]);
+
+				if ($added !== false) {
+					// Team
+					$member_data = [
+						'user_id' => $registered_user->user_id,
+						'email' => $registered_user->email,
+						'full_name' => $registered_user->first_name . ' ' . $registered_user->last_name,
+						'total_stars' => 0,
+						'rated_stars' => 0,
+						'avg_stars' => 0,
+						'pts' => 0,
+						'avatar_url' => avatar_url($registered_user->avatar, $registered_user->email),
+					];
+
+					$joined_meetings = $this->meeting_model
+											->select('meetings.meeting_id')
+											->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id AND mm.user_id = ' . $registered_user->user_id)
+											->join('actions a', 'a.action_id = meetings.meeting_id')
+											->where('a.project_id', $project_id)
+											->as_array()
+											->find_all();
+
+					$joined_meetings || $joined_meetings = [];
+					$member_data['total_stars'] = count($joined_meetings) * 5;
+
+					if (count($joined_meetings) > 0) {
+						$rated_stars = $this->meeting_member_rate_model->select_sum('rate')
+																	->where_in('meeting_id', array_column($joined_meetings, 'meeting_id'))
+																	->find_by('attendee_id', $registered_user->user_id);
+
+						if ($rated_stars && is_numeric($rated_stars->rate)) {
+							$member_data['rated_stars'] = $rated_stars->rate;
+						}
+					}
+
+					$member_data['pts'] = $this->mb_project->total_user_point_used($registered_user->user_id, 'project', $project_id);
+
+					Template::set('close_modal', 1);
+					Template::set('message', lang('pj_add_project_member_success'));
+					Template::set('message_type', 'success');
+					Template::set('data', $member_data);
+					Template::render();return;
+				}
+			} else {
+				$message = $this->invitation->send_invitation('project', $project_id, $email);
+
+				if ($message == 1) {
+					Template::set('close_modal', 1);
+					Template::set('message', lang('pj_invite_member_success'));
+					Template::set('message_type', 'success');
+					Template::render();return;
+				}
+			}
+
+			Template::set('close_modal', 1);
+			Template::set('message', lang('pj_something_went_wrong'));
+			Template::set('message_type', 'danger');
+			Template::render();return;
+		}
+
+		Template::render();
 	}
 }
