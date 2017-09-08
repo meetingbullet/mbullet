@@ -65,10 +65,16 @@ $(document).ready(function() {
 							location.reload();
 						}
 
-						if ($(e.target).attr('id') == 'create-meeting') {
-							$( $('#unscheduledSingle').render(data.data) )
-							.appendTo('#unscheduled-meeting-body .an-lists-body')
-							.effect('highlight', 500);
+						if ($(e.target).attr('id') == 'create-meeting') {console.log(data.data);
+							if (data.data.display_scheduled_start_time) {
+								$( $('#scheduledSingle').render(data.data) )
+								.appendTo('#scheduled-meeting-body .an-lists-body')
+								.effect('highlight', 500);
+							} else {
+								$( $('#unscheduledSingle').render(data.data) )
+								.appendTo('#unscheduled-meeting-body .an-lists-body')
+								.effect('highlight', 500);
+							}
 						}
 					}
 				}

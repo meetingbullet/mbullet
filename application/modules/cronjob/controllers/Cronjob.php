@@ -23,7 +23,7 @@ class Cronjob extends MX_Controller {
 	public function sent_meeting_reminder_mails()
 	{
 		$this->load->model('meeting/meeting_model');
-		$members = $this->meeting_model->select('meetings.meeting_id, meetings.name as meeting_name, meetings.meeting_key, att.first_name AS att_first_name, att.last_name AS att_last_name, att.email AS att_email, owner.first_name AS owner_first_name, owner.last_name AS owner_last_name, owner.email AS owner_email,
+		$members = $this->meeting_model->select('meetings.meeting_id, meetings.name as meeting_name, meetings.meeting_key, att.user_id AS att_user_id, att.first_name AS att_first_name, att.last_name AS att_last_name, att.email AS att_email, owner.first_name AS owner_first_name, owner.last_name AS owner_last_name, owner.email AS owner_email,
 									IF((SELECT COUNT(*) FROM ' . $this->db->dbprefix('meeting_members') . ' mmb WHERE mmb.meeting_id = ' . $this->db->dbprefix('meetings') . '.meeting_id AND ' . $this->db->dbprefix('meetings') . '.owner_id != mmb.user_id AND mmb.upcoming_reminded = 1) > 0, 1, 0) AS is_owner_got_alert')
 									->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id')
 									->join('users att', 'att.user_id = mm.user_id')
@@ -44,7 +44,9 @@ class Cronjob extends MX_Controller {
 				$this->load->library('parser');
 				$current_meeting_id = 0;
 				$is_first_meeting_member = false;
+				$email_sent = [];
 
+				$this->load->model('meeting/meeting_member_model');
 				foreach ($members as $member) {
 					if ($member->meeting_id != $current_meeting_id) {
 						$is_first_meeting_member = true;
@@ -71,7 +73,7 @@ class Cronjob extends MX_Controller {
 						'message' => $content
 					]);
 
-					if ($is_first_meeting_member) {
+					if ($is_first_meeting_member && ! $member->is_owner_got_alert) {
 						$email_data['USER_NAME'] = $member->owner_first_name . ' ' . $member->owner_last_name;
 
 						$content = $header;
@@ -85,6 +87,17 @@ class Cronjob extends MX_Controller {
 						]);
 
 						$is_first_meeting_member = false;
+					}
+
+					$email_sent[$member->meeting_id][] = [
+						'user_id' => $member->att_user_id,
+						'upcoming_reminded' => 1
+					];
+				}
+
+				if (! empty($email_sent)) {
+					foreach ($email_sent as $meeting_id => $data) {
+						$this->meeting_member_model->where('meeting_id', $meeting_id)->update_batch($data, 'user_id');
 					}
 				}
 			}

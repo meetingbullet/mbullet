@@ -967,6 +967,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						<a href="#team-body" role="button" data-toggle="collapse">
 							<?php echo lang('db_team') ?>
 						</a>
+						<button class="an-btn an-btn-icon small primary btn-add-project-member pull-right mb-open-modal" data-modal-id="add-project-member-modal" data-url="<?php echo site_url('project/add_project_member/') ?>{{:project_id}}"><i class="ion-android-person-add"></i></button>
 					</h4>
 				</div>
 				<div id="team-body" class="panel-collapse collapse in" role="tabpanel">
@@ -1137,6 +1138,51 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 			<span class="msg-tag label label-bordered label-{{:status}}">{{:lang_status}}</span>
 		</div>
 	</div> <!-- end .USER-LIST-SINGLE -->
+</script>
+
+<script id="scheduledSingle" type="text/bao">
+	<div class="list-user-single">
+		<div class="list-date number basis-30">
+			<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:meeting_key}}</a>
+		</div>
+		<div class="list-name basis-50">
+			<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:name}}</a>
+		</div>
+		<div class="list-date number basis-30">
+			{{:display_scheduled_start_time}}
+		</div>
+		<div class="list-action basis-20">
+			<span class="msg-tag label label-bordered label-{{:status}}">{{:lang_status}}</span>
+		</div>
+	</div> <!-- end .USER-LIST-SINGLE -->
+</script>
+
+<script id="projectTeamSingle" type="text/bao">
+	<div class="member">
+		<div class="row">
+			<div class="col-md-11">
+				<span class="avatar" style="background-image: url('{{:avatar_url}}')"></span>
+				<span class="info">
+					<a href="#"><b>{{:full_name}}</b></a><br>
+					<span class="text-info">
+					<?php echo lang('db_project_pts') ?> {{:pts.toFixed(1)}} &nbsp;
+					<i class="ion-ios-star"></i> {{:rated_stars}}/{{:total_stars}} &nbsp;
+					<?php echo lang('db_avg') ?> 
+						{{:~countingStars( (rated_stars / total_stars * 5).toFixed(0) )}}
+						{{:~countingStars( total_stars > 0 ? 5 - (rated_stars / total_stars * 5).toFixed(0) : 5, "ion-ios-star-outline")}}
+						{{: total_stars > 0 ? (rated_stars / total_stars * 5).toFixed(0) : ''}}
+					</span>
+				</span>
+			</div>
+			<div class="col-md-1" style="padding: 10px;">
+				<button class="an-btn an-btn-icon small muted danger btn-remove-member" 
+					data-user-id="{{:user_id}}"
+					data-full-name="{{:full_name}}">
+					<i class="icon-trash"></i>
+				</button>
+			</div>
+		</div>
+	</div> <!-- .member -->
 </script>
 
 <div class="hidden">

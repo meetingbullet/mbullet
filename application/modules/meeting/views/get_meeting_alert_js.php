@@ -38,5 +38,5 @@ $(document).ready(function() {
 				console.log('no meeting alert...');
 			}
 		});
-	}, 3000)
+	}, 300000)
 });
