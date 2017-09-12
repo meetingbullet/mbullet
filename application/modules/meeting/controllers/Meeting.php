@@ -155,6 +155,9 @@ class Meeting extends Authenticated_Controller
 							if ($id = $this->meeting_model->insert($data)) {
 								$this->mb_project->add_experience_point(10);
 								$this->mb_project->update_parent_objects('meeting', $id);
+								if (! empty($data['scheduled_start_time'])) {
+									$this->mb_project->notify_meeting_start_time($id);
+								}
 								$user_ids = [$data['owner_id']];
 								$this->load->library('invite/invitation');
 								foreach ($members as $member) {
@@ -223,6 +226,7 @@ class Meeting extends Authenticated_Controller
 								if ($id = $this->meeting_model->insert($data)) {
 									$this->mb_project->add_experience_point(10);
 									$this->mb_project->update_parent_objects('meeting', $id);
+									$this->mb_project->notify_meeting_start_time($id);
 									$user_ids = [$data['owner_id']];
 									foreach ($members as $member) {
 										do {
@@ -403,6 +407,9 @@ class Meeting extends Authenticated_Controller
 						if (! in_array($owner_email, $team)) {
 							if ($this->meeting_model->update($meeting->meeting_id, $data)) {
 								// $this->meeting_member_model->delete_where(['meeting_id' => $meeting->meeting_id]);
+								if (! empty($data['scheduled_start_time'])) {
+									$this->mb_project->notify_meeting_start_time($meeting->meeting_id);
+								}
 								$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
 								$meeting_members = $this->meeting_member_model->join('users', 'users.user_id = meeting_members.user_id')->where('meeting_id', $meeting->meeting_id)->as_array()->find_all();
 								$member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'email');
@@ -1322,6 +1329,7 @@ class Meeting extends Authenticated_Controller
 
 		if ($query) {
 			$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
+			$this->mb_project->notify_meeting_start_time($meeting->meeting_id);
 			if ( is_array($this->input->post('time_assigned')) ) {
 				$agenda_data = [];
 				foreach ($this->input->post('time_assigned') as $agenda_id => $time_assigned) {
