@@ -1255,6 +1255,7 @@ class Mb_project
 	/**
 	 * show alert for a closest upcoming or inprogress meeting
 	 *
+	 * @param boolean $display - display the html or not (css)
 	 * @return string html of alerts
 	 */
 	public function meeting_alert($display = true)
@@ -1279,6 +1280,90 @@ class Mb_project
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Sent reminder emails about meeting scheduled start time
+	 *
+	 * @param int $meeting_id - id of the meeting
+	 * @return void
+	 */
+	public function notify_meeting_start_time($meeting_id)
+	{
+		$this->ci->load->model('meeting/meeting_model');
+		$members = $this->ci->meeting_model->select('meetings.meeting_id, meetings.name as meeting_name, meetings.meeting_key, meetings.scheduled_start_time, att.user_id AS att_user_id, att.first_name AS att_first_name, att.last_name AS att_last_name, att.email AS att_email, owner.first_name AS owner_first_name, owner.last_name AS owner_last_name, owner.email AS owner_email')
+									->join('meeting_members mm', 'mm.meeting_id = meetings.meeting_id')
+									->join('users att', 'att.user_id = mm.user_id')
+									->join('users owner', 'owner.user_id = meetings.owner_id')
+									->where('(meetings.is_private != "1" OR meetings.is_private IS NULL)')
+									->where('mm.user_id != meetings.owner_id')
+									->where('meetings.meeting_id', $meeting_id)
+									->order_by('meetings.meeting_id')
+									->find_all();
+
+		if (! empty($members)) {
+			$template = $this->ci->db->where('email_template_key', 'MEETING_ALERT')
+								->where('language_code', 'en_US')
+								->get('email_templates')->row();
+			if ($template) {
+				$this->ci->load->library('emailer/emailer');
+				$this->ci->load->library('parser');
+				$this->ci->load->helper('mb_general');
+				$this->ci->load->helper('date');
+				$current_meeting_id = 0;
+				$is_first_meeting_member = false;
+				$queue_data = [];
+
+				$this->ci->load->model('meeting/meeting_member_model');
+				foreach ($members as $member) {
+					if ($member->meeting_id != $current_meeting_id) {
+						$is_first_meeting_member = true;
+						$current_meeting_id = $member->meeting_id;
+					}
+
+					$email_data = [
+						'USER_NAME' => $member->att_first_name . ' ' . $member->att_last_name,
+						'MEETING_NAME' => $member->meeting_name,
+						'URL' => site_url('meeting/' . $member->meeting_key),
+						'LABEL' => site_url('meeting/' . $member->meeting_key),
+						'SCHEDULED_START_TIME' => display_time($member->scheduled_start_time) . ' (' . relative_time(strtotime($member->scheduled_start_time)) . ')'
+					];
+
+					$header = $this->ci->load->view('emailer/email/_header', null, true);
+					$footer = $this->ci->load->view('emailer/email/_footer', null, true);
+
+					$content = $header;
+					$content .= $this->ci->parser->parse_string($template->email_template_content, $email_data, true);
+					$content .= $footer;
+
+					$queue_data[] = [
+						'to_email' => $member->att_email,
+						'subject' => $template->email_title,
+						'message' => $content
+					];
+
+					if ($is_first_meeting_member) {
+						$email_data['USER_NAME'] = $member->owner_first_name . ' ' . $member->owner_last_name;
+
+						$content = $header;
+						$content .= $this->ci->parser->parse_string($template->email_template_content, $email_data, true);
+						$content .= $footer;
+	
+						$queue_data[] = [
+							'to_email' => $member->owner_email,
+							'subject' => $template->email_title,
+							'message' => $content
+						];
+
+						$is_first_meeting_member = false;
+					}
+				}
+
+				if (! empty($queue_data)) {
+					$this->ci->db->insert_batch('email_queue', $queue_data);
+				}
+			}
+		}
 	}
 }
 /**
