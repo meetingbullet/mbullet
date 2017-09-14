@@ -2666,11 +2666,13 @@ class Meeting extends Authenticated_Controller
 			require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
 			$client_id = $this->config->item('client_id');
 			$client_secret = $this->config->item('client_secret');
+			$api_key = $this->config->item('api_key');
 
 			$client = new Google_Client();
 			$client->setAccessType("offline");
 			$client->setClientId($client_id);
 			$client->setClientSecret($client_secret);
+			$client->setDeveloperKey($api_key);
 			$client->refreshToken($this->current_user->google_refresh_token);
 			$token = $client->getAccessToken();
 

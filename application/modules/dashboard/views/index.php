@@ -811,7 +811,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						<div class="an-lists-body">
 						{{if completed_meetings}}
 							{{for completed_meetings}}
-								<div class="list-user-single">
+								<div class="list-user-single" data-meeting-id="{{:meeting_id}}">
 									<div class="list-date number basis-30">
 										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:meeting_key}}</a>
 									</div>

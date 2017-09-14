@@ -22,6 +22,7 @@ if (empty($meeting->is_private)) {
 	}
 }
 
+$hw_status = ['open', 'done', 'undone'];
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
 	<div class="an-page-title">
@@ -170,7 +171,7 @@ if (empty($meeting->is_private)) {
 				</div>
 			<div id="homework-list" class="an-component-body">
 				<div class="an-helper-block">
-					<div class="an-scrollable-x">
+					<div class="">
 						<table class="table table-striped table-detail-homework">
 							<thead>
 								<tr>
@@ -184,7 +185,7 @@ if (empty($meeting->is_private)) {
 								</tr>
 							</thead>
 							<tbody>
-								<?php if($homeworks): foreach ($homeworks as $homework) : ?>
+								<?php if($homeworks): foreach ($homeworks as $homework) : $can_edit = $current_user->user_id == $homework->created_by || in_array($current_user->user_id, array_column($homework->members, 'user_id'));?>
 								<tr data-homework-id="<?php e($homework->homework_id) ?>" class="<?php if ($meeting->status == 'open' || $meeting->status == 'ready') echo 'editable' ?>">
 									<td class='basis-15'><?php e($homework->name) ?></td>
 									<td class='basis-20'><?php echo word_limiter($homework->description, 20)?></td>
@@ -214,7 +215,26 @@ if (empty($meeting->is_private)) {
 										<?php endif; ?>
 									</td>
 									<td class='basis-10 homework-status text-center'>
-										<span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></span>
+										<!--span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></span-->
+										<!-- Update homework status button -->
+										<div class="btn-group">
+											<button type="button" class="btn btn-status label-<?php echo $homework->status ?>"><?php e(lang('hw_' . $homework->status)) ?></button>
+											<?php if ($can_edit) : ?>
+											<button type="button" class="btn dropdown-toggle label-<?php echo $homework->status ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu">
+											<?php $temp = $hw_status; for ($i = 0; $i < count($temp); $i++) : ?>
+												<?php if ($temp[$i] == $homework->status) : ?>
+												<li><a href="#" class="btn-update-homework-status hidden" data-pk="<?php echo $homework->homework_id ?>" data-value="<?php echo $temp[$i] ?>"><?php e(lang('hw_' . $temp[$i])) ?></a></li>
+												<?php elseif ($i <= count($hw_status)) : $temp[] = $temp[$i]; ?>
+												<?php else : ?>
+												<li><a href="#" class="btn-update-homework-status" data-pk="<?php echo $homework->homework_id ?>" data-value="<?php echo $temp[$i] ?>"><?php e(lang('hw_' . $temp[$i])) ?></a></li>
+												<?php endif ?>
+											<?php endfor ?>
+											<?php endif ?>
+											</ul>
+										</div>
 									</td>
 									<td class='basis-10 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 								</tr>
@@ -488,7 +508,18 @@ if (empty($meeting->is_private)) {
 			{{/if}}
 		</td>
 		<td class='basis-10 homework-status text-center'>
-			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
+		<!-- Update homework status button -->
+			<div class="btn-group">
+				<button type="button" class="btn btn-status label-open"><?php e(lang('hw_open')) ?></button>
+				<button type="button" class="btn dropdown-toggle label-open" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#" class="btn-update-homework-status hidden" data-pk="{{:homework_id}}" data-value="open"><?php e(lang('hw_open')) ?></a></li>
+					<li><a href="#" class="btn-update-homework-status " data-pk="{{:homework_id}}" data-value="done"><?php e(lang('hw_done')) ?></a></li>
+					<li><a href="#" class="btn-update-homework-status " data-pk="{{:homework_id}}" data-value="undone"><?php e(lang('hw_undone')) ?></a></li>
+				</ul>
+			</div>
 		</td>
 		<td class='basis-10 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 	</tr>
@@ -584,7 +615,19 @@ if (empty($meeting->is_private)) {
 			{{/if}}
 		</td>
 		<td class='basis-10 homework-status text-center'>
-			<span class="label label-bordered label-{{:status}}">{{:lang_status}}</span>
+			<!--span class="label label-bordered label-{{:status}}">{{:lang_status}}</span-->
+			<!-- Update homework status button -->
+			<div class="btn-group">
+				<button type="button" class="btn btn-status label-open"><?php e(lang('hw_open')) ?></button>
+				<button type="button" class="btn dropdown-toggle label-open" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="#" class="btn-update-homework-status hidden" data-pk="{{:homework_id}}" data-value="open"><?php e(lang('hw_open')) ?></a></li>
+					<li><a href="#" class="btn-update-homework-status " data-pk="{{:homework_id}}" data-value="done"><?php e(lang('hw_done')) ?></a></li>
+					<li><a href="#" class="btn-update-homework-status " data-pk="{{:homework_id}}" data-value="undone"><?php e(lang('hw_undone')) ?></a></li>
+				</ul>
+			</div>
 		</td>
 		<td class='basis-10 text-right'><?php if ($meeting->status == 'open') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 	</tr>
