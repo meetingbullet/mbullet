@@ -1267,9 +1267,11 @@ class Mb_project
 							->join('projects p', 'a.project_id = p.project_id')
 							->where('((' . $this->ci->db->dbprefix('meetings') . '.scheduled_start_time BETWEEN "' . date('Y-m-d H:i:s', strtotime('now')) . '" AND "' . date('Y-m-d H:i:s', strtotime('+ 15 minutes')) . '") OR (' . $this->ci->db->dbprefix('meetings') . '.status = "inprogress"))')
 							->order_by('meetings.scheduled_start_time', 'asc')
-							->find_by('p.organization_id', $this->current_user->current_organization_id);
+							->where('p.organization_id', $this->current_user->current_organization_id)
+							->find_all(); // use find all to prevent sql error
 		$html = "";
 		if (! empty($meeting)) {
+			$meeting = $meeting[0];
 			$html .= "
 			<div class='meeting-alert'>
 				<div class='alert alert-warning alert-dismissible fade in' " . ($display ? '' : 'style="display: none;"') . " role='alert' data-meeting-id='" . $meeting->meeting_id . "' data-alert-type='" . ($meeting->status == 'inprogress' ? 'inprogress' : 'upcoming') . "'>
