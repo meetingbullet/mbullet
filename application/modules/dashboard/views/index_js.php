@@ -695,3 +695,19 @@ $(document).on('click', '#add-project-member-modal [type="submit"]', function(e)
 		}
 	})
 });
+
+// show meeting summary for completed meeting in sidebar
+$(document).on('click', '.popover .panel-completed-meeting .an-lists-body .list-user-single a', function(e) {
+	e.preventDefault();
+	var that = $(this);
+	var meeting_id = that.closest('.list-user-single').data('meeting-id');
+	$.get('<?php echo site_url('meeting/check_done_meeting/') ?>' + meeting_id)
+	.done(function(data) {
+		data = JSON.parse(data);console.log(data);
+		if (data.done == 1) {
+			$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/done_meeting_summary/') ?>' + meeting_id);
+		} else {
+			//window.location.href = $(that).attr('href');
+		}
+	});
+});

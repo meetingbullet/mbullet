@@ -675,9 +675,15 @@ function update_monitor()
 
 function shall_enable_finish_button()
 {
-	if ($('.meeting-monitor .table-agenda .label-open, \
+	// no need to finish hw before moving to next step anymore
+	/*if ($('.meeting-monitor .table-agenda .label-open, \
 			.meeting-monitor .table-agenda .label-inprogress, \
 			.table-monitor-homework .btn-status[data-status="open"]').length == 0) {
+		$('.btn-finish').prop('disabled', false);
+	}*/
+
+	if ($('.meeting-monitor .table-agenda .label-open, \
+			.meeting-monitor .table-agenda .label-inprogress').length == 0) {
 		$('.btn-finish').prop('disabled', false);
 	}
 }

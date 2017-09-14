@@ -505,3 +505,38 @@ var anchor = getAnchor();
 if (anchor == 'join_meeting') {
 	$('a.mb-open-modal.open-meeting-monitor').click();
 }
+
+$(document).on('click', '#homework-list tr .homework-status', function(e) {
+	e.stopPropagation();
+})
+
+$(document).on('click', '#homework-list tr .homework-status .btn-update-homework-status', (e) => {
+	$.post("<?php echo site_url('homework/ajax_edit') ?>", {
+		pk: $(e.target).data('pk'),
+		name: 'status',
+		value: $(e.target).data('value'),
+	}, (data) => {
+		data = JSON.parse(data);
+
+		$.mbNotify(data.message, data.message_type);
+
+		if (data.message_type == 'success') {
+			var btn_status = $(e.target).parents('.btn-group').children('.btn-status');
+			var btn_status_caret = $(e.target).parents('.btn-group').children('.btn.dropdown-toggle');
+
+			$(btn_status).text( $(e.target).text() );
+			$(btn_status).prop('class', 'btn btn-status label-' + $(e.target).data('value'));
+			$(btn_status).data('status', $(e.target).data('value'));
+			$(btn_status).attr('data-status', $(e.target).data('value'));
+			$(btn_status_caret).prop('class', 'btn dropdown-toggle label-' + $(e.target).data('value'));
+
+			$(e.target).parents('ul').find('.btn-update-homework-status').removeClass('hidden');
+			$(e.target).addClass('hidden');
+		}
+	}).fail((data) => {
+		data = JSON.parse(data.responseText);
+
+		$.mbNotify(data.message, data.message_type);
+		console.log(data);
+	});
+});
