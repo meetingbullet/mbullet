@@ -237,3 +237,5 @@ $lang['st_attendee'] = 'Attendee';
 $lang['st_no_homeworks'] = 'There are no homeworks at the moment.';
 $lang['st_no_attendees'] = 'There are no attendees at the moment.';
 $lang['st_no_agendas'] = 'There are no agendas at the moment.';
+$lang['st_meeting_inprogress'] = 'A meeting is in progress';
+$lang['st_meeting_will_start'] = 'A upcoming meeting will start in a moment (%s)';

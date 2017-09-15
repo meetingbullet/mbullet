@@ -1271,12 +1271,13 @@ class Mb_project
 							->find_all(); // use find all to prevent sql error
 		$html = "";
 		if (! empty($meeting)) {
+			$this->ci->lang->load('meeting');
 			$meeting = $meeting[0];
 			$html .= "
 			<div class='meeting-alert'>
 				<div class='alert alert-warning alert-dismissible fade in' " . ($display ? '' : 'style="display: none;"') . " role='alert' data-meeting-id='" . $meeting->meeting_id . "' data-alert-type='" . ($meeting->status == 'inprogress' ? 'inprogress' : 'upcoming') . "'>
 					<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>×</span></button>
-					<h4>" . ($meeting->status == 'inprogress' ? 'A meeting is in progress' : ('A upcoming meeting will start in a moment (' . relative_time(strtotime($meeting->scheduled_start_time)) . ')')) . " <a target='_blank' href='" . site_url('meeting/' . $meeting->meeting_key) . "'>({$meeting->meeting_key} - {$meeting->name}).</a></h4>
+					<h4>" . ($meeting->status == 'inprogress' ? lang('st_meeting_inprogress') : sprintf(lang('st_meeting_will_start'), relative_time(strtotime($meeting->scheduled_start_time)))) . " <a target='_blank' href='" . site_url('meeting/' . $meeting->meeting_key) . "'>({$meeting->meeting_key} - {$meeting->name}).</a></h4>
 				</div>
 			</div>";
 		}
