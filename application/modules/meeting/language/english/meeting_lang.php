@@ -243,3 +243,4 @@ $lang['st_meeting_invite'] = 'You got an invitation to join a meeting';
 $lang['st_accept'] = 'Accept';
 $lang['st_maybe'] = 'Maybe';
 $lang['st_decline'] = 'Decline';
+$lang['st_decision'] = 'Your decision';
