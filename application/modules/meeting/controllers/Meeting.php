@@ -3766,6 +3766,7 @@ class Meeting extends Authenticated_Controller
 				'NAME' => $meeting['name'],
 				'ORG' => $meeting['org_name'],
 				'KEY' => $meeting['meeting_key'],
+				'NOTES' => nl2br($meeting['notes']),
 				'OWNER' => display_user($meeting['owner_email'], $meeting['owner_first_name'], $meeting['owner_last_name'], $meeting['owner_avatar']),
 				'MEETING_RATE' => round($meeting['average_rate'], 2)
 			];
@@ -3823,27 +3824,35 @@ class Meeting extends Authenticated_Controller
 		$this->db->insert_batch('email_queue', $queue_data);
 	}
 
-	public function check_done_meeting($meeting_id)
+	public function check_meeting_progress($meeting_id)
 	{
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
 
-		$done = $this->meeting_model
+		$meeting = $this->meeting_model->select('meetings.status, meetings.manage_state')
 									->join('users u', 'u.user_id = meetings.owner_id')
 									->join('actions a', 'a.action_id = meetings.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
 									->join('organizations o', 'o.organization_id = p.organization_id')
-									->where('meetings.manage_state', 'done')
-									->where('meetings.meeting_id', $meeting_id)
 									->as_array()
-									->count_all() > 0;
+									->find_by('meetings.meeting_id', $meeting_id);
+		if (empty($meeting)) {
+			echo json_encode([
+				'error' => 1,
+				'progress' => []
+			]); exit;
+		}
 		echo json_encode([
-			'done' => (int) $done
+			'error' => 0,
+			'progress' => [
+				'status' => $meeting['status'],
+				'manage_state' => $meeting['manage_state']
+			]
 		]); exit;
 	}
 
-	public function done_meeting_summary($meeting_id)
+	public function completed_meeting_summary($meeting_id)
 	{
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
@@ -3856,13 +3865,13 @@ class Meeting extends Authenticated_Controller
 									->join('actions a', 'a.action_id = meetings.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
 									->join('organizations o', 'o.organization_id = p.organization_id')
-									->where('meetings.manage_state', 'done')
+									->where('meetings.status', 'finished')
 									->as_array()
 									->find($meeting_id);
 		if (empty($meeting)) {
 			Template::set('content', '');
 			Template::set('data', ['status' => 0]);
-			Template::set('message', lang('st_meeting_not_exist_or_not_done'));
+			Template::set('message', lang('st_meeting_not_exist_or_not_finished'));
 			Template::set('message_type', 'danger');
 			Template::render();
 			return;

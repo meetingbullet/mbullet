@@ -64,6 +64,10 @@
 						<?php endfor ?>
 						</div>
 					</div>
+					<div class="row">
+						<div class="col-md-4"><label><?php echo lang('st_notes_summary') ?></label></div>
+						<div class="col-md-8"><?php echo nl2br($meeting['notes']) ?></div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -223,6 +227,6 @@
 	</div>
 
 	<div class="modal-footer">
-		<a href="#" class="an-btn an-btn-danger-transparent" data-dismiss="modal"><?php e(lang('st_cancel'))?></a>
+		<a href="#" class="an-btn an-btn-danger-transparent" data-dismiss="modal"><?php e(lang('mt_close'))?></a>
 	</div>
 </div>
