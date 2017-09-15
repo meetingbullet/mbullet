@@ -1238,12 +1238,13 @@ class Mb_project
 		$html = "";
 		if (! empty($invitations)) {
 			$html .= "<div class='invitations'>";
+			$this->ci->lang->load('meeting/meeting');
 			foreach ($invitations as $invitation) {
 				$html .= "
 					<div class='alert alert-info alert-dismissible fade in' role='alert'>
 						<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>×</span></button>
-						<h4>You got an invitation to join a meeting <a target='_blank' href='" . site_url('meeting/' . $invitation->meeting_key) . "'>({$invitation->meeting_key}: {$invitation->name}).</a></h4>
-						<p>Your decision: <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/accept') . "'>Accept</a> - <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/maybe') . "'>Maybe</a> - <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/decline') . "'>Decline</a></p>
+						<h4>" . lang('st_meeting_invite') . " <a target='_blank' href='" . site_url('meeting/' . $invitation->meeting_key) . "'>({$invitation->meeting_key}: {$invitation->name}).</a></h4>
+						<p>" . lang('st_decision') . ": <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/accept') . "'>" . lang('st_accept') . "</a> - <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/maybe') . "'>" . lang('st_maybe') . "</a> - <a class='decision' target='_blank' href='" . site_url('meeting/invite/' . $invitation->meeting_id . '/' . $invitation->invite_code . '/decline') . "'>" . lang('st_decline') . "</a></p>
 					</div>";
 			}
 			$html .= "</div>";
