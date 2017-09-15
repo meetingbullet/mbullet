@@ -52,7 +52,7 @@ if (! function_exists('display_user')) {
 		$full_name = $first_name . ' ' . $last_name;
 		$id = $id ? "id='{$id}'" : '';
 		$html = '<img '. $id .' class="user-avatar" title="' . $full_name . '" src="' . avatar_url($avatar, $email, $avatar_size) . '" style="width: ' . $avatar_size . 'px; height: ' . $avatar_size . 'px">';
-		if (! $avatar_only) $html .= ' <span class="user-name">' . $full_name . '</span>';
+		if (! $avatar_only) $html .= '&nbsp;<span class="user-name">' . $full_name . '</span>';
 		return $html;
 	}
 }
