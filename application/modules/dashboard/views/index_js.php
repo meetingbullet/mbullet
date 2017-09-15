@@ -701,13 +701,13 @@ $(document).on('click', '.popover .panel-completed-meeting .an-lists-body .list-
 	e.preventDefault();
 	var that = $(this);
 	var meeting_id = that.closest('.list-user-single').data('meeting-id');
-	$.get('<?php echo site_url('meeting/check_done_meeting/') ?>' + meeting_id)
+	$.get('<?php echo site_url('meeting/check_meeting_progress/') ?>' + meeting_id)
 	.done(function(data) {
 		data = JSON.parse(data);console.log(data);
-		if (data.done == 1) {
-			$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/done_meeting_summary/') ?>' + meeting_id);
+		if (data.error == 0 && data.progress.status == 'finished') {
+			$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/completed_meeting_summary/') ?>' + meeting_id);
 		} else {
-			//window.location.href = $(that).attr('href');
+			window.location.href = $(that).attr('href');
 		}
 	});
 });

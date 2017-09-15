@@ -125,11 +125,11 @@ $(document).ready(function() {
 		eventClick: function(event, jsEvent, view) {
 			if ($(this).hasClass('mbc-event')) {
 				var that = this;
-				$.get('<?php echo site_url('meeting/check_done_meeting/') ?>' + event.meeting_id)
+				$.get('<?php echo site_url('meeting/check_meeting_progress/') ?>' + event.meeting_id)
 				.done(function(data) {
 					data = JSON.parse(data);console.log(data);
-					if (data.done == 1) {
-						$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/done_meeting_summary/') ?>' + event.meeting_id);
+					if (data.error == 0 && data.progress.status == 'finished') {
+						$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/completed_meeting_summary/') ?>' + event.meeting_id);
 					} else {
 						window.location.href = $(that).attr('href');
 					}

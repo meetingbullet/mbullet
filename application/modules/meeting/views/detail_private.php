@@ -49,7 +49,7 @@ if ($meeting->scheduled_start_time) {
 			<div class="an-component-body">
 				<div class="an-helper-block readmore-container">
 					<div class="an-input-group meeting-notes readmore-container">
-						<?php echo $meeting->notes ?>
+						<?php echo nl2br($meeting->notes) ?>
 					</div>
 				</div> <!-- end .AN-HELPER-BLOCK -->
 			</div> <!-- end .AN-COMPONENT-BODY -->
