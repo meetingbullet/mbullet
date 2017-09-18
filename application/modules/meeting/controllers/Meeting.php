@@ -2409,20 +2409,26 @@ class Meeting extends Authenticated_Controller
 					}
 				}
 
-				$added = $this->meeting_member_model->insert([
-					'meeting_id' => $meeting_id,
-					'user_id' => $this->current_user->user_id
-				]);
-				if ($added === false) {
-					if (IS_AJAX) {
-						echo json_encode([
-							'message' => lang('st_something_went_wrong'),
-							'message_type' => 'danger'
-						]);
-						return;
-					} else {
-						Template::set_message(lang('st_something_went_wrong'), 'danger');
-						redirect('meeting/' . $meeting->meeting_key);
+				$in_meeting = $this->meeting_member_model
+											->where('meeting_id', $meeting_id)
+											->where('user_id', $this->current_user->user_id)
+											->count_all() > 0;
+				if (! $in_meeting) {
+					$added = $this->meeting_member_model->insert([
+						'meeting_id' => $meeting_id,
+						'user_id' => $this->current_user->user_id
+					]);
+					if ($added === false) {
+						if (IS_AJAX) {
+							echo json_encode([
+								'message' => lang('st_something_went_wrong'),
+								'message_type' => 'danger'
+							]);
+							return;
+						} else {
+							Template::set_message(lang('st_something_went_wrong'), 'danger');
+							redirect('meeting/' . $meeting->meeting_key);
+						}
 					}
 				}
 				$this->mb_project->update_parent_objects('meeting', $meeting_id);
