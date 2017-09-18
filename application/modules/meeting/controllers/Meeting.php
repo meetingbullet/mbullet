@@ -107,6 +107,11 @@ class Meeting extends Authenticated_Controller
 			return;
 		}
 
+		$project = $this->project_model->select('cost_of_time_1, value_of_time_1')->as_array()->find($project_id);
+
+		Template::set('default_cost_of_time', $project['value_of_time_1']);
+		Template::set('default_cost_of_time_name', $project['cost_of_time_1']);
+
 		// Get list resource/team member
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $project_id);
 
@@ -123,7 +128,9 @@ class Meeting extends Authenticated_Controller
 		}
 
 		Assets::add_js($this->load->view('create_js', [
-			'project_members' => $project_members
+			'project_members' => $project_members,
+			'default_cost_of_time' => $project['value_of_time_1'],
+			'default_cost_of_time_name' => $project['cost_of_time_1']
 		], true), 'inline');
 
 		if (isset($_POST['save'])) {
@@ -134,6 +141,13 @@ class Meeting extends Authenticated_Controller
 			if ($this->input->post('owner_id') == '') {
 				$data['owner_id'] = $this->current_user->user_id;
 			}
+			$query = $this->db->insert_string('project_members', [
+				'project_id' => $project_id,
+				'user_id' => $data['owner_id']
+			]);
+
+			$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+			$this->db->query($query);
 
 			$data['meeting_key'] = $this->mb_project->get_next_key($action->action_key);
 			// only when create meeting on dashboard calendar
@@ -148,8 +162,12 @@ class Meeting extends Authenticated_Controller
 					if ($data['owner_id'] != $this->current_user->user_id && ! in_array($this->current_user->user_id, $team)) {
 						$team[] = $this->current_user->user_id;
 					}
-					$member_data = [];
-					$members = $this->user_model->select('email, user_id')->where_in('user_id', $team)->as_array()->find_all();
+
+					$members = $this->user_model->select('email, user_id,
+												IF((SELECT COUNT(*) FROM ' . $this->db->dbprefix('user_to_organizations') . ' uto WHERE uto.user_id = ' . $this->db->dbprefix('users') . '.user_id AND uto.organization_id = "' . $this->current_user->current_organization_id . '") > 0, 1, 0) AS in_organization')
+												->where_in('email', $team)
+												->as_array()
+												->find_all();
 					if (! in_array($data['owner_id'], array_column($members, 'user_id'))) {
 						if (empty($this->input->post('repeat'))) {
 							if ($id = $this->meeting_model->insert($data)) {
@@ -158,40 +176,65 @@ class Meeting extends Authenticated_Controller
 								if (! empty($data['scheduled_start_time'])) {
 									$this->mb_project->notify_meeting_start_time($id);
 								}
-								$user_ids = [$data['owner_id']];
+								$user_emails = [$this->user_model->get_field($data['owner_id'], 'email')];
 								$this->load->library('invite/invitation');
-								foreach ($members as $member) {
-									do {
-										$invite_code = $this->invitation->generateRandomString(64);
-									} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+								$invite_data = [];
+								$member_data = [];
+								foreach ($team as $email) {
+									$index = array_search($email, array_column($members, 'email'));
+									if ($index !== false) {
+										$member = $members[$index];
+										do {
+											$invite_code = $this->invitation->generateRandomString(64);
+										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
 
-									if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
-										$member_data[] = [
+										if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+											$invite_data[] = [
+												'meeting_id' => $id,
+												'invite_email' => $member['email'],
+												'invite_code' => $invite_code,
+											];
+											if ($member['in_organization']) {
+												$member_data[] = [
+													'meeting_id' => $id,
+													'user_id' => $member['user_id']
+												];
+											}
+										} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+											$this->meeting_member_invite_model->insert([
+												'meeting_id' => $id,
+												'invite_email' => $member['email'],
+												'invite_code' => $invite_code,
+												'status' => 'accepted'
+											]);
+											$this->meeting_member_model->insert([
+												'meeting_id' => $id,
+												'user_id' => $member['user_id']
+											]);
+										}
+									} else {
+										do {
+											$invite_code = $this->invitation->generateRandomString(64);
+										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
+										$invite_data[] = [
 											'meeting_id' => $id,
-											'invite_email' => $member['email'],
+											'invite_email' => $email,
 											'invite_code' => $invite_code,
 										];
-									} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
-										$this->meeting_member_invite_model->insert([
-											'meeting_id' => $id,
-											'invite_email' => $member['email'],
-											'invite_code' => $invite_code,
-											'status' => 'accepted'
-										]);
-										$this->meeting_member_model->insert([
-											'meeting_id' => $id,
-											'user_id' => $member['user_id']
-										]);
 									}
 
-									if (! in_array($member['user_id'], $user_ids)) {
-										$user_ids[] = $member['user_id'];
+									if (! in_array($email, $user_emails)) {
+										$user_emails[] = $email;
 									}
 								}
-								
-								$this->meeting_member_invite_model->insert_batch($member_data);
+
+								$this->meeting_member_invite_model->insert_batch($invite_data);
+								if (! empty($member_data)) {
+									$this->meeting_member_model->insert_batch($member_data);
+								}
 								// $this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
-								$this->mb_project->invite_users($id, 'meeting', $this->current_user, $user_ids);
+								$this->mb_project->invite_emails($id, 'meeting', $this->current_user, $user_emails);
 
 								Template::set('close_modal', 1);
 								Template::set('message_type', 'success');
@@ -221,39 +264,72 @@ class Meeting extends Authenticated_Controller
 
 							$this->load->library('invite/invitation');
 							foreach ($occurrences as $occurrence) {
+								$invite_data = [];
 								$member_data = [];
 								$data['scheduled_start_time'] = $occurrence->format('Y-m-d H:i:s');
 								if ($id = $this->meeting_model->insert($data)) {
 									$this->mb_project->add_experience_point(10);
 									$this->mb_project->update_parent_objects('meeting', $id);
 									$this->mb_project->notify_meeting_start_time($id);
-									$user_ids = [$data['owner_id']];
-									foreach ($members as $member) {
-										do {
-											$invite_code = $this->invitation->generateRandomString(64);
-										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
-
-										if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
-											$member_data[] = [
+									$user_emails = [$this->user_model->get_field($data['owner_id'], 'email')];
+									$this->load->library('invite/invitation');
+									$invite_data = [];
+									$member_data = [];
+									foreach ($team as $email) {
+										$index = array_search($email, array_column($members, 'email'));
+										if ($index !== false) {
+											$member = $members[$index];
+											do {
+												$invite_code = $this->invitation->generateRandomString(64);
+											} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+	
+											if ($member['user_id'] != $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+												$invite_data[] = [
+													'meeting_id' => $id,
+													'invite_email' => $member['email'],
+													'invite_code' => $invite_code,
+												];
+												if ($member['in_organization']) {
+													$member_data[] = [
+														'meeting_id' => $id,
+														'user_id' => $member['user_id']
+													];
+												}
+											} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
+												$this->meeting_member_invite_model->insert([
+													'meeting_id' => $id,
+													'invite_email' => $member['email'],
+													'invite_code' => $invite_code,
+													'status' => 'accepted'
+												]);
+												$this->meeting_member_model->insert([
+													'meeting_id' => $id,
+													'user_id' => $member['user_id']
+												]);
+											}
+										} else {
+											do {
+												$invite_code = $this->invitation->generateRandomString(64);
+											} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+	
+											$invite_data[] = [
 												'meeting_id' => $id,
-												'invite_email' => $member['email'],
+												'invite_email' => $email,
 												'invite_code' => $invite_code,
 											];
-										} elseif ($member['user_id'] == $this->current_user->user_id && $member['user_id'] != $data['owner_id']) {
-											$this->meeting_member_model->insert([
-												'meeting_id' => $id,
-												'user_id' => $member['user_id']
-											]);
 										}
-
-										if (! in_array($member['user_id'], $user_ids)) {
-											$user_ids[] = $member['user_id'];
+	
+										if (! in_array($email, $user_emails)) {
+											$user_emails[] = $email;
 										}
 									}
 									
-									$this->meeting_member_invite_model->insert_batch($member_data);
+									$this->meeting_member_invite_model->insert_batch($invite_data);
+									if (! empty($member_data)) {
+										$this->meeting_member_model->insert_batch($member_data);
+									}
 									// $this->mb_project->notify_members($id, 'meeting', $this->current_user, 'insert');
-									$this->mb_project->invite_users($id, 'meeting', $this->current_user, $user_ids);
+									$this->mb_project->invite_emails($id, 'meeting', $this->current_user, $user_emails);
 								}
 							}
 
@@ -351,9 +427,11 @@ class Meeting extends Authenticated_Controller
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id, $meeting->project_id);
 		//$project_members = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
 
-		Template::set('project_members', $project_members);
 		Assets::add_js($this->load->view('create_js', [
-			'project_members' => $project_members
+			'project_members' => $project_members,
+			'default_cost_of_time' => $project['value_of_time_1'],
+			'default_cost_of_time_name' => $project['cost_of_time_1'],
+			'meeting_members' => $meeting_invitee_emails
 		], true), 'inline');
 
 		if ($data = $this->input->post()) {
@@ -416,11 +494,18 @@ class Meeting extends Authenticated_Controller
 								$member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
 								$invitee_emails = $meeting_invitee_emails;
 
+								$members = $this->user_model->select('email, user_id,
+															IF((SELECT COUNT(*) FROM ' . $this->db->dbprefix('user_to_organizations') . ' uto WHERE uto.user_id = ' . $this->db->dbprefix('users') . '.user_id AND uto.organization_id = "' . $this->current_user->current_organization_id . '") > 0, 1, 0) AS in_organization')
+															->where_in('email', $team)
+															->as_array()
+															->find_all();
+
 								if ($owner_email != $this->current_user->email && ! in_array($this->current_user->email, $team)) {
 									$team[] = $this->current_user->email;
 								}
 
 								$invite_data = [];
+								$member_data = [];
 								$this->load->library('invite/invitation');
 								foreach ($team as $email) {
 									if (array_search($email, $invitee_emails) === false && $email != $this->current_user->email) {
@@ -433,6 +518,17 @@ class Meeting extends Authenticated_Controller
 											'meeting_id' => $meeting->meeting_id,
 											'invite_code' => $invite_code,
 										];
+
+										$index = array_search($email, array_column($members, 'email'));
+										if ($index !== false) {
+											$member = $members[$index];
+											if ($member['in_organization']) {
+												$member_data[] = [
+													'meeting_id' => $meeting->meeting_id,
+													'user_id' => $member['user_id']
+												];
+											}
+										}
 									}
 
 									if ($email == $this->current_user->email && ! in_array($email, $member_emails)) {
@@ -468,6 +564,10 @@ class Meeting extends Authenticated_Controller
 
 								if (! empty($invite_data)) {
 									$this->meeting_member_invite_model->insert_batch($invite_data);
+								}
+
+								if (! empty($member_data)) {
+									$this->meeting_member_model->insert_batch($member_data);
 								}
 
 								if ((! empty($data['status'])) && $data['status'] != $meeting->status) {
@@ -2309,20 +2409,26 @@ class Meeting extends Authenticated_Controller
 					}
 				}
 
-				$added = $this->meeting_member_model->insert([
-					'meeting_id' => $meeting_id,
-					'user_id' => $this->current_user->user_id
-				]);
-				if ($added === false) {
-					if (IS_AJAX) {
-						echo json_encode([
-							'message' => lang('st_something_went_wrong'),
-							'message_type' => 'danger'
-						]);
-						return;
-					} else {
-						Template::set_message(lang('st_something_went_wrong'), 'danger');
-						redirect('meeting/' . $meeting->meeting_key);
+				$in_meeting = $this->meeting_member_model
+											->where('meeting_id', $meeting_id)
+											->where('user_id', $this->current_user->user_id)
+											->count_all() > 0;
+				if (! $in_meeting) {
+					$added = $this->meeting_member_model->insert([
+						'meeting_id' => $meeting_id,
+						'user_id' => $this->current_user->user_id
+					]);
+					if ($added === false) {
+						if (IS_AJAX) {
+							echo json_encode([
+								'message' => lang('st_something_went_wrong'),
+								'message_type' => 'danger'
+							]);
+							return;
+						} else {
+							Template::set_message(lang('st_something_went_wrong'), 'danger');
+							redirect('meeting/' . $meeting->meeting_key);
+						}
 					}
 				}
 				$this->mb_project->update_parent_objects('meeting', $meeting_id);
@@ -3420,7 +3526,9 @@ class Meeting extends Authenticated_Controller
 
 	public function create_private()
 	{
-
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
 		// Get list resource/team member
 		$project_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
 
@@ -3440,13 +3548,13 @@ class Meeting extends Authenticated_Controller
 
 			if ($team = $this->input->post('team')) {
 				if ($team = explode(',', $team)) {
-					if ($data['owner_id'] != $this->current_user->user_id && ! in_array($this->current_user->user_id, $team)) {
-						$team[] = $this->current_user->user_id;
+					$owner_email = $this->user_model->get_field($data['owner_id'], 'email');
+					if ($owner_email != $this->current_user->email && ! in_array($this->current_user->email, $team)) {
+						$team[] = $this->current_user->email;
 					}
-					$member_data = [];
-					$members = $this->user_model->select('email, user_id')->where_in('user_id', $team)->as_array()->find_all();
-					if (! in_array($data['owner_id'], array_column($members, 'user_id'))) {
-						$data['members'] = json_encode(array_column($members, 'email'));
+
+					if (! in_array($owner_email, $team)) {
+						$data['members'] = json_encode($team);
 					} else {
 						Template::set('close_modal', 0);
 						Template::set('message_type', 'danger');
@@ -3515,6 +3623,10 @@ class Meeting extends Authenticated_Controller
 	 */
 	public function detail_private($meeting_id = null)
 	{
+		if (! $this->input->is_ajax_request()) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
 		if (empty($meeting_id)) {
 			Template::set_message(lang('st_meeting_does_not_exist'), 'danger');
 			redirect(DEFAULT_LOGIN_LOCATION);
@@ -3639,7 +3751,10 @@ class Meeting extends Authenticated_Controller
 
 		Template::set('project_members', $project_members);
 		Assets::add_js($this->load->view('create_js', [
-			'project_members' => $project_members
+			'project_members' => $project_members,
+			'default_cost_of_time' => 'N/A',
+			'default_cost_of_time_name' => 'N/A',
+			'meeting_members' => json_decode($meeting->members)
 		], true), 'inline');
 
 		if ($data = $this->input->post()) {

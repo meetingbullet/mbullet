@@ -134,9 +134,12 @@ $times = [
 		<?php echo form_close(); ?>
 	</div>
 
-<?php if (IS_AJAX) {
+<?php
+if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('create_js', [
-		'project_members ' => $project_members 
+		'project_members' => $project_members,
+		'default_cost_of_time' => $default_cost_of_time,
+		'default_cost_of_time_name' => $default_cost_of_time_name,
 	], true) . '</script>';
 }
 ?>
