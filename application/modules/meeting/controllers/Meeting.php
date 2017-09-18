@@ -1424,7 +1424,7 @@ class Meeting extends Authenticated_Controller
 		$query = $this->meeting_model->skip_validation(1)->update($meeting->meeting_id, [
 			'status' => 'ready',
 			'manage_state' => 'monitor',
-			'scheduled_start_time' => $this->input->post('scheduled_start_time')
+			'scheduled_start_time' => get_utc_time($this->input->post('scheduled_start_time'))
 		]);
 
 		if ($query) {
@@ -1933,7 +1933,14 @@ class Meeting extends Authenticated_Controller
 					Template::set('message', lang('st_rating_success'));
 					Template::set('message_type', 'success');
 					Template::set('close_modal', 0);
-					$this->done_meeting_if_qualified($meeting);
+					// change: done after owner rating 
+					if ($meeting->owner_id == $this->current_user->user_id) {
+						$this->meeting_model->skip_validation(true)->update($meeting_id, [
+							'manage_state' => 'done'
+						]);
+						$this->send_meeting_result($meeting_id);
+					}
+					//$this->done_meeting_if_qualified($meeting);
 				}
 			} else {
 				$validation_error = true;
@@ -1944,7 +1951,7 @@ class Meeting extends Authenticated_Controller
 			Template::set('close_modal', 0);
 		}
 
-		if (! empty($validation_error)) {
+		if (! empty($validation_error) && ! empty($_POST)) {
 			Template::set('message', lang('st_need_to_vote_all_items'));
 			Template::set('message_type', 'danger');
 			Template::set('close_modal', 0);
@@ -2123,7 +2130,17 @@ class Meeting extends Authenticated_Controller
 								->as_array()
 								->find_all();
 
-		$this->done_meeting_if_qualified($meeting);
+		// change: done after owner rating 
+		if ($meeting->owner_id == $this->current_user->user_id) {
+			$evaluated = $this->is_evaluated($meeting_id);
+			if ($evaluated) {
+				$this->meeting_model->skip_validation(true)->update($meeting_id, [
+					'manage_state' => 'done'
+				]);
+				$this->send_meeting_result($meeting_id);
+			}
+		}
+		// $this->done_meeting_if_qualified($meeting);
 		echo json_encode([
 			'message_type' => 'success',
 			'message' => lang('st_rate_db_success')

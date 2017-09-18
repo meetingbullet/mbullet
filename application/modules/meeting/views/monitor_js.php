@@ -62,7 +62,7 @@ $('#datetimepicker1').datetimepicker({
 }).on('dp.change', function (ev) {
 	// console.log('Client set:', ev.date.format('YYYY-MM-DD HH:mm:ss'));
 	// console.log('Server set:', ev.date.utc().format('YYYY-MM-DD HH:mm:ss'));
-	$('input[name="scheduled_start_time"]').val(ev.date.utc().format('YYYY-MM-DD HH:mm:ss'));
+	$('input[name="scheduled_start_time"]').val(ev.date.format('YYYY-MM-DD HH:mm:ss'));
 });
 
 // Prevent duplicate binding function
