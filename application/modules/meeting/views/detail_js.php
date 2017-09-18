@@ -126,11 +126,13 @@ $(document).on("submit", '.form-ajax', (e) => {
 						project_members.concat(anonymous_members).forEach((item) => {
 							var i = team.indexOf(item.email);
 							if (i >= 0) {
-								resource_html += '<li>\
-													<img class="user-avatar" title="'+ item.name + '" src="'+ item.avatar + '" style="width: 24px; height: 24px">\
-													<span class="user-name">'+ (typeof(item.name) != 'undefined' ? item.name : item.email) + '</span>\
-													<span class="badge badge-'+ item.cost_of_time + ' badge-bordered pull-right">'+ item.cost_of_time_name +'</span>\
-												</li>';
+								if (typeof(item.id) == 'undefined' || item.id != owner_id) {
+									resource_html += '<li>\
+														<img class="user-avatar" title="'+ item.name + '" src="'+ item.avatar + '" style="width: 24px; height: 24px">\
+														<span class="user-name">'+ (typeof(item.name) != 'undefined' ? item.name : item.email) + '</span>\
+														<span class="badge badge-'+ item.cost_of_time + ' badge-bordered pull-right">'+ item.cost_of_time_name +'</span>\
+													</li>';
+								}
 								team.splice(i, 1);
 							}
 						});
