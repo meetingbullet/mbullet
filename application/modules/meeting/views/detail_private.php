@@ -9,8 +9,8 @@ if ($meeting->scheduled_start_time) {
 	$scheduled_start_time = strtotime($meeting->scheduled_start_time);
 	$scheduled_end_time = strtotime('+' . $meeting->in . ' ' . $meeting->in_type, $scheduled_start_time);
 
-	$scheduled_start_time = gmdate('Y-m-d H:i:s', $scheduled_start_time);
-	$scheduled_end_time = gmdate('Y-m-d H:i:s', $scheduled_end_time);
+	$scheduled_start_time = date('Y-m-d H:i:s', $scheduled_start_time);
+	$scheduled_end_time = date('Y-m-d H:i:s', $scheduled_end_time);
 }
 ?>
 <div class="an-body-topbar wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
