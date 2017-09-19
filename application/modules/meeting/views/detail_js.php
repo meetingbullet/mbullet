@@ -93,6 +93,7 @@ $(document).on("submit", '.form-ajax', (e) => {
 					if ($(e.target).prop('id') == 'create-agenda') {
 						$('#agenda-list tbody').append($.templates('#agenda-row').render(data.data));
 						$('#agenda-list tbody tr:last-child').effect("highlight", {}, 3000);
+						$('.btn-block .open-meeting-monitor.meeting-open').removeAttr('disabled');
 					}
 
 					// Homework created

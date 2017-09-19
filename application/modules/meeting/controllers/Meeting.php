@@ -1807,7 +1807,7 @@ class Meeting extends Authenticated_Controller
 
 		$evaluated = $this->is_evaluated($meeting_id);
 
-		if ($evaluated === true || $meeting->manage_state != 'evaluate') {
+		if ($evaluated === true || ($meeting->manage_state != 'evaluate' && $meeting->manage_state != 'done')) {
 			Template::set('message', $evaluated === true ? lang('st_meeting_already_evaluated') : lang('st_meeting_not_ready_for_evaluate'));
 			Template::set('message_type', 'danger');
 			Template::set('close_modal', 1);
@@ -1852,9 +1852,9 @@ class Meeting extends Authenticated_Controller
 			$homework->attachments = $homework->attachments ? $homework->attachments : [];
 		}
 
-		//if ($evaluated === false || $meeting->manage_state == 'evaluate') {
-		if (($evaluated === false || $meeting->manage_state == 'evaluate') && $role != 'other') {
-			if ($this->input->post()) {
+		if ($this->input->post()) {
+			// change: still able to evaluate even when meeting manage state is done 
+			if (($evaluated === false && ($meeting->manage_state == 'evaluate' || $meeting->manage_state == 'done')) && $role != 'other') {
 				if ($role == 'owner') {
 					if (! is_array($this->input->post('attendee_rate'))
 					|| count($this->input->post('attendee_rate')) != count($meeting->members)) {
@@ -1944,12 +1944,12 @@ class Meeting extends Authenticated_Controller
 					//$this->done_meeting_if_qualified($meeting);
 				}
 			} else {
-				$validation_error = true;
+				Template::set('message', lang('st_unable_evaluate'));
+				Template::set('message_type', 'danger');
+				Template::set('close_modal', 0);
 			}
 		} else {
-			Template::set('message', lang('st_unable_evaluate'));
-			Template::set('message_type', 'danger');
-			Template::set('close_modal', 0);
+			$validation_error = true;
 		}
 
 		if (! empty($validation_error) && ! empty($_POST)) {
@@ -2075,7 +2075,8 @@ class Meeting extends Authenticated_Controller
 		$manage_state = $this->meeting_model->get_field($meeting_id, 'manage_state');
 		$evaluated = $this->is_evaluated($meeting_id);
 
-		if ($evaluated === false && $manage_state == 'evaluate') {
+		// change: still able to evaluate even when meeting manage state is done 
+		if ($evaluated === false && ($manage_state == 'evaluate' || $manage_state == 'done')) {
 			if ($mode == 'user') {
 				$rated = $this->meeting_member_rate_model->skip_validation(true)->insert([
 					'meeting_id' => $meeting_id,
@@ -3901,7 +3902,7 @@ class Meeting extends Authenticated_Controller
 
 			if (empty($meeting_homeworks)) {
 				$meeting_homeworks = [];
-				$email_data['HOMEWORKS'] = [
+				$email_data['HOMEWORKS'][] = [
 					'HOMEWORK_NAME' => 'N/A',
 					'HOMEWORK_RATE' => 'N/A'
 				];
