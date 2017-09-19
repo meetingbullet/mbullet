@@ -542,3 +542,11 @@ $(document).on('click', '#homework-list tr .homework-status .btn-update-homework
 		console.log(data);
 	});
 });
+
+$(document).on('click', '.btn-block .an-btn', function(e) {
+	$(this).attr('disabled', 'disabled');
+});
+
+$(document).on('click', '.modal-monitor-evaluator button.close, #meeting-monitor-modal button.close, #meeting-decider-modal button.close', function(e) {
+	location.reload();
+});
