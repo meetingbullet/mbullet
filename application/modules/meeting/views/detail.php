@@ -69,7 +69,7 @@ $hw_status = ['open', 'done', 'undone'];
 
 		<?php endif; ?>
 
-		<?php if ($meeting->manage_state == 'evaluate' && $evaluated === false && (($is_member /*&& ! empty($owner_evaluated)*/) || $is_owner)) : ?>
+		<?php if (($meeting->manage_state == 'evaluate' && $evaluated === false && (($is_member /*&& ! empty($owner_evaluated)*/) || $is_owner)) && $meeting->status != 'finished') : ?>
 		<a href='#' id="open-meeting-evaluator" data-is-owner="<?php echo $is_owner == true ? '1' : '0' ?>" class='an-btn an-btn-danger'><i class="ion-play"></i> <?php echo lang('st_evaluator')?></a>
 		<?php endif; ?>
 	<?php endif ?>
