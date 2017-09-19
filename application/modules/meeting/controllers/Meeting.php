@@ -1938,6 +1938,7 @@ class Meeting extends Authenticated_Controller
 						$this->meeting_model->skip_validation(true)->update($meeting_id, [
 							'manage_state' => 'done'
 						]);
+						$this->mb_project->update_parent_objects('meeting', $meeting_id);
 						$this->send_meeting_result($meeting_id);
 					}
 					//$this->done_meeting_if_qualified($meeting);
@@ -2137,6 +2138,7 @@ class Meeting extends Authenticated_Controller
 				$this->meeting_model->skip_validation(true)->update($meeting_id, [
 					'manage_state' => 'done'
 				]);
+				$this->mb_project->update_parent_objects('meeting', $meeting_id);
 				$this->send_meeting_result($meeting_id);
 			}
 		}
@@ -3864,13 +3866,6 @@ class Meeting extends Authenticated_Controller
 											->order_by('agendas.agenda_id')
 											->as_array()
 											->find_all();
-		if (empty($meeting_agendas)) {
-			$meeting_agendas = [];
-			$email_data['AGENDAS'][] = [
-				'AGENDA_NAME' => 'N/A',
-				'AGENDA_RATE' => 'N/A'
-			];
-		}
 
 		$meeting_homeworks = $this->homework_model->select('homework.*,
 													o.email AS owner_email, o.first_name AS owner_first_name, o.last_name AS owner_last_name, o.avatar AS owner_avatar,
@@ -3881,13 +3876,6 @@ class Meeting extends Authenticated_Controller
 												->order_by('homework.homework_id')
 												->as_array()
 												->find_all();
-		if (empty($meeting_homeworks)) {
-			$meeting_homeworks = [];
-			$email_data['HOMEWORKS'][] = [
-				'HOMEWORK_NAME' => 'N/A',
-				'HOMEWORK_RATE' => 'N/A'
-			];
-		}
 
 		$template = $this->db->where('email_template_key', 'MEETING_SUMMARY')
 							->where('language_code', 'en_US')
@@ -3902,6 +3890,22 @@ class Meeting extends Authenticated_Controller
 				'OWNER' => display_user($meeting['owner_email'], $meeting['owner_first_name'], $meeting['owner_last_name'], $meeting['owner_avatar']),
 				'MEETING_RATE' => round($meeting['average_rate'], 2)
 			];
+
+			if (empty($meeting_agendas)) {
+				$meeting_agendas = [];
+				$email_data['AGENDAS'][] = [
+					'AGENDA_NAME' => 'N/A',
+					'AGENDA_RATE' => 'N/A'
+				];
+			}
+
+			if (empty($meeting_homeworks)) {
+				$meeting_homeworks = [];
+				$email_data['HOMEWORKS'] = [
+					'HOMEWORK_NAME' => 'N/A',
+					'HOMEWORK_RATE' => 'N/A'
+				];
+			}
 
 			foreach ($meeting_members as $member) {
 				$email_data['MEMBERS'][] = [

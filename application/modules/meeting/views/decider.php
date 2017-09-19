@@ -60,7 +60,7 @@ $confirmation_status = [
 
 		<div class="decider-meeting-container">
 			<div class="row">
-				<div id="meeting-info" class="col-md-8">
+				<div id="meeting-info" class="col-md-7">
 					<div class="row">
 						<div class="col-md-12">
 							<div class="an-single-component with-shadow">
@@ -78,7 +78,7 @@ $confirmation_status = [
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-7">
+						<div class="col-md-12">
 							<div class="an-single-component with-shadow">
 								<div class="an-component-body an-helper-block">
 									<table class="table table-striped table-meeting-time">
@@ -110,28 +110,29 @@ $confirmation_status = [
 								</div> <!-- end .AN-COMPONENT-BODY -->
 							</div>
 						</div>
-
-						<div class="col-md-5">
-							<div class="an-single-component fixed-height with-shadow">
-								<div class="an-component-header">
-									<h6><?php e(lang('st_attendees'))?></h6>
-								</div>
-								<div class="an-component-body an-helper-block">
-									<ul class="list-unstyled list-member">
-										<?php foreach ($meeting->members as $user) { ?>
-										<li>
-											<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
-
-											<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
-										</li>
-										<?php } ?>
-									</ul>
-								</div> <!-- end .AN-COMPONENT-BODY -->
-							</div>
-						</div>
 					</div> <!-- end .row -->
 				</div>
-				<div class="col-md-4">
+
+				<div class="col-md-5">
+					<div class="an-single-component fixed-height with-shadow">
+						<div class="an-component-header">
+							<h6><?php e(lang('st_attendees'))?></h6>
+						</div>
+						<div class="an-component-body an-helper-block">
+							<ul class="list-unstyled list-member">
+								<?php foreach ($meeting->members as $user) { ?>
+								<li>
+									<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
+
+									<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
+								</li>
+								<?php } ?>
+							</ul>
+						</div> <!-- end .AN-COMPONENT-BODY -->
+					</div>
+				</div>
+
+				<div class="col-md-4 hidden">
 					<div id="comment">
 						<div class="an-single-component with-shadow">
 							<div class="an-component-header">
