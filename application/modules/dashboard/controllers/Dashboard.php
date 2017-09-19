@@ -48,9 +48,12 @@ class Dashboard extends Authenticated_Controller
 		$evaluates = [];
 		foreach ($my_todo['meetings'] as $meeting) {
 			foreach ($my_todo['evaluates'] as $todo) {
+				$todo = json_decode(json_encode($todo));
 				if ($todo->meeting_id == $meeting->meeting_id) {
-					$meeting->evaluates[] = $todo;
-					$evaluates[$meeting->meeting_id] = $meeting;
+					if (! ($todo->evaluate_mode == 'meeting' && $todo->is_owner == 1)) {
+						$meeting->evaluates[] = $todo;
+						$evaluates[$meeting->meeting_id] = $meeting;
+					}
 				}
 			}
 		}
@@ -684,6 +687,7 @@ class Dashboard extends Authenticated_Controller
 			->join('meeting_member_reads r', 'meeting_members.meeting_id = r.meeting_id AND meeting_members.user_id = r.rating_user_id AND r.user_id =' . $this->current_user->user_id, 'LEFT')
 			->where_in('meeting_members.meeting_id', $owner_meeting_ids)
 			->where('(' . $this->db->dbprefix('meeting_members') . '.user_id, ' . $this->db->dbprefix('meeting_members') . '.meeting_id) NOT IN (SELECT ' . $this->db->dbprefix('meeting_member_rates') . '.attendee_id, ' . $this->db->dbprefix('meeting_member_rates') . '.meeting_id FROM ' . $this->db->dbprefix('meeting_member_rates') . ' WHERE ' . $this->db->dbprefix('meeting_member_rates') . '.meeting_id IN (' . implode(',', $owner_meeting_ids) . ') AND ' . $this->db->dbprefix('meeting_member_rates') . '.user_id = "' . $this->current_user->user_id . '")')
+			->where('meeting_members.user_id !=', $this->current_user->user_id)
 			->find_all();
 
 			if (empty($evaluate_members)) {
@@ -692,7 +696,7 @@ class Dashboard extends Authenticated_Controller
 		}
 
 		$evaluates = array_merge($evaluate_meetings, $evaluate_members, $evaluate_agendas, $evaluate_homeworks);
-	
+
 		$decides = $this->meeting_model
 		->select('meetings.*, meetings.name AS meeting_name, ag.*, 
 		ag.name AS agenda_name, ag.description AS agenda_description, 
