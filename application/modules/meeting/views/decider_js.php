@@ -83,6 +83,11 @@ $(document).on('submit.decider', '.form-meeting-decider', function(e) {
 	console.log('submitted');
 	// Validation
 	var is_valid = true;
+
+	if ($('#rating-form').serializeArray().length != $('#rating-form ul li').length) {
+		is_valid = false;
+	}
+
 	$('.form-meeting-decider .confirmation-status').each((i, item) => {
 		if ($(item).val() === null) {
 			$(item).addClass('danger');
@@ -102,7 +107,7 @@ $(document).on('submit.decider', '.form-meeting-decider', function(e) {
 		return false;
 	}
 
-	$.post($(this).attr('action'), $(this).serialize(), (result) => {
+	$.post($(this).attr('action'), $(this).serialize() + '&' + $('#rating-form').serialize(), (result) => {
 		var data = JSON.parse(result);
 
 		if (data.message_type) {
@@ -124,25 +129,15 @@ $(document).on('submit.decider', '.form-meeting-decider', function(e) {
 
 					// Open Evaluator for Owner
 					$('#create-meeting').on('hidden.bs.modal', function () {
+						// merge evaluator for owner and decider screen
 						// @Bao: Open Evaluator for Owner
-						$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-							data = JSON.parse(data);
-							$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
-							$('.modal-monitor-evaluator').modal({
-								backdrop: 'static'
-							});
-						});
+						// $.mbOpenModalViaUrl('meeting-evaluator-modal' , "<?php e(site_url('meeting/evaluator/' . $meeting_key)) ?>", 'modal-80');
 					});
 				});
 			} else {
+				// merge evaluator for owner and decider screen
 				// @Bao: Open Evaluator for Owner
-				$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-					data = JSON.parse(data);
-					$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
-					$('.modal-monitor-evaluator').modal({
-						backdrop: 'static'
-					});
-				});
+				// $.mbOpenModalViaUrl('meeting-evaluator-modal' , "<?php e(site_url('meeting/evaluator/' . $meeting_key)) ?>", 'modal-80');
 			}
 		}
 	})
@@ -258,3 +253,11 @@ function update_comment_data()
 		});
 	});
 }
+
+$(document).on("click.decider", ".rating label", function(){
+	$(this).parent().find("label").css({"color": "#D8D8D8"});
+	$(this).css({"color": "#FFED85"});
+	$(this).nextAll().css({"color": "#FFED85"});
+	var input_id = $(this).attr('for');
+	$(this).parent().find('#' + input_id).click();
+});

@@ -50,22 +50,10 @@ $(document).on('hide.bs.modal.preview', '#meeting-preview-modal', function(){
 	// 	});
 	// }, 3000);
 	<?php endif; ?>
+	
 
 	// dont need to wait for owner evaluator anymore
-	$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-		data = JSON.parse(data);
-
-		if (data.close_modal === 0) {
-			$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
-			$('.modal-monitor-evaluator').modal({
-				backdrop: 'static'
-			});
-		}
-
-		if (data.message_type) {
-			$.mbNotify(data.message, data.message_type);
-		}
-	});
+	$.mbOpenModalViaUrl('meeting-evaluator-modal' , "<?php e(site_url('meeting/evaluator/' . $meeting_key)) ?>", 'modal-80');
 })
 
 $(document).on('mouseleave.preview', '#comment .list-user-single.unread', function() {
