@@ -1163,6 +1163,25 @@ class Meeting extends Authenticated_Controller
 			return;
 		}
 
+		$owner_id = $this->meeting_model->get_field($meeting_id, 'owner_id');
+		$count_members = $this->meeting_member_model
+		->select('u.user_id, avatar, email, first_name, last_name')
+		->join('users u', 'u.user_id = meeting_members.user_id')
+		->where('u.user_id !=', $owner_id)
+		->where('meeting_id', $meeting_id)
+		->as_array()
+		->count_all();
+
+		//evaluate validation
+		if (! is_array($this->input->post('attendee_rate'))
+		|| count($this->input->post('attendee_rate')) != $count_members
+		|| count($this->input->post('attendee_rate')) < 1) {
+			echo json_encode([
+				'message_type' => 'danger',
+				'message' => lang('st_please_select_all_confirmation_status')
+			]);
+		}
+
 		// Prepare data
 
 		$agenda_data = [];
@@ -1174,16 +1193,27 @@ class Meeting extends Authenticated_Controller
 				'modified_by' => $this->current_user->user_id
 			];
 		}
+		
+		$attendee_rate_data = [];
+		foreach ($this->input->post('attendee_rate') as $attendee_id => $rate) {
+			$attendee_rate_data[] = [
+				'meeting_id' => $meeting_id,
+				'user_id' => $this->current_user->user_id,
+				'attendee_id' => $attendee_id,
+				'rate' => $rate
+			];
+		}
 
-		if ($this->agenda_model->update_batch($agenda_data, 'agenda_key') ) {
+		if ($this->agenda_model->update_batch($agenda_data, 'agenda_key') && $this->meeting_member_rate_model->insert_batch($attendee_rate_data)) {
 			$notes = $this->input->post('note') ? $this->input->post('note') : null;
 
 			$this->meeting_model->skip_validation(TRUE)->update($meeting_id, [
-				'manage_state' => 'evaluate',
+				'manage_state' => 'done',
 				'notes' => $notes
 			]);
 
 			$this->mb_project->update_parent_objects('meeting', $meeting_id);
+			$this->send_meeting_result($meeting_id);
 
 			echo json_encode([
 				'message_type' => 'success',
@@ -1807,16 +1837,16 @@ class Meeting extends Authenticated_Controller
 
 		$evaluated = $this->is_evaluated($meeting_id);
 
-		if ($evaluated === true || ($meeting->manage_state != 'evaluate' && $meeting->manage_state != 'done')) {
-			Template::set('message', $evaluated === true ? lang('st_meeting_already_evaluated') : lang('st_meeting_not_ready_for_evaluate'));
-			Template::set('message_type', 'danger');
-			Template::set('close_modal', 1);
-		}
+		// if ($evaluated === true || ($meeting->manage_state != 'evaluate' && $meeting->manage_state != 'done')) {
+		// 	Template::set('message', $evaluated === true ? lang('st_meeting_already_evaluated') : lang('st_meeting_not_ready_for_evaluate'));
+		// 	Template::set('message_type', 'danger');
+		// 	Template::set('close_modal', 1);
+		// }
 
 		$meeting->members = $this->meeting_member_model
 							->select('u.user_id, avatar, email, first_name, last_name')
 							->join('users u', 'u.user_id = meeting_members.user_id')
-							//->where('u.user_id !=', $this->current_user->user_id)
+							->where('u.user_id !=', $meeting->owner_id)
 							->where('meeting_id', $meeting_id)
 							->as_array()
 							->find_all();
@@ -1854,7 +1884,7 @@ class Meeting extends Authenticated_Controller
 
 		if ($this->input->post()) {
 			// change: still able to evaluate even when meeting manage state is done 
-			if (($evaluated === false && ($meeting->manage_state == 'evaluate' || $meeting->manage_state == 'done')) && $role != 'other') {
+			if (($evaluated === false && ($meeting->manage_state == 'evaluate' || $meeting->manage_state == 'decide' || $meeting->manage_state == 'done')) && $role != 'other') {
 				if ($role == 'owner') {
 					if (! is_array($this->input->post('attendee_rate'))
 					|| count($this->input->post('attendee_rate')) != count($meeting->members)) {
@@ -1944,7 +1974,7 @@ class Meeting extends Authenticated_Controller
 					//$this->done_meeting_if_qualified($meeting);
 				}
 			} else {
-				Template::set('message', lang('st_unable_evaluate'));
+				Template::set('message', lang('st_unable_evaluate') . $meeting->manage_state);
 				Template::set('message_type', 'danger');
 				Template::set('close_modal', 0);
 			}
@@ -2076,7 +2106,7 @@ class Meeting extends Authenticated_Controller
 		$evaluated = $this->is_evaluated($meeting_id);
 
 		// change: still able to evaluate even when meeting manage state is done 
-		if ($evaluated === false && ($manage_state == 'evaluate' || $manage_state == 'done')) {
+		if ($evaluated === false && ($manage_state == 'evaluate'|| $meeting->manage_state == 'decide' || $manage_state == 'done')) {
 			if ($mode == 'user') {
 				$rated = $this->meeting_member_rate_model->skip_validation(true)->insert([
 					'meeting_id' => $meeting_id,

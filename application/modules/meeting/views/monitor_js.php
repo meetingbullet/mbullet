@@ -584,8 +584,10 @@ function update_monitor()
 			if ($('.meeting-monitor').data('is-owner') == '1') {
 				$.mbOpenModalViaUrl('meeting-decider-modal' , "<?php e(site_url('meeting/decider/' . $meeting_key)) ?>", 'modal-80');
 			} else {
+				// remove comment section, show evaluator
 				// Member response to the Goal
-				$.mbOpenModalViaUrl('meeting-preview-modal' , "<?php e(site_url('meeting/preview/' . $meeting_key . '?response')) ?>",);
+				// $.mbOpenModalViaUrl('meeting-preview-modal' , "<?php e(site_url('meeting/preview/' . $meeting_key . '?response')) ?>",);
+				$.mbOpenModalViaUrl('meeting-evaluator-modal' , "<?php e(site_url('meeting/evaluator/' . $meeting_key)) ?>", 'modal-80');
 			}
 		}
 

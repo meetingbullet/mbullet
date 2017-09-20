@@ -1263,7 +1263,7 @@ class Mb_project
 	{
 		$this->ci->load->model('meeting/meeting_model');
 
-		$meeting = $this->ci->meeting_model
+		$meeting = $this->ci->meeting_model->select('meetings.*, IF(' . $this->ci->db->dbprefix('meetings') . '.actual_start_time IS NULL, ' . $this->ci->db->dbprefix('meetings') . '.scheduled_start_time, ' . $this->ci->db->dbprefix('meetings') . '.actual_start_time) AS start_time')
 							->join('actions a', 'a.action_id = meetings.action_id')
 							->join('projects p', 'a.project_id = p.project_id')
 							->where('(' . $this->ci->db->dbprefix('meetings') . '.scheduled_start_time BETWEEN "' . date('Y-m-d H:i:s', strtotime('now')) . '" AND "' . date('Y-m-d H:i:s', strtotime('+ 15 minutes')) . '")')
@@ -1278,7 +1278,7 @@ class Mb_project
 			<div class='meeting-alert'>
 				<div class='alert alert-warning alert-dismissible fade in' " . ($display ? '' : 'style="display: none;"') . " role='alert' data-meeting-id='" . $meeting->meeting_id . "' data-alert-type='" . ($meeting->status == 'inprogress' ? 'inprogress' : 'upcoming') . "'>
 					<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>×</span></button>
-					<h4>" . ($meeting->status == 'inprogress' ? lang('st_meeting_inprogress') : sprintf(lang('st_meeting_will_start'), relative_time(strtotime($meeting->scheduled_start_time)))) . " <a target='_blank' href='" . site_url('meeting/' . $meeting->meeting_key) . "'>({$meeting->meeting_key}: {$meeting->name}).</a></h4>
+					<h4>" . ($meeting->status == 'inprogress' ? lang('st_meeting_inprogress') : sprintf(lang('st_meeting_will_start'), relative_time(strtotime($meeting->start_time)))) . " <a target='_blank' href='" . site_url('meeting/' . $meeting->meeting_key) . "'>({$meeting->meeting_key}: {$meeting->name}).</a></h4>
 				</div>
 			</div>";
 		}

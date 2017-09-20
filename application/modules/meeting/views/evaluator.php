@@ -145,7 +145,6 @@ if ($meeting->scheduled_start_time) {
 							<th class="text-center"><?php e(lang('st_started'))?></th>
 							<th class="text-center"><?php e(lang('st_duration'))?></th>
 							<th class="text-center"><?php e(lang('st_status'))?></th>
-							<th class="text-center"><?php e(lang('st_confirm_status'))?></th>
 							<?php if ($role != 'owner') : ?>
 							<th><?php e(lang('st_rate'))?></th>
 							<?php endif ?>
@@ -160,11 +159,6 @@ if ($meeting->scheduled_start_time) {
 							<td class="text-center agenda-status">
 								<?php if (! empty($agenda->status)) : ?>
 								<span class="label label-bordered label-<?php e($agenda->status)?>"><?php e(lang('st_' . $agenda->status))?></span>
-								<?php endif ?>
-							</td>
-							<td class="text-center agenda-status">
-								<?php if (! empty($agenda->confirm_status)) : ?>
-								<span class="label label-bordered label-<?php e($agenda->confirm_status)?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 								<?php endif ?>
 							</td>
 							<?php if ($role != 'owner') : ?>
@@ -261,15 +255,6 @@ if ($meeting->scheduled_start_time) {
 		</div>
 	</div>
 
-	<div class="col-md-12">
-		<label><?php echo lang('st_notes') ?></label>
-		<div class="meeting-notes-container">
-			<div class='meeting-notes'>
-			<?php echo nl2br($meeting->notes) ?>
-			</div>
-		</div>
-	</div>
-
 	<div class="col-md-12" style="padding-bottom: 30px;">
 		<div class="row">
 			<div class="col-md-8">
@@ -284,6 +269,11 @@ if ($meeting->scheduled_start_time) {
 	</div>
 </div>
 <?php echo form_close() ?>
+<style>
+.modal-content {
+	overflow: hidden;
+}
+</style>
 <script>
 	<?php
 	echo $this->load->view('evaluator_js', [

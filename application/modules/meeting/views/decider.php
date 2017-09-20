@@ -117,17 +117,32 @@ $confirmation_status = [
 					<div class="an-single-component fixed-height with-shadow">
 						<div class="an-component-header">
 							<h6><?php e(lang('st_attendees'))?></h6>
+							<div style="display:none" class="rating">
+								<input type="radio" id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+								<input type="radio" id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+								<input type="radio" id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+								<input type="radio" id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+								<input type="radio" id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+							</div>
 						</div>
 						<div class="an-component-body an-helper-block">
-							<ul class="list-unstyled list-member">
-								<?php foreach ($meeting->members as $user) { ?>
-								<li>
-									<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
-
-									<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right"><?php e($user['cost_of_time_name'])?></span>
-								</li>
-								<?php } ?>
-							</ul>
+							<form id="rating-form">
+								<ul class="list-unstyled list-member">
+									<?php foreach ($meeting->members as $user) { ?>
+									<li>
+										<?php echo display_user($user['email'], $user['first_name'], $user['last_name'], $user['avatar']); ?>
+										<span class="badge badge-<?php e($user['cost_of_time'])?> badge-bordered pull-right" style="margin-top: 4px; margin-left: 5px;"><?php e($user['cost_of_time_name'])?></span>
+										<div class="rating pull-right">
+											<input type="radio" id="star5" name="attendee_rate[<?php echo $user['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $user['user_id'] . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
+											<input type="radio" id="star4" name="attendee_rate[<?php echo $user['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $user['user_id'] . ']', 4) ?> value="4" /><label class = "full" for="star4" title="4 stars"></label>
+											<input type="radio" id="star3" name="attendee_rate[<?php echo $user['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $user['user_id'] . ']', 3) ?> value="3" /><label class = "full" for="star3" title="3 stars"></label>
+											<input type="radio" id="star2" name="attendee_rate[<?php echo $user['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $user['user_id'] . ']', 2) ?> value="2" /><label class = "full" for="star2" title="2 stars"></label>
+											<input type="radio" id="star1" name="attendee_rate[<?php echo $user['user_id'] ?>]" <?php echo set_radio('attendee_rate[' . $user['user_id'] . ']', 1) ?> value="1" /><label class = "full" for="star1" title="1 star"></label>
+										</div>
+									</li>
+									<?php } ?>
+								</ul>
+							</form>
 						</div> <!-- end .AN-COMPONENT-BODY -->
 					</div>
 				</div>

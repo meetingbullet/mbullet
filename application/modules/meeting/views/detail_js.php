@@ -186,8 +186,8 @@ $(document).on("submit", '.form-ajax', (e) => {
 });
 
 // open meeting evaluator
-$('#open-meeting-evaluator').click((e) => {
-	e.preventDefault();
+// $('#open-meeting-evaluator').click((e) => {
+	// e.preventDefault();
 	// var is_owner = $('#open-meeting-evaluator').data('is-owner');
 	// if (is_owner == 0) {
 	// 	swal({
@@ -225,21 +225,21 @@ $('#open-meeting-evaluator').click((e) => {
 	// }
 
 	// dont need to wait for owner evaluate any more
-	$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
-		data = JSON.parse(data);
+// 	$.get('<?php echo site_url('meeting/evaluator/' . $meeting_key) ?>').done(function(data) {
+// 		data = JSON.parse(data);
 
-		if (data.close_modal === 0) {
-			$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
-			$('.modal-monitor-evaluator').modal({
-				backdrop: 'static'
-			});
-		}
+// 		if (data.close_modal === 0) {
+// 			$('.modal-monitor-evaluator .modal-content').html(data.modal_content);
+// 			$('.modal-monitor-evaluator').modal({
+// 				backdrop: 'static'
+// 			});
+// 		}
 
-		if (data.message_type) {
-			$.mbNotify(data.message, data.message_type);
-		}
-	});
-});
+// 		if (data.message_type) {
+// 			$.mbNotify(data.message, data.message_type);
+// 		}
+// 	});
+// });
 
 $(document).ready(function() {
 	<?php if (! empty($chosen_agenda)) : ?>
@@ -548,6 +548,6 @@ $(document).on('click', '.btn-block .an-btn', function(e) {
 	$(this).attr('disabled', 'disabled');
 });
 
-$(document).on('click', '.modal-monitor-evaluator button.close, #meeting-monitor-modal button.close, #meeting-decider-modal button.close', function(e) {
+$(document).on('click', '.modal-monitor-evaluator button.close, #meeting-evaluator-modal button.close, #meeting-monitor-modal button.close, #meeting-decider-modal button.close', function(e) {
 	location.reload();
 });
