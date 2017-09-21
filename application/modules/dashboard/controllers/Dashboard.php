@@ -599,7 +599,7 @@ class Dashboard extends Authenticated_Controller
 		->join('meeting_reads r', 'meetings.meeting_id = r.meeting_id AND r.user_id =' . $this->current_user->user_id, 'LEFT')
 		->where('p.organization_id', $this->current_user->current_organization_id)
 		->where('(sm.user_id = "' . $this->current_user->user_id . '" OR meetings.owner_id = "' . $this->current_user->user_id . '")')
-		->where('meetings.manage_state', 'evaluate')
+		->where('(meetings.manage_state = "decide" OR meetings.manage_state = "evaluate" OR meetings.manage_state = "done")')
 		->group_by('meetings.meeting_id')
 		->find_all();
 
@@ -630,9 +630,8 @@ class Dashboard extends Authenticated_Controller
 		// 	}
 		// }
 		
-		// dont need to wait for owner evaluator anymore
 		foreach($evaluate_meetings as $key => $meeting) {
-			if ($this->is_evaluated($meeting->meeting_id)) {
+			if ($this->is_evaluated($meeting->meeting_id) || ! $this->is_evaluated($meeting->meeting_id, $meeting->owner_id)) {
 				unset($evaluate_meetings[$key]);
 			}
 
@@ -642,10 +641,11 @@ class Dashboard extends Authenticated_Controller
 
 			if ($meeting->is_owner) {
 				$owner_meeting_ids[] = $meeting->meeting_id;
-			} else {
+			} elseif ($this->is_evaluated($meeting->meeting_id, $meeting->owner_id)) {
 				$member_meeting_ids[] = $meeting->meeting_id;
+			} else {
+				//unset($evaluate_meetings[$key]);
 			}
-
 		}
 
 		$evaluate_agendas = [];
@@ -670,8 +670,11 @@ class Dashboard extends Authenticated_Controller
 			r.user_id IS NOT NULL AS is_read, 
 			(SELECT m.meeting_key FROM ' . $this->db->dbprefix('meetings') . ' m WHERE m.meeting_id = ' . $this->db->dbprefix('homework') . '.meeting_id) AS meeting_key', false)
 			->join('homework_reads r', 'homework.homework_id = r.homework_id AND r.user_id =' . $this->current_user->user_id, 'LEFT')
+			->join('homework_members hm', 'hm.homework_id = homework.homework_id')
 			->where_in('homework.meeting_id', $member_meeting_ids)
 			->where($this->db->dbprefix('homework.homework_id') . ' NOT IN (SELECT ' . $this->db->dbprefix('homework_rates') . '.homework_id FROM ' . $this->db->dbprefix('homework_rates') . ' WHERE ' . $this->db->dbprefix('homework_rates') . '.homework_id = ' . $this->db->dbprefix('homework') . '.homework_id AND ' . $this->db->dbprefix('homework_rates') . '.user_id = "' . $this->current_user->user_id . '")')
+			->where('hm.user_id', $this->current_user->user_id)
+			->group_by('homework.homework_id')
 			->find_all();
 			if (empty($evaluate_homeworks)) {
 				$evaluate_homeworks = [];
@@ -693,6 +696,25 @@ class Dashboard extends Authenticated_Controller
 			if (empty($evaluate_members)) {
 				$evaluate_members = [];
 			}
+
+			// change: only hw assignees can rate their hw, so meeting owner also rate homework if he/she is a hw assignee 
+			$owner_evaluate_homeworks = $this->homework_model
+			->select('homework.*, "evaluate" AS todo_type, "homework" AS evaluate_mode,
+			r.user_id IS NOT NULL AS is_read, 
+			(SELECT m.meeting_key FROM ' . $this->db->dbprefix('meetings') . ' m WHERE m.meeting_id = ' . $this->db->dbprefix('homework') . '.meeting_id) AS meeting_key', false)
+			->join('homework_reads r', 'homework.homework_id = r.homework_id AND r.user_id =' . $this->current_user->user_id, 'LEFT')
+			->join('homework_members hm', 'hm.homework_id = homework.homework_id')
+			->where_in('homework.meeting_id', $owner_meeting_ids)
+			->where($this->db->dbprefix('homework.homework_id') . ' NOT IN (SELECT ' . $this->db->dbprefix('homework_rates') . '.homework_id FROM ' . $this->db->dbprefix('homework_rates') . ' WHERE ' . $this->db->dbprefix('homework_rates') . '.homework_id = ' . $this->db->dbprefix('homework') . '.homework_id AND ' . $this->db->dbprefix('homework_rates') . '.user_id = "' . $this->current_user->user_id . '")')
+			->where('hm.user_id', $this->current_user->user_id)
+			->group_by('homework.homework_id')
+			->find_all();
+
+			if (empty($owner_evaluate_homeworks)) {
+				$owner_evaluate_homeworks = [];
+			}
+
+			$evaluate_homeworks = array_merge($evaluate_homeworks, $owner_evaluate_homeworks);
 		}
 
 		$evaluates = array_merge($evaluate_meetings, $evaluate_members, $evaluate_agendas, $evaluate_homeworks);
@@ -783,9 +805,12 @@ class Dashboard extends Authenticated_Controller
 																->where_in('agenda_id', $all_agenda_ids)
 																->count_all() == count($all_agenda_ids)) : false;
 
-			$all_homeworks = $this->homework_model->select('homework_id')
+			$all_homeworks = $this->homework_model->select('homework.homework_id')
 								->join('meetings m', 'm.meeting_id = homework.meeting_id')
+								->join('homework_members hm', 'hm.homework_id = homework.homework_id')
 								->where('m.meeting_id', $meeting_id)
+								->where('hm.user_id', $user_id)
+								->group_by('homework.homework_id')
 								->as_array()
 								->find_all();
 			if (empty($all_homeworks)) $all_homeworks = [];

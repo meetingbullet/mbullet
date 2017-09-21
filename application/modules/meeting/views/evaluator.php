@@ -234,6 +234,7 @@ if ($meeting->scheduled_start_time) {
 							</td>
 							<?php if ($role != 'owner') : ?>
 							<td>
+								<?php if ($homework->is_member) : ?>
 								<div class="rating">
 									<input type="radio" id="star5" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 5) ?> value="5" /><label class = "full" for="star5" title="5 stars"></label>
 									<input type="radio" id="star4" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 4) ?> value="4" /><label class = "full" for="star4" title="4 stars"></label>
@@ -241,6 +242,7 @@ if ($meeting->scheduled_start_time) {
 									<input type="radio" id="star2" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 2) ?> value="2" /><label class = "full" for="star2" title="2 stars"></label>
 									<input type="radio" id="star1" name="homework_rate[<?php echo $homework->homework_id ?>]" <?php echo set_radio('homework_rate[' . $homework->homework_id . ']', 1) ?> value="1" /><label class = "full" for="star1" title="1 star"></label>
 								</div>
+								<?php endif ?>
 							</td>
 							<?php endif ?>
 						</tr>
