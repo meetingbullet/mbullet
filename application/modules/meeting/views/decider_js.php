@@ -129,12 +129,14 @@ $(document).on('submit.decider', '.form-meeting-decider', function(e) {
 
 					// Open Evaluator for Owner
 					$('#create-meeting').on('hidden.bs.modal', function () {
+						location.reload();
 						// merge evaluator for owner and decider screen
 						// @Bao: Open Evaluator for Owner
 						// $.mbOpenModalViaUrl('meeting-evaluator-modal' , "<?php e(site_url('meeting/evaluator/' . $meeting_key)) ?>", 'modal-80');
 					});
 				});
 			} else {
+				location.reload();
 				// merge evaluator for owner and decider screen
 				// @Bao: Open Evaluator for Owner
 				// $.mbOpenModalViaUrl('meeting-evaluator-modal' , "<?php e(site_url('meeting/evaluator/' . $meeting_key)) ?>", 'modal-80');

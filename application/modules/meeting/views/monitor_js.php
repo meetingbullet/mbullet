@@ -587,7 +587,25 @@ function update_monitor()
 				// remove comment section, show evaluator
 				// Member response to the Goal
 				// $.mbOpenModalViaUrl('meeting-preview-modal' , "<?php e(site_url('meeting/preview/' . $meeting_key . '?response')) ?>",);
-				$.mbOpenModalViaUrl('meeting-evaluator-modal' , "<?php e(site_url('meeting/evaluator/' . $meeting_key)) ?>", 'modal-80');
+				swal({
+					title: '<?php echo lang('st_waiting') ?>',
+					text: '<?php echo lang('st_waiting_evaluator') ?>',
+					allowEscapeKey: false,
+					imageUrl: '<?php echo Template::theme_url('images/clock.svg') ?>',
+					showConfirmButton: false
+				});
+
+				var interval = setInterval(function(){
+					$.get('<?php echo site_url('meeting/check_meeting_progress/' . $meeting_id) ?>').done(function(data) {
+						data = JSON.parse(data);
+						if (data.error == 0 && (data.progress.manage_state == 'evaluate' || data.progress.manage_state == 'done')) {
+							clearInterval(interval);
+							swal.close();
+
+							$.mbOpenModalViaUrl('meeting-evaluator-modal' , "<?php e(site_url('meeting/evaluator/' . $meeting_key)) ?>", 'modal-80');
+						}
+					});
+				}, 3000);
 			}
 		}
 

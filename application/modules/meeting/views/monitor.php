@@ -269,7 +269,8 @@ $scheduled_time = $scheduled_start_time ? $scheduled_start_time . ' - ' . $sched
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('monitor_js', [
 		'meeting_key' => $meeting_key,
-		'current_user' => $current_user
+		'current_user' => $current_user,
+		'meeting_id' => $meeting->meeting_id
 	], true) . '</script>';
 }
 ?>

@@ -1874,10 +1874,16 @@ class Meeting extends Authenticated_Controller
 			$role = 'other';
 		}
 
-		$homeworks = $this->homework_model->where('meeting_id', $meeting->meeting_id)->find_all();
+		$homeworks = $this->homework_model->select('*, IF((SELECT COUNT(*) FROM ' . $this->db->dbprefix('homework_members') . ' hm WHERE hm.user_id = "' . $this->current_user->user_id . '" AND hm.homework_id = ' . $this->db->dbprefix('homework') . '.homework_id) > 0, 1, 0) AS is_member')
+										->where('meeting_id', $meeting->meeting_id)
+										->as_object()->find_all();
 		if (empty($homeworks)) $homeworks = [];
 
+		$is_hw_member_count = 0;
 		foreach ($homeworks as &$homework) {
+			if ($homework->is_member) {
+				$is_hw_member_count += 1;
+			}
 			$homework->attachments = $this->homework_attachment_model->where('homework_id', $homework->homework_id)->find_all();
 			$homework->attachments = $homework->attachments ? $homework->attachments : [];
 		}
@@ -1913,7 +1919,7 @@ class Meeting extends Authenticated_Controller
 					if (empty($this->input->post('meeting_rate'))
 					|| ! is_array($this->input->post('agenda_rate'))
 					|| count($this->input->post('agenda_rate')) != count($agendas)
-					|| count($this->input->post('homework_rate')) != count($homeworks)) {
+					|| count($this->input->post('homework_rate')) != $is_hw_member_count) {
 						$validation_error = true;
 					}
 
@@ -2106,7 +2112,7 @@ class Meeting extends Authenticated_Controller
 		$evaluated = $this->is_evaluated($meeting_id);
 
 		// change: still able to evaluate even when meeting manage state is done 
-		if ($evaluated === false && ($manage_state == 'evaluate'|| $meeting->manage_state == 'decide' || $manage_state == 'done')) {
+		if ($evaluated === false && ($manage_state == 'evaluate'|| $manage_state == 'decide' || $manage_state == 'done')) {
 			if ($mode == 'user') {
 				$rated = $this->meeting_member_rate_model->skip_validation(true)->insert([
 					'meeting_id' => $meeting_id,
@@ -2317,7 +2323,25 @@ class Meeting extends Authenticated_Controller
 			$all = $this->meeting_member_model
 								->where('meeting_id', $meeting_id)
 								->count_all();
-			if ($all == $evaluated_members && $all > 0) {
+
+			// change: only hw assignees can rate their hw, so meeting owner also rate homework if he/she is a hw assignee
+			$all_homeworks = $this->homework_model->select('homework.homework_id')
+								->join('meetings m', 'm.meeting_id = homework.meeting_id')
+								->join('homework_members hm', 'hm.homework_id = homework.homework_id')
+								->where('m.meeting_id', $meeting_id)
+								->where('hm.user_id', $user_id)
+								->group_by('homework.homework_id')
+								->as_array()
+								->find_all();
+			if (empty($all_homeworks)) $all_homeworks = [];
+			$all_homework_ids = array_column($all_homeworks, 'homework_id');
+
+			$homeworks_rated = count($all_homework_ids) > 0 ? ($this->homework_rate_model
+																->where('user_id', $user_id)
+																->where_in('homework_id', $all_homework_ids)
+																->count_all() == count($all_homework_ids)) : true;
+
+			if ($all == $evaluated_members && $all > 0 && $homeworks_rated) {
 				$evaluated = true;
 			}
 		} else {
@@ -2340,9 +2364,12 @@ class Meeting extends Authenticated_Controller
 																->where_in('agenda_id', $all_agenda_ids)
 																->count_all() == count($all_agenda_ids)) : false;
 
-			$all_homeworks = $this->homework_model->select('homework_id')
+			$all_homeworks = $this->homework_model->select('homework.homework_id')
 								->join('meetings m', 'm.meeting_id = homework.meeting_id')
+								->join('homework_members hm', 'hm.homework_id = homework.homework_id')
 								->where('m.meeting_id', $meeting_id)
+								->where('hm.user_id', $user_id)
+								->group_by('homework.homework_id')
 								->as_array()
 								->find_all();
 			if (empty($all_homeworks)) $all_homeworks = [];
@@ -3900,8 +3927,7 @@ class Meeting extends Authenticated_Controller
 
 		$meeting_homeworks = $this->homework_model->select('homework.*,
 													o.email AS owner_email, o.first_name AS owner_first_name, o.last_name AS owner_last_name, o.avatar AS owner_avatar,
-													(SELECT (SUM(hr.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('homework_rates') . ' hr WHERE hr.homework_id=' . $this->db->dbprefix('homework') . '.homework_id AND hr.rate IS NOT NULL) AS average_rate')
-												->join('homework_rates hr', 'homework.homework_id = hr.homework_id')
+													(SELECT (SUM(hr.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('homework_rates') . ' hr WHERE hr.homework_id=' . $this->db->dbprefix('homework') . '.homework_id AND hr.rate IS NOT NULL AND hr.user_id IN (SELECT user_id FROM ' . $this->db->dbprefix('homework_members') . ' hm WHERE hm.homework_id = hr.homework_id)) AS average_rate')
 												->join('users o', 'o.user_id = homework.created_by')
 												->where('meeting_id', $meeting_id)
 												->order_by('homework.homework_id')
@@ -4065,8 +4091,7 @@ class Meeting extends Authenticated_Controller
 
 		$meeting_homeworks = $this->homework_model->select('homework.*,
 													o.email AS owner_email, o.first_name AS owner_first_name, o.last_name AS owner_last_name, o.avatar AS owner_avatar,
-													(SELECT (SUM(hr.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('homework_rates') . ' hr WHERE hr.homework_id=' . $this->db->dbprefix('homework') . '.homework_id AND hr.rate IS NOT NULL) AS average_rate')
-												->join('homework_rates hr', 'homework.homework_id = hr.homework_id')
+													(SELECT (SUM(hr.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('homework_rates') . ' hr WHERE hr.homework_id=' . $this->db->dbprefix('homework') . '.homework_id AND hr.rate IS NOT NULL AND hr.user_id IN (SELECT user_id FROM ' . $this->db->dbprefix('homework_members') . ' hm WHERE hm.homework_id = hr.homework_id)) AS average_rate')
 												->join('users o', 'o.user_id = homework.created_by')
 												->where('meeting_id', $meeting_id)
 												->order_by('homework.homework_id')
