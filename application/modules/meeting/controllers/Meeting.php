@@ -159,8 +159,8 @@ class Meeting extends Authenticated_Controller
 
 			if ($team = $this->input->post('team')) {
 				if ($team = explode(',', $team)) {
-					if ($data['owner_id'] != $this->current_user->user_id && ! in_array($this->current_user->user_id, $team)) {
-						$team[] = $this->current_user->user_id;
+					if ($data['owner_id'] != $this->current_user->user_id && ! in_array($this->current_user->email, $team)) {
+						$team[] = $this->current_user->email;
 					}
 
 					$members = $this->user_model->select('email, user_id,
@@ -229,7 +229,10 @@ class Meeting extends Authenticated_Controller
 									}
 								}
 
-								$this->meeting_member_invite_model->insert_batch($invite_data);
+								if (! empty($invite_data)) {
+									$this->meeting_member_invite_model->insert_batch($invite_data);
+								}
+
 								if (! empty($member_data)) {
 									$this->meeting_member_model->insert_batch($member_data);
 								}

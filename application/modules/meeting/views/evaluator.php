@@ -43,65 +43,82 @@ if ($meeting->scheduled_start_time) {
 			<div class="an-bootstrap-custom-tab">
 				<h2>
 					<?php e($meeting->name)?>
-					<?php if ($role != 'owner') : ?>
-					<div style="display: inline-block; vertical-align: middle; padding-bottom: 5px;" class="meeting-rating">
-						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 5 ? 'checked' : '' ?> id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
-						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 4 ? 'checked' : '' ?> id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
-						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 3 ? 'checked' : '' ?> id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
-						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 2 ? 'checked' : '' ?> id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
-						<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 1 ? 'checked' : '' ?> id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
-					</div>
-					<?php endif ?>
 				</h2>
 			</div>
 		</div>
 	</div> <!-- end AN-BODY-TOPBAR -->
 
+	<div class="col-md-7">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="an-single-component with-shadow">
+					<div class="an-component-header">
+						<h6><?php e(lang('st_goal'))?></h6>
+					</div>
+					<div class="an-component-body an-helper-block" style="max-height: 300px; overflow-y: auto">
+						<?php echo nl2br($meeting->goal) ?>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="an-single-component with-shadow">
+					<div class="an-component-header">
+						<h6>
+							<?php e(lang('st_notes'))?>
+							<?php if ($role != 'owner') : ?>
+							<div style="display: inline-block; vertical-align: middle; padding-bottom: 2.5px;" class="meeting-rating">
+								<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 5 ? 'checked' : '' ?> id="star5" value="5" /><label class = "full" for="star5" title="5 stars"></label>
+								<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 4 ? 'checked' : '' ?> id="star4" value="4" /><label class = "full" for="star4" title="4 stars"></label>
+								<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 3 ? 'checked' : '' ?> id="star3" value="3" /><label class = "full" for="star3" title="3 stars"></label>
+								<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 2 ? 'checked' : '' ?> id="star2" value="2" /><label class = "full" for="star2" title="2 stars"></label>
+								<input type="radio" name="meeting_rate" <?php echo set_value('meeting_rate') == 1 ? 'checked' : '' ?> id="star1" value="1" /><label class = "full" for="star1" title="1 star"></label>
+							</div>
+							<?php endif ?>
+						</h6>
+					</div>
+					<div class="an-component-body an-helper-block">
+						<?php echo nl2br($meeting->notes) ?>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="an-single-component">
+					<div class="an-component-body an-helper-block">
+						<table class="table table-striped table-meeting-time">
+							<thead>
+								<tr>
+									<th></th>
+									<th class="text-center"><?php e(lang('st_scheduled'))?></th>
+									<th class="text-center"><?php e(lang('st_actual'))?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td><strong><?php echo lang('st_start_time') ?></strong></td>
+									<td class="text-center"><?php e(display_time($scheduled_start_time)) ?></td>
+									<td class="text-center"><?php e(display_time($meeting->actual_start_time)) ?></td>
+								</tr>
+								<tr>
+									<td><strong><?php echo lang('st_end_time') ?></strong></td>
+									<td class="text-center"><?php e(display_time($scheduled_end_time)) ?></td>
+									<td class="text-center"><?php e(display_time($meeting->actual_end_time)) ?></td>
+								</tr>
+								<tr>
+									<td><strong><?php echo lang('st_elapsed_time') ?></strong></td>
+									<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
+									<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
+								</tr>
+							</tbody>
+						</table>
+					</div> <!-- end .AN-COMPONENT-BODY -->
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="col-md-5">
-		<div class="an-single-component">
-			<div class="an-component-body an-helper-block">
-				<table class="table table-striped table-meeting-time">
-					<thead>
-						<tr>
-							<th></th>
-							<th class="text-center"><?php e(lang('st_scheduled'))?></th>
-							<th class="text-center"><?php e(lang('st_actual'))?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td><strong><?php echo lang('st_start_time') ?></strong></td>
-							<td class="text-center"><?php e(display_time($scheduled_start_time)) ?></td>
-							<td class="text-center"><?php e(display_time($meeting->actual_start_time)) ?></td>
-						</tr>
-						<tr>
-							<td><strong><?php echo lang('st_end_time') ?></strong></td>
-							<td class="text-center"><?php e(display_time($scheduled_end_time)) ?></td>
-							<td class="text-center"><?php e(display_time($meeting->actual_end_time)) ?></td>
-						</tr>
-						<tr>
-							<td><strong><?php echo lang('st_elapsed_time') ?></strong></td>
-							<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
-							<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
-						</tr>
-					</tbody>
-				</table>
-			</div> <!-- end .AN-COMPONENT-BODY -->
-		</div>
-	</div>
-
-	<div class="col-md-4">
-		<div class="an-single-component with-shadow">
-			<div class="an-component-header">
-				<h6><?php e(lang('st_goal'))?></h6>
-			</div>
-			<div class="an-component-body an-helper-block" style="max-height: 300px; overflow-y: auto">
-				<?php echo nl2br($meeting->goal) ?>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-md-3">
 		<div class="an-single-component with-shadow">
 			<div class="an-component-header">
 				<h6><?php e(lang('st_attendees'))?></h6>
@@ -145,6 +162,7 @@ if ($meeting->scheduled_start_time) {
 							<th class="text-center"><?php e(lang('st_started'))?></th>
 							<th class="text-center"><?php e(lang('st_duration'))?></th>
 							<th class="text-center"><?php e(lang('st_status'))?></th>
+							<th class="text-center"><?php e(lang('st_confirm_status'))?></th>
 							<?php if ($role != 'owner') : ?>
 							<th><?php e(lang('st_rate'))?></th>
 							<?php endif ?>
@@ -159,6 +177,11 @@ if ($meeting->scheduled_start_time) {
 							<td class="text-center agenda-status">
 								<?php if (! empty($agenda->status)) : ?>
 								<span class="label label-bordered label-<?php e($agenda->status)?>"><?php e(lang('st_' . $agenda->status))?></span>
+								<?php endif ?>
+							</td>
+							<td class="text-center agenda-status">
+								<?php if (! empty($agenda->confirm_status)) : ?>
+								<span class="label label-bordered label-<?php e($agenda->confirm_status)?>"><?php e(lang('st_' . $agenda->confirm_status))?></span>
 								<?php endif ?>
 							</td>
 							<?php if ($role != 'owner') : ?>
