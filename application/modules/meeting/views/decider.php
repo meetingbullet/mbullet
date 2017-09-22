@@ -76,6 +76,17 @@ $confirmation_status = [
 								</div> <!-- end .AN-COMPONENT-BODY -->
 							</div>
 						</div>
+
+						<div class="col-md-12">
+							<div class="an-single-component with-shadow">
+							<div class="an-component-header">
+									<h6><?php e(lang('st_notes'))?></h6>
+								</div>
+								<div class="an-component-body an-helper-block">
+									<textarea id="note" name="note" rows="6" class="an-form-control note" style="border: none;" placeholder="<?php e(lang('st_write_a_note_here')) ?>"></textarea>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="row">
 						<div class="col-md-12">
@@ -297,15 +308,6 @@ $confirmation_status = [
 					</tbody>
 				</table>
 			</div> <!-- end .AN-COMPONENT-BODY -->
-		</div>
-
-		<div class="row">
-			<div class="col-md-12">
-				<div class="an-helper-block">
-					<label for="note"><?php e(lang('st_notes'))?></label>
-					<textarea id="note" name="note" rows="6" class="an-form-control note" placeholder="<?php e(lang('st_write_a_note_here')) ?>"></textarea>
-				</div>
-			</div>
 		</div>
 
 		<div class="modal-footer">
