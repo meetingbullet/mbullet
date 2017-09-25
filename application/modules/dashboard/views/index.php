@@ -19,6 +19,14 @@ foreach ($my_projects as $project) {
 	}
 }
 
+$has_new_upcoming_meeting = false;
+foreach($my_todo['today_meetings'] as $meeting) {
+	if ($meeting->is_read == 0) {
+		$has_new_upcoming_meeting = true;
+		break;
+	}
+}
+
 $evaluates_count = 0;
 $has_new_rating = false;
 foreach ($my_todo['evaluates'] as $evaluate) {
@@ -107,6 +115,9 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							<?php echo lang('db_today_meetings') ?>
 							<?php if (count($my_todo['today_meetings']) > 0): ?>
 							<span class="badge badge-primary pull-right"><?php echo count($my_todo['today_meetings']) ?></span>
+							<?php endif; ?>
+							<?php if ($has_new_upcoming_meeting):?>
+							<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
 							<?php endif; ?>
 						</a>
 					</li>
@@ -530,7 +541,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 	</div> <!-- #popover-rate -->
 
 	<div id="popover-today-meetings" style="display: none">
-		<div id="rate-content" class="mb-popover-content">
+		<div id="upcoming-popover-content" class="mb-popover-content">
 			<table class="table">
 				<thead>
 					<tr>
@@ -539,23 +550,51 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						<th>Meeting</th>
 						<th colspan="2" class="text-center">Scheduled start time</th>
 						<th colspan="2" class="text-center">Duration</th>
-						<th></th>
+						<th>Status</th>
+						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php $i = 0; foreach ($my_todo['today_meetings'] as $meeting) : $i++ ?>
-					<tr>
+					<tr data-meeting-id="<?php echo $meeting->meeting_id ?>" class="<?php if (! $meeting->is_read) echo 'upcoming-new' ?>">
 						<td><?php echo $meeting->meeting_key ?></td>
 						<td><?php echo $i ?></td>
-						<td><?php echo $meeting->name ?></td>
+						<td>
+							<a href="<?php site_url('meeting/' . $meeting->meeting_key) ?>" target="_blank" style="margin-right: 10px"><?php echo $meeting->name ?></a>
+							<?php if (! $meeting->is_read) : ?>
+							<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
+							<?php endif ?>
+						</td>
 						<td><?php echo display_time($meeting->scheduled_start_time) ?></td>
 						<td><?php echo relative_time(strtotime($meeting->scheduled_start_time)) ?></td>
 						<td><?php echo $meeting->in ?></td>
 						<td><?php echo $meeting->in_type ?></td>
+						<td><span class="msg-tag label label-bordered label-<?php echo $meeting->status ?>"><?php echo $meeting->status ?></span></td>
 						<td>
-						<?php if ($meeting->status == 'inprogress') : ?>
-							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key . '#join_meeting' ) ?>" target="_blank" class="an-btn an-btn-primary-transparent an-btn-small">Join</button>
-						<?php endif ?>
+						<?php if ($meeting->status == 'open'): ?>
+							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key . '#monitor' ) ?>" target="_blank" class="an-btn an-btn-primary-transparent an-btn-small <?php echo ($meeting->owner_id == $current_user->user_id ? '' : ' hidden')?>">
+								<?php e(lang('st_set_up')); ?>
+							</a>
+						<?php elseif ($meeting->status == 'ready' || $meeting->status == 'inprogress'): ?>
+							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key . '#monitor' ) ?>" target="_blank" class="an-btn an-btn-primary-transparent an-btn-small <?php echo ($meeting->owner_id == $current_user->user_id ? '' : ' hidden')?>">
+								<?php e(lang('st_monitor')); ?>
+							</a>
+							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key . '#monitor' ) ?>" target="_blank" class="an-btn an-btn-primary-transparent an-btn-small <?php echo ($meeting->owner_id != $current_user->user_id && $meeting->status == 'inprogress' ? '' : ' hidden')?>">
+								<?php e(lang('st_join')); ?>
+							</a>
+						<?php endif; ?>
+
+						<?php if ($meeting->manage_state == 'decide' && $meeting->owner_id == $current_user->user_id): ?>
+							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key . '#decide' ) ?>" target="_blank" class="an-btn an-btn-primary-transparent an-btn-small">
+								<?php echo lang('st_decider')?>
+							</a>
+						<?php endif; ?>
+
+						<?php if ((($meeting->manage_state == 'evaluate' || $meeting->manage_state == 'decide' || $meeting->manage_state == 'done') && $is_evaluated($meeting->meeting_id) === false) && $meeting->status != 'finished') : ?>
+							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key . '#evaluate' ) ?>" target="_blank" class="an-btn an-btn-primary-transparent an-btn-small">
+								<?php echo lang('st_evaluator')?>
+							</a>
+						<?php endif; ?>
 						</td>
 					</tr>
 					<?php endforeach ?>

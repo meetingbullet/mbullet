@@ -489,6 +489,7 @@ $(document).on('click', '#meeting-date-time-picker .modal-footer button', functi
 // show message if evaluated
 <?php if (! empty($evaluated)) : ?>
 $.mbNotify('<?php echo lang('st_meeting_already_evaluated') ?>', 'info');
+
 <?php endif ?>
 
 // get anchor value
@@ -505,8 +506,12 @@ function getAnchor(url) {
 }
 
 var anchor = getAnchor();
-if (anchor == 'join_meeting') {
-	$('a.mb-open-modal.open-meeting-monitor').click();
+if (anchor == 'monitor') {
+	$('a.mb-open-modal.open-meeting-monitor:not(.hidden)').click();
+} else if (anchor == 'decide') {
+	$('a.mb-open-modal.open-meeting-decider:not(.hidden)').click();
+} else if (anchor == 'evaluate') {
+	$('a.mb-open-modal#open-meeting-monitor:not(.hidden)').click();
 }
 
 $(document).on('click', '#homework-list tr .homework-status', function(e) {

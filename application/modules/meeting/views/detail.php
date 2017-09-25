@@ -61,7 +61,7 @@ $hw_status = ['open', 'done', 'undone'];
 
 		<?php if ($meeting->manage_state == 'decide' && $is_owner): ?>
 
-		<a href='#' class='an-btn an-btn-danger mb-open-modal'
+		<a href='#' class='an-btn an-btn-danger mb-open-modal open-meeting-decider'
 			data-modal-id="meeting-decider-modal"
 			data-url="<?php e(site_url('meeting/decider/' . $meeting_key)) ?>" 
 			data-modal-dialog-class="modal-80"
