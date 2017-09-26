@@ -182,6 +182,9 @@ class Dashboard extends Authenticated_Controller
 		Template::set('current_user', $this->current_user);
 		Template::set('user', $user);
 		Template::set('page_title', lang('db_dashboard'));
+		Template::set('is_evaluated', function($meeting_id) {
+			return $this->is_evaluated($meeting_id);
+		});
 		Template::render('dashboard');
 	}
 
@@ -220,7 +223,7 @@ class Dashboard extends Authenticated_Controller
 			return;
 		}
 
-		if ( !in_array($object_type, ['project', 'meeting', 'user', 'agenda', 'homework']) ) {
+		if ( !in_array($object_type, ['project', 'meeting', 'upcoming_meeting', 'user', 'agenda', 'homework']) ) {
 			echo json_encode([
 				'message_type' => 'danger',
 				'message' => lang('db_unknown_error')
@@ -231,7 +234,7 @@ class Dashboard extends Authenticated_Controller
 		$object_pk = $object_type;
 
 		$insert_data = [
-			$object_pk . '_id' => $object_id,
+			($object_type == 'upcoming_meeting' ? 'meeting' : $object_pk) . '_id' => $object_id,
 			'user_id' => $this->current_user->user_id
 		];
 
@@ -738,9 +741,10 @@ class Dashboard extends Authenticated_Controller
 		}
 
 		$today = display_time(date('Y-m-d H:i:s'), null, 'Y-m-d');
-		$today_meetings = $this->meeting_model->select('meetings.*')
+		$today_meetings = $this->meeting_model->select('meetings.*, IF(umr.user_id IS NOT NULL, 1, 0) AS is_read')
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
+		->join('upcoming_meeting_reads umr', 'umr.meeting_id = meetings.meeting_id AND umr.user_id = "' . $this->current_user->user_id . '"', 'LEFT')
 		->join('meeting_members sm', 'sm.meeting_id = meetings.meeting_id AND sm.user_id = "' . $this->current_user->user_id . '"', 'LEFT')
 		->where('p.organization_id', $this->current_user->current_organization_id)
 		->where('(sm.user_id = "' . $this->current_user->user_id . '" OR meetings.owner_id = "' . $this->current_user->user_id . '")')

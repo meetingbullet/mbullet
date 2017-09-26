@@ -51,6 +51,22 @@
 						<div class="col-md-8"><?php echo $meeting['name'] ?></div>
 					</div>
 					<div class="row">
+						<div class="col-md-4"><label><?php echo lang('st_owner') ?></label></div>
+						<div class="col-md-8"><?php echo display_user($meeting['owner_email'], $meeting['owner_first_name'], $meeting['owner_last_name'], $meeting['owner_avatar']) ?></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default panel-overview">
+			<div class="panel-heading" role="tab">
+				<h4 class="panel-title">
+					<a href="#general-body" role="button" data-toggle="collapse" aria-expanded="true"><?php echo lang('st_notes') ?></a>
+				</h4>
+			</div>
+			<div id="general-body" class="panel-collapse collapse in" role="tabpanel" aria-expanded="true">
+				<div class="panel-body">
+					<div class="row">
 						<div class="col-md-4"><label><?php echo lang('st_meeting_rating') ?></label></div>
 						<div class="col-md-8" style="color: orange;">
 						<?php for ($s = 1; $s <= 5; $s++) : ?>
@@ -65,7 +81,11 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-4"><label><?php echo lang('st_notes_summary') ?></label></div>
+						<div class="col-md-4"><label><?php echo lang('st_rated') ?></label></div>
+						<div class="col-md-8"><?php echo $meeting['member_rated'] . ' / ' . count($meeting_members) ?></div>
+					</div>
+					<div class="row">
+						<div class="col-md-4"><label><?php echo lang('st_content') ?></label></div>
 						<div class="col-md-8"><?php echo nl2br($meeting['notes']) ?></div>
 					</div>
 				</div>
@@ -81,22 +101,22 @@
 			<div id="attendees-body" class="panel-collapse collapse in" role="tabpanel" aria-expanded="true">
 				<div class="an-user-lists">
 					<div class="list-title">
-						<h6 class="basis-30">#</h6>
-						<h6 class="basis-50"><?php echo lang('st_attendee') ?></h6>
-						<h6 class="basis-50"><?php echo lang('st_meeting_rating') ?></h6>
+						<h6 class="basis-20">#</h6>
+						<h6 class="basis-40"><?php echo lang('st_attendee') ?></h6>
+						<h6 class="basis-40"><?php echo lang('st_meeting_rating') ?></h6>
 					</div>
 
 					<div class="an-lists-body">
 					<?php if (! empty($meeting_members)) : ?>
 						<?php foreach ($meeting_members as $index => $member) : ?>
 						<div class="list-user-single">
-							<div class="list-date number basis-30">
+							<div class="list-date number basis-20">
 								<?php echo $index + 1 ?>
 							</div>
-							<div class="list-name basis-50">
+							<div class="list-name basis-40">
 								<?php echo display_user($member['attendee_email'], $member['attendee_first_name'], $member['attendee_last_name'], $member['attendee_avatar']) ?>
 							</div>
-							<div class="list-action basis-50" style="color: orange;">
+							<div class="list-action basis-40" style="color: orange;">
 							<?php for ($s = 1; $s <= 5; $s++) : ?>
 								<?php if (($member['average_rate'] - $s) > -1 && ($member['average_rate'] - $s) < 0) : ?>
 								<i class="ion-ios-star-half"></i>
@@ -132,22 +152,26 @@
 			<div id="agendas-body" class="panel-collapse collapse in" role="tabpanel" aria-expanded="true">
 				<div class="an-user-lists">
 					<div class="list-title">
-						<h6 class="basis-30">#</h6>
-						<h6 class="basis-50"><?php echo lang('st_agenda') ?></h6>
-						<h6 class="basis-50"><?php echo lang('st_meeting_rating') ?></h6>
+						<h6 class="basis-20">#</h6>
+						<h6 class="basis-40"><?php echo lang('st_agenda') ?></h6>
+						<h6 class="basis-20"><?php echo lang('st_rated') ?></h6>
+						<h6 class="basis-20"><?php echo lang('st_meeting_rating') ?></h6>
 					</div>
 
 					<div class="an-lists-body">
 					<?php if (! empty($meeting_agendas)) : ?>
 						<?php foreach ($meeting_agendas as $index => $agenda) : ?>
 						<div class="list-user-single">
-							<div class="list-date number basis-30">
+							<div class="list-date number basis-20">
 								<?php echo $index + 1 ?>
 							</div>
-							<div class="list-name basis-50">
+							<div class="list-name basis-40">
 								<?php echo $agenda['name'] ?>
 							</div>
-							<div class="list-action basis-50" style="color: orange;">
+							<div class="list-date number basis-20">
+								<?php echo $agenda['member_rated'] . ' / ' . count($meeting_members) ?>
+							</div>
+							<div class="list-action basis-20" style="color: orange;">
 							<?php for ($s = 1; $s <= 5; $s++) : ?>
 								<?php if (($agenda['average_rate'] - $s) > -1 && ($agenda['average_rate'] - $s) < 0) : ?>
 								<i class="ion-ios-star-half"></i>
@@ -183,22 +207,22 @@
 			<div id="hw-body" class="panel-collapse collapse in" role="tabpanel" aria-expanded="true">
 				<div class="an-user-lists">
 					<div class="list-title">
-						<h6 class="basis-30">#</h6>
-						<h6 class="basis-50"><?php echo lang('st_homework') ?></h6>
-						<h6 class="basis-50"><?php echo lang('st_meeting_rating') ?></h6>
+						<h6 class="basis-20">#</h6>
+						<h6 class="basis-40"><?php echo lang('st_homework') ?></h6>
+						<h6 class="basis-40"><?php echo lang('st_meeting_rating') ?></h6>
 					</div>
 
 					<div class="an-lists-body">
 					<?php if (! empty($meeting_homeworks)) : ?>
 						<?php foreach ($meeting_homeworks as $index => $hw) : ?>
 						<div class="list-user-single">
-							<div class="list-date number basis-30">
+							<div class="list-date number basis-32">
 								<?php echo $index + 1 ?>
 							</div>
-							<div class="list-name basis-50">
+							<div class="list-name basis-40">
 								<?php echo $hw['name'] ?>
 							</div>
-							<div class="list-action basis-50" style="color: orange;">
+							<div class="list-action basis-40" style="color: orange;">
 							<?php for ($s = 1; $s <= 5; $s++) : ?>
 								<?php if (($hw['average_rate'] - $s) > -1 && ($hw['average_rate'] - $s) < 0) : ?>
 								<i class="ion-ios-star-half"></i>

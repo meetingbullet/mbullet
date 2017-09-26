@@ -711,3 +711,21 @@ $(document).on('click', '.popover .panel-completed-meeting .an-lists-body .list-
 		}
 	});
 });
+
+// read upcoming meeting
+$(document).on('click', '#upcoming-popover-content .upcoming-new', function() {
+	var that = this;
+
+	$.get('<?php echo site_url('dashboard/mark_as_read/upcoming_meeting/') ?>' + $(this).data('meeting-id'), (data) => {
+		data = JSON.parse(data);
+
+		if (data.message_type == 'success') {
+			$(that).removeClass('upcoming-new');
+			$(that).find('.badge-todo-new').fadeOut('fast', function() {
+				if(! $('#upcoming-popover-content .upcoming-new').length) {
+					$('#today-meetings .badge-todo-new').fadeOut('fast');
+				}
+			});
+		}
+	})
+});

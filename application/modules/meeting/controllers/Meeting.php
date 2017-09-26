@@ -4056,7 +4056,8 @@ class Meeting extends Authenticated_Controller
 
 		$meeting = $this->meeting_model->select('meetings.*, o.name as org_name,
 										u.email AS owner_email, u.first_name AS owner_first_name, u.last_name AS owner_last_name, u.avatar AS owner_avatar,
-										(SELECT (SUM(mm.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('meeting_members') . ' mm WHERE mm.meeting_id="' . $meeting_id . '" AND mm.rate IS NOT NULL) AS average_rate')
+										(SELECT (SUM(mm.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('meeting_members') . ' mm WHERE mm.meeting_id="' . $meeting_id . '" AND mm.rate IS NOT NULL) AS average_rate,
+										(SELECT COUNT(*) FROM ' . $this->db->dbprefix('meeting_members') . ' mm WHERE mm.meeting_id="' . $meeting_id . '" AND mm.rate IS NOT NULL) AS member_rated')
 									->join('users u', 'u.user_id = meetings.owner_id')
 									->join('actions a', 'a.action_id = meetings.action_id')
 									->join('projects p', 'p.project_id = a.project_id')
@@ -4082,7 +4083,8 @@ class Meeting extends Authenticated_Controller
 
 		$meeting_agendas = $this->agenda_model->select('agendas.*,
 												o.email AS owner_email, o.first_name AS owner_first_name, o.last_name AS owner_last_name, o.avatar AS owner_avatar,
-												(SELECT (SUM(ar.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('agenda_rates') . ' ar WHERE ar.agenda_id=' . $this->db->dbprefix('agendas') . '.agenda_id AND ar.rate IS NOT NULL) AS average_rate')
+												(SELECT (SUM(ar.rate)/(COUNT(*))) FROM ' . $this->db->dbprefix('agenda_rates') . ' ar WHERE ar.agenda_id=' . $this->db->dbprefix('agendas') . '.agenda_id AND ar.rate IS NOT NULL) AS average_rate,
+												(SELECT COUNT(*) FROM ' . $this->db->dbprefix('agenda_rates') . ' ar WHERE ar.agenda_id=' . $this->db->dbprefix('agendas') . '.agenda_id AND ar.rate IS NOT NULL) AS member_rated')
 											->join('users o', 'o.user_id = agendas.owner_id')
 											->where('meeting_id', $meeting_id)
 											->order_by('agendas.agenda_id')

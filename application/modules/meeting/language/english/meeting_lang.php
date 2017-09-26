@@ -244,3 +244,5 @@ $lang['st_accept'] = 'Accept';
 $lang['st_maybe'] = 'Maybe';
 $lang['st_decline'] = 'Decline';
 $lang['st_decision'] = 'Your decision';
+$lang['st_content'] = "Content";
+$lang['st_rated'] = "Rated";
