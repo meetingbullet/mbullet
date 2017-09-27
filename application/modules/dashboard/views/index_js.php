@@ -517,23 +517,6 @@ function bringToTop(order_index, speed = 300)  {
 	}, speed);
 }
 
-$('#private-meeting-list').popover({
-	html: true,
-	content: function() {
-		var that = this;
-
-		$.get({ url: '<?php echo site_url('meeting/get_private_meetings') ?>' }).done(function(data) {
-			data = JSON.parse(data);
-			if (data.status == 1) {
-				$(that).next().children('.popover-content').html($('#popover-private-meetings').render(data));
-				$(that).popover('reposition');
-			}
-		});
-
-		return "<div class='popover-loading'><?php echo lang('db_loading') ?></div>";
-	}
-});
-
 // Meeting invites
 $('.invitations a.decision').click(function(e) {
 	e.preventDefault();
@@ -705,7 +688,15 @@ $(document).on('click', '.popover .panel-completed-meeting .an-lists-body .list-
 	.done(function(data) {
 		data = JSON.parse(data);console.log(data);
 		if (data.error == 0 && data.progress.status == 'finished') {
-			$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/completed_meeting_summary/') ?>' + meeting_id);
+			$.get('<?php echo site_url('meeting/check_is_evaluated/') ?>' + meeting_id).done(function(data) {
+				data = JSON.parse(data);
+				if (data.error == 0 && data.is_evaluated == 0 && data.is_member == 1) {
+					var meeting_key = that.closest('.list-user-single').data('meeting-key');
+					$.mbOpenModalViaUrl('meeting-evaluator-modal', '<?php echo site_url('meeting/evaluator/') ?>' + meeting_key, 'modal-80');
+				} else {
+					$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/completed_meeting_summary/') ?>' + meeting_id);
+				}
+			});
 		} else {
 			window.location.href = $(that).attr('href');
 		}

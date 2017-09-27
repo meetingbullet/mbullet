@@ -12,7 +12,7 @@
 			</div>
 			<div class="col-md-9 col-sm-12">
 				<select name="project" class="an-form-control">
-					<option value="">Unspecified Project</option>
+					<option value="USP">Unspecified Project</option>
 					<optgroup label="My projects">
 					<?php foreach ($my_projects as $project) : ?>
 						<option value="<?php echo $project['cost_code'] ?>"><?php echo $project['name'] ?></option>

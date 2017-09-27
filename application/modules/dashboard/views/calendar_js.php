@@ -364,7 +364,7 @@ $(document).ready(function() {
 		// we need to add it on our own.
 
 		data += '&' + $('#calendar-create-event-modal .form-ajax').find('[type="submit"]').attr('name') + '=';
-
+		var need_refresh = $('#calendar-create-event-modal .form-ajax input[name="need_refresh"]').val();
 		$.ajax({
 			type: "POST",
 			url: $('#calendar-create-event-modal .form-ajax').attr('action'),
@@ -380,6 +380,9 @@ $(document).ready(function() {
 
 				if (data.message_type) {
 					if (data.message_type == 'success') {
+						if (need_refresh == 1) {
+							location.reload();
+						}
 						$('#calendar').fullCalendar('refetchEventSources', ['mbc', 'mbcp']);
 						$("textarea[name=recurring]").val('');
 					}

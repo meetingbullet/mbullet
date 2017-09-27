@@ -140,9 +140,6 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</a>
 
 				<ul class="an-child-nav js-open-nav" style="display: none;">
-					<li class='project'>
-						<a id="private-meeting-list"><i class="ion-help-circled"></i>&nbsp;Unspecified meetings</a>
-					</li>
 					<?php foreach ($my_projects AS $project): ?>
 					<li class='project' data-project-id="<?php echo $project->project_id ?>">
 						<a 	href="<?php echo site_url('project/' . $project->cost_code)?>" 
@@ -152,7 +149,12 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							data-owned="<?php echo $project->owned_by_x ?>"
 							data-cost-code="<?php echo $project->cost_code ?>" 
 							data-team="<?php echo $project->member_number ?>" 
-							>
+
+							<?php if ($project->is_unspecified_project) echo 'style="text-transform: uppercase;"' ?>
+						>
+							<?php if ($project->is_unspecified_project) : ?>
+							<i class="ion-help-circled"></i>
+							<?php endif ?>
 							<?php echo ($project->name . " <b>[{$project->cost_code}]</b>") ?>
 							<?php if ( ! $project->is_read): ?>
 							<span class="badge badge-warning badge-bordered badge-new">new</span>
@@ -560,7 +562,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						<td><?php echo $meeting->meeting_key ?></td>
 						<td><?php echo $i ?></td>
 						<td>
-							<a href="<?php site_url('meeting/' . $meeting->meeting_key) ?>" target="_blank" style="margin-right: 10px"><?php echo $meeting->name ?></a>
+							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key) ?>" target="_blank" style="margin-right: 10px"><?php echo $meeting->name ?></a>
 							<?php if (! $meeting->is_read) : ?>
 							<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
 							<?php endif ?>
@@ -622,12 +624,13 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				<a href="<?php echo site_url('project/')?>{{:cost_code}}">
 				<span>[{{:cost_code}}]</span>
 				</a>
-
+				{{if is_unspecified_project == 0}}
 				<a href="#" class="enable-edit-title" data-target="#project-{{:project_id}}">
 					<i class="ion-edit"></i>
 				</a>
+				{{/if}}
 			</h4>
-			<p>{{:owned_by_x}}</p>
+			<p {{if is_unspecified_project == 1}} style="visibility: hidden" {{/if}}>{{:owned_by_x}}</p>
 		</div>
 
 		<div class="pull-right">
@@ -850,7 +853,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						<div class="an-lists-body">
 						{{if completed_meetings}}
 							{{for completed_meetings}}
-								<div class="list-user-single" data-meeting-id="{{:meeting_id}}">
+								<div class="list-user-single" data-meeting-id="{{:meeting_id}}" data-meeting-key="{{:meeting_key}}">
 									<div class="list-date number basis-30">
 										<a href="<?php echo "/meeting/" ?>{{:meeting_key}}">{{:meeting_key}}</a>
 									</div>
@@ -1055,101 +1058,6 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 				</div>
 			</div> 
 		</div> <!-- Team members -->
-	</div>
-</script>
-
-<script type="text/bao" id="popover-private-meetings">
-	<div class="project-header">
-		<div class='project-header-content'>
-			<h4>Unspecified meetings</h4>
-		</div>
-	</div>
-
-	<div class="mb-popover-content">
-		<div class="project-body order-1">
-			<div class="panel panel-default panel-overview">
-				<div class="panel-heading" role="tab">
-					<h4 class="panel-title">
-						<a href="#overview-body" role="button" data-toggle="collapse">
-							<?php echo lang('db_overview') ?>
-						</a>
-					</h4>
-				</div>
-				<div id="overview-body" class="panel-collapse collapse in" role="tabpanel">
-					<div class="panel-body">
-						<div class="row number-container">
-							<div class="col-md-3">
-								<i class="ion-android-people"></i>
-								<?php echo lang('db_meeting') ?><br/>
-								<b class='number'>{{:no_of_meeting}}</b>
-							</div>
-							<div class="col-md-3 team-wrapper">
-								<i class="ion-android-people"></i>
-								<?php echo lang('db_team') ?><br/>
-								<b class='number'>{{:team}}</b>
-							</div>
-							<div class="col-md-3 time-wrapper">
-								<i class="ion-ios-alarm-outline"></i>
-								<?php echo lang('db_time') ?><br/>
-								<b class='number'>N/A</b>
-							</div>
-							<div class="col-md-3">
-								<i class="ion-android-people"></i>
-								<?php echo lang('db_points') ?><br/>
-								<b class='number'>N/A</b>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div> <!-- Overview -->
-
-			<div class="panel panel-default panel-unscheduled-meeting">
-				<div class="panel-heading" role="tab">
-					<h4 class="panel-title">
-						<a href="#unscheduled-meeting-body" role="button" data-toggle="collapse">
-							<?php echo lang('st_meetings') ?>
-						</a>
-					</h4>
-				</div>
-				<div id="unscheduled-meeting-body" class="panel-collapse collapse in" role="tabpanel">
-					<div class="an-user-lists">
-						<div class="list-title">
-							<h6 class="basis-30"><?php e(lang('pj_detail_tab_info_table_label_key')) ?></h6>
-							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_name')) ?></h6>
-							<h6 class="basis-50"><?php e(lang('pj_detail_tab_info_table_label_status')) ?></h6>
-						</div>
-
-						<div class="an-lists-body">
-						{{if meetings}}
-							{{for meetings}}
-								<div class="list-user-single">
-									<div class="list-date number basis-30">
-										<a href="<?php echo site_url('meeting/') ?>{{:meeting_id}}">N/A</a>
-									</div>
-									<div class="list-name basis-50">
-										<a href="<?php echo site_url('meeting/') ?>{{:meeting_id}}">{{:name}}</a>
-									</div>
-									<div class="list-action basis-50">
-										<span class="msg-tag label label-bordered label-inactive">N/A</span>
-									</div>
-								</div> <!-- end .USER-LIST-SINGLE -->
-							{{/for}}
-						{{else}}
-							<div id="no-meeting" class="list-user-single">
-								<div class="list-text basis-30">
-								</div>
-								<div class="list-date email approve basis-40">
-									<?php e(lang('pj_no_meeting')) ?>
-								</div>
-								<div class="list-text basis-30">
-								</div>
-							</div>
-						{{/if}}
-						</div>
-					</div>
-				</div>
-			</div> <!-- Unspecified Meeting -->
-		</div>
 	</div>
 </script>
 

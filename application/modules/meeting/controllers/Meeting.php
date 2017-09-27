@@ -38,6 +38,8 @@ class Meeting extends Authenticated_Controller
 		$this->load->model('project/project_model');
 		$this->load->model('project/project_member_model');
 
+		$this->load->model('invite/user_to_organizations_model');
+
 		Assets::add_module_css('homework', 'homework.css');
 		Assets::add_module_css('meeting', 'meeting.css');
 		Assets::add_module_js('meeting', 'meeting.js');
@@ -78,6 +80,42 @@ class Meeting extends Authenticated_Controller
 		}
 
 		$project_id = $this->mb_project->get_object_id('project', $project_key);
+
+		if (empty($project_id) && $project_key == 'USP') {
+			$organiztion_owner = $this->user_to_organizations_model->join('roles r', 'r.role_id = user_to_organizations.role_id')
+																->where('r.is_public', 1)
+																->where('r.system_default', 0)
+																->where('r.join_default', 0)
+																->limit(1)
+																->find_by('user_to_organizations.organization_id', $this->current_user->current_organization_id);
+
+			$unspecified_project_id = $this->project_model->insert([
+				'cost_code' => 'USP',
+				'owner_id' => $organiztion_owner->user_id,
+				'name' => 'Unspecified Project',
+				'organization_id' => $this->current_user->current_organization_id,
+				'is_unspecified_project' => 1,
+				'created_by' => $this->current_user->user_id
+			]);
+			$project_id = $unspecified_project_id;
+
+			/*
+				Temporary disable Action functionality, auto create an Action after creating Project 
+				and automatically uses it as default action for creating Meeting
+			*/
+
+			$this->action_model->insert([
+				'project_id' => $project_id,
+				'action_key' => 'USP-1', // PJK-1
+				'owner_id' => $organiztion_owner->user_id,
+				'name' => '[default_action]',
+				'action_type' => 'decide',
+				'success_condition' => 'action_gate',
+				'sort_order' => 999
+			]);
+
+			Template::set('need_refresh', 1);
+		}
 
 		if (empty($project_id)) {
 			Template::set('close_modal', 0);
@@ -137,6 +175,7 @@ class Meeting extends Authenticated_Controller
 			$data = $this->meeting_model->prep_data($this->input->post());
 			$data['action_id'] = $action->action_id;
 			$data['created_by'] = $this->current_user->user_id;
+			unset($data['need_refresh']);
 
 			if ($this->input->post('owner_id') == '') {
 				$data['owner_id'] = $this->current_user->user_id;
@@ -4122,5 +4161,41 @@ class Meeting extends Authenticated_Controller
 		}
 
 		echo json_encode(['html' => $this->mb_project->meeting_alert(false)]);exit;
+	}
+
+	public function check_is_evaluated($meeting_id)
+	{
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
+		$data = [
+			'error' => 0,
+			'is_member' => 0,
+			'is_evaluated' => 0
+		];
+
+		if (empty($meeting_id)) {
+			$data['error'] = 1;
+			echo json_encode($data);exit;
+		}
+
+		$evaluated = $this->is_evaluated($meeting_id);
+		if ($evaluated) {
+			$data['is_evaluated'] = 1;
+		}
+
+		$owner_id = $this->meeting_model->get_field($meeting_id, 'owner_id');
+		$members = $this->meeting_member_model->select('u.user_id')
+											->join('users u', 'u.user_id = meeting_members.user_id')
+											->where('u.user_id !=', $owner_id)
+											->where('meeting_id', $meeting_id)
+											->as_array()
+											->find_all();
+		if (in_array($this->current_user->user_id, array_column($members, 'user_id'))) {
+			$data['is_member'] = 1;
+		}
+
+		echo json_encode($data);exit;
 	}
 }
