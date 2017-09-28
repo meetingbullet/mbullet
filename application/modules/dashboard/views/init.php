@@ -517,9 +517,9 @@
 								<select id="goal-importance" name="importance" class="an-form-control">
 									<option disabled selected>(Select)</option>
 									<option value="urgent">Urgent/Critical</option>
-									<option value="required">Requried for [Sprint]</option>
-									<option value="requested">Requested for [Sprint]</option>
-									<option value="backlog">Backlog for [Project]</option>
+									<option value="required_for_sprint">Requried for [Sprint]</option>
+									<option value="requested_for_sprint">Requested for [Sprint]</option>
+									<option value="backlog_for_project">Backlog for [Project]</option>
 									<option value="other">Other [Fill in Blank]</option>
 								</select>
 							</div>
