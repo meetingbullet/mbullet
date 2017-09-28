@@ -548,6 +548,7 @@ class Dashboard extends Authenticated_Controller
 		->where('projects.status !=', 'draft') //exclude draft
 		->where_not_in('project_id', count($my_project_ids) > 0 ? $my_project_ids : [-1])
 		->where('organization_id', $this->current_user->current_organization_id)
+		->where('is_unspecified_project', 0)
 		->order_by('projects.name')
 		->find_all();
 
