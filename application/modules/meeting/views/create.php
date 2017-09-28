@@ -56,7 +56,7 @@ $times = [
 				<?php echo mb_form_input('text', 'name', lang('st_name'), true) ?>
 				<?php echo mb_form_input('text', 'owner_id', lang('st_owner'), true, '', 'owner-id an-tags-input', '', lang('st_select_team_member')) ?>
 				<?php echo mb_form_input('text', 'team', lang('st_resource'), true, '', 'team select-member an-tags-input', '', lang('st_add_team_member')) ?>
-
+				<input name="need_refresh" class="hidden" value="<?php echo set_value('need_refresh', empty($need_refresh) ? 0 : 1) ?>">
 				<div class="row">
 					<div class="col-md-3 col-sm-12">
 						<label for="goal" class="pull-right"><?php e(lang('st_goal')) ?></label>

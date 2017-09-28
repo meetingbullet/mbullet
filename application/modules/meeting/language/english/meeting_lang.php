@@ -246,3 +246,4 @@ $lang['st_decline'] = 'Decline';
 $lang['st_decision'] = 'Your decision';
 $lang['st_content'] = "Content";
 $lang['st_rated'] = "Rated";
+$lang['st_unable_to_modify_default_project'] = 'Unable to modify the unspecified project infomation';

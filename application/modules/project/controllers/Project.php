@@ -84,6 +84,12 @@ class Project extends Authenticated_Controller
 		if (! IS_AJAX) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+
+		if ($project_key == 'USP') {
+			Template::set_message(lang('st_unable_to_modify_default_project'), 'danger');
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
+
 		$project_id = $this->mb_project->get_object_id('project', $project_key);
 
 		if (empty($project_id)) {
@@ -207,7 +213,7 @@ class Project extends Authenticated_Controller
 
 			$check_cost_code = $this->project_model->where('organization_id', $this->current_user->current_organization_id)->where('status !=', 'draft')->find_by('cost_code', $project_data['cost_code']);
 
-			if ($check_cost_code !== false && ($type == 'insert' || ($type == 'update' && $check_cost_code->project_id != $project_id))) {
+			if ($check_cost_code !== false && $check_cost_code->cost_code != 'USP' && ($type == 'insert' || ($type == 'update' && $check_cost_code->project_id != $project_id))) {
 				Template::set('message', lang('pj_duplicated_cost_code'));
 				return false;
 			}

@@ -268,7 +268,7 @@ class Dashboard extends Authenticated_Controller
 	private function get_my_projects()
 	{
 		$projects = $this->project_model
-		->select('projects.name, projects.project_id, projects.cost_code, u.email, u.avatar, u.first_name, u.last_name, 
+		->select('projects.name, projects.project_id, projects.cost_code, projects.is_unspecified_project, u.email, u.avatar, u.first_name, u.last_name, 
 		(SELECT COUNT(*) FROM ' . $this->db->dbprefix('project_members') . ' WHERE ' . 
 		$this->db->dbprefix('project_members') . '.project_id = ' . 
 		$this->db->dbprefix('projects') . '.project_id) as member_number,
@@ -280,6 +280,7 @@ class Dashboard extends Authenticated_Controller
 		->where('projects.status !=', 'draft') //exclude draft
 		->where('(pm.user_id = \'' . $this->current_user->user_id . '\' OR projects.owner_id = \'' . $this->current_user->user_id . '\')')
 		->where('organization_id', $this->current_user->current_organization_id)
+		->order_by('projects.is_unspecified_project', 'desc')
 		->order_by('projects.name')
 		->find_all();
 
@@ -309,6 +310,7 @@ class Dashboard extends Authenticated_Controller
 			return;
 		}
 
+		$result['is_unspecified_project'] = $this->project_model->get_field($project_id, 'is_unspecified_project');
 		$result['allowed_point'] = $this->project_constraint_model->select('total_point_project')->find($project_id);
 		$result['allowed_point'] && $result['allowed_point'] = (int) $result['allowed_point']->total_point_project;
 		$result['total_used'] = $this->mb_project->total_used('project', $project_id);
@@ -356,7 +358,7 @@ class Dashboard extends Authenticated_Controller
 		$result['scheduled_meetings'] = $this->meeting_model->find_all();
 
 		$result['completed_meetings'] = $this->meeting_model->
-		select('meetings.meeting_id, meetings.name, meetings.meeting_key, scheduled_start_time, 
+		select('meetings.meeting_id, meetings.meeting_key, meetings.name, meetings.meeting_key, scheduled_start_time, 
 		meetings.status, u.email, u.avatar, u.first_name, u.last_name')
 		->join('actions a', 'a.action_id = meetings.action_id')
 		->join('projects p', 'p.project_id = a.project_id')
