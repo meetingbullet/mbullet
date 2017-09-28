@@ -3109,6 +3109,7 @@ class Meeting extends Authenticated_Controller
 										->where('status !=', 'draft')
 										->find_all();
 
+
 		Template::set('data', $data);
 		Template::set('projects', empty($projects) ? [] : $projects);
 		Template::render();
@@ -3266,10 +3267,52 @@ class Meeting extends Authenticated_Controller
 
 		$attachment = $_FILES;
 
+		$unspecified_project = $this->project_model->where('is_unspecified_project', 1)->find_by('organization_id', $this->current_user->current_organization_id);
 		foreach ($data['meetings'] as $event_id => $meeting) {
 			$user_emails = $meeting['members'];
 			$user_emails[] = $meeting['owner'];
 			$user_emails = array_unique($user_emails);
+
+			if ($meeting['project_id'] == '') {
+				if (empty($unspecified_project)) {
+					$organiztion_owner = $this->user_to_organizations_model->join('roles r', 'r.role_id = user_to_organizations.role_id')
+								->where('r.is_public', 1)
+								->where('r.system_default', 0)
+								->where('r.join_default', 0)
+								->limit(1)
+								->find_by('user_to_organizations.organization_id', $this->current_user->current_organization_id);
+
+					$unspecified_project = [
+						'cost_code' => 'USP',
+						'owner_id' => $organiztion_owner->user_id,
+						'name' => 'Unspecified Project',
+						'organization_id' => $this->current_user->current_organization_id,
+						'is_unspecified_project' => 1,
+						'created_by' => $this->current_user->user_id
+					];
+
+					$unspecified_project_id = $this->project_model->insert($unspecified_project);
+					$unspecified_project['project_id'] = $unspecified_project_id;
+					$unspecified_project = (object) $unspecified_project;
+
+					/*
+					Temporary disable Action functionality, auto create an Action after creating Project 
+					and automatically uses it as default action for creating Meeting
+					*/
+
+					$this->action_model->insert([
+						'project_id' => $unspecified_project_id,
+						'action_key' => 'USP-1', // PJK-1
+						'owner_id' => $organiztion_owner->user_id,
+						'name' => '[default_action]',
+						'action_type' => 'decide',
+						'success_condition' => 'action_gate',
+						'sort_order' => 999
+					]);
+				}
+				$meeting['project_id'] = $unspecified_project->project_id;
+			}
+
 			$project_key = $this->project_model->get_field($meeting['project_id'], 'cost_code');
 			$owner = $this->user_model->select('user_id')->find_by('email', $meeting['owner']);
 
@@ -3312,10 +3355,23 @@ class Meeting extends Authenticated_Controller
 				} else {
 					$this->load->library('invite/invitation');
 
+					$query = $this->db->insert_string('project_members', [
+						'project_id' => $meeting['project_id'],
+						'user_id' => $meeting_data['owner_id']
+					]);
+		
+					$query = str_replace('INSERT', 'INSERT IGNORE', $query);
+					$this->db->query($query);
+
 					$in_system_users = $this->user_model->select('user_id, email')->where_in('email', $user_emails)->as_array()->find_all();
 					if (empty($in_system_users)) $in_system_users = [];
 
 					$in_system_emails = array_column($in_system_users, 'email');
+
+					$in_organization_users = $this->user_model->select('users.user_id, email')->join('user_to_organizations uto', 'uto.user_id = users.user_id')->where_in('email', $user_emails)->as_array()->find_all();
+					if (empty($in_organization_users)) $in_organization_users = [];
+
+					$in_organization_emails = array_column($in_organization_users, 'email');
 
 					$meeting_users = [];
 					foreach ($user_emails as $email) {
@@ -3341,6 +3397,14 @@ class Meeting extends Authenticated_Controller
 									'email' => $email
 								];
 							}
+
+							$index = array_search($email, $in_organization_emails);
+							if ($index !== false) {
+								$meeting_members[] = [
+									'user_id' => $in_organization_users[$index]['user_id'],
+									'meeting_id' => $meeting_id
+								];
+							}
 						} else {
 							$this->meeting_member_model->insert([
 								'meeting_id' => $meeting_id,
@@ -3350,8 +3414,15 @@ class Meeting extends Authenticated_Controller
 					}
 					$meeting_users = array_merge($meeting_users, $in_system_users);
 
-					$this->meeting_member_invite_model->insert_batch($member_data);
-					$this->mb_project->invite_emails($meeting_id, 'meeting', $this->current_user, $user_emails);
+					if (! empty($member_data)) {
+						$this->meeting_member_invite_model->insert_batch($member_data);
+					}
+					if (! empty($meeting_members)) {
+						$this->meeting_member_model->insert_batch($meeting_members);
+					}
+					if (! empty($user_emails)) {
+						$this->mb_project->invite_emails($meeting_id, 'meeting', $this->current_user, $user_emails);
+					}
 
 					$meeting_data['meeting_id'] = $meeting_id;
 					if ($data['path'] == 'owner') {
@@ -3368,7 +3439,7 @@ class Meeting extends Authenticated_Controller
 
 					$this->db->where('user_id', $this->current_user->user_id)
 							->where('organization_id', $this->current_user->current_organization_id)
-							->update('user_to_organizations', ['inited', 1]);
+							->update('user_to_organizations', ['inited' => 1]);
 				}
 			} else {
 				$error = true;
@@ -3425,12 +3496,12 @@ class Meeting extends Authenticated_Controller
 					$item_id = $this->{$type . '_model'}->insert($data);
 
 					if ($type != 'goal') {
-						if (! file_exists('user_data/' . $this->current_user->user_id)) {
-							mkdir('user_data/' . $this->current_user->user_id, 0777, true);
+						if (! file_exists('../user_data/' . $this->current_user->user_id)) {
+							mkdir('../user_data/' . $this->current_user->user_id, 0777, true);
 						}
 
 						$upload_config = [
-							'upload_path'   => 'user_data/' . $this->current_user->user_id,
+							'upload_path'   => '../user_data/' . $this->current_user->user_id,
 							'allowed_types' => 'gif|jpg|jpeg|png|doc|docx|xls|txt',
 							'encrypt_name'  => true
 						];
@@ -3439,22 +3510,24 @@ class Meeting extends Authenticated_Controller
 						$this->upload->initialize($upload_config);
 
 						$temp = $files;
-						for ($j = 0; $j < count($temp[$type]['name'][$meeting_data['google_event_id']][$object_index]); $j++) {
-							$attachment['image']['name'] = $temp[$type]['name'][$meeting_data['google_event_id']][$object_index][$j];
-							$attachment['image']['type'] = $temp[$type]['type'][$meeting_data['google_event_id']][$object_index][$j];
-							$attachment['image']['tmp_name'] = $temp[$type]['tmp_name'][$meeting_data['google_event_id']][$object_index][$j];
-							$attachment['image']['error'] = $temp[$type]['error'][$meeting_data['google_event_id']][$object_index][$j];
-							$attachment['image']['size'] = $temp[$type]['size'][$meeting_data['google_event_id']][$object_index][$j];
+						if (! empty($temp[$type])) {
+							for ($j = 0; $j < count($temp[$type]['name'][$meeting_data['google_event_id']][$object_index]); $j++) {
+								$attachment['image']['name'] = $temp[$type]['name'][$meeting_data['google_event_id']][$object_index][$j];
+								$attachment['image']['type'] = $temp[$type]['type'][$meeting_data['google_event_id']][$object_index][$j];
+								$attachment['image']['tmp_name'] = $temp[$type]['tmp_name'][$meeting_data['google_event_id']][$object_index][$j];
+								$attachment['image']['error'] = $temp[$type]['error'][$meeting_data['google_event_id']][$object_index][$j];
+								$attachment['image']['size'] = $temp[$type]['size'][$meeting_data['google_event_id']][$object_index][$j];
 
-							$_FILES = $attachment;
-							$this->upload->do_upload('image');
-							$upload_data = $this->upload->data();
-							$attachment_data = [
-								$type . '_id' => $item_id,
-								'url' => $upload_data['full_path']
-							];
+								$_FILES = $attachment;
+								$this->upload->do_upload('image');
+								$upload_data = $this->upload->data();
+								$attachment_data = [
+									$type . '_id' => $item_id,
+									'url' => $upload_data['full_path']
+								];
 
-							$this->{$type . '_attachment_model'}->insert($attachment_data);
+								$this->{$type . '_attachment_model'}->insert($attachment_data);
+							}
 						}
 
 						$object_members = [];
@@ -3470,7 +3543,7 @@ class Meeting extends Authenticated_Controller
 						}
 
 						if (! empty($object_members)) {
-							$this->{$type . '_members_model'}->insert_batch($object_members);
+							$this->{$type . '_member_model'}->insert_batch($object_members);
 						}
 					}
 				}

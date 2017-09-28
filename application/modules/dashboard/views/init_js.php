@@ -1095,4 +1095,8 @@ $(document).on('submit','#init #attachment-form', function(e) {
 		}
 	});
 });
+
+$(document).on('hidden.bs.modal', '#init.modal', function() {
+	location.reload();
+});
 // ********end - baodg********
