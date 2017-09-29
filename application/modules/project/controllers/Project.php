@@ -179,6 +179,8 @@ class Project extends Authenticated_Controller
 		$project_data = $this->project_model->prep_data($data);
 		if (! empty($project_data['deadline'])) {
 			$project_data['deadline'] = get_utc_time($project_data['deadline']);
+		} else {
+			$project_data['deadline'] = null;
 		}
 
 		$draft = $this->project_model->where('organization_id', $this->current_user->current_organization_id)
