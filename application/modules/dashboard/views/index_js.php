@@ -720,3 +720,19 @@ $(document).on('click', '#upcoming-popover-content .upcoming-new', function() {
 		}
 	})
 });
+
+// show meeting summary for today upcoming meeting in sidebar
+$(document).on('click', '#upcoming-popover-content tbody tr td a.name', function(e) {
+	e.preventDefault();
+	var that = $(this);
+	var meeting_id = that.closest('tr').data('meeting-id');
+	$.get('<?php echo site_url('meeting/check_meeting_progress/') ?>' + meeting_id)
+	.done(function(data) {
+		data = JSON.parse(data);console.log(data);
+		if (data.error == 0 && data.progress.status == 'finished') {
+			$.mbOpenModalViaUrl('meeting-summary', '<?php echo site_url('meeting/completed_meeting_summary/') ?>' + meeting_id);
+		} else {
+			window.location.href = $(that).attr('href');
+		}
+	});
+});

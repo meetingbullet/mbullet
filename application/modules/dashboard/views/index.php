@@ -562,7 +562,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 						<td><?php echo $meeting->meeting_key ?></td>
 						<td><?php echo $i ?></td>
 						<td>
-							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key) ?>" target="_blank" style="margin-right: 10px"><?php echo $meeting->name ?></a>
+							<a class="name" href="<?php echo site_url('meeting/' . $meeting->meeting_key) ?>" target="_blank" style="margin-right: 10px"><?php echo $meeting->name ?></a>
 							<?php if (! $meeting->is_read) : ?>
 							<span class="badge badge-warning badge-bordered badge-todo-new">new</span>
 							<?php endif ?>
@@ -592,7 +592,7 @@ foreach ($my_todo['evaluates'] as $evaluate) {
 							</a>
 						<?php endif; ?>
 
-						<?php if ((($meeting->manage_state == 'evaluate' || $meeting->manage_state == 'decide' || $meeting->manage_state == 'done') && $is_evaluated($meeting->meeting_id) === false) && $meeting->status != 'finished') : ?>
+						<?php if ($meeting->manage_state == 'done' && $meeting->owner_id != $current_user->user_id && $is_evaluated($meeting->meeting_id) === false) : ?>
 							<a href="<?php echo site_url('meeting/' . $meeting->meeting_key . '#evaluate' ) ?>" target="_blank" class="an-btn an-btn-primary-transparent an-btn-small">
 								<?php echo lang('st_evaluator')?>
 							</a>

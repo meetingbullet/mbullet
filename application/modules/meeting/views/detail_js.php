@@ -511,7 +511,7 @@ if (anchor == 'monitor') {
 } else if (anchor == 'decide') {
 	$('a.mb-open-modal.open-meeting-decider:not(.hidden)').click();
 } else if (anchor == 'evaluate') {
-	$('a.mb-open-modal#open-meeting-monitor:not(.hidden)').click();
+	$('a.mb-open-modal#open-meeting-evaluator:not(.hidden)').click()
 }
 
 $(document).on('click', '#homework-list tr .homework-status', function(e) {
