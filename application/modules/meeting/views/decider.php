@@ -83,7 +83,9 @@ $confirmation_status = [
 									<h6><?php e(lang('st_notes'))?></h6>
 								</div>
 								<div class="an-component-body an-helper-block">
-									<textarea id="note" name="note" rows="6" class="an-form-control note" style="border: none;" placeholder="<?php e(lang('st_write_a_note_here')) ?>"></textarea>
+									<form id="note-form">
+										<textarea id="note" name="note" rows="6" class="an-form-control note" placeholder="<?php e(lang('st_write_a_note_here')) ?>"><?php echo set_value('note') ?></textarea>
+									</form>
 								</div>
 							</div>
 						</div>

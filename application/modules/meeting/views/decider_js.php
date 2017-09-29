@@ -107,7 +107,7 @@ $(document).on('submit.decider', '.form-meeting-decider', function(e) {
 		return false;
 	}
 
-	$.post($(this).attr('action'), $(this).serialize() + '&' + $('#rating-form').serialize(), (result) => {
+	$.post($(this).attr('action'), $(this).serialize() + '&' + $('#rating-form').serialize() + '&' + $('#note-form').serialize(), (result) => {
 		var data = JSON.parse(result);
 
 		if (data.message_type) {

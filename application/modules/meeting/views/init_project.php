@@ -31,12 +31,17 @@
 				<td><?php echo (count($meeting['members']) + 1) ?></td>
 				<td>
 					<select class="an-form-control">
-					<?php foreach ($projects as $project) : ?>
+						<option value="">Unspecified Project </option>
+						<?php foreach ($projects as $project) : ?>
 						<option value="<?php echo $project->project_id ?>" <?php if (! empty($meeting['project_id']) && $meeting['project_id'] == $project->project_id) echo 'selected' ?>><?php echo $project->name ?></option>
-					<?php endforeach ?>
+						<?php endforeach ?>
 					</select>
 				</td>
-				<td class="action"><i data-modal-id="init-create-project-modal" data-url="<?php echo site_url('project/create')?>" class="mb-open-modal add-project ion-plus-circled"></i></td>
+				<td class="action">
+				<?php if (has_permission('Project.Create')) : ?>
+					<i data-modal-id="init-create-project-modal" data-url="<?php echo site_url('project/create')?>" class="mb-open-modal add-project ion-plus-circled"></i>
+				<?php endif ?>
+				</td>
 			</tr>
 		<?php endforeach ?>
 		</tbody>

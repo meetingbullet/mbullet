@@ -62,7 +62,9 @@ $('#calendar-init').fullCalendar({
 		// Update overview after switchs to new month
 		if (! isLoading) {
 			updateOverview();
-			$('.btn-next-step').prop('disabled', false);
+			if (INIT_DATA.currentStepIndex == 1) {
+				$('.btn-next-step').prop('disabled', false);
+			}
 		}
 	},
 	events: {
@@ -457,7 +459,7 @@ $('.btn-create-todo').click(function(e){
 	$('#time-spent').val('');
 	$('#todo-assignee')[0].selectize.clear();
 
-	$('.btn-wide[data-type="homework"] > span').text($('.table-homework tbody tr').length);
+	$('.btn-wide[data-type="homework"] > span').text($('.table-homework tbody tr').length / 2);
 });
 
 $('.btn-create-agenda').click(function(e){
@@ -522,7 +524,7 @@ $('.btn-create-agenda').click(function(e){
 
 	$('#agenda-name').val('');
 	$('#agenda-assignee')[0].selectize.clear();
-	$('.btn-wide[data-type="agenda"] > span').text($('.table-agenda tbody tr').length);
+	$('.btn-wide[data-type="agenda"] > span').text($('.table-agenda tbody tr').length / 2);
 
 	// Create atleast 1 agenda to continue
 	$('.btn-next-step').prop('disabled', false);
@@ -668,27 +670,36 @@ $(document).on('click', '.init .fc-event', function(e){
 	var event = INIT_DATA.events[$(this).data('index')];
 
 	if ( $('#init .step-30 .owner:visible').length ) {
+		console.log(event.attendees)
+		$('.table-team tbody').html('');
+		attendees = []
 		for (var i in event.attendees) {
 			if (event.attendees[i].responseStatus == 'declined') {
-				event.attendees.splice(i, 1);
 				continue;
 			}
 
+			attendees.push(event.attendees[i])
+
 			// Don't show yourself
-			if (event.attendees[i].email != event.ownerEmail) {
-				$('.table-team tbody').html('');
-				$(`
-					<tr data-email="${event.attendees[i].email}">
-						<td>${event.attendees[i].email}</td>
-						<td class="text-center">
-							<a href="#" class="remove-team text-danger">
-								<i class="ion-close"></i>
-							</a>
-						</td>
-					</tr>
-				`).appendTo('.table-team tbody');
+			if (event.attendees[i].email == event.ownerEmail) {
+				continue;
 			}
+
+			$(`
+				<tr data-email="${event.attendees[i].email}">
+					<td>${event.attendees[i].email}</td>
+					<td class="text-center">
+						<a href="#" class="remove-team text-danger">
+							<i class="ion-close"></i>
+						</a>
+					</td>
+				</tr>
+			`).appendTo('.table-team tbody');
+
+			console.log($('.table-team tbody'))
 		}
+
+		event.attendees = attendees;
 		
 
 		currentEvent = event;
@@ -1094,5 +1105,9 @@ $(document).on('submit','#init #attachment-form', function(e) {
 			//console.log(data);
 		}
 	});
+});
+
+$(document).on('hidden.bs.modal', '#init.modal', function() {
+	location.reload();
 });
 // ********end - baodg********
