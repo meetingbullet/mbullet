@@ -71,60 +71,69 @@ $(document).on('click.mb', '.mb-open-modal', function(e) {
 });
 
 $.mbOpenModal = function(modal_id, title, content, dialog_class) {
-	var template = `
-	<div class="modal fade mb-modal" id="${modal_id}" tabindex="-1" role="dialog">
-		<div class="modal-dialog ${dialog_class}" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">${title}</h4>
-				</div>
-				<div class="modal-body">
-					${content}
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	if (! $('#' + modal_id + '-placeholder').length) {
+		$('body').append('<div id="' + modal_id + '-placeholder"></div>');
+
+		var template = `
+		<div class="modal fade mb-modal" id="${modal_id}" tabindex="-1" role="dialog">
+			<div class="modal-dialog ${dialog_class}" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">${title}</h4>
+					</div>
+					<div class="modal-body">
+						${content}
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
 				</div>
 			</div>
-		</div>
-	</div>`;
+		</div>`;
 
-	modal_id = '#' + modal_id;
+		modal_id = '#' + modal_id;
 
-	$('body').append(template);
-	$(modal_id).modal({backdrop: "static"});
+		$('body').append(template);
+		$(modal_id).modal({backdrop: "static"});
+		$(modal_id + '-placeholder').remove();
+	}
 }
 
 $.mbOpenModalViaUrl = function(modal_id, url, dialog_class = 'modal-lg') {
+	if (! $('#' + modal_id + '-placeholder').length) {
+		$('body').append('<div id="' + modal_id + '-placeholder"></div>');
 
-	var template = '\
-	<div class="modal fade mb-modal" id="'+ modal_id +'" tabindex="-1" role="dialog">\
-		<div class="modal-dialog '+ dialog_class +'" role="document">\
-			<div class="modal-content">\
+		var template = '\
+		<div class="modal fade mb-modal" id="'+ modal_id +'" tabindex="-1" role="dialog">\
+			<div class="modal-dialog '+ dialog_class +'" role="document">\
+				<div class="modal-content">\
+				</div>\
 			</div>\
-		</div>\
-	</div>';
+		</div>';
 
-	modal_id = '#' + modal_id;
+		modal_id = '#' + modal_id;
 
-	$.get(url, (data) => {
-		data = JSON.parse(data);
+		$.get(url, (data) => {
+			data = JSON.parse(data);
 
-		if (data.message_type != 'success' && data.message_type != null) {
-			$.notify({
-				message: data.message
-			}, {
-				type: data.message_type,
-				z_index: 1051
-			});
+			if (data.message_type != 'success' && data.message_type != null) {
+				$.notify({
+					message: data.message
+				}, {
+					type: data.message_type,
+					z_index: 1051
+				});
 
-			return;
-		}
+				return;
+			}
 
-		$('body').append(template);
-		$(modal_id +' .modal-content').html(data.modal_content);
-		$(modal_id).modal({backdrop: "static"});
-	});
+			$('body').append(template);
+			$(modal_id +' .modal-content').html(data.modal_content);
+			$(modal_id).modal({backdrop: "static"});
+			$(modal_id + '-placeholder').remove();
+		});
+	}
 }
 
 $.mbNotify = function (message, message_type) {
