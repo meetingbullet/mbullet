@@ -124,13 +124,12 @@ $.mbOpenModalViaUrl = function(modal_id, url, dialog_class = 'modal-lg') {
 					type: data.message_type,
 					z_index: 1051
 				});
-
-				return;
+			} else {
+				$('body').append(template);
+				$(modal_id +' .modal-content').html(data.modal_content);
+				$(modal_id).modal({backdrop: "static"});
 			}
 
-			$('body').append(template);
-			$(modal_id +' .modal-content').html(data.modal_content);
-			$(modal_id).modal({backdrop: "static"});
 			$(modal_id + '-placeholder').remove();
 		});
 	}
