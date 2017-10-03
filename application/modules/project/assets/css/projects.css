@@ -162,3 +162,7 @@
 .update-btn .disabled {
 	color: #ccc;
 }
+
+#homework-list tr td.homework-status {
+	min-width: 100px;
+}
