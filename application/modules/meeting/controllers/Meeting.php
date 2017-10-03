@@ -525,109 +525,141 @@ class Meeting extends Authenticated_Controller
 					// $this->meeting_member_model->insert_batch($member_data);
 					if (! empty($team)) {
 						if (! in_array($owner_email, $team)) {
-							if ($this->meeting_model->update($meeting->meeting_id, $data)) {
-								// $this->meeting_member_model->delete_where(['meeting_id' => $meeting->meeting_id]);
-								if (! empty($data['scheduled_start_time'])) {
-									$this->mb_project->notify_meeting_start_time($meeting->meeting_id);
-								}
-								$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
-								$meeting_members = $this->meeting_member_model->join('users', 'users.user_id = meeting_members.user_id')->where('meeting_id', $meeting->meeting_id)->as_array()->find_all();
-								$member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'email');
-								$member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
-								$invitee_emails = $meeting_invitee_emails;
+							$protected_members = [];
 
-								$members = $this->user_model->select('email, user_id,
-															IF((SELECT COUNT(*) FROM ' . $this->db->dbprefix('user_to_organizations') . ' uto WHERE uto.user_id = ' . $this->db->dbprefix('users') . '.user_id AND uto.organization_id = "' . $this->current_user->current_organization_id . '") > 0, 1, 0) AS in_organization')
-															->where_in('email', $team)
-															->as_array()
-															->find_all();
+							$agenda_members = $this->agenda_model->select('u.email')
+																->join('agenda_members am', 'agendas.agenda_id = am.agenda_id')
+																->join('users u', 'u.user_id = am.user_id')
+																->where('meeting_id', $meeting->meeting_id)
+																->group_by('u.email')
+																->as_array()
+																->find_all();
+							if (! empty($agenda_members)) {
+								$protected_members = array_merge($protected_members, array_column($agenda_members, 'email'));
+							}
 
-								if ($owner_email != $this->current_user->email && ! in_array($this->current_user->email, $team)) {
-									$team[] = $this->current_user->email;
-								}
+							$homework_members = $this->homework_model->select('u.email')
+														->join('homework_members hm', 'homework.homework_id = hm.homework_id')
+														->join('users u', 'u.user_id = hm.user_id')
+														->where('meeting_id', $meeting->meeting_id)
+														->group_by('u.email')
+														->as_array()
+														->find_all();
+							if (! empty($homework_members)) {
+								$protected_members = array_merge($protected_members, array_column($homework_members, 'email'));
+							}
 
-								$invite_data = [];
-								$member_data = [];
-								$this->load->library('invite/invitation');
-								foreach ($team as $email) {
-									if (array_search($email, $invitee_emails) === false && $email != $this->current_user->email) {
-										do {
-											$invite_code = $this->invitation->generateRandomString(64);
-										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+							$protected_members = array_unique($protected_members);
 
-										$invite_data[] = [
-											'invite_email' => $email,
-											'meeting_id' => $meeting->meeting_id,
-											'invite_code' => $invite_code,
-										];
+							if (count($protected_members) == count(array_intersect($protected_members, array_unique(array_merge($team, [$owner_email]))))) {
+								if ($this->meeting_model->update($meeting->meeting_id, $data)) {
+									// $this->meeting_member_model->delete_where(['meeting_id' => $meeting->meeting_id]);
+									if (! empty($data['scheduled_start_time'])) {
+										$this->mb_project->notify_meeting_start_time($meeting->meeting_id);
+									}
+									$this->mb_project->update_parent_objects('meeting', $meeting->meeting_id);
+									$meeting_members = $this->meeting_member_model->join('users', 'users.user_id = meeting_members.user_id')->where('meeting_id', $meeting->meeting_id)->as_array()->find_all();
+									$member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'email');
+									$member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
+									$invitee_emails = $meeting_invitee_emails;
 
-										$index = array_search($email, array_column($members, 'email'));
-										if ($index !== false) {
-											$member = $members[$index];
-											if ($member['in_organization']) {
-												$member_data[] = [
-													'meeting_id' => $meeting->meeting_id,
-													'user_id' => $member['user_id']
-												];
+									$members = $this->user_model->select('email, user_id,
+																IF((SELECT COUNT(*) FROM ' . $this->db->dbprefix('user_to_organizations') . ' uto WHERE uto.user_id = ' . $this->db->dbprefix('users') . '.user_id AND uto.organization_id = "' . $this->current_user->current_organization_id . '") > 0, 1, 0) AS in_organization')
+																->where_in('email', $team)
+																->as_array()
+																->find_all();
+
+									if ($owner_email != $this->current_user->email && ! in_array($this->current_user->email, $team)) {
+										$team[] = $this->current_user->email;
+									}
+
+									$invite_data = [];
+									$member_data = [];
+									$this->load->library('invite/invitation');
+									foreach ($team as $email) {
+										if (array_search($email, $invitee_emails) === false && $email != $this->current_user->email) {
+											do {
+												$invite_code = $this->invitation->generateRandomString(64);
+											} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
+											$invite_data[] = [
+												'invite_email' => $email,
+												'meeting_id' => $meeting->meeting_id,
+												'invite_code' => $invite_code,
+											];
+
+											$index = array_search($email, array_column($members, 'email'));
+											if ($index !== false) {
+												$member = $members[$index];
+												if ($member['in_organization']) {
+													$member_data[] = [
+														'meeting_id' => $meeting->meeting_id,
+														'user_id' => $member['user_id']
+													];
+												}
 											}
+										}
+
+										if ($email == $this->current_user->email && ! in_array($email, $member_emails)) {
+											do {
+												$invite_code = $this->invitation->generateRandomString(64);
+											} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
+											$this->meeting_member_invite_model->insert([
+												'invite_email' => $email,
+												'meeting_id' => $meeting->meeting_id,
+												'invite_code' => $invite_code,
+												'status' => 'accepted'
+											]);
+											$this->meeting_member_model->insert([
+												'meeting_id' => $meeting->meeting_id,
+												'user_id' => $this->current_user->user_id
+											]);
 										}
 									}
 
-									if ($email == $this->current_user->email && ! in_array($email, $member_emails)) {
-										do {
-											$invite_code = $this->invitation->generateRandomString(64);
-										} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
-
-										$this->meeting_member_invite_model->insert([
-											'invite_email' => $email,
-											'meeting_id' => $meeting->meeting_id,
-											'invite_code' => $invite_code,
-											'status' => 'accepted'
-										]);
-										$this->meeting_member_model->insert([
-											'meeting_id' => $meeting->meeting_id,
-											'user_id' => $this->current_user->user_id
-										]);
+									$removed_members = $this->meeting_member_model->select('users.user_id')
+																					->join('users', 'users.user_id = meeting_members.user_id')
+																					->where_not_in('email', $team)
+																					->where('meeting_id', $meeting->meeting_id)
+																					->as_array()
+																					->find_all();
+									$removed_member_ids = empty($removed_members) ? [] : array_column($removed_members, 'user_id');
+									if (! empty($removed_member_ids)) {
+										$this->meeting_member_model->where_in('user_id', $removed_member_ids)->delete_where(['meeting_id' => $meeting->meeting_id]);
 									}
-								}
+				
+									$this->meeting_member_invite_model->where_not_in('invite_email', $team)->delete_where(['meeting_id' => $meeting->meeting_id]);
 
-								$removed_members = $this->meeting_member_model->select('users.user_id')
-																				->join('users', 'users.user_id = meeting_members.user_id')
-																				->where_not_in('email', $team)
-																				->where('meeting_id', $meeting->meeting_id)
-																				->as_array()
-																				->find_all();
-								$removed_member_ids = empty($removed_members) ? [] : array_column($removed_members, 'user_id');
-								if (! empty($removed_member_ids)) {
-									$this->meeting_member_model->where_in('user_id', $removed_member_ids)->delete_where(['meeting_id' => $meeting->meeting_id]);
-								}
-			
-								$this->meeting_member_invite_model->where_not_in('invite_email', $team)->delete_where(['meeting_id' => $meeting->meeting_id]);
+									if (! empty($invite_data)) {
+										$this->meeting_member_invite_model->insert_batch($invite_data);
+									}
 
-								if (! empty($invite_data)) {
-									$this->meeting_member_invite_model->insert_batch($invite_data);
-								}
+									if (! empty($member_data)) {
+										$this->meeting_member_model->insert_batch($member_data);
+									}
 
-								if (! empty($member_data)) {
-									$this->meeting_member_model->insert_batch($member_data);
-								}
+									if ((! empty($data['status'])) && $data['status'] != $meeting->status) {
+										$this->mb_project->notify_members($meeting->meeting_id, 'meeting', $this->current_user, 'update_status');
+									}
 
-								if ((! empty($data['status'])) && $data['status'] != $meeting->status) {
-									$this->mb_project->notify_members($meeting->meeting_id, 'meeting', $this->current_user, 'update_status');
-								}
+									Template::set('close_modal', 1);
+									Template::set('message_type', 'success');
+									Template::set('message', lang('st_meeting_successfully_updated'));
 
-								Template::set('close_modal', 1);
-								Template::set('message_type', 'success');
-								Template::set('message', lang('st_meeting_successfully_updated'));
-
-								// Just to reduce AJAX request size
-								if (IS_AJAX) {
-									Template::set('content', '');
+									// Just to reduce AJAX request size
+									if (IS_AJAX) {
+										Template::set('content', '');
+									}
+								} else {
+									Template::set('close_modal', 0);
+									Template::set('message_type', 'danger');
+									Template::set('message', lang('st_please_add_team_member'));
 								}
 							} else {
 								Template::set('close_modal', 0);
 								Template::set('message_type', 'danger');
-								Template::set('message', lang('st_please_add_team_member'));
+								Template::set('message', lang('st_can_not_remove_member_of_hw_or_ag'));
 							}
 						} else {
 							Template::set('close_modal', 0);
@@ -792,7 +824,8 @@ class Meeting extends Authenticated_Controller
 				'meeting_key' => $meeting_key,
 				'current_user' => $this->current_user,
 				'chosen_agenda' => ! empty($chosen_agenda) ? $chosen_agenda : null,
-				'evaluated' => ! empty($evaluated)
+				'evaluated' => ! empty($evaluated),
+				'meeting_id' => $meeting->meeting_id
 			], true), 'inline');
 			Template::set('evaluated', $evaluated);
 			Template::set('point_used', $point_used);
@@ -4270,5 +4303,16 @@ class Meeting extends Authenticated_Controller
 		}
 
 		echo json_encode($data);exit;
+	}
+
+	public function get_meeting_resource($meeting_id)
+	{
+		// if (! IS_AJAX) {
+		// 	redirect(DEFAULT_LOGIN_LOCATION);
+		// }
+
+		$res = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
+
+		echo json_encode(empty($res) ? [] : $res);exit;
 	}
 }

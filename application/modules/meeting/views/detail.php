@@ -197,8 +197,8 @@ $hw_status = ['open', 'done', 'undone'];
 											}
 										} ?>
 									</td>
-									<td class='basis-20 text-center'><?php echo $homework->time_spent ?></td>
-									<td>
+									<td class='basis-10 text-center'><?php echo $homework->time_spent ?></td>
+									<td class='basis-15'>
 										<?php if ($homework->attachments): ?>
 										<div class="attachment">
 											<?php foreach ($homework->attachments as $att): ?>
@@ -215,7 +215,7 @@ $hw_status = ['open', 'done', 'undone'];
 										</div>
 										<?php endif; ?>
 									</td>
-									<td class='basis-10 homework-status text-center'>
+									<td class='basis-15 homework-status text-center'>
 										<!--span class="label label-bordered label-<?php e($homework->status)?>"><?php e(lang('hw_' . $homework->status))?></span-->
 										<!-- Update homework status button -->
 										<div class="btn-group">
@@ -237,7 +237,7 @@ $hw_status = ['open', 'done', 'undone'];
 											</ul>
 										</div>
 									</td>
-									<td class='basis-10 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
+									<td class='basis-5 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 								</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
@@ -498,8 +498,8 @@ $hw_status = ['open', 'done', 'undone'];
 				{{:html}}
 			{{/for}}
 		</td>
-		<td class='basis-20 text-center'>{{:time_spent}}</td>
-		<td>
+		<td class='basis-10 text-center'>{{:time_spent}}</td>
+		<td class='basis-15'>
 			{{if attachments}}
 				<div class="attachment">
 					{{for attachments}}
@@ -508,7 +508,7 @@ $hw_status = ['open', 'done', 'undone'];
 				</div>
 			{{/if}}
 		</td>
-		<td class='basis-10 homework-status text-center'>
+		<td class='basis-15 homework-status text-center'>
 		<!-- Update homework status button -->
 			<div class="btn-group">
 				<button type="button" class="btn btn-status label-open"><?php e(lang('hw_open')) ?></button>
@@ -522,7 +522,7 @@ $hw_status = ['open', 'done', 'undone'];
 				</ul>
 			</div>
 		</td>
-		<td class='basis-10 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
+		<td class='basis-5 text-right'><?php if ($meeting->status == 'open' || $meeting->status == 'ready') : ?><i class="ion-close-circled close-btn"></i><?php endif ?></td>
 	</tr>
 </script>
 

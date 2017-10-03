@@ -10,7 +10,12 @@ class Homework extends Authenticated_Controller
 		$this->load->helper('mb_form');
 		$this->load->helper('text');
 
+		$this->load->library('invite/invitation');
+
 		$this->load->model('meeting/meeting_model');
+		$this->load->model('meeting/meeting_member_model');
+		$this->load->model('meeting/meeting_member_invite_model');
+
 		$this->load->model('users/user_model');
 		
 		$this->load->model('homework_model');
@@ -54,6 +59,7 @@ class Homework extends Authenticated_Controller
 			}
 
 			$status = $this->meeting_model->get_field($meeting_id, 'status');
+			$meeting_owner_id = $this->meeting_model->get_field($meeting_id, 'owner_id');
 
 			if (empty($status) || ($status != 'open' && $status !== 'ready')) {
 				Template::set('message_type', 'danger');
@@ -110,22 +116,52 @@ class Homework extends Authenticated_Controller
 				$homework_id = $this->homework_model->insert($data);
 
 				if ($homework_id) {
+					$meeting_members = $this->meeting_member_model->join('users u', 'u.user_id = meeting_members.user_id')->where('meeting_id', $meeting_id)->as_array()->find_all();
+					$meeting_member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
+					$meeting_member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'email');
+
+					$insert_meeting_members = [];
+					$insert_meeting_member_invites = [];
+
 					$this->mb_project->add_experience_point(1);
 					$this->mb_project->update_parent_objects('homework', $homework_id);
 					$members = $this->input->post('member');
-					$members = explode(',', $members);
+					$members = empty(trim($members)) ? [] : explode(',', $members);
 					if (! empty($members)) {
-						foreach ($members as $user_id) {
-							if (! empty($user_id)) {
-								$homework_members[] = [
-									'homework_id' => $homework_id,
-									'user_id' => $user_id
+						$members_data = $this->user_model->where_in('user_id', $members)->find_all();
+						foreach ($members_data as $user) {
+							$homework_members[] = [
+								'homework_id' => $homework_id,
+								'user_id' => $user->user_id
+							];
+
+							if (! in_array($user->user_id, $meeting_member_ids) && $user->user_id != $meeting_owner_id) {
+								do {
+									$invite_code = $this->invitation->generateRandomString(64);
+								} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
+								$insert_meeting_members[] = [
+									'meeting_id' => $meeting_id,
+									'user_id' => $user->user_id
+								];
+
+								$insert_meeting_member_invites[] = [
+									'meeting_id' => $meeting_id,
+									'invite_email' => $user->email,
+									'invite_code' => $invite_code
 								];
 							}
 						}
 
 						if (! empty($homework_members)) {
 							if ($inserted = $this->homework_member_model->insert_batch($homework_members) ) {
+								if (! empty($insert_meeting_members)) {
+									$this->meeting_member_model->insert_batch($insert_meeting_members);
+								}
+	
+								if (! empty($insert_meeting_member_invites)) {
+									$this->meeting_member_invite_model->insert_batch($insert_meeting_member_invites);
+								}
 
 								if ($attachments = $this->input->post('attachments')) {
 									if (is_array($attachments)) {
@@ -342,16 +378,40 @@ class Homework extends Authenticated_Controller
 			$updated = $this->homework_model->update($homework_id, $data);
 
 			if ($updated) {
+				$meeting_owner_id = $this->meeting_model->get_field($test->meeting_id, 'owner_id');
+				$meeting_members = $this->meeting_member_model->join('users u', 'u.user_id = meeting_members.user_id')->where('meeting_id', $test->meeting_id)->as_array()->find_all();
+				$meeting_member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
+				$meeting_member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'email');
+
+				$insert_meeting_members = [];
+				$insert_meeting_member_invites = [];
+
 				$this->homework_member_model->delete($homework_id);
 				$this->mb_project->update_parent_objects('homework', $homework_id);
 				$members = $this->input->post('member');
-				$members = explode(',', $members);
+				$members = empty(trim($members)) ? [] : explode(',', $members);
 				if (! empty($members)) {
-					foreach ($members as $user_id) {
-						if (! empty($user_id)) {
-							$homework_members[] = [
-								'homework_id' => $homework_id,
-								'user_id' => $user_id
+					$members_data = $this->user_model->where_in('user_id', $members)->find_all();
+					foreach ($members_data as $user) {
+						$homework_members[] = [
+							'homework_id' => $homework_id,
+							'user_id' => $user->user_id
+						];
+
+						if (! in_array($user->user_id, $meeting_member_ids) && $user->user_id != $meeting_owner_id) {
+							do {
+								$invite_code = $this->invitation->generateRandomString(64);
+							} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+
+							$insert_meeting_members[] = [
+								'meeting_id' => $test->meeting_id,
+								'user_id' => $user->user_id
+							];
+
+							$insert_meeting_member_invites[] = [
+								'meeting_id' => $test->meeting_id,
+								'invite_email' => $user->email,
+								'invite_code' => $invite_code
 							];
 						}
 					}
@@ -359,6 +419,15 @@ class Homework extends Authenticated_Controller
 					if (! empty($homework_members)) {
 						if ($inserted = $this->homework_member_model->insert_batch($homework_members) ) {
 							$this->homework_attachment_model->delete_where(['homework_id' => $homework_id]);
+
+							if (! empty($insert_meeting_members)) {
+								$this->meeting_member_model->insert_batch($insert_meeting_members);
+							}
+
+							if (! empty($insert_meeting_member_invites)) {
+								$this->meeting_member_invite_model->insert_batch($insert_meeting_member_invites);
+							}
+
 							if ($attachments = $this->input->post('attachments')) {
 								if (is_array($attachments)) {
 									foreach ($attachments as &$att) {

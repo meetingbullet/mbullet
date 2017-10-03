@@ -10,6 +10,8 @@ class Agenda extends Authenticated_Controller
 		$this->load->helper('mb_form');
 		$this->load->helper('text');
 
+		$this->load->library('invite/invitation');
+
 		$this->load->model('agenda_model');
 		$this->load->model('agenda_member_model');
 		$this->load->model('agenda_read_model');
@@ -18,6 +20,8 @@ class Agenda extends Authenticated_Controller
 		$this->load->model('agenda_attachment_model');
 
 		$this->load->model('meeting/meeting_model');
+		$this->load->model('meeting/meeting_member_model');
+		$this->load->model('meeting/meeting_member_invite_model');
 		$this->load->model('users/user_model');
 		
 		$this->load->model('project/project_model');
@@ -56,6 +60,7 @@ class Agenda extends Authenticated_Controller
 			}
 
 			$status = $this->meeting_model->get_field($meeting_id, 'status');
+			$meeting_owner_id = $this->meeting_model->get_field($meeting_id, 'owner_id');
 
 			if (empty($status) || ($status != 'open' && $status !== 'ready')) {
 				Template::set('message_type', 'danger');
@@ -113,16 +118,39 @@ class Agenda extends Authenticated_Controller
 					$agenda_id = $this->agenda_model->insert($data);
 
 					if ($agenda_id) {
+						$meeting_members = $this->meeting_member_model->join('users u', 'u.user_id = meeting_members.user_id')->where('meeting_id', $meeting_id)->as_array()->find_all();
+						$meeting_member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
+						$meeting_member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'email');
+	
+						$insert_meeting_members = [];
+						$insert_meeting_member_invites = [];
+
 						$this->mb_project->add_experience_point(1);
 						$this->mb_project->update_parent_objects('agenda', $agenda_id);
 						$assignees = $this->input->post('assignee');
-						$assignees = explode(',', $assignees);
+						$assignees = empty(trim($assignees)) ? [] : explode(',', $assignees);
 						if (! empty($assignees)) {
-							foreach ($assignees as $user_id) {
-								if (! empty($user_id)) {
-									$agenda_members[] = [
-										'agenda_id' => $agenda_id,
-										'user_id' => $user_id
+							$members_data = $this->user_model->where_in('user_id', $assignees)->find_all();
+							foreach ($members_data as $user) {
+								$agenda_members[] = [
+									'agenda_id' => $agenda_id,
+									'user_id' => $user->user_id
+								];
+
+								if (! in_array($user->user_id, $meeting_member_ids) && $user->user_id != $meeting_owner_id) {
+									do {
+										$invite_code = $this->invitation->generateRandomString(64);
+									} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+	
+									$insert_meeting_members[] = [
+										'meeting_id' => $meeting_id,
+										'user_id' => $user->user_id
+									];
+	
+									$insert_meeting_member_invites[] = [
+										'meeting_id' => $meeting_id,
+										'invite_email' => $user->email,
+										'invite_code' => $invite_code
 									];
 								}
 							}
@@ -130,6 +158,14 @@ class Agenda extends Authenticated_Controller
 							if (! empty($agenda_members)) {
 								$inserted = $this->agenda_member_model->insert_batch($agenda_members);
 								if ($inserted) {
+									if (! empty($insert_meeting_members)) {
+										$this->meeting_member_model->insert_batch($insert_meeting_members);
+									}
+		
+									if (! empty($insert_meeting_member_invites)) {
+										$this->meeting_member_invite_model->insert_batch($insert_meeting_member_invites);
+									}
+
 									$this->mb_project->notify_members($agenda_id, 'agenda', $this->current_user, 'insert');
 									Template::set('message', lang('ag_create_agenda_success'));
 									Template::set('message_type', 'success');
@@ -320,17 +356,41 @@ class Agenda extends Authenticated_Controller
 					$updated = $this->agenda_model->skip_validation(true)->update($agenda_id, $data);
 
 					if ($updated) {
+						$meeting_owner_id = $this->meeting_model->get_field($agenda->meeting_id, 'owner_id');
+						$meeting_members = $this->meeting_member_model->join('users u', 'u.user_id = meeting_members.user_id')->where('meeting_id', $agenda->meeting_id)->as_array()->find_all();
+						$meeting_member_ids = empty($meeting_members) ? [] : array_column($meeting_members, 'user_id');
+						$meeting_member_emails = empty($meeting_members) ? [] : array_column($meeting_members, 'email');
+		
+						$insert_meeting_members = [];
+						$insert_meeting_member_invites = [];
+
 						//$this->mb_project->add_experience_point(1);
 						$this->mb_project->update_parent_objects('agenda', $agenda_id);
 						$this->agenda_member_model->delete($agenda_id);
 						$assignees = $this->input->post('assignee');
-						$assignees = explode(',', $assignees);
+						$assignees = empty(trim($assignees)) ? [] : explode(',', $assignees);
 						if (! empty($assignees)) {
-							foreach ($assignees as $user_id) {
-								if (! empty($user_id)) {
-									$agenda_members[] = [
-										'agenda_id' => $agenda_id,
-										'user_id' => $user_id
+							$members_data = $this->user_model->where_in('user_id', $assignees)->find_all();
+							foreach ($members_data as $user) {
+								$agenda_members[] = [
+									'agenda_id' => $agenda_id,
+									'user_id' => $user->user_id
+								];
+
+								if (! in_array($user->user_id, $meeting_member_ids) && $user->user_id != $meeting_owner_id) {
+									do {
+										$invite_code = $this->invitation->generateRandomString(64);
+									} while ($this->meeting_member_invite_model->count_by('invite_code', $invite_code) > 0);
+		
+									$insert_meeting_members[] = [
+										'meeting_id' => $agenda->meeting_id,
+										'user_id' => $user->user_id
+									];
+		
+									$insert_meeting_member_invites[] = [
+										'meeting_id' => $agenda->meeting_id,
+										'invite_email' => $user->email,
+										'invite_code' => $invite_code
 									];
 								}
 							}
@@ -338,6 +398,14 @@ class Agenda extends Authenticated_Controller
 							if (! empty($agenda_members)) {
 								$inserted = $this->agenda_member_model->insert_batch($agenda_members);
 								if ($inserted) {
+									if (! empty($insert_meeting_members)) {
+										$this->meeting_member_model->insert_batch($insert_meeting_members);
+									}
+		
+									if (! empty($insert_meeting_member_invites)) {
+										$this->meeting_member_invite_model->insert_batch($insert_meeting_member_invites);
+									}
+		
 									//$this->mb_project->notify_members($agenda_id, 'agenda', $this->current_user, 'insert');
 									Template::set('message', lang('ag_update_agenda_success'));
 									Template::set('message_type', 'success');

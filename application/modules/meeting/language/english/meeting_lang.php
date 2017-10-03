@@ -247,3 +247,4 @@ $lang['st_decision'] = 'Your decision';
 $lang['st_content'] = "Content";
 $lang['st_rated'] = "Rated";
 $lang['st_unable_to_modify_default_project'] = 'Unable to modify the unspecified project infomation';
+$lang['st_can_not_remove_member_of_hw_or_ag'] = 'Unable to remove members associated with existing homeworks or agendas.';

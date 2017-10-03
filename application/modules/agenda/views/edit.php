@@ -22,7 +22,7 @@
 
 <?php if (IS_AJAX) {
 	echo '<script type="text/javascript">' . $this->load->view('create_js', [
-		'organization_members ' => $organization_members 
+		'organization_members ' => $organization_members
 	], true) . '</script>';
 }
 ?>

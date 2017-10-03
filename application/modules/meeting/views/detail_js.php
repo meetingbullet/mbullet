@@ -94,6 +94,8 @@ $(document).on("submit", '.form-ajax', (e) => {
 						$('#agenda-list tbody').append($.templates('#agenda-row').render(data.data));
 						$('#agenda-list tbody tr:last-child').effect("highlight", {}, 3000);
 						$('.btn-block .open-meeting-monitor.meeting-open').removeAttr('disabled');
+
+						update_meeting_resource('<?php echo $meeting_id ?>');
 					}
 
 					// Homework created
@@ -106,6 +108,8 @@ $(document).on("submit", '.form-ajax', (e) => {
 							$('.table-monitor-homework tbody').append($('#monitor-homework-row').render(data.data));
 							$('.table-monitor-homework tbody tr:last-child').effect("highlight", {}, 3000);
 						}
+
+						update_meeting_resource('<?php echo $meeting_id ?>');
 					}
 
 					// Meeting updated
@@ -118,7 +122,7 @@ $(document).on("submit", '.form-ajax', (e) => {
 						var owner_id = $('#form-update-meeting input[name="owner_id"]').val();
 						var team = $('#form-update-meeting input[name="team"]').val().split(',');
 						var owner_html = $('.meeting-detail .owner').html();
-						var resource_html = '';
+						/*var resource_html = '';
 
 						if (team.indexOf('<?php echo $current_user->email ?>') == '-1') {
 							team.push('<?php echo $current_user->email ?>');
@@ -144,7 +148,7 @@ $(document).on("submit", '.form-ajax', (e) => {
 												<span class="user-name">'+ email + '</span>\
 												<span class="badge badge-'+ default_cost_of_time + ' badge-bordered pull-right">'+ default_cost_of_time_name +'</span>\
 											</li>';
-						});
+						});*/
 
 						// Update view
 						$('#meeting-name').text(meeting_name);
@@ -152,7 +156,8 @@ $(document).on("submit", '.form-ajax', (e) => {
 						$('.meeting-detail .owner').html(owner_html);
 						$('.detail-goal').html(goal);
 						$('.detail-goal').readmore(rm_option);
-						$('#meeting-resource').html(resource_html);
+						//$('#meeting-resource').html(resource_html);
+						update_meeting_resource('<?php echo $meeting_id ?>');
 
 						// Hide\Show Button for Owner
 						if (owner_id == <?php e($current_user->user_id) ?>) {
@@ -322,6 +327,8 @@ $(document).on('click', '#edit-agenda [type=submit]', function(e) {
 						$('#agenda-list tbody').append($.templates('#agenda-row').render(data.data));
 						$('#agenda-list tbody tr:last-child').effect("highlight", {}, 3000);
 					});
+
+					update_meeting_resource('<?php echo $meeting_id ?>');
 				}
 			}
 		}
@@ -417,6 +424,8 @@ $(document).on('click', '#edit-homework [type=submit]', function(e) {
 						$('#homework-list tbody').append($.templates('#homework-row').render(data.data));
 						$('#homework-list tbody tr:last-child').effect("highlight", {}, 3000);
 					});
+
+					update_meeting_resource('<?php echo $meeting_id ?>');
 				}
 			}
 		}
@@ -556,3 +565,18 @@ $(document).on('click', '.btn-block .an-btn', function(e) {
 $(document).on('click', '.modal-monitor-evaluator button.close, #meeting-evaluator-modal button.close, #meeting-monitor-modal button.close, #meeting-decider-modal button.close', function(e) {
 	location.reload();
 });
+
+function update_meeting_resource(meeting_id) {
+	$.get('<?php echo site_url('meeting/get_meeting_resource/') ?>' + meeting_id).done(function(data) {
+		data = JSON.parse(data);
+		resource_html = '';
+		data.forEach(function(item) {
+			resource_html += '<li>\
+								<img class="user-avatar" title="'+ (item.first_name ? (item.first_name + ' ' + item.last_name) : item.invite_email) + '" src="'+ (item.avatar ? item.avatar : '//www.gravatar.com/avatar/?d=identicon') + '" style="width: 24px; height: 24px">\
+								<span class="user-name">'+ (item.first_name ? (item.first_name + ' ' + item.last_name) : item.invite_email) + '</span>\
+								<span class="badge badge-'+ (item.cost_of_time_name ? item.cost_of_time : '' ) + ' badge-bordered pull-right">'+ (item.cost_of_time_name ? item.cost_of_time_name : '?') +'</span>\
+							</li>';
+		});
+		$('#meeting-resource').html(resource_html);
+	});
+}
