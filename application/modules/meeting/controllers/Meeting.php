@@ -188,7 +188,7 @@ class Meeting extends Authenticated_Controller
 			$query = str_replace('INSERT', 'INSERT IGNORE', $query);
 			$this->db->query($query);
 
-			$data['meeting_key'] = $this->mb_project->get_next_key($action->action_key);
+			// $data['meeting_key'] = $this->mb_project->get_next_key($action->action_key);
 			// only when create meeting on dashboard calendar
 			if (! empty($this->input->post_get('scheduled_start_time'))) {
 				$data['scheduled_start_time'] = get_utc_time($this->input->post_get('scheduled_start_time'));
@@ -2778,9 +2778,9 @@ class Meeting extends Authenticated_Controller
 				$this->load->library('invite/invitation');
 				if (empty($event->recurrence) || $import_mode == 0) {
 					$meeting_data = [
-						'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
+						//'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
 						'action_id' => $action_id,
-						'scheduled_start_time' => $start,
+						'scheduled_start_time' => get_utc_time($start),
 						'in' => (strtotime($end) - strtotime($start)) / 60,
 						'in_type' => 'minutes',
 						'name' => $event->summary,
@@ -2831,9 +2831,9 @@ class Meeting extends Authenticated_Controller
 
 					foreach ($occurrences as $occurrence) {
 						$meeting_data = [
-							'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
+							//'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
 							'action_id' => $action_id,
-							'scheduled_start_time' => $occurrence->format('Y-m-d H:i:s'),
+							'scheduled_start_time' => get_utc_time($occurrence->format('Y-m-d H:i:s')),
 							'in' => (strtotime($end) - strtotime($start)) / 60,
 							'in_type' => 'minutes',
 							'name' => $event->summary,
@@ -3377,7 +3377,7 @@ class Meeting extends Authenticated_Controller
 					'in_type' => 'minutes',
 					'action_id' => $action_id,
 					'google_event_id' => $event_id,
-					'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
+					//'meeting_key' => $this->mb_project->get_next_key($project_key . '-1'),
 					'owner_id' => $owner_id
 				];
 
@@ -4307,9 +4307,9 @@ class Meeting extends Authenticated_Controller
 
 	public function get_meeting_resource($meeting_id)
 	{
-		// if (! IS_AJAX) {
-		// 	redirect(DEFAULT_LOGIN_LOCATION);
-		// }
+		if (! IS_AJAX) {
+			redirect(DEFAULT_LOGIN_LOCATION);
+		}
 
 		$res = $this->meeting_member_invite_model->get_meeting_invited_members($meeting_id);
 
