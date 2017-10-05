@@ -183,6 +183,10 @@ class Project extends Authenticated_Controller
 			$project_data['deadline'] = null;
 		}
 
+		if (empty(trim($project_data['team_point']))) {
+			$project_data['team_point'] = null;
+		}
+
 		$draft = $this->project_model->where('organization_id', $this->current_user->current_organization_id)
 									->where('created_by', $this->current_user->user_id)
 									->find_by('status', 'draft');
