@@ -73,20 +73,39 @@ class Invitation
 
 		// Now send the email
 		
+		// $data = array(
+		// 	'to'	  => $email,
+		// 	'subject' => lang('iv_meeting_bullet_invitation'),
+		// 	'message' => $this->ci->load->view(
+		// 		'invite/invitation_template',
+		// 		array(
+		// 			'link' => $pass_link,
+		// 			'organization_name' => $invitation->organization_name,
+		// 			'inviter_name' => $invitation->inviter_name,
+		// 			'avatar' => $invitation->avatar,
+		// 			'email' => $email,
+		// 		),
+		// 		true
+		// 	),
+		// );
+		
+		$template = $this->ci->db->where('email_template_key', 'INVITE_USER_TO_ORGANIZATION')
+							->where('language_code', 'en_US')
+							->get('email_templates')->row();
+		if (empty($template)) {
+			return lang('iv_unknown_error');
+		}
+
 		$data = array(
 			'to'	  => $email,
-			'subject' => lang('iv_meeting_bullet_invitation'),
-			'message' => $this->ci->load->view(
-				'invite/invitation_template',
-				array(
-					'link' => $pass_link,
-					'organization_name' => $invitation->organization_name,
-					'inviter_name' => $invitation->inviter_name,
-					'avatar' => $invitation->avatar,
-					'email' => $email,
-				),
-				true
-			),
+			'subject' => $template->email_title,
+			'message' => $this->ci->parser->parse_string($template->email_title, [
+				'LINK' => $pass_link,
+				'ORGANIZATION_NAME' => $invitation->organization_name,
+				'INVITER_NAME' => $invitation->inviter_name,
+				'AVATAR' => strstr($invitation->avatar, 'http') ? $invitation->avatar : img_path() . 'users/'. $invitation->avatar,
+				'EMAIL' => $email,
+			], true)
 		);
 
 		$this->ci->emailer->send($data, TRUE);
