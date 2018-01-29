@@ -60,9 +60,9 @@ $confirmation_status = [
 
 		<div class="decider-meeting-container">
 			<div class="row">
-				<div id="meeting-info" class="col-md-7">
+				<div id="meeting-info" class="col-md-12">
 					<div class="row">
-						<div class="col-md-12">
+						<div class="col-md-7">
 							<div class="an-single-component with-shadow">
 								<div class="an-component-header">
 									<h6><?php e(lang('st_goal'))?></h6>
@@ -75,58 +75,8 @@ $confirmation_status = [
 									</div>
 								</div> <!-- end .AN-COMPONENT-BODY -->
 							</div>
-						</div>
-
-						<div class="col-md-12">
-							<div class="an-single-component with-shadow">
-							<div class="an-component-header">
-									<h6><?php e(lang('st_notes'))?></h6>
-								</div>
-								<div class="an-component-body an-helper-block">
-									<form id="note-form">
-										<textarea id="note" name="note" rows="6" class="an-form-control note" placeholder="<?php e(lang('st_write_a_note_here')) ?>"><?php echo set_value('note') ?></textarea>
-									</form>
-								</div>
 							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-12">
-							<div class="an-single-component with-shadow">
-								<div class="an-component-body an-helper-block">
-									<table class="table table-striped table-meeting-time">
-										<thead>
-											<tr>
-												<th></th>
-												<th class="text-center"><?php e(lang('st_scheduled'))?></th>
-												<th class="text-center"><?php e(lang('st_actual'))?></th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td><strong><?php e(lang('st_start_time')) ?></strong></td>
-												<td class="text-center"><?php echo display_time($scheduled_start_time) ?></td>
-												<td class="text-center"><?php echo display_time($meeting->actual_start_time) ?></td>
-											</tr>
-											<tr>
-												<td><strong><?php e(lang('st_end_time')) ?></strong></td>
-												<td class="text-center"><?php echo display_time($scheduled_end_time) ?></td>
-												<td class="text-center"><?php echo display_time($meeting->actual_end_time) ?></td>
-											</tr>
-											<tr>
-												<td><strong><?php e(lang('st_elapsed_time')) ?></strong></td>
-												<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
-												<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
-											</tr>
-										</tbody>
-									</table>
-								</div> <!-- end .AN-COMPONENT-BODY -->
-							</div>
-						</div>
-					</div> <!-- end .row -->
-				</div>
-
-				<div class="col-md-5">
+							<div class="col-md-5">
 					<div class="an-single-component fixed-height with-shadow">
 						<div class="an-component-header">
 							<h6><?php e(lang('st_attendees'))?></h6>
@@ -159,6 +109,90 @@ $confirmation_status = [
 						</div> <!-- end .AN-COMPONENT-BODY -->
 					</div>
 				</div>
+						
+
+						<div class="col-md-6">
+							<div class="an-single-component with-shadow">
+							<div class="an-component-header">
+									<h6><?php e(lang('st_notes'))?></h6>
+								</div>
+								<div class="an-component-body an-helper-block">
+									<form id="note-form">
+										<textarea id="note" name="note" rows="6" class="an-form-control note" placeholder="<?php e(lang('st_write_a_note_here')) ?>"><?php echo set_value('note') ?></textarea>
+									</form>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="an-single-component with-shadow">
+								<div class="an-component-body an-helper-block">
+									<table class="table table-striped table-meeting-time">
+										<thead>
+											<tr>
+												<th></th>
+												<th class="text-center"><?php e(lang('st_scheduled'))?></th>
+												<th class="text-center"><?php e(lang('st_actual'))?></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><strong><?php e(lang('st_start_time')) ?></strong></td>
+												<td class="text-center"><?php echo display_time($scheduled_start_time) ?></td>
+												<td class="text-center"><?php echo display_time($meeting->actual_start_time) ?></td>
+											</tr>
+											<tr>
+												<td><strong><?php e(lang('st_end_time')) ?></strong></td>
+												<td class="text-center"><?php echo display_time($scheduled_end_time) ?></td>
+												<td class="text-center"><?php echo display_time($meeting->actual_end_time) ?></td>
+											</tr>
+											<tr>
+												<td><strong><?php e(lang('st_elapsed_time')) ?></strong></td>
+												<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
+												<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
+											</tr>
+										</tbody>
+									</table>
+								</div> <!-- end .AN-COMPONENT-BODY -->
+							</div>
+						</div>
+					</div>
+					<!--div class="row">
+						<div class="col-md-12">
+							<div class="an-single-component with-shadow">
+								<div class="an-component-body an-helper-block">
+									<table class="table table-striped table-meeting-time">
+										<thead>
+											<tr>
+												<th></th>
+												<th class="text-center"><?php e(lang('st_scheduled'))?></th>
+												<th class="text-center"><?php e(lang('st_actual'))?></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><strong><?php e(lang('st_start_time')) ?></strong></td>
+												<td class="text-center"><?php echo display_time($scheduled_start_time) ?></td>
+												<td class="text-center"><?php echo display_time($meeting->actual_start_time) ?></td>
+											</tr>
+											<tr>
+												<td><strong><?php e(lang('st_end_time')) ?></strong></td>
+												<td class="text-center"><?php echo display_time($scheduled_end_time) ?></td>
+												<td class="text-center"><?php echo display_time($meeting->actual_end_time) ?></td>
+											</tr>
+											<tr>
+												<td><strong><?php e(lang('st_elapsed_time')) ?></strong></td>
+												<td class="text-center"><?php echo timespan(strtotime($meeting->scheduled_start_time), strtotime($scheduled_end_time) ) ?></td>
+												<td class="text-center"><?php echo timespan(strtotime($meeting->actual_start_time), strtotime($meeting->actual_end_time)) ?></td>
+											</tr>
+										</tbody>
+									</table>
+								</div> 
+							</div>
+						</div>
+					</div --> 
+				</div>
+
+				
 
 				<div class="col-md-4 hidden">
 					<div id="comment">

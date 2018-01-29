@@ -88,11 +88,20 @@ class Agenda extends Authenticated_Controller
 				return;
 			}
 		}
-
-		$organization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
-		if (empty($organization_members)) {
-			$organization_members = [];
+		$project_id = $this->project_model->get_project_id($project_key,$this->current_user->current_organization_id);
+		
+		$org_members = $this->user_model->get_organization_members($this->current_user->current_organization_id,$project_id);
+		$organization_members = [];
+		foreach($org_members as $pr_member){
+			if($this->project_member_model->is_project_member($project_id,$pr_member->user_id)){
+				$organization_members[] = $pr_member;
+			}
 		}
+		
+		//$organization_members = $this->user_model->get_organization_members($this->current_user->current_organization_id);
+		/* if (empty($organization_members)) {
+			$organization_members = [];
+		} */
 
 		if ($meeting_id === false) {
 			Template::set('message', lang('ag_not_have_permission'));

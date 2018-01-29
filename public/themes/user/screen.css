@@ -761,3 +761,7 @@ body.modal-open .main-wrapper:not(.modal) {
 .an-lists-body {
 	max-height: none;
 }
+
+.table-rate .text-center{
+	width: 125px !important;
+}

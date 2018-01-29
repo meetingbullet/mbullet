@@ -17,10 +17,12 @@
 					<?php foreach ($my_projects as $project) : ?>
 						<option value="<?php echo $project['cost_code'] ?>"><?php echo $project['name'] ?></option>
 					<?php endforeach ?>
+					<?php if (has_permission('Project.View.All')):?>
 					<optgroup label="Other projects">
 					<?php foreach ($other_projects as $project) : ?>
 						<option value="<?php echo $project['cost_code'] ?>"><?php echo $project['name'] ?></option>
 					<?php endforeach ?>
+					<?php endif;?>
 					</select>
 				<input name="in" type="hidden" value="<?php echo (strtotime($this->input->get('end')) - strtotime($this->input->get('start'))) / 60 ?>"/>
 				<input name="scheduled_start_time" type="hidden" value="<?php echo $this->input->get('start') ?>" />

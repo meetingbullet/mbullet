@@ -88,6 +88,7 @@ $(document).ready(function() {
 		eventLimit: true, // allow "more" link when too many events
 		eventSources: <?php echo json_encode($event_sources) ?>,
 		editable: true,
+		nowIndicator: true,
 		eventDrop: function(event, delta, revertFunc) {
 			$.post(
 				'<?php echo site_url('meeting/edit_calendar_event') ?>',

@@ -18,9 +18,16 @@
 								<div class="an-input-group">
 									<label class='an-form-avatar-label'><?php echo lang('us_reg_avatar') ?></label>
 									<div class="an-avatar">
-										<img class='an-form-avatar-preview' id="user-avatar-preview" src="<?php echo img_path() . 'default_avatar.png' ?>"/>
-										<div class='an-form-avatar-dim'><span><i class='ion-ios-upload-outline'></i></span></div>
-										<input type="file" id="user-avatar" name="avatar" class="an-form-avatar"/>
+										<?php if(isset($_POST['avatar']) && $_POST['avatar'] != ''):?>
+											<img class='an-form-avatar-preview' id="user-avatar-preview" src="<?php echo $_POST['avatar'];  ?>"/>
+											<div class='an-form-avatar-dim'><span><i class='ion-ios-upload-outline'></i></span></div>
+											<input type="file" id="user-avatar" name="avatar" class="an-form-avatar"/>
+										<?php else:?>
+											<img class='an-form-avatar-preview' id="user-avatar-preview" src="<?php echo img_path() . 'default_avatar.png' ?>"/>
+											<div class='an-form-avatar-dim'><span><i class='ion-ios-upload-outline'></i></span></div>
+											<input type="file" id="user-avatar" name="avatar" class="an-form-avatar"/>
+										<?php endif;?>
+										
 									</div>
 								</div>
 
@@ -30,11 +37,11 @@
 									<input type="text" name="email" class="an-form-control <?php echo iif( form_error('email') , 'danger') ;?>" value="<?php echo set_value('email', isset($_GET['email']) ? $_GET['email'] : '') ?>" readOnly/>
 								</div>
 
-								<label><?php echo lang('us_reg_name') ?></label>
+								<!--label><?php echo lang('us_reg_name') ?></label -->
 								<div class="an-input-group">
 									<div class="an-input-group-addon"><i class="ion-ios-person"></i></div>
-									<input type="text" name="first_name" class="an-form-firstname an-form-control <?php echo iif( form_error('first_name') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_first_name') ?>" value="<?php echo set_value('first_name', isset($_POST['first_name']) ? $_POST['first_name'] : '') ?>"/>
-									<input type="text" name="last_name" class="an-form-lastname an-form-control <?php echo iif( form_error('last_name') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_last_name') ?>" value="<?php echo set_value('last_name', isset($_POST['last_name']) ? $_POST['last_name'] : '') ?>"/>
+									<input type="hidden" name="first_name" class="an-form-firstname an-form-control <?php echo iif( form_error('first_name') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_first_name') ?>" value="<?php echo set_value('first_name', isset($_POST['first_name']) ? $_POST['first_name'] : '') ?>"/>
+									<input type="hidden" name="last_name" class="an-form-lastname an-form-control <?php echo iif( form_error('last_name') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_last_name') ?>" value="<?php echo set_value('last_name', isset($_POST['last_name']) ? $_POST['last_name'] : '') ?>"/>
 								</div>
 
 								<label><?php echo lang('us_reg_password') ?></label>
@@ -47,16 +54,25 @@
 									<input type="password" name="conf_password" class="an-form-control <?php echo iif( form_error('password') , 'danger') ;?>" placeholder="<?php echo lang('us_reg_conf_password') ?>"/>
 								</div>
 
-								<label><?php echo lang('us_reg_skype') ?></label>
+								<!--label><?php echo lang('us_reg_skype') ?></label -->
 								<div class="an-input-group">
 									<div class="an-input-group-addon"><i class="ion-social-skype"></i></div>
-									<input type="text" name="skype" class="an-form-control <?php echo iif( form_error('skype') , 'danger') ;?>" value="<?php echo set_value('skype', isset($_POST['skype']) ? $_POST['skype'] : '') ?>"/>
+									<input type="hidden" name="skype" class="an-form-control <?php echo iif( form_error('skype') , 'danger') ;?>" value="<?php echo set_value('skype', isset($_POST['skype']) ? $_POST['skype'] : '') ?>"/>
 								</div>
 
-								<label><?php echo lang('us_reg_org') ?></label>
+								<!--label><?php echo lang('us_reg_org') ?></label>
 								<div class="an-input-group">
 									<div class="an-input-group-addon"><i class="ion-briefcase"></i></div>
 									<input type="text" name="org" class="an-form-control <?php echo iif( form_error('org') , 'danger') ;?>" value="<?php echo set_value('org', isset($_POST['org']) ? $_POST['org'] : '') ?>"/>
+								</div -->
+								
+								<div class="an-input-group">
+								<div class="an-input-group-addon"><i class="ion-briefcase"></i></div>
+									<select name="organization_id" class="an-form-control <?php echo iif( form_error('organization_id') , 'danger') ;?>">
+										<?php foreach($organizations as $organization):?>
+											<option value="<?=$organization['organization_id']?>"><?=$organization['name']?></option>
+										<?php endforeach;?>
+									</select>
 								</div>
 
 								<span class="an-custom-checkbox primary">

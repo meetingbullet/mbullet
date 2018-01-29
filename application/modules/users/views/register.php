@@ -14,13 +14,19 @@
 						</div>
 						<div class="an-component-body">
 						<?php echo form_open(REGISTER_URL, array('class' => "form-horizontal", 'autocomplete' => 'off')); ?>
-							<label><?php echo lang('us_reg_email') ?></label>
+						<div class="an-component-body addon">
+										<a href="<?php echo $auth_url ?>" class="an-btn an-btn-google block-icon fluid mb-uppercase">
+											<i class="fa fa-google-plus" aria-hidden="true"></i>
+											<?php e(' ' . lang('us_let_me_in') . ' ' . lang('us_with_google')); ?>
+										</a>
+									</div>
+							<!--label><?php echo lang('us_reg_email') ?></label>
 							<div class="an-input-group">
 								<div class="an-input-group-addon"><i class="ion-ios-email-outline"></i></div>
 								<input type="text" name="email" class="an-form-control <?php echo iif( form_error('email') , 'danger') ;?>" value="<?php echo set_value('email'); ?>" tabindex="1">
 							</div>
 
-							<button type="submit" name="register" class="an-btn an-btn-default fluid"><?php echo lang('us_continue'); ?></button>
+							<button type="submit" name="register" class="an-btn an-btn-default fluid"><?php echo lang('us_continue'); ?></button -->
 						<?php echo form_close(); ?>
 
 						</div> <!-- end .AN-COMPONENT-BODY -->

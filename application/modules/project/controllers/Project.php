@@ -17,6 +17,7 @@ class Project extends Authenticated_Controller
 		$this->load->model('project_expectation_model');
 		$this->load->model('project_member_model');
 		$this->load->model('meeting/meeting_model');
+		$this->load->model('meeting/meeting_member_model');
 		$this->load->model('action/action_model');
 
 		Assets::add_module_js('project', 'projects.js');
@@ -172,8 +173,27 @@ class Project extends Authenticated_Controller
 			'message_type' => 'success'
 		]);
 	}
+	
+	public function create_project(){
+		if (IS_AJAX) {
+			if($_POST['init_modal']){
+				$project = $this->save_project('insert',null,true);
+			}else{
+				$project = $this->save_project();
+			}
+			
+			echo json_encode([
+				'message_type' => 'success'
+			]);
+		}else{
+			echo json_encode([
+				'message_type' => 'faild'
+			]);
 
-	private function save_project($type = 'insert', $project_id = null)
+		}
+	}
+
+	private function save_project($type = 'insert', $project_id = null,$initMode = false)
 	{
 		$data = $this->input->post();
 		$project_data = $this->project_model->prep_data($data);
@@ -230,6 +250,9 @@ class Project extends Authenticated_Controller
 			$project_data['organization_id'] = $this->current_user->current_organization_id;
 			$project_data['owner_id'] = $project_data['created_by'] = $this->current_user->user_id;
 			$project_data['cost_code'] = strtoupper($project_data['cost_code']);
+			if($initMode){
+				$project_data['init_mode'] = 1;
+			}
 
 			if (! empty($draft)) {
 				$project_data['members'] = null;
@@ -1110,10 +1133,11 @@ class Project extends Authenticated_Controller
 			Template::render();return;
 		}
 
-		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id));
+		Template::set('invite_emails', $this->user_model->get_organization_members($this->current_user->current_organization_id,null,$this->current_user->user_id));
 
 		if ($this->input->post()) {
 			$email = trim($this->input->post('email'));
+			
 			if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
 				Template::set('close_modal', 1);
 				Template::set('message', lang('pj_email_problem'));

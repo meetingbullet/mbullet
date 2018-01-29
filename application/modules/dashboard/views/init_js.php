@@ -7,7 +7,7 @@ var INIT_DATA = {
 	events: []
 };
 
-var STEPS = [10, 20, 30, 31, 32, 33, 40, 50, 60];
+var STEPS = [10, 20, 30, 31, 33, 40, 50, 60];
 var currentEvent = null;
 var todoAttachment = [];
 var agendaAttachment = [];
@@ -147,6 +147,18 @@ $('.btn-convert-time + ul > li > a').click(function() {
 
 // Next step
 $('.btn-next-step').click(function() {
+	if (INIT_DATA.currentStep == 33){
+		var sectionMeeting = $('.btn-wide.selected').data('type');
+		if(sectionMeeting == "team"){
+			var projectName = $('#team-project-name').val();
+			var projectCode = $('#team-project-code').val();
+			if(projectName != "" && projectCode != ""){
+				$.post("<?php echo site_url('/project/create_project') ?>", {
+					name: projectName,cost_code:projectCode,init_modal:true
+				})
+			}
+		}
+	}
 	if (INIT_DATA.currentStepIndex + 1 >= STEPS.length) return;
 
 	// Next Goal, Todo, Agenda, Team
@@ -199,7 +211,7 @@ $('.btn-next-step').click(function() {
 			break;
 		case 33:
 			if (INIT_DATA.path == 'owner') { // Path: Owner
-
+				$('.btn-next-step').addClass('hidden');
 				insertCurrentEvent();
 				
 				$('.step-30').slideUp();
@@ -219,7 +231,7 @@ $('.btn-next-step').click(function() {
 			}
 			break;
 		case 40:
-
+			$('.btn-next-step').removeClass('hidden');
 			$.post("<?php echo site_url('/meeting/init_project') ?>", {
 				data: JSON.stringify(INIT_DATA)
 			}).done(function(data) {
@@ -284,7 +296,12 @@ $('.btn-wide').click(function(e) {
 	if ($(this).hasClass('selected') ) return;
 
 	var type = $(this).data('type');
-
+	if(type == "team"){
+		$('.btn-next-step').removeClass('hidden');
+		$('.btn-next-step').prop('disabled', false);
+	}else{
+		$('.btn-next-step').addClass('hidden'); 
+	}
 	$('.define:visible').slideUp();
 	$('.define-' + type).slideDown();
 
@@ -293,8 +310,14 @@ $('.btn-wide').click(function(e) {
 	$(this).addClass('passed');
 });
 
-$('.btn-create-goal').click(function(e) {
+$('.btn-create-goal').click(function(e) {  
 	e.preventDefault();
+	var name = $('#goal-name').val();
+	var type = $('#goal-type').val();
+	var importance = $('#goal-importance').val();
+	if(name =="" && type == null && importance == null){
+		$('.btn-next-step').click();
+	}else{
 	$('#goal-name').removeClass('danger');
 	$('#goal-type').removeClass('danger');
 	$('#goal-importance').removeClass('danger');
@@ -346,6 +369,8 @@ $('.btn-create-goal').click(function(e) {
 	$('#goal-importance').prop('selectedIndex', 0);
 
 	$('.btn-wide[data-type="goal"] > span').text(index + 1);
+	$('.btn-next-step').click();
+	}
 })
 
 $('.init .define-homework .input-attachment').change(function(e) {
@@ -388,7 +413,12 @@ $('.init .define-agenda .input-attachment').change(function(e) {
 
 $('.btn-create-todo').click(function(e){
 	e.preventDefault();
-
+	var name = $('#todo-name').val();
+	var time_spent = $('#time-spent').val();
+	var assignee = $('#todo-assignee').val();
+	if(name =="" && time_spent == "" && assignee == ""){
+		$('.btn-next-step').click();
+	}else{
 	// Validation
 	var err = false;
 	$('#todo-name').removeClass('danger');
@@ -408,7 +438,7 @@ $('.btn-create-todo').click(function(e){
 
 	if ( $('#todo-assignee').val() == '' ) {
 		$('#todo-assignee').addClass('danger');
-		err = true;
+		//err = true;
 	}
 
 	if (err) return;
@@ -460,11 +490,17 @@ $('.btn-create-todo').click(function(e){
 	$('#todo-assignee')[0].selectize.clear();
 
 	$('.btn-wide[data-type="homework"] > span').text($('.table-homework tbody tr').length / 2);
+	$('.btn-next-step').click();
+	}
 });
 
 $('.btn-create-agenda').click(function(e){
 	e.preventDefault();
-
+	var name = $('#agenda-name').val();
+	var assignee = $('#agenda-assignee').val();
+	if(name =="" && assignee == ""){
+		$('.btn-next-step').click();
+	}else{
 	// Validation
 	var err = false;
 	$('#agenda-name').removeClass('danger');
@@ -478,7 +514,7 @@ $('.btn-create-agenda').click(function(e){
 
 	if ( $('#agenda-assignee').val() == '' ) {
 		$('#agenda-assignee').addClass('danger');
-		err = true;
+		//err = true;
 	}
 
 	if (err) return;
@@ -528,6 +564,8 @@ $('.btn-create-agenda').click(function(e){
 
 	// Create atleast 1 agenda to continue
 	$('.btn-next-step').prop('disabled', false);
+	$('.btn-next-step').click();
+	}
 });
 
 // Rating handler
@@ -701,7 +739,10 @@ $(document).on('click', '.init .fc-event', function(e){
 
 		event.attendees = attendees;
 		
-
+		var teamCount = 1;
+		if(event.attendees.length > 1){
+			teamCount = event.attendees.length;
+		}
 		currentEvent = event;
 		var date = event.start.format('ddd MMM D') == event.end.format('ddd MMM D') ?
 					event.start.format('ddd MMM D') :
@@ -711,11 +752,12 @@ $(document).on('click', '.init .fc-event', function(e){
 		$('#init .table-improve-meeting .name').text(event.title);
 		$('#init .table-improve-meeting .date').text(date);
 		$('#init .table-improve-meeting .time').text(event.start.format('hh:mma') + ' - ' + event.end.format('hh:mma'));
-		$('#init .table-improve-meeting .team').text(event.attendees.length);
-
+		//$('#init .table-improve-meeting .team').text(event.attendees.length);
+		$('#init .table-improve-meeting .team').text(teamCount);
+		
 		$('#init .meeting-cost .hour').text("<?php echo lang('db_x_hrs') ?>".format(hour))
-		$('#init .meeting-cost .total-participant').text("<?php echo lang('db_x_participants') ?>".format(event.attendees.length))
-		$('#init .meeting-cost .total-hour').text("<?php echo lang('db_x_hrs') ?>".format(hour * event.attendees.length))
+		$('#init .meeting-cost .total-participant').text("<?php echo lang('db_x_participants') ?>".format(teamCount))
+		$('#init .meeting-cost .total-hour').text("<?php echo lang('db_x_hrs') ?>".format(hour * teamCount))
 
 		$('#init .step-30 .owner .instruction').addClass('passed');
 		$('#init .step-30 .owner .table-improve-meeting').slideDown();
@@ -1011,7 +1053,17 @@ $(document).on('click', '#init .init-footer.calendar #previous-step, #init .init
 
 		if (INIT_DATA.currentStep < 40) {
 			if (INIT_DATA.path == 'owner') {
-
+				if (INIT_DATA.currentStep == 33) {
+					var sectionMeeting = $('.btn-wide.selected').data('type');
+					console.log(sectionMeeting)
+					if(sectionMeeting != "team"){
+						$('.btn-next-step').addClass('hidden');
+					}else{
+						$('.btn-next-step').prop('disabled', false);
+					}
+					//$('.btn-next-step').addClass('hidden');
+					
+				}
 			} else {
 
 			}
@@ -1106,6 +1158,51 @@ $(document).on('submit','#init #attachment-form', function(e) {
 		}
 	});
 });
+function HourlyCost(element){
+	var cost = $(element).val();
+	cost = cost.replace('$','');
+	var newCost = '$'+cost;
+	console.log(cost)
+	$(element).val('');
+	$(element).val(newCost);
+	var meetingHours = $('.meeting-cost').find('.hour').text();
+	var meetingHoursLength = meetingHours.length;
+	var meetingHoursPart = meetingHours.substring(meetingHoursLength / 2, meetingHoursLength);
+	meetingHoursDigit = meetingHoursPart.replace(/\D+$/g, "")
+	
+	var countPart = $('#init .meeting-cost .total-participant').text();
+	var totalCost = parseInt(countPart) * parseInt(cost) * meetingHoursDigit;
+	console.log(totalCost)
+	$('#meetin-cost').text("$"+totalCost)
+	$('#meetin-cost-block').removeClass('hidden');
+}
+
+function changeCostType(costType){
+	
+	$('#cost_type_show').html(costType + '<span class="caret"></span>');
+	var cost = $('#hourly-cost').val();
+	cost = cost.replace('$','');
+	var meetingHours = $('.meeting-cost').find('.hour').text();
+	var meetingHoursLength = meetingHours.length;
+	var meetingHoursPart = meetingHours.substring(meetingHoursLength / 2, meetingHoursLength);
+	meetingHoursDigit = meetingHoursPart.replace(/\D+$/g, "")
+	var timeForMeeting = meetingHoursDigit;
+	if(costType == "Minutes"){
+		timeForMeeting = meetingHoursDigit * 60;
+	}else if(costType == "Days"){
+		timeForMeeting = meetingHoursDigit / 24 ;
+		timeForMeeting = timeForMeeting.toFixed(3);
+	}else if(costType == "Weeks"){
+		timeForMeeting = meetingHoursDigit / 168 ;
+		timeForMeeting = timeForMeeting.toFixed(3);
+	}
+	
+	var countPart = $('#init .meeting-cost .total-participant').text();
+	var totalCost = parseInt(countPart) * parseInt(cost) * timeForMeeting;
+	console.log(totalCost)
+	$('#meetin-cost').text("$"+totalCost)
+	$('#meetin-cost-block').removeClass('hidden');
+}
 
 $(document).on('hidden.bs.modal', '#init.modal', function() {
 	location.reload();

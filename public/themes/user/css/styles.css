@@ -859,7 +859,9 @@ textarea.an-form-control {
     padding-top: 15px;
     resize: vertical;
 }
-
+#note-form textarea.an-form-control {
+	min-height: 85px !important;
+}
 .an-search-field {
     position: relative;
 }

@@ -85,7 +85,7 @@
 						</tbody>
 					</table>
 				</div>
-				<a href="#" class='btn-wide' data-type='homework'><i class="ion-ios-filing-outline"></i> Todo (<span>0</span>) <i class="pull-right ion-ios-arrow-forward"></i></a>
+				<a href="#" class='btn-wide' data-type='homework'><i class="ion-ios-filing-outline"></i> To Do (<span>0</span>) <i class="pull-right ion-ios-arrow-forward"></i></a>
 				<div class="table-wrapper homework">
 					<table class="table table-homework">
 						<thead>
@@ -321,13 +321,44 @@
 								</tr>
 							</tbody>
 						</table>
-						<strong class="meeting-cost">
+						<strong class="meeting-cost" style="font-weight:200;">
 							<span class="mic">Meeting Investment Cost</span> 
 							<span class="hour">x hrs</span> x 
 							<span class="total-participant">x participants</span>=
 							<span class="total-hour">x hrs</span>
 						</strong>
-
+						
+						<div class="row" style="padding-top: 10px;">
+							<div class="col-md-6 col-xs-12" style="padding-top: 5px;">
+								<strong class="meeting-cost">
+									<span class="mic">Average Hourly Cost : </span> 
+								</strong>
+							</div>
+							<div class="col-md-4 col-xs-12">
+								<div class="input-group">
+									<input type="text" id="hourly-cost" onkeyup="HourlyCost(this);" class="form-control time-spent" placeholder="$" name="time_spent" min="0">
+									<div class="input-group-btn">
+										<button type="button" class="btn btn-default dropdown-toggle" id="cost_type_show" data-toggle="dropdown">Hours <span class="caret"></span></button>
+										<ul class="dropdown-menu dropdown-menu-right" id="cost_type">
+											<li><a href="#" onclick="changeCostType('Minutes')" data-type="minute">Minutes</a></li>
+											<li><a href="#" onclick="changeCostType('Hours')" data-type="hour">Hours</a></li>
+											<li><a href="#" onclick="changeCostType('Days')" data-type="day">Days</a></li>
+											<li><a href="#" onclick="changeCostType('Weeks')" data-type="week">Weeks</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row hidden" id="meetin-cost-block" style="padding-top: 25px;">
+							<div class="col-md-8 col-xs-12" style="padding-top: 5px;">
+								<strong class="meeting-cost">
+									<span class="mic">Total Cost for Each Meeting : </span> 
+								</strong>
+							</div>
+							<div class="col-md-4 col-xs-12" style="padding-top: 7px;">
+								<span id="meetin-cost"></span>
+							</div>
+						</div>
 						<div class="bigest-challenge" style="display: none">
 							<p>To help us, help your meeting improve, tell us:</p>
 							<h3 class="section">
@@ -526,7 +557,7 @@
 						</div>
 
 						<div class="pull-right">
-							<button class="an-btn an-btn-primary btn-create-goal">Create</button>
+							<button class="an-btn an-btn-primary btn-create-goal">Continue</button>
 						</div>
 
 						<div class="clear"></div>
@@ -590,7 +621,7 @@
 						</div>
 
 						<div class="pull-right">
-							<button class="an-btn an-btn-primary btn-create-todo">Create</button>
+							<button class="an-btn an-btn-primary btn-create-todo">Continue</button>
 						</div>
 
 						<div class="clear"></div>
@@ -635,7 +666,7 @@
 						</div>
 
 						<div class="pull-right">
-							<button class="an-btn an-btn-primary btn-create-agenda">Create</button>
+							<button class="an-btn an-btn-primary btn-create-agenda">Continue</button>
 						</div>
 
 						<div class="clear"></div>
@@ -643,12 +674,19 @@
 				</div> <!-- .define-agenda -->
 
 				<div class="define define-team" style="display: none">
+					<form id="create-project">
+					<h3 class="section no-margin-top">Create Your Project</h3>
+						<label for="agenda-name">Enter Project Name</label>
+						<input id="team-project-name" name="projectName" class="an-form-control" type="text" placeholder="Project Name">
+						<label for="agenda-name">Enter Project Code</label>
+						<input id="team-project-code" name="projectCode" class="an-form-control" type="text" placeholder="Project Code">
+					</form>
 					<h3 class="section no-margin-top">Confirm your guest [TEAM]</h3>
 					<p style="text-align: justify">
 						A meeting is only valuable if the right guests are 
 						invited to attend it and benefit. Your guests are your 
 						<strong class="primay">Team</strong>, and without them 
-						the meeting has no value, but inviteing unecessary guests 
+						the meeting has no value, but inviting unecessary guests 
 						to your team will increase the cost of the meeting.
 					</p>
 					<p>

@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed');
 
-class Organization_model extends BF_Model
+class Private_meeting_model extends BF_Model
 {
-	protected $table_name	= 'organizations';
-	protected $key			= 'organization_id';
+	protected $table_name	= 'private_meetings';
+	protected $key			= 'private_meeting_id';
 	protected $date_format	= 'datetime';
 
 	protected $log_user	= true;
@@ -11,21 +11,21 @@ class Organization_model extends BF_Model
 	protected $set_modified = true;
 	protected $soft_deletes	= false;
 
-	protected $created_field = 'created_on';
-	protected $created_by_field = 'created_by';
-	protected $modified_field = 'modified_on';
-	protected $modified_by_field = 'modified_by';
+	protected $created_field	 = 'created_on';
+	protected $modified_field	 = 'modified_on';
+	protected $created_by_field	 = 'created_by';
+	protected $modified_by_field	 = 'modified_by';
 
 	// Customize the operations of the model without recreating the insert,
 	// update, etc. methods by adding the method names to act as callbacks here.
 	protected $before_insert	= array();
-	protected $after_insert	= array();
+	protected $after_insert	    = array();
 	protected $before_update	= array();
-	protected $after_update	= array();
+	protected $after_update	    = array();
 	protected $before_find		= array();
 	protected $after_find		= array();
 	protected $before_delete	= array();
-	protected $after_delete	= array();
+	protected $after_delete	    = array();
 
 	// For performance reasons, you may require your model to NOT return the id
 	// of the last inserted row as it is a bit of a slow method. This is
@@ -43,21 +43,24 @@ class Organization_model extends BF_Model
 	// That way it is only required during inserts, not updates which may only
 	// be updating a portion of the data.
 	protected $validation_rules		= array(
-		'create_organization' => array(
-			array(
-				'field' => 'name',
-				'label' => 'lang:org_reg_name',
-				'rules' => 'trim|required|max_length[255]',
-			),
-			array(
-				'field' => 'url',
-				'label' => 'lang:org_reg_url',
-				'rules' => 'trim|required|max_length[255]|unique[organizations.url]',
-			)
+		array(
+			'field' => 'name',
+			'label' => 'lang:st_meeting_name',
+			'rules' => 'trim|required|max_length[255]',
+		),
+		array(
+			'field' => 'owner_id',
+			'label' => 'lang:st_project_id',
+			'rules' => 'trim|numeric',
+		),
+		array(
+			'field' => 'team',
+			'label' => 'lang:st_team_member',
+			'rules' => 'trim|required',
 		)
 	);
 	protected $insert_validation_rules  = array();
-	protected $skip_validation			= true;
+	protected $skip_validation	= false;
 
 	/**
 	 * Constructor
@@ -67,32 +70,5 @@ class Organization_model extends BF_Model
 	public function __construct()
 	{
 		parent::__construct();
-	}
-
-	public function get_user_organizations($user_id)
-	{
-		$query = $this->db->select('o.organization_id, o.name, o.url, o.icon, o.signup_mode')
-							->from('organizations o')
-							->join('user_to_organizations uo', 'o.organization_id = uo.organization_id')
-							->where('uo.user_id', $user_id)
-							->where('uo.enabled', 1)
-							->get();
-		if ($query->num_rows() > 0) {
-			return $query->result();
-		} else {
-			return [];
-		}
-	}
-	
-	public function get_all_organizations()
-	{
-		$query = $this->db->select('o.organization_id, o.name, o.url, o.icon, o.signup_mode')
-							->from('organizations o')
-							->get();
-		if ($query->num_rows() > 0) {
-			return $query->result();
-		} else {
-			return [];
-		}
 	}
 }

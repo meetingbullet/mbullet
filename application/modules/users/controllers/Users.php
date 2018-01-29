@@ -542,6 +542,84 @@ class Users extends Front_Controller
 		if ($this->auth->is_logged_in() === true) {
 			redirect(DEFAULT_LOGIN_LOCATION);
 		}
+		
+		require_once APPPATH . 'modules/users/libraries/google-api-client/vendor/autoload.php';
+		$client_id = $this->config->item('client_id');
+		$client_secret = $this->config->item('client_secret');
+		$redirect_uri = (is_https() ? 'https://' : 'http://') . $this->domain->get_main_domain() . '/login';
+
+		$client = new Google_Client();
+		$client->setAccessType("offline");
+		$client->setClientId($client_id);
+		$client->setClientSecret($client_secret);
+		$client->setRedirectUri($redirect_uri);
+		//$client->setIncludeGrantedScopes(true);
+		$client->addScope(Google_Service_Calendar::CALENDAR);
+		$client->addScope("email");
+		$client->addScope("profile");
+
+		// signin by google url
+		Template::set('auth_url', $client->createAuthUrl());
+		
+		if (isset($_GET['code']) && isset($_GET['timezone'])) {
+			// merge user & add user to db
+			$service = new Google_Service_Oauth2($client);
+			try {
+				$ret = $client->authenticate($_GET['code']);
+				if (isset($ret) && ($ret['error'])) {
+					throw new Exception(lang('us_login_google_code_error'));
+				}
+				$token = $client->getAccessToken();
+				$google_user = $service->userinfo->get();
+
+				$user = $this->user_model->find_by('google_id', $google_user->id);
+				$user || $user = $this->user_model->find_by('email', $google_user->email);
+
+				if (! $user) {
+					// add google user to db
+					$added = $this->user_model->insert([
+						'email' => $google_user->email,
+						'google_id' => $google_user->id,
+						'google_refresh_token' => $token['refresh_token'],
+						'google_id_token' => $token['id_token'],
+						'first_name' => $google_user->given_name,
+						'last_name' => $google_user->family_name,
+						'avatar' => $google_user->picture,
+						'active' => 1,
+						'timezone' => $this->input->get('timezone')
+					]);
+
+					if (! $added) {
+						throw new Exception(lang('us_failed_login_attempts'));
+					}
+				} else {
+					$update_data = [
+						'email' => $google_user->email,
+						'google_id' => $google_user->id,
+						'google_id_token' => $token['id_token'],
+						'first_name' => $google_user->given_name,
+						'last_name' => $google_user->family_name,
+						'avatar' => $google_user->picture,
+						'active' => 1,
+						'timezone' => $this->input->get('timezone'),
+						'is_temporary' => 0 // in case that the existed user is temporary
+					];
+
+					if (! empty($token['refresh_token'])) {
+						$update_data['google_refresh_token'] = $token['refresh_token'];
+					}
+					// merge user if email exist
+					$updated = $this->user_model->update($user->user_id, $update_data);
+
+					if (! $updated) {
+						throw new Exception(lang('us_failed_login_attempts'));
+					}
+				}
+			} catch (Exception $e) {
+				$google_login_error = true;
+				Template::set_message($e->getMessage(), 'danger');
+			}
+		}
 
 		if ($this->input->post()) {
 			$rules = $this->user_model->get_validation_rules();
@@ -583,95 +661,200 @@ class Users extends Front_Controller
 			redirect('/');
 		}
 
-		if ($this->auth->is_logged_in() === true) {
+		/* if ($this->auth->is_logged_in() === true) {
 			redirect(DEFAULT_LOGIN_LOCATION);
-		}
+		} */
 
 		$upload_config = $this->config->load('upload');
 		$this->load->library('upload', $upload_config);
-
+		
+		$organization = $this->db->select('o.organization_id,o.name')
+											->from('organizations o')
+											->get()->result_array();
 		if ($this->input->post()) {
-			$rules = $this->user_model->get_validation_rules();
-			// custom error message for confirm terms
-			$rules['create_profile'][1]['errors']['required'] = lang('form_validation_confirm_required');
-			$rules['create_profile'][0]['rules'][] = [
-				'unique_email',
-				function($email) {
-					$is_unique = $this->user_model->unique_email($email);
-					if (! $is_unique) {
-						$this->form_validation->set_message('unique_email', lang('us_reg_existed_email'));
-					}
-
-					return $is_unique;
-				}
-			];
-			$this->form_validation->set_rules($rules['create_profile']);
-
-			if ($this->form_validation->run() !== false) {
+			$user = $this->user_model->find_by('email', $this->input->post('email'));
+			if($user){				
 				$post_avatar = $this->input->post('avatar');
-				$avatar = NULL;
+				$avatar = $user->avatar;
 
 				if ($post_avatar['size'] > 0) {
 					$this->upload->do_upload('avatar');
-					$avatar = $this->upload->data();
+					$file_info = $this->upload->data();
+					$avatar =  $file_info;
 				}
-
 				$password = $this->auth->hash_password($this->input->post('password'));
 				if (empty($password) || empty($password['hash'])) {
 					Template::set_message(lang('us_register_failed'), 'danger');
 					@unlink($upload_config['upload_path'] . $data['avatar']);
 				} else {
+					$organization = $this->db->select('o.organization_id,o.name')
+											->from('organizations o')
+											->where('o.organization_id',$this->input->post('organization_id'))
+											->get()->row();
+											
 					$data = [
-						'avatar' => $avatar['file_name'],
+						'avatar' => $avatar,
 						'first_name' => $this->input->post('first_name'),
 						'last_name' => $this->input->post('last_name'),
 						'email' => $this->input->post('email'),
 						'skype' => $this->input->post('skype'),
 						'password_hash' => $password['hash'],
-						'organization' => $this->input->post('org')
+						'organization' => $organization->name
 					];
-
+					
+					$this->load->model('roles/role_model');
+					$owner_role = $this->role_model->select('role_id')->where('system_default', 0)->where('join_default', 0)->find_by('is_public', 1);
+					$user_role_added = $this->db->insert('user_to_organizations', [
+							'user_id' => $user->user_id,
+							'organization_id' => $organization->organization_id,
+							'role_id' => $owner_role->role_id,
+						]);
+					if (! $user_role_added) {
+						logit('line 67: unable to set this user to be organization owner.');
+						throw new Exception(lang('org_error_position_2'));
+					}
+					
+					
 					if (! empty($this->input->post('timezone'))) {
 						$data['timezone'] = $this->input->post('timezone');
 					}
+					// merge user if email exist
+					$updated = $this->user_model->update($user->user_id, $data);
 
-					$temp_user = $this->user_model->select('user_id')->where('is_temporary', 1)->find_by('email', $data['email']);
-					if ($temp_user) {
-						$data['is_temporary'] = 0;
-						$added = $this->user_model->update($temp_user->user_id, $data);
-					} else {
-						$added = $this->user_model->insert($data);
+					if (! $updated) {
+						throw new Exception(lang('us_failed_login_attempts'));
+					}
+					if ($this->auth->is_logged_in() === true) {
+						redirect(DEFAULT_LOGIN_LOCATION);
+					}else{
+						if ((true === $this->auth->login(
+								$this->input->post('login'),
+								$this->input->post('password'),
+								$this->input->post('remember_me') == '1'
+							)) || (true === $this->auth->login(
+								$user->email,
+								null,
+								true,
+								true,
+								$user->google_id_token
+							))
+						) {
+							
+							redirect(DEFAULT_LOGIN_LOCATION);
+						}
+					}
+				}
+			}else{
+			
+				$rules = $this->user_model->get_validation_rules();
+				
+				// custom error message for confirm terms
+				$rules['create_profile'][1]['errors']['required'] = lang('form_validation_confirm_required');
+				$rules['create_profile'][0]['rules'][] = [
+					'unique_email',
+					function($email) {
+						$is_unique = $this->user_model->unique_email($email);
+						if (! $is_unique) {
+							$this->form_validation->set_message('unique_email', lang('us_reg_existed_email'));
+						}
+
+						return $is_unique;
+					}
+				];
+				$this->form_validation->set_rules($rules['create_profile']);
+
+				if ($this->form_validation->run() !== false) {
+					$post_avatar = $this->input->post('avatar');
+					$avatar = NULL;
+
+					if ($post_avatar['size'] > 0) {
+						$this->upload->do_upload('avatar');
+						$avatar = $this->upload->data();
 					}
 
-					if (! $added) {
+					$password = $this->auth->hash_password($this->input->post('password'));
+					if (empty($password) || empty($password['hash'])) {
 						Template::set_message(lang('us_register_failed'), 'danger');
 						@unlink($upload_config['upload_path'] . $data['avatar']);
 					} else {
-						if ($temp_user) {
-							$user_id = $temp_user->user_id;
-						} else {
-							$user_id = $added;
+						$organization = $this->db->select('o.organization_id,o.name')
+												->from('organizations o')
+												->where('o.organization_id',$this->input->post('organization_id'))
+												->get()->row();
+						$data = [
+							'avatar' => $avatar['file_name'],
+							'first_name' => $this->input->post('first_name'),
+							'last_name' => $this->input->post('last_name'),
+							'email' => $this->input->post('email'),
+							'skype' => $this->input->post('skype'),
+							'password_hash' => $password['hash'],
+							'organization' => $organization->name
+						];
+						
+						
+						if (! empty($this->input->post('timezone'))) {
+							$data['timezone'] = $this->input->post('timezone');
 						}
-						$activation = $this->user_model->set_activation($user_id);
 
-						$message = $activation['message'];
-						$error = $activation['error'];
+						$temp_user = $this->user_model->select('user_id')->where('is_temporary', 1)->find_by('email', $data['email']);
+						if ($temp_user) {
+							$data['is_temporary'] = 0;
+							$added = $this->user_model->update($temp_user->user_id, $data);
+						} else {
+							$added = $this->user_model->insert($data);
+						}
 
-						log_activity($user_id, lang('us_log_register'), 'users');
-						Template::set_message($message, $error === true ? 'danger' : 'success');
-						redirect(LOGIN_URL);
+						if (! $added) {
+							Template::set_message(lang('us_register_failed'), 'danger');
+							@unlink($upload_config['upload_path'] . $data['avatar']);
+						} else {
+							if ($temp_user) {
+								$user_id = $temp_user->user_id;
+							} else {
+								$user_id = $added;
+							}
+							$this->load->model('roles/role_model');
+							$owner_role = $this->role_model->select('role_id')->where('system_default', 0)->where('join_default', 0)->find_by('is_public', 1);
+							$user_role_added = $this->db->insert('user_to_organizations', [
+									'user_id' => $user_id,
+									'organization_id' => $organization->organization_id,
+									'role_id' => $owner_role->role_id,
+								]);
+							if (! $user_role_added) {
+								logit('line 67: unable to set this user to be organization owner.');
+								throw new Exception(lang('org_error_position_2'));
+							}
+							
+							$activation = $this->user_model->set_activation($user_id);
+
+							$message = $activation['message'];
+							$error = $activation['error'];
+
+							log_activity($user_id, lang('us_log_register'), 'users');
+							Template::set_message($message, $error === true ? 'danger' : 'success');
+							redirect(LOGIN_URL);
+						}
 					}
+				} else {
+					if (form_error('email') != '') {
+						Template::set_message(form_error('email'), 'danger');
+						redirect(REGISTER_URL);
+						// Template::redirect('/users/create_profile?email=' . $this->input->post('email'));
+					}
+					Template::set_message(validation_errors(), 'danger');
 				}
-			} else {
-				if (form_error('email') != '') {
-					Template::set_message(form_error('email'), 'danger');
-					redirect(REGISTER_URL);
-					// Template::redirect('/users/create_profile?email=' . $this->input->post('email'));
-				}
-				Template::set_message(validation_errors(), 'danger');
 			}
 		}
-
+		if (! isset($this->current_user)) {
+			if (! class_exists('Auth')) {
+				$this->load->library('users/Auth');
+			}
+			$_POST = (array)$this->auth->user();
+		} else {
+			$_POST = (array)$this->current_user;
+		}
+		//Template::set('current_user', $current_user);
+		Template::set('organizations', $organization);
 		Assets::add_js($this->load->view('create_profile_js', [], true), 'inline');
 		Template::render('account');
 	}
@@ -1149,7 +1332,11 @@ class Users extends Front_Controller
 			if (! empty($user_organization)) {
 				redirect(DEFAULT_LOGIN_LOCATION); // organization url
 			} else {
-				redirect('/organization/create');
+				if(empty($current_user->role_ids)){
+					redirect('/users/create_profile');
+				}else{
+					redirect('/login');
+				}
 			}
 		} else {
 			// if it is not a public domain name, check if it is in existed organization
@@ -1195,7 +1382,8 @@ class Users extends Front_Controller
 
 				redirect(DEFAULT_LOGIN_LOCATION);
 			} else {
-				redirect('/organization/create');
+				//redirect('/login');
+				redirect('/login');
 			}
 		}
 	}

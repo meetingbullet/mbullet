@@ -28,12 +28,18 @@
 					<i class="ion-checkmark"></i>
 				<?php endif ?>
 				</td>
-				<td><?php echo (count($meeting['members']) + 1) ?></td>
+				<td><?php echo (count($meeting['members'])) ?></td>
 				<td>
 					<select class="an-form-control">
-						<option value="">Unspecified Project </option>
+						<?php if(!empty($created_project)):?>
+							<option value="<?php echo $created_project->project_id ?>" <?php if (! empty($meeting['project_id']) && $meeting['project_id'] == $created_project->project_id) echo 'selected' ?>><?php echo $created_project->name ?></option>
+						<?php else:?>
+							<option value="">Unspecified Project </option>
+						<?php endif;?>
 						<?php foreach ($projects as $project) : ?>
-						<option value="<?php echo $project->project_id ?>" <?php if (! empty($meeting['project_id']) && $meeting['project_id'] == $project->project_id) echo 'selected' ?>><?php echo $project->name ?></option>
+							<?php if($project->project_id != $created_project->project_id):?>
+								<option value="<?php echo $project->project_id ?>" <?php if (! empty($meeting['project_id']) && $meeting['project_id'] == $project->project_id) echo 'selected' ?>><?php echo $project->name ?></option>
+							<?php endif;?>
 						<?php endforeach ?>
 					</select>
 				</td>

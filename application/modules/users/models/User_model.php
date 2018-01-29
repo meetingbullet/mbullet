@@ -88,6 +88,11 @@ class User_model extends BF_Model
 				'rules' => 'trim',
 			),
 			array(
+				'field' => 'organization_id',
+				'label' => 'lang:us_reg_org',
+				'rules' => 'trim|required',
+			),
+			array(
 				'field' => 'google_id_token',
 				'label' => 'lang:us_reg_google_id_token',
 				'rules' => 'trim|max_length[2048]',
@@ -179,13 +184,16 @@ class User_model extends BF_Model
 		return $this->find_all();
 	}
 
-	public function get_organization_members($organization_id, $project_id = null)
+	public function get_organization_members($organization_id, $project_id = null,$own_user_id = false)
 	{
 		$cost_of_time_name_query_str = ', ';
 
-		$this->select('uto.user_id, email, first_name, last_name, avatar, cost_of_time')
-				->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $organization_id);
-
+		$this->select('uto.user_id, email, first_name, last_name, avatar, cost_of_time');
+		if($own_user_id){
+			$this->where(['users.user_id !='=>$own_user_id]);
+		}
+		$this->join('user_to_organizations uto', 'users.user_id = uto.user_id AND enabled = 1 AND organization_id = ' . $organization_id);
+		
 		if (is_numeric($project_id)) {
 			$this->select('IF(
 								uto.cost_of_time = 1, 

@@ -51,7 +51,7 @@ class Meeting_member_model extends BF_Model
 		parent::__construct();
 	}
 
-	public function get_meeting_member($meeting_id)
+	public function get_meeting_member($meeting_id,$own_user_id = false)
 	{
 		$query = $this->select('uto.user_id, email, first_name, last_name, avatar, cost_of_time, 
 							CONCAT(first_name, " ", last_name) AS full_name,
@@ -71,18 +71,20 @@ class Meeting_member_model extends BF_Model
 										)
 									)
 								)
-							) AS cost_of_time_name', false)
-							->join('users u', 'meeting_members.user_id = u.user_id')
-							->join('meetings s', 'meeting_members.meeting_id = s.meeting_id')
-							->join('actions a', 's.action_id = a.action_id')
-							->join('projects p', 'p.project_id = a.project_id')
-							->join('user_to_organizations uto', 'u.user_id = uto.user_id AND enabled = 1 AND uto.organization_id = ' . $this->auth->user()->current_organization_id)
-							->where('meeting_members.meeting_id', $meeting_id)
-							->order_by('full_name')
-							->order_by('uto.cost_of_time', 'DESC')
-							->as_array()
-							->find_all();
+							) AS cost_of_time_name', false);
+							if($own_user_id){
+								$this->where(['u.user_id != '=>$own_user_id]);
+							}
+							$this->join('users u', 'meeting_members.user_id = u.user_id');
+							$this->join('meetings s', 'meeting_members.meeting_id = s.meeting_id');
+							$this->join('actions a', 's.action_id = a.action_id');
+							$this->join('projects p', 'p.project_id = a.project_id');
+							$this->join('user_to_organizations uto', 'u.user_id = uto.user_id AND enabled = 1 AND uto.organization_id = ' . $this->auth->user()->current_organization_id);
+							$this->where('meeting_members.meeting_id', $meeting_id);
+							$this->order_by('full_name');
+							$this->order_by('uto.cost_of_time', 'DESC');
+							$this->as_array();
 
-		return $query ? $query : [];
+		return $this->find_all();
 	}
 }
